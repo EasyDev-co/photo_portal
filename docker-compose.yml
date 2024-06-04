@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    build: ./nginx
+    container_name: ${PROJECT_SLUG}_nginx
+    volumes:
+      - static_dir:/opt/backend/static/
+      - media_dir:/opt/backend/media/
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    networks:
+      - nginx_network
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+    container_name: ${PROJECT_SLUG}_app
+    working_dir: /opt/backend
+    volumes:
+      - static_dir:/opt/backend/static/
+      - media_dir:/opt/backend/media/
+      - ./backend:/opt/backend:rw
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - nginx_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    container_name: ${PROJECT_SLUG}_frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      nginx_network:
+
+  db:
+    image: postgres:latest
+    container_name: ${PROJECT_SLUG}_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - nginx_network
+
+
+volumes:
+  static_dir:
+  media_dir:
+  pgdata:
+
+networks:
+  nginx_network:
