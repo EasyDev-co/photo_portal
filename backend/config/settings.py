@@ -26,6 +26,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+
+    # Приложения
+    'apps.kindergarten',
 ]
 
 MIDDLEWARE = [
