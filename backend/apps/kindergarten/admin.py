@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from apps.kindergarten.models.region import Region
 from apps.kindergarten.models.kindergarten import Kindergarten
@@ -11,12 +12,15 @@ class KindergartenAdmin(admin.ModelAdmin):
         'region',
         'name',
         'code',
-        'qr_code',
         'has_photobook'
     )
     list_filter = ('region',)
     search_fields = ('name', 'code')
-    readonly_fields = ('qr_code',)
+    readonly_fields = ('image_tag', 'qr_code')
+
+    def image_tag(self, obj):
+        if obj.qr_code:
+            return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
 
 
 @admin.register(Region)
