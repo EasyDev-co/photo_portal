@@ -1,7 +1,7 @@
 from django.db import models
 
 from apps.utils.models_mixins.models_mixins import UUIDMixin
-from .region import Region
+from apps.kindergarten.models.region import Region
 
 
 class PhotoType(models.TextChoices):

@@ -1,7 +1,11 @@
+from io import BytesIO
+
+from django.core.files.base import ContentFile
 from django.db import models
 
-from .region import Region
 from apps.utils.models_mixins.models_mixins import UUIDMixin
+from apps.kindergarten.models.region import Region
+from apps.kindergarten.services import generate_qr_code
 
 
 class Kindergarten(UUIDMixin):
@@ -38,3 +42,14 @@ class Kindergarten(UUIDMixin):
     class Meta:
         verbose_name = 'Детский сад'
         verbose_name_plural = 'Детские сады'
+
+    def save(self, *args, **kwargs):
+        if not self.qr_code:
+            qr_code = generate_qr_code(self.code)
+
+            buffer = BytesIO()
+            qr_code.save(buffer, format='PNG')
+            buffer.seek(0)
+
+            self.qr_code.save(f'{self.code}_qr.png', ContentFile(buffer.read()))
+        super().save(*args, **kwargs)
