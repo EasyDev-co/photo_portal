@@ -4,16 +4,16 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin
 from apps.kindergarten.models.region import Region
 
 
-class PhotoType(models.TextChoices):
+class PhotoType(models.IntegerChoices):
     """
     Типы печатной продукции для фотографий.
     """
-    small_photo = '10x15', '10x15'
-    medium_photo = '15x20', '15x20'
-    large_photo = '20x30', '20x30'
-    magnet = 'Магнит', 'Магнит'
-    calendar = 'Календарь', 'Календарь'
-    photobook = 'Фотокнига', 'Фотокнига'
+    small_photo = 1, '10x15'
+    medium_photo = 2, '15x20'
+    large_photo = 3, '20x30'
+    magnet = 4, 'Магнит'
+    calendar = 5, 'Календарь'
+    photobook = 6, 'Фотокнига'
 
 
 class PhotoPrice(UUIDMixin):
@@ -29,8 +29,7 @@ class PhotoPrice(UUIDMixin):
         related_name='photo_prices',
         verbose_name='Регион'
     )
-    photo_type = models.CharField(
-        max_length=10,
+    photo_type = models.PositiveSmallIntegerField(
         choices=PhotoType.choices,
         default=PhotoType.small_photo,
         verbose_name='Тип фотографии'
