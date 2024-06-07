@@ -6,6 +6,17 @@ from apps.kindergarten.models.kindergarten import Kindergarten
 from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
 
 
+class KindergartenInline(admin.TabularInline):
+    model = Kindergarten
+    extra = 0
+    fields = ('name', 'code', 'has_photobook')
+
+
+class PhotoPriceInline(admin.TabularInline):
+    model = PhotoPrice
+    extra = 0
+
+
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
     list_display = (
@@ -16,9 +27,10 @@ class KindergartenAdmin(admin.ModelAdmin):
     )
     list_filter = ('region',)
     search_fields = ('name', 'code')
-    readonly_fields = ('image_tag', 'qr_code')
+    readonly_fields = ('qr_image', 'qr_code')
+    raw_id_fields = ('region',)
 
-    def image_tag(self, obj):
+    def qr_image(self, obj):
         if obj.qr_code:
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
 
@@ -26,8 +38,13 @@ class KindergartenAdmin(admin.ModelAdmin):
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
     list_display = ('name', 'ransom_amount')
+    inlines = [
+        KindergartenInline,
+        PhotoPriceInline
+    ]
 
 
 @admin.register(PhotoPrice)
 class PhotoPriceAdmin(admin.ModelAdmin):
     list_display = ('price', 'photo_type', 'region')
+    raw_id_fields = ('region',)
