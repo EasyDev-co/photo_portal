@@ -34,6 +34,23 @@ class KindergartenAdmin(admin.ModelAdmin):
         if obj.qr_code:
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
 
+    def get_fields(self, request, obj=None):
+        if obj:
+            return (
+                'region',
+                'name',
+                'code',
+                'has_photobook',
+                'qr_image',
+                'qr_code'
+            )
+        return (
+            'region',
+            'name',
+            'code',
+            'has_photobook'
+        )
+
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
