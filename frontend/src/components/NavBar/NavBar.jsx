@@ -85,14 +85,18 @@ export const NavBar = ({ onClose }) => {
           />
         </ul>
         <ul className="nav-bar__social-list">
-          <SocialItem href="vk.com" icon={vkIcon} alt="иконка вконтакте" />
           <SocialItem
-            href="whatsapp.com"
+            href="https://vk.com"
+            icon={vkIcon}
+            alt="иконка вконтакте"
+          />
+          <SocialItem
+            href="https://whatsapp.com"
             icon={whatsAppIcon}
             alt="иконка WhatsApp"
           />
           <SocialItem
-            href="telegram.org"
+            href="https://telegram.org"
             icon={telegramIcon}
             alt="иконка telegram"
           />

@@ -1,11 +1,14 @@
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "../Header/Header";
 import { SideBar } from "../SideBar/SideBar";
+import { Orders } from "../Orders/Orders";
 import { useState, useEffect } from "react";
 
 export const App = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -18,17 +21,25 @@ export const App = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    // Перенаправляем на "/orders" при входе на сайт
+    if (location.pathname === "/") {
+      navigate("/orders");
+    }
+  }, [location.pathname, navigate]);
+
   return (
     <div className="body">
       <div className="page">
         <Routes>
           <>
             <Route
-              path={"/"}
+              path={"/orders"}
               element={
                 <>
                   <Header />
                   {isSidebarVisible > 768 && <SideBar />}
+                  <Orders />
                 </>
               }
             />
