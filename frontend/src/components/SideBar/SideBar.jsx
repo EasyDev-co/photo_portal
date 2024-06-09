@@ -10,7 +10,7 @@ export const SideBar = () => {
         <nav className="side-bar__nav">
           <ul className="side-bar__nav-list">
             <SideBarItem
-              router="/"
+              router="/orders"
               svgWidth="25"
               svgHeight="24"
               svgViewBox="0 0 25 24"
@@ -23,7 +23,7 @@ export const SideBar = () => {
               svgStrokeLinecap="round"
             />
             <SideBarItem
-              router="/photoshoot"
+              router="/gallery"
               svgWidth="25"
               svgHeight="24"
               svgViewBox="0 0 25 24"

@@ -48,13 +48,13 @@ export const NavBar = ({ onClose }) => {
         </ul>
         <ul className="nav-bar__nav-list">
           <NavBarItem
-            router="/order"
+            router="/orders"
             icon={bagIcon}
             alt="иконка корзины"
             text="Заказы"
           />
           <NavBarItem
-            router="/photoshoot"
+            router="/gallery"
             icon={imageIcon}
             alt="иконка картинки"
             text="Галерея"
