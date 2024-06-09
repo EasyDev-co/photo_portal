@@ -52,36 +52,42 @@ export const NavBar = ({ onClose }) => {
             icon={bagIcon}
             alt="иконка корзины"
             text="Заказы"
+            onClick={onClose}
           />
           <NavBarItem
             router="/gallery"
             icon={imageIcon}
             alt="иконка картинки"
             text="Галерея"
+            onClick={onClose}
           />
           <NavBarItem
             router="/profile"
             icon={profileIcon}
             alt="иконка профиля"
             text="Личный кабинет"
+            onClick={onClose}
           />
           <NavBarItem
             router="/about-us"
             icon={infoIcon}
             alt="иконка инфо"
             text="О нас"
+            onClick={onClose}
           />
           <NavBarItem
             router="/rules"
             icon={rulesIcon}
             alt="иконка правил"
             text="Правила"
+            onClick={onClose}
           />
           <NavBarItem
             router="/sign-in"
             icon={exitIcon}
             alt="иконка выхода"
             text="Выход"
+            onClick={onClose}
           />
         </ul>
         <ul className="nav-bar__social-list">

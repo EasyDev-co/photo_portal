@@ -1,5 +1,9 @@
 import "./NotFound.css";
 
 export const NotFound = () => {
-  return <></>;
+  return (
+    <>
+      <p>404</p>
+    </>
+  );
 };
