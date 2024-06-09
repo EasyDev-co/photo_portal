@@ -1,0 +1,14 @@
+.nav-bar-item {
+}
+
+.nav-bar-item__link {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-bar-item__text {
+  color: #090909;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+}

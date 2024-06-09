@@ -1,0 +1,23 @@
+.burger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: transparent;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.burger-line {
+  width: 16px;
+  height: 0px;
+  border: 1.5px solid #6e6e6e;
+  border-radius: 2px;
+}
+
+.burger-line:nth-of-type(1) {
+  width: 8px;
+}
+
+.burger-line:nth-of-type(3) {
+  width: 12px;
+}

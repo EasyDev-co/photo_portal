@@ -1,0 +1,53 @@
+@font-face {
+  font-family: "NunitoSans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./NunitoSans-Regular.woff2") format("woff2"),
+    url("./NunitoSans-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NunitoSans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./NunitoSans-SemiBold.woff2") format("woff2"),
+    url("./NunitoSans-SemiBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NunitoSansItalic";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./NunitoSans-SemiBoldItalic.woff2") format("woff2"),
+    url("./NunitoSans-SemiBoldItalic.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NunitoSans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./NunitoSans-Bold.woff2") format("woff2"),
+    url("./NunitoSans-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./Nunito-Bold.woff2") format("woff2"),
+    url("./Nunito-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./Inter-Bold.woff2") format("woff2"),
+    url("./Inter-Bold.woff") format("woff");
+}
