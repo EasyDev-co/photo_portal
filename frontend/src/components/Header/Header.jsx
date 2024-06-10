@@ -27,9 +27,21 @@ export const Header = () => {
     }
   }, [windowWidth]);
 
+  // Предотвращение прокрутки страницы при открытом навбаре
+  useEffect(() => {
+    if (navBarState) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [navBarState]);
+
   return (
     <>
-      <header className="header" id="header">
+      <header
+        className={`header ${navBarState ? "header__open-menu" : ""}`}
+        id="header"
+      >
         <div className="header__container">
           <div className="header__left-block">
             <img className="header__logo" src={logo} alt="логотип" />

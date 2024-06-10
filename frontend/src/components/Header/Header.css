@@ -49,6 +49,12 @@
     border-bottom: none;
   }
 
+  .header__open-menu {
+    height: 100%;
+    position: fixed;
+    overflow-y: auto;
+  }
+
   .nav-bar__close-button {
     width: 19.2px;
     height: 19.2px;
