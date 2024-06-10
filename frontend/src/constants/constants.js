@@ -8,6 +8,9 @@ import exitIcon from "../assets/images/SideBarIcons/exit.svg";
 import vkIcon from "../assets/images/socials/vk.svg";
 import whatsAppIcon from "../assets/images/socials/WhatsApp.svg";
 import telegramIcon from "../assets/images/socials/telegram.svg";
+import aboutUsFirst from "../assets/images/AboutUsPhotos/PhotoG.jpg";
+import aboutUsSecond from "../assets/images/AboutUsPhotos/PhotoM.jpg";
+import quotesIcon from "../assets/images/quotes.svg";
 
 const userInfo = {
   surname: "Иванова",
@@ -42,6 +45,23 @@ const rulesItems = [
   },
 ];
 
+const aboutUsItems = [
+  {
+    photo: aboutUsFirst,
+    text: "С 2016 года мы радуем наших клиентов качественными фотографиями, которые остаются яркими и красочными на протяжении десятилетий. Мы гордимся тем, что наши работы становятся настоящими семейными ценностями и передают тепло и радость поколениям.",
+    icon: quotesIcon,
+    iconAlt: "кавычки",
+    infoAltPhoto: "фото ребёнка",
+  },
+  {
+    photo: aboutUsSecond,
+    text: "Наша компания - это не просто фотостудия, мы создаем настоящие волшебные моменты, которые останутся в памяти на долгие годы. Мы делаем вклад в сохранение памяти о детстве, захватывая его яркими и неповторимыми образами.",
+    icon: quotesIcon,
+    iconAlt: "кавычки",
+    infoAltPhoto: "фото ребёнка",
+  },
+];
+
 export {
   logo,
   bagIcon,
@@ -55,4 +75,5 @@ export {
   telegramIcon,
   userInfo,
   rulesItems,
+  aboutUsItems,
 };

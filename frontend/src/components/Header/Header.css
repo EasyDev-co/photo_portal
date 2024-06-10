@@ -53,6 +53,7 @@
     height: 100%;
     position: fixed;
     overflow-y: auto;
+    z-index: 999;
   }
 
   .nav-bar__close-button {
