@@ -5,6 +5,9 @@ from apps.user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели пользователя.
+    """
     password = serializers.CharField(
         write_only=True,
         required=True,
