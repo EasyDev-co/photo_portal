@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
@@ -32,15 +33,16 @@ class ParentRegisterAPIView(CreateAPIView):
         except Kindergarten.DoesNotExist:
             raise ValidationError({'message': "Такого детского сада не существует."})
 
-        user = User.objects.create_user(
-            password=password,
-            **validated_data
-        )
+        with transaction.atomic():
+            user = User.objects.create_user(
+                password=password,
+                **validated_data
+            )
 
-        parent = Parent.objects.create(user=user)
-        parent.kindergarten.add(kindergarten)
-        user.role = UserRole.parent
-        user.save()
+            parent = Parent.objects.create(user=user)
+            parent.kindergarten.add(kindergarten)
+            user.role = UserRole.parent
+            user.save()
 
         return user
 
