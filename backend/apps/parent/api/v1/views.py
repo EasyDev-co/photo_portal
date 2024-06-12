@@ -11,6 +11,7 @@ from apps.parent.api.v1.serializers import ParentTokenObtainPairSerializer
 from apps.parent.models.parent import Parent
 from apps.user.api.v1.serializers import UserSerializer
 from apps.user.models import User
+from apps.user.models.user import UserRole
 
 
 class ParentRegisterAPIView(CreateAPIView):
@@ -38,7 +39,7 @@ class ParentRegisterAPIView(CreateAPIView):
 
         parent = Parent.objects.create(user=user)
         parent.kindergarten.add(kindergarten)
-        user.role = 'parent'
+        user.role = UserRole.parent
         user.save()
 
         return user

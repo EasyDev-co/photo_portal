@@ -4,18 +4,36 @@ from django.db import models
 from apps.user.managers import UserManager
 
 
-class User(AbstractUser):
-    ROLE = (
-        ('parent', 'Родитель'),
-    )
+class UserRole(models.IntegerChoices):
+    """
+    Роли пользователей.
+    """
+    parent = 1, 'Родитель'
+    manager = 2, 'Заведующий'
 
+
+class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=255, verbose_name='Имя')
-    second_name = models.CharField(max_length=255, verbose_name='Отчество', blank=True)
-    last_name = models.CharField(max_length=255, verbose_name='Фамилия')
+    first_name = models.CharField(
+        max_length=255,
+        verbose_name='Имя'
+    )
+    second_name = models.CharField(
+        max_length=255,
+        verbose_name='Отчество',
+        blank=True
+    )
+    last_name = models.CharField(
+        max_length=255,
+        verbose_name='Фамилия'
+    )
 
-    role = models.CharField(max_length=7, choices=ROLE, default='parent')
+    role = models.PositiveSmallIntegerField(
+        choices=UserRole.choices,
+        default=UserRole.parent,
+        verbose_name='Роль'
+    )
 
     objects = UserManager()
 

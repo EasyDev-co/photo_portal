@@ -7,8 +7,17 @@ from apps.user.models import User
 
 
 class Parent(UUIDMixin):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='parent', verbose_name='Пользователь')
-    kindergarten = models.ManyToManyField(Kindergarten, related_name='parents', verbose_name='Детский сад')
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='parent',
+        verbose_name='Пользователь'
+    )
+    kindergarten = models.ManyToManyField(
+        Kindergarten,
+        related_name='parents',
+        verbose_name='Детский сад'
+    )
 
     def __str__(self):
         return f'Родитель {self.user}'
