@@ -1,5 +1,4 @@
 from django.db import transaction
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -7,6 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework import status
 
+from apps.exceptions.api_exceptions import (MissingKindergartenCode,
+                                            KindergartenCodeNotFound)
 from apps.kindergarten.models import Kindergarten
 from apps.parent.api.v1.serializers import ParentTokenObtainPairSerializer
 from apps.parent.models.parent import Parent
@@ -27,11 +28,11 @@ class ParentRegisterAPIView(CreateAPIView):
         kindergarten_code: str = validated_data.pop('kindergarten_code', None)
 
         if not kindergarten_code:
-            raise ValidationError({'message': "Код детского сада не указан."})
+            raise MissingKindergartenCode
         try:
             kindergarten = Kindergarten.objects.get(code=kindergarten_code)
         except Kindergarten.DoesNotExist:
-            raise ValidationError({'message': "Такого детского сада не существует."})
+            raise KindergartenCodeNotFound
 
         with transaction.atomic():
             user = User.objects.create_user(
@@ -58,6 +59,7 @@ class ParentLogoutAPIView(APIView):
     """
     View для логаута пользователя.
     """
+
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
