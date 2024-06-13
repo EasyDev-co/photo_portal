@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -26,9 +25,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
 
     # Приложения
     'apps.kindergarten',
+    'apps.user',
+    'apps.parent',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +74,6 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', 5432),
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -124,3 +125,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 REGISTRATION_URL_FOR_PARENT = os.environ.get('REGISTRATION_URL_FOR_PARENT')
+
+AUTH_USER_MODEL = 'user.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}

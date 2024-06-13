@@ -90,6 +90,30 @@ django = ">=3.0"
 pytz = "*"
 
 [[package]]
+name = "djangorestframework-simplejwt"
+version = "5.3.1"
+description = "A minimal JSON Web Token authentication plugin for Django REST Framework"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "djangorestframework_simplejwt-5.3.1-py3-none-any.whl", hash = "sha256:381bc966aa46913905629d472cd72ad45faa265509764e20ffd440164c88d220"},
+    {file = "djangorestframework_simplejwt-5.3.1.tar.gz", hash = "sha256:6c4bd37537440bc439564ebf7d6085e74c5411485197073f508ebdfa34bc9fae"},
+]
+
+[package.dependencies]
+django = ">=3.2"
+djangorestframework = ">=3.12"
+pyjwt = ">=1.7.1,<3"
+
+[package.extras]
+crypto = ["cryptography (>=3.3.1)"]
+dev = ["Sphinx (>=1.6.5,<2)", "cryptography", "flake8", "freezegun", "ipython", "isort", "pep8", "pytest", "pytest-cov", "pytest-django", "pytest-watch", "pytest-xdist", "python-jose (==3.3.0)", "sphinx_rtd_theme (>=0.1.9)", "tox", "twine", "wheel"]
+doc = ["Sphinx (>=1.6.5,<2)", "sphinx_rtd_theme (>=0.1.9)"]
+lint = ["flake8", "isort", "pep8"]
+python-jose = ["python-jose (==3.3.0)"]
+test = ["cryptography", "freezegun", "pytest", "pytest-cov", "pytest-django", "pytest-xdist", "tox"]
+
+[[package]]
 name = "gunicorn"
 version = "21.2.0"
 description = "WSGI HTTP Server for UNIX"
@@ -306,6 +330,23 @@ files = [
 ]
 
 [[package]]
+name = "pyjwt"
+version = "2.8.0"
+description = "JSON Web Token implementation in Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "PyJWT-2.8.0-py3-none-any.whl", hash = "sha256:59127c392cc44c2da5bb3192169a91f429924e17aff6534d70fdc02ab3e04320"},
+    {file = "PyJWT-2.8.0.tar.gz", hash = "sha256:57e28d156e3d5c10088e0c68abb90bfac3df82b40a71bd0daa20c65ccd5c23de"},
+]
+
+[package.extras]
+crypto = ["cryptography (>=3.4.0)"]
+dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+docs = ["sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
+
+[[package]]
 name = "pypng"
 version = "0.20220715.0"
 description = "Pure Python library for saving and loading PNG images"
@@ -420,4 +461,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "022ee3196c8a16d5efb9de0c6e294c066af3d30893a690f1bdc7ca21ca388617"
+content-hash = "7e61b30cec6e63d86fd1d3b2755bd5aba220b586fd2ce752acf7b1a853419a2b"
