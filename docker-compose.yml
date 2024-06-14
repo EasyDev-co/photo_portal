@@ -45,6 +45,15 @@ services:
     volumes:
       - ./backend/:/opt/backend/:rw
 
+  celery-beat:
+    <<: *base_web
+    build:
+      context: ./backend
+      dockerfile: celery_beat.dockerfile
+    container_name: ${PROJECT_SLUG}_celery_beat
+    volumes:
+      - ./backend/:/opt/backend/:rw
+
   frontend:
     build:
       context: ./frontend

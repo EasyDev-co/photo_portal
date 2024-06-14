@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    'django_celery_beat',
 
     # Приложения
     'apps.kindergarten',
@@ -139,3 +141,23 @@ REDIS_PORT = os.environ.get('REDIS_PORT')
 REDIS_DB_CELERY = os.environ.get('REDIS_DB_CELERY')
 
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_CELERY}'
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.yandex.ru')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+CELERY_BEAT_SCHEDULE = {
+    "resend_code": {
+        "task": "apps.parent.tasks.resend_code",
+        "schedule": crontab(minute="*/1"),
+    },
+}
