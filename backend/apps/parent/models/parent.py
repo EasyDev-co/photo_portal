@@ -18,6 +18,10 @@ class Parent(UUIDMixin):
         related_name='parents',
         verbose_name='Детский сад'
     )
+    is_verified = models.BooleanField(
+        default=False,
+        verbose_name='Подтверждение email'
+    )
 
     def __str__(self):
         return f'Родитель {self.user}'
