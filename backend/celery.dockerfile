@@ -19,8 +19,8 @@ RUN mkdir -p /opt/src/static/ && \
 
 COPY . .
 
-COPY ./worker_start.sh /worker_start.sh
+COPY celery_start.sh /celery_start.sh
 
-RUN chmod +x /worker_start.sh
+RUN chmod +x /celery_start.sh
 
-ENTRYPOINT ["/worker_start.sh"]
+ENTRYPOINT ["/celery_start.sh"]

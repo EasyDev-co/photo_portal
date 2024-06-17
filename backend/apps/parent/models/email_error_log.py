@@ -1,13 +1,14 @@
 from django.db import models
 
-from apps.parent.models import ConfirmCode
+from apps.parent.models import ConfirmCode, Parent
 
 
-class SendEmailError(models.Model):
+class EmailErrorLog(models.Model):
     confirm_code = models.ForeignKey(
         ConfirmCode,
         on_delete=models.PROTECT,
-        verbose_name='Код'
+        verbose_name='Код',
+        null=True
     )
     message = models.TextField(
         verbose_name='Сообщение ошибки'
@@ -19,4 +20,9 @@ class SendEmailError(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Время создания'
+    )
+    parent = models.ForeignKey(
+        Parent,
+        on_delete=models.PROTECT,
+        verbose_name='Родитель'
     )
