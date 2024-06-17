@@ -1,4 +1,4 @@
-import "./NavBar.css";
+import styles from "./NavBar.module.css";
 import React, { useEffect } from "react";
 import {
   bagIcon,
@@ -34,9 +34,9 @@ export const NavBar = ({ onClose }) => {
   }, [onClose]);
 
   return (
-    <div className="nav-bar">
-      <div className="nav-bar__container">
-        <ul className="nav-bar__user-info-list">
+    <div className={styles.navBar}>
+      <div className={styles.container}>
+        <ul className={styles.userInfoList}>
           <HeaderUserInfoItem
             top={`${userInfo.surname} ${userInfo.name} ${userInfo.patronymic}`}
             bottom={userInfo.tel}
@@ -46,7 +46,7 @@ export const NavBar = ({ onClose }) => {
             bottom={userInfo.kindergarten}
           />
         </ul>
-        <ul className="nav-bar__nav-list">
+        <ul className={styles.navList}>
           <NavBarItem
             router="/orders"
             icon={bagIcon}
@@ -90,7 +90,7 @@ export const NavBar = ({ onClose }) => {
             onClick={onClose}
           />
         </ul>
-        <ul className="nav-bar__social-list">
+        <ul className={styles.socialList}>
           <SocialItem
             href="https://vk.com"
             icon={vkIcon}

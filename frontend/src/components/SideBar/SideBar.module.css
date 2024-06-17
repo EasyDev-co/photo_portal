@@ -1,4 +1,4 @@
-.side-bar {
+.sideBar {
   width: 100px;
   height: fit-content;
   background-color: #fff;
@@ -6,26 +6,26 @@
   position: absolute;
 }
 
-.side-bar__first-block {
+.firstBlock {
   border-bottom: 1px solid #e5e5e5;
 }
 
-.side-bar__nav {
+.nav {
   padding: 80px 0 0 0;
 }
 
-.side-bar__nav-list {
+.navList {
   display: flex;
   gap: 40px;
   flex-direction: column;
 }
 
-.side-bar__nav-link-exit {
+.navLinkExit {
   height: 48px;
   margin: 104px 0 40px 0;
 }
 
-.side-bar__social-list {
+.socialList {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,7 +34,7 @@
 }
 
 @media screen and (max-width: 768px) {
-  .side-bar {
+  .sideBar {
     display: none;
   }
 }

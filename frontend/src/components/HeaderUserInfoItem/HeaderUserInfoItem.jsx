@@ -1,10 +1,10 @@
-import "./HeaderUserInfoItem.css";
+import styles from "./HeaderUserInfoItem.module.css";
 
-export const HeaderUserInfoItem = ({ styles, top, bottom }) => {
+export const HeaderUserInfoItem = ({ style, top, bottom }) => {
   return (
-    <li className={`header-user-info-item${styles ? styles : ""}`}>
-      <p className="header-user-info-item__text">{top}</p>
-      <p className="header-user-info-item__text">{bottom}</p>
+    <li className={`${style ? style : ""}`}>
+      <p className={styles.text}>{top}</p>
+      <p className={styles.text}>{bottom}</p>
     </li>
   );
 };

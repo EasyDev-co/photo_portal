@@ -1,12 +1,12 @@
-import "./NavBarItem.css";
+import styles from "./NavBarItem.module.css";
 import { Link } from "react-router-dom";
 
-export const NavBarItem = ({ styles, router, icon, alt, text, onClick }) => {
+export const NavBarItem = ({ style, router, icon, alt, text, onClick }) => {
   return (
-    <li className={`nav-bar-item${styles ? styles : ""}`}>
-      <Link className="nav-bar-item__link" to={router} onClick={onClick}>
+    <li className={`${style ? style : ""}`}>
+      <Link className={styles.link} to={router} onClick={onClick}>
         <img src={icon} alt={alt} />
-        <p className="nav-bar-item__text">{text}</p>
+        <p className={styles.text}>{text}</p>
       </Link>
     </li>
   );

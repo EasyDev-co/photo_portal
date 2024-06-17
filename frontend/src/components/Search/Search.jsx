@@ -1,15 +1,15 @@
-import "./Search.css";
+import styles from "./Search.module.css";
 import { searchIcon } from "../../constants/constants";
 
-export const Search = ({ styles }) => {
+export const Search = ({ style }) => {
   return (
     <>
-      <div className={`search__block${styles ? styles : ""}`}>
-        <label className="search__icon-label" htmlFor="search-input">
-          <img className="search__icon" src={searchIcon} alt="иконка лупы" />
+      <div className={`${styles.block} ${style ? style : ""}`}>
+        <label className={styles.label} htmlFor="search-input">
+          <img className={styles.icon} src={searchIcon} alt="иконка лупы" />
         </label>
         <input
-          className="search__input"
+          className={styles.input}
           type="text"
           placeholder="Поиск"
           id="search-input"

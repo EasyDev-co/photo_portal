@@ -1,12 +1,9 @@
-.nav-bar-item {
-}
-
-.nav-bar-item__link {
+.link {
   display: flex;
   gap: 15px;
 }
 
-.nav-bar-item__text {
+.text {
   color: #090909;
   font-weight: 400;
   font-size: 15px;

@@ -1,13 +1,13 @@
-import "./Rules.css";
+import styles from "./Rules.module.css";
 import { RulesItem } from "./RulesItem/RulesItem";
 import { Title } from "../Title/Title";
 import { rulesItems } from "../../constants/constants";
 
 export const Rules = () => {
   return (
-    <div className="riles">
+    <div className={styles.rules}>
       <Title text="Правила" />
-      <ul className="rules__list">
+      <ul className={styles.list}>
         {rulesItems.map((item, index) => {
           return <RulesItem text={item} key={index} />;
         })}

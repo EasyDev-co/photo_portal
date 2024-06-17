@@ -2,6 +2,7 @@
 @import url(./vendor/fonts/fonts.css);
 
 body {
+  font-family: "NunitoSans", Arial, sans-serif;
   color: #090909;
   background-color: #fff;
 }

@@ -1,10 +1,10 @@
-.rules-item__item {
+.item {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.rules-item__num-block {
+.numBlock {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,7 @@
   border-radius: 4px;
 }
 
-.rules-item__num {
+.num {
   color: #090909;
   font-weight: 400;
   font-size: 18px;
@@ -25,7 +25,7 @@
   text-overflow: ellipsis;
 }
 
-.rules-item__text {
+.text {
   width: 100%;
   color: #090909;
   font-weight: 400;
@@ -34,7 +34,7 @@
 }
 
 @media screen and (max-width: 768px) {
-  .rules-item__item {
+  .item {
     align-items: flex-start;
   }
 }

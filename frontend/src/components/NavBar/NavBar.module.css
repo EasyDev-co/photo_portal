@@ -1,15 +1,15 @@
-.nav-bar {
+.navBar {
   width: 100%;
   background-color: #fff;
 }
 
-.nav-bar__container {
+.container {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.nav-bar__user-info-list {
+.userInfoList {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -17,7 +17,7 @@
   padding: 0 16px;
 }
 
-.nav-bar__nav-list {
+.navList {
   display: flex;
   flex-direction: column;
   gap: 40px;
@@ -25,7 +25,7 @@
   padding: 0 16px;
 }
 
-.nav-bar__social-list {
+.socialList {
   display: flex;
   gap: 40px;
   border-top: 1px solid #e5e5e5;

@@ -1,7 +1,6 @@
-import "./App.css";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Header } from "../Header/Header";
-import { SideBar } from "../SideBar/SideBar";
+import { useEffect } from "react";
+import { Layout } from "../Layout/Layout";
 import { Orders } from "../Orders/Orders";
 import { Gallery } from "../Gallery/Gallery";
 import { Profile } from "../Profile/Profile";
@@ -12,23 +11,10 @@ import { Login } from "../Login/Login";
 import { Registration } from "../Registration/Registration";
 import { PasswordReset } from "../PasswordReset/PasswordReset";
 import { NotFound } from "../NotFound/NotFound";
-import { useState, useEffect } from "react";
 
 export const App = () => {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSidebarVisible(window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
-    // Проверяем начальное состояние при загрузке страницы
-    handleResize();
-    // Очищаем обработчик событий при размонтировании компонента
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     // Перенаправляем на "/orders" при входе на сайт
@@ -38,96 +24,20 @@ export const App = () => {
   }, [location.pathname, navigate]);
 
   return (
-    <div className="body">
-      <div className="page">
-        <Routes>
-          <Route
-            path={"/orders"}
-            element={
-              <>
-                <Header />
-                {isSidebarVisible > 768 && <SideBar />}
-                <Orders />
-              </>
-            }
-          />
-          <Route
-            path={"/gallery"}
-            element={
-              <>
-                <Header />
-                {isSidebarVisible > 768 && <SideBar />}
-                <Gallery />
-              </>
-            }
-          />
-          <Route
-            path={"/profile"}
-            element={
-              <>
-                <Header />
-                {isSidebarVisible > 768 && <SideBar />}
-                <Profile />
-              </>
-            }
-          />
-          <Route
-            path={"/about-us"}
-            element={
-              <>
-                <Header />
-                {isSidebarVisible > 768 && <SideBar />}
-                <AboutUs />
-              </>
-            }
-          />
-          <Route
-            path={"/rules"}
-            element={
-              <>
-                <Header />
-                {isSidebarVisible > 768 && <SideBar />}
-                <Rules />
-              </>
-            }
-          />
-          <Route
-            path={"orders/payment"}
-            element={
-              <>
-                <Header />
-                {isSidebarVisible > 768 && <SideBar />}
-                <Payment />
-              </>
-            }
-          />
-          <Route
-            path={"/sign-in"}
-            element={
-              <>
-                <Login />
-              </>
-            }
-          />
-          <Route
-            path={"/sign-up"}
-            element={
-              <>
-                <Registration />
-              </>
-            }
-          />
-          <Route
-            path={"/password-reset"}
-            element={
-              <>
-                <PasswordReset />
-              </>
-            }
-          />
-          <Route path="/*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path={"/orders"} element={<Orders />} />
+        <Route path={"/gallery"} element={<Gallery />} />
+        <Route path={"/profile"} element={<Profile />} />
+        <Route path={"/about-us"} element={<AboutUs />} />
+        <Route path={"/rules"} element={<Rules />} />
+        <Route path={"orders/payment"} element={<Payment />} />
+      </Route>
+
+      <Route path="/sign-in" element={<Login />} />
+      <Route path="/sign-up" element={<Registration />} />
+      <Route path="/password-reset" element={<PasswordReset />} />
+      <Route path="/*" element={<NotFound />} />
+    </Routes>
   );
 };

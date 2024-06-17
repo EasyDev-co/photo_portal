@@ -1,4 +1,4 @@
-import "./Header.css";
+import styles from "./Header.module.css";
 import React, { useState, useEffect } from "react";
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBar } from "../NavBar/NavBar";
@@ -39,16 +39,16 @@ export const Header = () => {
   return (
     <>
       <header
-        className={`header ${navBarState ? "header__open-menu" : ""}`}
+        className={`${styles.header} ${navBarState ? styles.openMenu : ""}`}
         id="header"
       >
-        <div className="header__container">
-          <div className="header__left-block">
-            <img className="header__logo" src={logo} alt="логотип" />
+        <div className={styles.container}>
+          <div className={styles.leftBlock}>
+            <img className={styles.logo} src={logo} alt="логотип" />
           </div>
 
-          <div className="header__right-block">
-            <ul className="header__user-info-list">
+          <div className={styles.rightBlock}>
+            <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
                 top={`${userInfo.surname} ${userInfo.name} ${userInfo.patronymic}`}
                 bottom={userInfo.tel}
@@ -63,7 +63,7 @@ export const Header = () => {
             <>
               {navBarState ? (
                 <button
-                  className="nav-bar__close-button"
+                  className={styles.barCloseButton}
                   onClick={toggleNavBar}
                 />
               ) : (

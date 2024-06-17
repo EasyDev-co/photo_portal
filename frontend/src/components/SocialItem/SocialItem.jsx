@@ -1,15 +1,11 @@
-import "./SocialItem.css";
+import styles from "./SocialItem.module.css";
 
 export const SocialItem = ({ href, icon, alt }) => {
   return (
-    <li className="social-item">
-    <a className="social-item-link" href={href} target="blank">
-      <img
-        className="social-item-icon"
-        src={icon}
-        alt={alt}
-      />
-    </a>
-  </li>
+    <li className={styles.socialItem}>
+      <a className={styles.link} href={href} target="blank">
+        <img className={styles.icon} src={icon} alt={alt} />
+      </a>
+    </li>
   );
-}
+};

@@ -1,15 +1,15 @@
-.side-bar__nav-item {
+.navItem {
   width: 100px;
   height: 64px;
 }
 
-.side-bar__nav-link {
+.navLink {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
 }
 
-.side-bar__nav-item.active {
+.navItem.active {
   border-right: 1px solid #11bbd1;
 }

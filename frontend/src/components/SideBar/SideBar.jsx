@@ -1,14 +1,14 @@
-import "./SideBar.css";
+import styles from "./SideBar.module.css";
 import { vkIcon, whatsAppIcon, telegramIcon } from "../../constants/constants";
 import { SocialItem } from "../SocialItem/SocialItem";
 import { SideBarItem } from "./SideBarItem/SideBarItem";
 
 export const SideBar = () => {
   return (
-    <div className="side-bar">
-      <div className="side-bar__first-block">
-        <nav className="side-bar__nav">
-          <ul className="side-bar__nav-list">
+    <div className={styles.sideBar}>
+      <div className={styles.firstBlock}>
+        <nav className={styles.nav}>
+          <ul className={styles.navList}>
             <SideBarItem
               router="/orders"
               svgWidth="25"
@@ -79,7 +79,7 @@ export const SideBar = () => {
               pathFill="#6E6E6E"
             />
             <SideBarItem
-              styles=" side-bar__nav-link-exit"
+              sty={styles.navLinkExit}
               router="/sign-in"
               svgWidth="24"
               svgHeight="24"
@@ -96,7 +96,7 @@ export const SideBar = () => {
           </ul>
         </nav>
       </div>
-      <ul className="side-bar__social-list">
+      <ul className={styles.socialList}>
         <SocialItem
           href="https://vk.com"
           icon={vkIcon}

@@ -1,8 +1,8 @@
-import "./SideBarItem.css";
+import styles from "./SideBarItem.module.css";
 import { Link, useLocation } from "react-router-dom";
 
 export const SideBarItem = ({
-  styles,
+  sty,
   router,
   pathFill,
   svgWidth,
@@ -22,11 +22,11 @@ export const SideBarItem = ({
 
   return (
     <li
-      className={`side-bar__nav-item${styles ? styles : ""} ${
-        isActive ? "active" : ""
+      className={`${styles.navItem} ${sty ? sty : ""} ${
+        isActive ? styles.active : ""
       }`}
     >
-      <Link className="side-bar__nav-link" to={router}>
+      <Link className={styles.navLink} to={router}>
         <svg
           width={svgWidth}
           height={svgHeight}

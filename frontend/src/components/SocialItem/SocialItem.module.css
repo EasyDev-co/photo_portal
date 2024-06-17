@@ -1,9 +1,9 @@
-.social-item {
+.socialItem {
   width: 32px;
   height: 32px;
 }
 
-.social-item-link {
+.link {
   display: flex;
   align-items: center;
   justify-content: center;
