@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
@@ -7,10 +8,16 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.exceptions.api_exceptions import (MissingKindergartenCode,
-                                            KindergartenCodeNotFound)
+                                            KindergartenCodeNotFound,
+                                            InvalidCode)
 from apps.kindergarten.models import Kindergarten
-from apps.parent.api.v1.serializers import ParentTokenObtainPairSerializer
+from apps.parent.api.v1.serializers import (ParentTokenObtainPairSerializer,
+                                            EmailSerializer,
+                                            PasswordChangeSerializer)
+from apps.parent.models import ConfirmCode
+from apps.parent.models.code import CodePurpose
 from apps.parent.models.parent import Parent
+from apps.parent.tasks import send_confirm_code
 from apps.user.api.v1.serializers import UserSerializer
 from apps.user.models import User
 from apps.user.models.user import UserRole
@@ -45,6 +52,10 @@ class ParentRegisterAPIView(CreateAPIView):
             user.role = UserRole.parent
             user.save()
 
+        send_confirm_code.delay(
+            user_id=user.pk,
+            code_purpose=CodePurpose.CONFIRM_EMAIL
+        )
         return user
 
 
@@ -69,3 +80,151 @@ class ParentLogoutAPIView(APIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response({'message': str(e), 'status': status.HTTP_400_BAD_REQUEST})
+
+
+class ConfirmCodeMixin:
+
+    @classmethod
+    def validate_code(cls, parent, code, purpose):
+        """
+        Проверяет код для родителя.
+        """
+        confirm_code = ConfirmCode.objects.filter(
+            parent=parent,
+            code=code,
+            purpose=purpose,
+            is_used=False
+        ).first()
+
+        if not confirm_code or confirm_code.is_expired:
+            raise InvalidCode
+
+
+class EmailVerificationCodeAPIView(ConfirmCodeMixin, APIView):
+    """
+    View для верификации кода при регистрации родителя.
+    """
+    email_serializer = EmailSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.email_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+
+        code = request.data.get('code')
+        parent = Parent.objects.get(user__email=email)
+        try:
+            self.validate_code(
+                parent=parent,
+                code=code,
+                purpose=CodePurpose.CONFIRM_EMAIL
+            )
+        except InvalidCode:
+            return Response(
+                {'message': InvalidCode.default_detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            parent.is_verified = True
+            parent.save()
+
+            ConfirmCode.objects.filter(code=code).update(is_used=True)
+
+        refresh_token = RefreshToken.for_user(parent.user)
+
+        return Response(
+            {
+                'refresh': str(refresh_token),
+                'access': str(refresh_token.access_token)
+            }, status=status.HTTP_201_CREATED
+        )
+
+
+class ResetPasswordAPIView(APIView):
+    """
+    View для восстановления пароля.
+    """
+    email_serializer = EmailSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.email_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+
+        user = User.objects.get(email=email)
+
+        send_confirm_code.delay(
+            user_id=user.pk,
+            code_purpose=CodePurpose.RESET_PASSWORD,
+        )
+
+        return Response(
+            {
+                "message": "Код для восстановления пароля был отправлен на указанный email."
+            },
+            status=status.HTTP_200_OK)
+
+
+class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
+    """
+    View для верификации кода восстановления пароля.
+    """
+    email_serializer = EmailSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.email_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+        code = request.data.get('code')
+        parent = Parent.objects.get(user__email=email)
+
+        try:
+            self.validate_code(
+                parent=parent,
+                code=code,
+                purpose=CodePurpose.RESET_PASSWORD
+            )
+        except InvalidCode:
+            return Response(
+                {'message': InvalidCode.default_detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(
+            {"message": "Код верифицирован. Можете сменить пароль."},
+            status=status.HTTP_200_OK
+        )
+
+
+class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
+    """
+    View для смены пароля пользователя.
+    """
+    password_change_serializer = PasswordChangeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.password_change_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+        new_password = serializer.validated_data['new_password']
+        code = request.data.get('code')
+        parent = Parent.objects.get(user__email=email)
+
+        self.validate_code(
+            parent=parent,
+            code=code,
+            purpose=CodePurpose.RESET_PASSWORD
+        )
+        with transaction.atomic():
+            parent.user.password = make_password(new_password)
+            parent.user.save()
+
+            ConfirmCode.objects.filter(code=code).update(is_used=True)
+
+        return Response(
+            {"message": "Пароль успешно изменен."},
+            status=status.HTTP_200_OK
+        )
