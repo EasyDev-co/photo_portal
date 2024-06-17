@@ -157,7 +157,7 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 
 CELERY_BEAT_SCHEDULE = {
     "resend_code": {
-        "task": "apps.parent.tasks.resend_code",
+        "task": "apps.parent.tasks.ResendConfirmCodeTask",
         "schedule": crontab(minute="*/1"),
     },
 }

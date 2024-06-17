@@ -1,6 +1,5 @@
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
