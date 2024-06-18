@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'apps.kindergarten',
     'apps.user',
     'apps.parent',
+    'apps.photo',
 ]
 
 MIDDLEWARE = [
@@ -110,9 +111,9 @@ LOGGING = {
     },
 }
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -127,6 +128,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 REGISTRATION_URL_FOR_PARENT = os.environ.get('REGISTRATION_URL_FOR_PARENT')
+PHOTO_LINE_URL = os.environ.get('PHOTO_LINE_URL')
 
 AUTH_USER_MODEL = 'user.User'
 
