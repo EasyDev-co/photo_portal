@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom"; // для рендеринга вложенных маршрутов
 import { Header } from "../Header/Header";
 import { SideBar } from "../SideBar/SideBar";
 
@@ -21,7 +22,7 @@ export const Layout = ({ children }) => {
       <div className="page">
         <Header />
         {isSidebarVisible > 768 && <SideBar />}
-        {children}
+        <Outlet />
       </div>
     </div>
   );

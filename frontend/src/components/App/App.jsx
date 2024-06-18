@@ -11,6 +11,7 @@ import { Login } from "../Login/Login";
 import { Registration } from "../Registration/Registration";
 import { PasswordReset } from "../PasswordReset/PasswordReset";
 import { NotFound } from "../NotFound/NotFound";
+import { AuthRoutes } from "../AuthRoutes/AuthRoutes";
 
 export const App = () => {
   const location = useLocation();
@@ -33,11 +34,12 @@ export const App = () => {
         <Route path={"/rules"} element={<Rules />} />
         <Route path={"orders/payment"} element={<Payment />} />
       </Route>
-
-      <Route path="/sign-in" element={<Login />} />
-      <Route path="/sign-up" element={<Registration />} />
-      <Route path="/password-reset" element={<PasswordReset />} />
-      <Route path="/*" element={<NotFound />} />
+      <Route element={<AuthRoutes />}>
+        <Route path="/sign-in" element={<Login />} />
+        <Route path="/sign-up" element={<Registration />} />
+        <Route path="/password-reset" element={<PasswordReset />} />
+        <Route path="/*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 };
