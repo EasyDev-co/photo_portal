@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.files.base import ContentFile
+from rest_framework.exceptions import ValidationError
 
 from apps.kindergarten.models import Kindergarten
 from apps.utils.services import generate_qr_code
@@ -35,12 +36,3 @@ class PhotoLine(UUIDMixin):
     class Meta:
         verbose_name = 'Линия фотографий'
         verbose_name_plural = 'Линии фотографий'
-
-    def save(self, *args, **kwargs):
-        if not self.qr_code:
-            qr_code, buffer = generate_qr_code(PHOTO_LINE_URL + str(self.id))
-            self.qr_code.save(
-                f'{str(self.photo_theme.name)}_qr.png',
-                ContentFile(buffer.read())
-            )
-        super().save(*args, **kwargs)
