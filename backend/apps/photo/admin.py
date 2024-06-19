@@ -1,9 +1,21 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from rest_framework.exceptions import ValidationError
+from django.contrib import messages
 
 from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine)
+
+
+class CustomMessageMixin:
+    def save_model(self, request, obj, form, change):
+        try:
+            obj.save()
+        except ValidationError as e:
+            messages.set_level(request, messages.ERROR)
+            error_msg = ', '.join(e.detail)
+            self.message_user(request, error_msg, level=messages.ERROR)
 
 
 class PhotoInline(admin.TabularInline):
@@ -18,7 +30,7 @@ class PhotoInline(admin.TabularInline):
 
 
 @admin.register(PhotoTheme)
-class PhotoThemeAdmin(admin.ModelAdmin):
+class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = (
         'name',
         'is_active',
@@ -30,7 +42,7 @@ class PhotoThemeAdmin(admin.ModelAdmin):
 
 
 @admin.register(PhotoLine)
-class PhotoLineAdmin(admin.ModelAdmin):
+class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = ('photo_theme', 'kindergarten')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
