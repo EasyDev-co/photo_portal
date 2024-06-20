@@ -7,6 +7,7 @@ from config import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('apps.parent.api.urls')),
+    path('api/', include('apps.photo.api.urls')),
 ]
 
 if settings.DEBUG:
