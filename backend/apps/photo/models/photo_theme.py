@@ -1,7 +1,5 @@
 from django.db import models
-from rest_framework.exceptions import ValidationError
 
-from apps.kindergarten.models import Kindergarten
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 
 
