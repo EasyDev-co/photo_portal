@@ -11,7 +11,13 @@ class OrderItem(UUIDMixin):
         max_length=200,
         choices=PHOTO_TYPES,
         default="10x15",
-        verbose_name="Тип фото"
+        verbose_name="Тип фото",
+        null=True,
+        blank=True,
+    )
+    is_digital = models.BooleanField(
+        default=False,
+        verbose_name="В электронном виде",
     )
     amount = models.PositiveIntegerField(
         default=1,

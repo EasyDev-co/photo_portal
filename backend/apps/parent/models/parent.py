@@ -4,6 +4,7 @@ from apps.kindergarten.models import Kindergarten
 
 from apps.user.models import User
 
+
 class Parent(UUIDMixin):
     user = models.OneToOneField(
         User,
