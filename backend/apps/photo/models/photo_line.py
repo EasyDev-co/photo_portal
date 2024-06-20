@@ -1,10 +1,6 @@
 from django.db import models
-from django.core.files.base import ContentFile
-from rest_framework.exceptions import ValidationError
 
 from apps.kindergarten.models import Kindergarten
-from apps.utils.services import generate_qr_code
-from config.settings import PHOTO_LINE_URL
 from .photo_theme import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 

@@ -7,6 +7,10 @@ from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine)
 
+from config.settings import PHOTO_LINE_URL
+from apps.utils.services import generate_qr_code
+from django.core.files.base import ContentFile
+
 
 class CustomMessageMixin:
     def save_model(self, request, obj, form, change):
@@ -54,6 +58,30 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
     def qr_image(self, obj):
         if obj.qr_code:
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+
+        obj = form.instance
+        kindergarten_code = obj.kindergarten.code
+        photo_numbers = []
+
+        for formset in formsets:
+            for inline_form in formset.forms:
+                if inline_form.is_valid():
+                    photo_numbers.append(inline_form.instance.number)
+
+        qr_code, buffer = generate_qr_code(
+            photo_line_id=obj.id,
+            url=PHOTO_LINE_URL,
+            kindergarten_code=kindergarten_code,
+            photo_numbers=photo_numbers,
+        )
+
+        obj.qr_code.save(
+            f'{str(obj.photo_theme.name)}_qr.png',
+            ContentFile(buffer.read())
+        )
 
 
 @admin.register(Photo)
