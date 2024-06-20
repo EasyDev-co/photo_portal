@@ -1,0 +1,78 @@
+.header {
+  background-color: #fff;
+  width: 100%;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.container {
+  max-width: 1920px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 40px 16px 40px;
+  margin: 0 auto;
+}
+
+.leftBlock {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.userInfoList {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.rightBlock {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.search {
+  max-width: 240px;
+}
+
+.bellButton {
+  width: 24px;
+  height: 24px;
+  background-image: url("../../assets/images/bell.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+@media screen and (max-width: 768px) {
+  .header {
+    border-bottom: none;
+  }
+
+  .openMenu {
+    height: 100%;
+    position: fixed;
+    overflow-y: auto;
+    z-index: 999;
+  }
+
+  .barCloseButton {
+    width: 19.2px;
+    height: 19.2px;
+    background-image: url(../../assets/images/cross.svg);
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .userInfoList {
+    display: none;
+  }
+
+  .rightBlock {
+    display: none;
+  }
+
+  .container {
+    padding: 8px 20px;
+  }
+}

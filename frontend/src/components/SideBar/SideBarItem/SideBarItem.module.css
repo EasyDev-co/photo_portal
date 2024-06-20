@@ -1,0 +1,15 @@
+.navItem {
+  width: 100px;
+  height: 64px;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.navItem.active {
+  border-right: 1px solid #11bbd1;
+}

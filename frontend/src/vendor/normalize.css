@@ -1,0 +1,73 @@
+/* normalize.css */
+
+/* Document
+   ========================================================================== */
+html {
+  line-height: 1.15; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/* Sections
+     ========================================================================== */
+body {
+  margin: 0;
+}
+
+/* Grouping content
+     ========================================================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+abbr,
+code,
+kbd,
+samp,
+ul,
+ol,
+li,
+dl,
+dd,
+dt {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+li {
+  list-style: none;
+}
+
+button {
+  font-family: "NunitoSans", sans-serif;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background-color: inherit;
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+button:disabled {
+  cursor: auto;
+}
+
+section {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}
