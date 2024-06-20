@@ -21,7 +21,17 @@ const userInfo = {
   city: "Ростов-на-Дону",
   kindergarten: "Детский сад “Ромашка”",
 };
-
+const userInfoProfile = {
+  surname: "Иванова",
+  name: "Ольга",
+  patronymic: "Игоревна",
+  tel: "+7 916 555 55 55",
+  country: "Россия",
+  city: "Ростов-на-Дону",
+  kindergarten: "Детский сад “Ромашка”",
+  email: "bobik228@mail.ru",
+  password:"12asd345!678910"
+};
 const rulesItems = [
   {
     num: "1.",
@@ -76,4 +86,5 @@ export {
   userInfo,
   rulesItems,
   aboutUsItems,
+  userInfoProfile
 };

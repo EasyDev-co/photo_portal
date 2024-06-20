@@ -1,0 +1,14 @@
+.mainButton{
+    background-color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+.resetButton{
+    background-color: #fff;
+    padding: 24px 24px;
+    color: rgb(17, 187, 209);
+    font-size: 15px;
+    font-weight: 700;
+}

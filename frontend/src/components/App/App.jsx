@@ -29,7 +29,7 @@ export const App = () => {
       <Route element={<Layout />}>
         <Route path={"/orders"} element={<Orders />} />
         <Route path={"/gallery"} element={<Gallery />} />
-        <Route path={"/profile"} element={<Profile />} />
+        <Route path={"/profile"} element={<Profile role={'parent'}/>} />
         <Route path={"/about-us"} element={<AboutUs />} />
         <Route path={"/rules"} element={<Rules />} />
         <Route path={"orders/payment"} element={<Payment />} />
