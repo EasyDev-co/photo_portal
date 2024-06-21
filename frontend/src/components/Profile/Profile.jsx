@@ -1,7 +1,6 @@
 import ManagerProfile from "./ManagerProfile/ManagerProfile";
 import ParentProfile from "./ParentProfile/ParentProfile";
 import styles from "./Profile.module.css";
-import { Title } from "../Title/Title";
 import { useState } from "react";
 export const Profile = ({ role }) => {
   const [nurseryIsAuth, setNurseryIsAuth] = useState(false)

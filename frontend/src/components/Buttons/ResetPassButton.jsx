@@ -1,8 +1,8 @@
 import styles from './MainButton.module.css'
 
-const ResetPassButton = ({value}) => {
+const ResetPassButton = ({value,resetPassActive, setResetActive}) => {
     return ( 
-        <button className={styles.resetButton}>{value}</button>
+        <button onClick={()=>setResetActive(true)}className={styles.resetButton}>{value}</button>
     );
 }
  

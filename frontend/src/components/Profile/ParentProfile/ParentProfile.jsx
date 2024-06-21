@@ -6,32 +6,35 @@ import { userInfoProfile } from "../../../constants/constants";
 import { useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
-import { Title } from "../../Title/Title";
+
 const ParentProfile = ({ nurseryIsAuth }) => {
-    const [inputValue,setInputValue]  = useState({
-        parentSurname:'',
-        parentName:'',
-        parentPatronymic:'',
-        parentPhone:'',
-        parentEmail:'',
-        kindergarten:'',
-        parentCity:'',
-        parentPass:'',
-        parentNewPass:''
+    const [resetPassActive, setResetActive] = useState(false)
+    const [generatePass, setPass] = useState(gen_password(12))
+    const [inputValue, setInputValue] = useState({
+        parentSurname: '',
+        parentName: '',
+        parentPatronymic: '',
+        parentPhone: '',
+        parentEmail: '',
+        kindergarten: '',
+        parentCity: '',
+        parentPass: '',
+        parentNewPass: '',
+        resetEmail: ''
     });
 
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
     }
-    const onSubmitHandler = (e) =>{
+    const onSubmitHandler = (e) => {
         e.preventDefault();
         console.log(inputValue)
     }
     return (
         <div className={styles.profileWrap}>
-            <form onSubmit={(e)=>{onSubmitHandler(e)}} className={styles.profileForm} action="">
-            <h1 className={styles.profileTitle}>Личный кабинет</h1>
+            <form onSubmit={(e) => { onSubmitHandler(e) }} className={styles.profileForm} action="">
+                <h1 className={styles.profileTitle}>Личный кабинет</h1>
                 <div className={styles.profileInputWrap}>
                     <InputField
                         placeholder={"Фамилия"}
@@ -69,7 +72,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 </div>
                 <div className={styles.profileInputWrap}>
                     <InputField
-                        placeholder={"Телефон"}
+                        placeholder={"+7"}
                         label={"Телефон"}
                         type={"text"}
                         name={"parentPhone"}
@@ -80,7 +83,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         inputValue={inputValue.parentPhone}
                     />
                     <InputField
-                        placeholder={"Электронный адрес"}
+                        placeholder={"mail@mail.ru"}
                         label={"Электронный адрес"}
                         type={"text"}
                         name={"parentEmail"}
@@ -105,7 +108,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         inputValue={inputValue.parentCity}
                     />
                     <InputField
-                        placeholder={"Сад"}
+                        placeholder={"Детский сад “Ромашка”"}
                         label={"Сад"}
                         type={"text"}
                         name={"kindergarten"}
@@ -118,13 +121,13 @@ const ParentProfile = ({ nurseryIsAuth }) => {
 
                 </div>
                 {!nurseryIsAuth && <div className={styles.parentPromotion}>
-                        <p>
-                            <span>
-                                Активный родитель!
-                            </span>
-                            Мы не работаем в вашем детском саду и предлагаем вам продвинуть наши услуги в вашем детском саду. За это вы получите 90% скидку, как активный родитель. Если вам удасться продвинуть нас свяжитесь с нами по почте @…. и мы выдадим вам уникальный промокод со скидкой
-                        </p>
-                    </div> 
+                    <p>
+                        <span>
+                            Активный родитель!
+                        </span>
+                        Мы не работаем в вашем детском саду и предлагаем вам продвинуть наши услуги в вашем детском саду. За это вы получите 90% скидку, как активный родитель. Если вам удасться продвинуть нас свяжитесь с нами по почте @…. и мы выдадим вам уникальный промокод со скидкой
+                    </p>
+                </div>
                 }
                 <div className={styles.profileInputWrap}>
                     <InputField
@@ -139,25 +142,38 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         inputValue={inputValue.parentPass}
                     />
                     <InputField
-                        placeholder={"Новый пароль"}
+                        placeholder={generatePass}
                         label={"Новый пароль"}
                         type={"text"}
                         name={"parentNewPass"}
                         id={"parentNewPass"}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        value={gen_password(12)}
+                        value={generatePass}
                         inputValue={inputValue.parentNewPass}
                     />
-                    <ResetPassButton
-                        value={"Восстановить пароль"}
-                    />
+                    {resetPassActive ? <InputField
+                        placeholder={'mail@mail.ru'}
+                        label={"Введите Email для восстановления"}
+                        type={"text"}
+                        name={"resetEmail"}
+                        id={"resetEmail"}
+                        isPencil
+                        onChangeHandler={onChangeHandler}
+                        value={''}
+                        inputValue={inputValue.resetEmail}
+                    /> :
+                        <ResetPassButton
+                            setResetActive={setResetActive}
+                            value={'Восстановить пароль'}
+                        />
+                    }
                 </div>
                 <MainButton
                     value={"Сохранить"}
                 />
             </form>
-            <PaymentTimer/>
+            <PaymentTimer />
         </div>
     );
 }
