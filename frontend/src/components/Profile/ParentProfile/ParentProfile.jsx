@@ -5,6 +5,8 @@ import styles from "./ParentProfile.module.css";
 import { userInfoProfile } from "../../../constants/constants";
 import { useState } from "react";
 import { gen_password } from "./utils";
+import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
+import { Title } from "../../Title/Title";
 const ParentProfile = ({ nurseryIsAuth }) => {
     const [inputValue,setInputValue]  = useState({
         parentSurname:'',
@@ -29,6 +31,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     return (
         <div className={styles.profileWrap}>
             <form onSubmit={(e)=>{onSubmitHandler(e)}} className={styles.profileForm} action="">
+            <h1 className={styles.profileTitle}>Личный кабинет</h1>
                 <div className={styles.profileInputWrap}>
                     <InputField
                         placeholder={"Фамилия"}
@@ -154,6 +157,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     value={"Сохранить"}
                 />
             </form>
+            <PaymentTimer/>
         </div>
     );
 }

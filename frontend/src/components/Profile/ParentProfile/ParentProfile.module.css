@@ -1,58 +1,95 @@
-.profileWrap{
-    margin: 0 40px 0 140px;
+.profileWrap {
+    margin: 0 0 0 140px;
+    display: flex;
+}
+
+@media screen and (max-width: 1000px) {
+    .profileWrap {
+        flex-direction: column;
+    }
 }
 @media screen and (max-width: 768px) {
-    .profileWrap{
+    .profileWrap {
         margin: 0 15px 40px 15px;
     }
 }
+
 @media screen and (max-width: 460px) {
-    .profileWrap{
+    .profileWrap {
         margin: 0 15px 40px 15px;
     }
 }
-.profileInputWrap{
+
+.profileTitle {
+    color: #090909;
+    font-family: "Nunito";
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 20px;
+    padding: 60px 40px 40px 0;
+}
+
+@media screen and (max-width: 768px) {
+    .profileTitle {
+        margin-left: 0;
+        padding: 40px 20px 40px 0;
+    }
+}
+
+
+.profileInputWrap {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
     align-items: end;
 }
+
 @media screen and (max-width: 768px) {
-    .profileInputWrap{
+    .profileInputWrap {
         justify-content: center;
         flex-direction: column;
         align-items: start;
     }
 }
+
 @media screen and (max-width: 460px) {
-    .profileInputWrap{
-        width:100%;
+    .profileInputWrap {
+        width: 100%;
     }
 }
-.profileForm{
+
+.profileForm {
     display: flex;
     flex-direction: column;
     align-items: start;
     gap: 40px;
 }
+
 @media screen and (max-width: 768px) {
-    .profileForm{
+    .profileForm {
         align-items: center;
     }
 }
-.parentPromotion{
+
+.parentPromotion {
     background-color: #F8F9FB;
-    padding: 16px 24px 16px 24px;
+    margin-right: 40px;
     font-size: 15px;
     font-weight: 400;
     border-radius: 8px;
 }
+.parentPromotion>p{
+    padding: 16px 24px 16px 24px;
+    line-height: 24px;
+}
 @media screen and (max-width: 768px) {
-    .parentPromotion{
+    .parentPromotion {
         margin: 0 3vw;
     }
+   
 }
-.parentPromotion>p>span{
+
+.parentPromotion>p>span {
     font-weight: 600;
     font-size: 18px;
 }

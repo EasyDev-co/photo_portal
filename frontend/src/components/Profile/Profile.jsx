@@ -7,7 +7,7 @@ export const Profile = ({ role }) => {
   const [nurseryIsAuth, setNurseryIsAuth] = useState(false)
   return <>
     <div className={styles.profileWrap}>
-    <Title text="Личный кабинет" />
+   
       {role === 'manager' ? <ManagerProfile /> : <ParentProfile nurseryIsAuth={nurseryIsAuth}/>}
     </div>
 
