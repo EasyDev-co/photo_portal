@@ -50,7 +50,14 @@ class EmailSerializer(serializers.Serializer):
         return value
 
 
-class PasswordChangeSerializer(EmailSerializer):
+class EmailAndCodeSerializer(EmailSerializer):
+    """
+    Сериализатор для проверки кода.
+    """
+    code = serializers.CharField()
+
+
+class PasswordChangeSerializer(EmailAndCodeSerializer):
     """
     Сериализатор для смены пароля.
     """
@@ -59,4 +66,3 @@ class PasswordChangeSerializer(EmailSerializer):
         required=True,
         validators=[validate_password]
     )
-
