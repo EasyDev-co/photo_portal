@@ -1,9 +1,11 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveAPIView
 
 from apps.photo.api.v1.serializers import (CurrentPhotoThemeRetrieveSerializer,
                                            PhotoLineRetrieveSerializer,
                                            PhotoRetrieveSerializer)
 from apps.photo.models import Photo, PhotoLine, PhotoTheme
+from apps.photo.permissions import HasPermissionCanViewPhotoLine
 
 
 class PhotoRetrieveAPIView(RetrieveAPIView):
@@ -11,6 +13,7 @@ class PhotoRetrieveAPIView(RetrieveAPIView):
     Получение фотографии по введенному номеру.
     """
     serializer_class = PhotoRetrieveSerializer
+    permission_classes = [IsAuthenticated]
     lookup_field = 'number'
 
     def get_queryset(self):
@@ -24,6 +27,7 @@ class PhotoLineRetrieveAPIView(RetrieveAPIView):
     """
     serializer_class = PhotoLineRetrieveSerializer
     queryset = PhotoLine.objects.prefetch_related('photos').all()
+    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
 
 
 class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):

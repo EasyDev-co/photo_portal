@@ -44,7 +44,10 @@ class Kindergarten(UUIDMixin):
 
     def save(self, *args, **kwargs):
         if not self.qr_code:
-            qr_code, buffer = generate_qr_code(REGISTRATION_URL_FOR_PARENT + self.code)
+            qr_code, buffer = generate_qr_code(
+                url=REGISTRATION_URL_FOR_PARENT,
+                kindergarten_code=self.code
+            )
             self.qr_code.save(
                 f'{self.code}_qr.png',
                 ContentFile(buffer.read())
