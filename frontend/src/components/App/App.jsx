@@ -9,10 +9,10 @@ import { Rules } from "../Rules/Rules";
 import { Payment } from "../Payment/Payment";
 import { Login } from "../Login/Login";
 import { Registration } from "../Registration/Registration";
-import { PasswordReset } from "../PasswordReset/PasswordReset";
 import { NotFound } from "../NotFound/NotFound";
 import { AuthRoutes } from "../AuthRoutes/AuthRoutes";
-
+import ResetPassword from "../Registration/ResetPassword/ResetPassword";
+import NewPassword from "../Registration/NewPassword/NewPassword";
 export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,7 +37,8 @@ export const App = () => {
       <Route element={<AuthRoutes />}>
         <Route path="/sign-in" element={<Login />} />
         <Route path="/sign-up" element={<Registration />} />
-        <Route path="/password-reset" element={<PasswordReset />} />
+        <Route path="/password-reset" element={<ResetPassword />} />
+        <Route path="/password-reset/new-password" element={<NewPassword />} />
         <Route path="/*" element={<NotFound />} />
       </Route>
     </Routes>

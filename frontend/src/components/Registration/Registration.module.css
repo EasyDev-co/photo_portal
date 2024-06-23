@@ -1,83 +1,201 @@
 .login {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .container {
-    min-width: 100vw;
-    width: 100%;
-    min-height: 100vh;
-    height: 100%;
-    background-image: url("../../assets/images/logInBg.jpg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .regFormContainer{
-    padding: 100px 120px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    align-items: center;
-  }
-  .regFormWrap{
-    width: 620px;
-    position: absolute;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 16px;
-    gap: 32px;
-    margin-left: 240px;
-  }
-  .regForm{
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .privacyCheckbox{
-    display: flex;
-    align-items: start;
+  width: 100%;
+  height: 100%;
+}
 
-    font-size: 15px;
+.container {
+  min-width: 100vw;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  background-image: url("../../assets/images/logInBg.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.formHeader{
+  font-size: 24px;
+  font-weight: 700;
+}
+.blurContainer {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+
+.regFormContainer {
+  padding: 100px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  .regFormContainer {
+    padding: 80px 46px;
   }
-  .privacyCheckbox>label>p>span{
-    color: rgb(17, 187, 209);
-   
-    line-height: 24px;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+  .regFormContainer {
+    padding: 60px 16px;
   }
-  .authButton{
-      background-color: rgb(17, 187, 209);
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 700;
+}
+.regFormWrap {
+  width: 620px;
+  position: absolute;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 16px;
+  gap: 32px;
+  margin-left: 240px;
+  z-index: 100;
+}
+
+@media screen and (max-width: 768px) {
+  .regFormWrap {
+    width: 736px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
   }
-  .socialIcon{
+}
+
+@media (min-width: 360px) and (max-width: 767px) {
+  .regFormWrap {
+    width: 95%;
+  }
+}
+
+.regForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.privacyCheckbox {
+  display: flex;
+  align-items: start;
+
+  font-size: 15px;
+}
+
+.privacyCheckbox>label>p {
+  color: rgb(110, 110, 110);
+  font-size: 15px;
+}
+
+.privacyCheckbox>label>p>span {
+  color: rgb(17, 187, 209);
+  line-height: 24px;
+}
+
+.loginEnter {
+  color: rgb(17, 187, 209);
+  line-height: 24px;
+}
+
+@media screen and (max-width: 768px) {
+  .privacyCheckbox {
+    gap: 16px;
+  }
+
+  .privacyCheckbox>label>p {
+    font-size: 20px;
+  }
+
+  .privacyCheckbox>input {
     width: 24px;
     height: 24px;
   }
-  .socialWrap{
-    display: flex;
-    gap: 24px;
+}
+
+@media (min-width: 360px) and (max-width: 767px) {
+  .privacyCheckbox {
+    gap: 8px;
   }
-  .socialList{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  .loginLinkWrap{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+  .privacyCheckbox>label>p {
     font-size: 15px;
   }
-  .loginLinkWrap>p>span{
-    color: rgb(17, 187, 209);
+}
+
+.authButton {
+  background-color: rgb(17, 187, 209);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+  .authButton {
+    font-size: 20px;
   }
+}
+@media (min-width: 360px) and (max-width: 767px) {
+  .authButton {
+   font-size: 15px;
+  }
+}
+.socialIcon {
+  width: 24px;
+  height: 24px;
+}
+
+@media screen and (max-width: 768px) {
+  .socialIcon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (min-width: 360px) and (max-width: 767px) {
+  .socialIcon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.socialWrap {
+  display: flex;
+  gap: 24px;
+}
+
+.socialList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loginLinkWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-size: 15px;
+}
+
+@media screen and (max-width: 768px) {
+  .loginLinkWrap {
+    font-size: 20px;
+  }
+}
+@media (min-width: 360px) and (max-width: 767px) {
+  .loginLinkWrap {
+   font-size: 15px;
+  }
+}
+
+.loginLinkWrap>p>span {
+  color: rgb(17, 187, 209);
+}

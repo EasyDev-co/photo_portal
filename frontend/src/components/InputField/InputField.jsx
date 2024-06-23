@@ -1,16 +1,35 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import style from './InputField.module.css'
-
-const InputField = ({ placeholder, type, label, name, id, value, isPencil, isMarker, isNone, isQuestions, onChangeHandler, inputValue, isAuthForm }) => {
+import { useClickOutside } from '../../utils/useClickOutside';
+import Prompt from '../Registration/Prompt/Prompt';
+const InputField = ({ placeholder, type, label, name, id, value, isPencil, isMarker, isNone, isQuestions, setActiveBlur, activeBlur, onChangeHandler, inputValue, isAuthForm }) => {
     const [activeInput, setIsActiveInput] = useState(false);
-    const [activeWidget,setActiveWidget] = useState(false)
+    const [activeWidget, setActiveWidget] = useState(false);
+    const [highlight, setHighlight] = useState(false);
+
+    const inputRef = useRef(null);
+
     const clickMarker = (e) => {
-        setIsActiveInput(!activeInput)
-        if(isQuestions){
+        setIsActiveInput(!activeInput);
+       
+        const siblingInput = inputRef.current;
+        if (isQuestions) {
+            
             setActiveWidget(!activeWidget)
+            const siblingValue = siblingInput.getAttribute('name');
+            if (siblingValue === 'gardenCode') {
+                setHighlight(true)
+            } else {
+                setHighlight(false)
+            }
         }
+       
     }
-    console.log(activeWidget)
+    
+    const radioRef = useRef(null)
+    useClickOutside(radioRef, () => {
+        setActiveWidget(false);
+    })
     return (
         <div className={style.inputWrap}>
             <label className={style.labelDesc} htmlFor={id}>
@@ -18,8 +37,9 @@ const InputField = ({ placeholder, type, label, name, id, value, isPencil, isMar
             </label>
             <div className={isAuthForm ? style.inputFieldWrapAuth : style.inputFieldWrap}>
                 <input
+                    ref={inputRef}
                     onChange={(e) => onChangeHandler(e)}
-                    className={style.inputField}
+                    className={activeWidget ? style.inputQuestionField : style.inputField}
                     type={activeInput ? 'text' : type}
                     placeholder={placeholder}
                     name={name}
@@ -36,8 +56,11 @@ const InputField = ({ placeholder, type, label, name, id, value, isPencil, isMar
                                         : style.inputIsShow}>
 
                 </div>
-                <div className={activeWidget?style.showWidget:style.hideWidget}>
-                        qweqweqweqweqweqw
+                <div ref={radioRef} className={activeWidget ? style.showWidget : style.hideWidget}>
+                    <Prompt
+                        highlight={highlight}
+                        activeWidget={activeWidget}
+                    />
                 </div>
             </div>
         </div>

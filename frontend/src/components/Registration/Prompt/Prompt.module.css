@@ -1,0 +1,166 @@
+.promptWrap{
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    position: relative;
+}
+
+.promptWrap::after{
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-right: 20px solid white;
+    border-bottom: 12px solid transparent;
+    top: 10px;
+    left: -18px;
+}
+@media screen and (max-width: 768px) {
+    .promptWrap {
+        padding: 12px 16px;
+        width: min-content;
+        box-shadow: 0px 8px 20px 0px #18798A33;
+
+    }
+    .promptWrap::after{
+        display: none;
+    }
+  }
+.promptImgWrap{
+    display: flex;
+    gap: 4px;
+}
+@media screen and (max-width: 768px) {
+    .promptImgWrap {
+      justify-content: center;
+    }
+  }
+  @media (min-width: 360px) and (max-width: 767px) {
+    .promptImgWrap {
+      gap: 1.5px;
+    }
+  }
+.promptImgName{
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #EA4141;
+    margin: 0px 20px;
+    padding: 8px 15px;
+}
+@media screen and (max-width: 768px) {
+    .promptImgName {
+        margin: 0px 10px;
+        padding: 8px 10px;
+        border-radius: 4px;
+    }
+  }
+  @media (min-width: 360px) and (max-width: 767px) {
+    .promptImgName{
+        margin: 0px 10px;
+        padding: 8px 5px;
+    }
+  }
+
+
+.promptImgNameFalse{
+    display: flex;
+    justify-content: space-between;
+    border: none;
+    margin: 0px 20px;
+    padding: 8px 15px;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .promptImgNameFalse{
+        margin: 0px 10px;
+        padding: 4px 5px;
+    }
+  }
+.promptImgNameFalse>span{
+    font-size: 18px;
+    font-weight: 600;
+}
+.promptImgName>span{
+    font-size: 18px;
+    font-weight: 600;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .promptImgName>span{
+        font-size: 9px;
+    }
+    .promptImgNameFalse>span{
+        font-size: 9px;
+    }
+  }
+.promptBody{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding: 0px 15px;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .promptBody{
+        padding: 0;
+        margin-top: 7px;
+    }
+  }
+.promptBody>div:nth-child(1){
+    color: rgb(110, 110, 110);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .promptBody>div:nth-child(1){
+       font-size: 10px;
+       gap: 6px;
+    }
+  }
+.promptInfo{
+    padding: 8px 15px;
+    font-size: 18px;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .promptInfo{
+        padding: 0;
+       font-size: 14px;
+    }
+  }
+.borderActive{
+    border: 1px solid #EA4141;
+    padding: 8px;
+}
+.borderActiveUnActive{
+    border: none;
+    padding: 8px;
+}
+@media screen and (max-width: 768px) {
+    .borderActive {
+        border-radius: 4px;
+        padding: 4px;
+    }
+  }
+  @media (min-width: 360px) and (max-width: 767px) {
+    .borderActive{
+       padding: 2px;
+    }
+  }
+
+@media screen and (max-width: 768px) {
+    .promtImg {
+        width: 102px;
+        height: 153px;
+    }
+  }
+  @media (min-width: 360px) and (max-width: 767px) {
+    .promtImg{
+        width: 54px;
+        height: 81px;
+    }
+  }
+  @media (min-width: 360px) and (max-width: 767px) {
+    .promptLogo>img{
+       width: 141px;
+       height: 42px;
+    }
+  }

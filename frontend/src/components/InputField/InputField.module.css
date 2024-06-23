@@ -24,9 +24,35 @@
     width: 100%;
     transition: .3s;
 }
-
-.inputField:required:invalid {
+@media screen and (max-width: 768px) {
+    .inputField{
+      font-size: 20px;
+        
+    }
+    .inputField::placeholder{
+        font-size: 20px;
+    }
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .inputField{
+        font-size: 15px;
+          
+      }
+      .inputField::placeholder{
+          font-size: 15px;
+      }
+  }
+.inputField:focus:required:invalid {
     border: 1px solid rgb(240, 149, 149);
+}
+.inputQuestionField{
+    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgb(17, 187, 209);
+    height: 40px;
+    outline: none;
+    width: 100%;
+    transition: .3s;
 }
 .inputFieldWrap{
     width:436px;
@@ -38,11 +64,26 @@
         width:100%;
     }
 }
+
 .inputFieldWrapAuth{
     width:380px;
     display: flex;
     position: relative;
 }
+@media screen and (max-width: 768px) {
+    .inputQuestionField{
+        font-size: 20px;
+    }
+    .inputFieldWrapAuth{
+        width:100%;
+        
+    }
+}
+@media (min-width: 360px) and (max-width: 767px) {
+    .inputQuestionField{
+        font-size: 15px;
+    }
+  }
 @media screen and (max-width: 460px) {
     .inputFieldWrapAuth{
         width:100%;
@@ -100,7 +141,18 @@
 
 .showWidget{
     position: absolute;
+    z-index: 100;
+    right: -1115px;
 }
 .hideWidget{
     display: none;
 }
+
+@media screen and (max-width: 768px) {
+    .showWidget {
+        width: fit-content;    
+        left:50%;
+        transform:translatex(-50%);
+        top: 60px;
+    }
+  }

@@ -6,19 +6,16 @@ import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
 import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
-import InputAuth from "../InputField/InputAuth";
+import { Link } from "react-router-dom";
 export const Registration = () => {
+  const[activeBlur,setActiveBlur] = useState(false)
   const [inputValue, setInputValue] = useState({
-    // parentSurname: '',
-    // parentName: '',
-    // parentPatronymic: '',
-    // parentPhone: '',
-    // parentEmail: '',
-    // kindergarten: '',
-    // parentCity: '',
-    // parentPass: '',
-    // parentNewPass: '',
-    // resetEmail: ''
+    gardenCode: '',
+    pictureNumbers: '',
+    fullName: '',
+    email: '',
+    password: '',
+    repeatPassword: ''
   });
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
@@ -28,19 +25,24 @@ export const Registration = () => {
     e.preventDefault();
     console.log(inputValue)
   }
+
   return <>
     <div className={styles.login}>
       <div className={styles.container}>
+        <div className={activeBlur?styles.blurContainer:' '}></div>
         <div className={styles.regFormWrap}>
           <div className={styles.regFormContainer}>
-            <h1>Регистрация</h1>
-            <form className={styles.regForm} action="">
+            <h1 className={styles.formHeader}>Регистрация</h1>
+            <form onSubmit={(e)=>onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}
                 isQuestions
                 isAuthForm
+                value={inputValue.gardenCode}
+                activeBlur={activeBlur}
+                setActiveBlur={setActiveBlur}
               />
               <InputField
                 name={'pictureNumbers'}
@@ -48,6 +50,9 @@ export const Registration = () => {
                 placeholder={'Номера кадров'}
                 isQuestions
                 isAuthForm
+                value={inputValue.pictureNumbers}
+                activeBlur={activeBlur}
+                setActiveBlur={setActiveBlur}
               />
               <InputField
                 name={'fullName'}
@@ -55,6 +60,7 @@ export const Registration = () => {
                 placeholder={'ФИО'}
                 isNone
                 isAuthForm
+                value={inputValue.fullName}
               />
               <InputField
                 name={'email'}
@@ -62,7 +68,7 @@ export const Registration = () => {
                 placeholder={'Электронный адрес'}
                 isNone
                 isAuthForm
-
+                value={inputValue.email}
               />
               <InputField
                 name={'password'}
@@ -70,6 +76,7 @@ export const Registration = () => {
                 type={'password'}
                 placeholder={'Пароль'}
                 isAuthForm
+                value={inputValue.password}
               />
               <InputField
                 name={'repeatPassword'}
@@ -77,6 +84,7 @@ export const Registration = () => {
                 type={'password'}
                 placeholder={'Повторить пароль'}
                 isAuthForm
+                value={inputValue.repeatPassword}
               />
 
               <div className={styles.privacyCheckbox}>
@@ -86,13 +94,13 @@ export const Registration = () => {
                     Даю согласие на обработку своих персональных данных.
                     <span> С соглашением ознакомлен.</span>
                   </p>
-                 
+
                 </label>
               </div>
               <button className={styles.authButton}>Продолжить</button>
             </form>
             <div className={styles.loginLinkWrap}>
-              <p>Если есть аккаунт, выполните <span> Вход</span></p>
+              <p>Если есть аккаунт, выполните <Link to={'/sign-in'}><span className={styles.loginEnter}>Вход</span> </Link> </p>
               <div className={styles.socialList}>
                 <span>Войти через</span>
                 <div className={styles.socialWrap}>
