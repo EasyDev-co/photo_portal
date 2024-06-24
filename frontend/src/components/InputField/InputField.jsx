@@ -25,7 +25,6 @@ const InputField = ({ placeholder, type, label, name, id, value, isPencil, isMar
         }
        
     }
-    
     const radioRef = useRef(null)
     useClickOutside(radioRef, () => {
         setActiveWidget(false);
