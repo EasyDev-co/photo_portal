@@ -2,7 +2,7 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from django.db import models
 from apps.order.models import Order
 from apps.order.models.const import PhotoType
-# импорт apps.photo.models import Photo
+from apps.photo.models import Photo
 
 
 class OrderItem(UUIDMixin, TimeStampedMixin):
@@ -26,9 +26,11 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
         related_name="order_items",
         verbose_name="Заказ"
     )
-    # заглушка - заменить на ForeignKey после ревью PP-4
-    photo = models.UUIDField(
-        verbose_name="Фотография"
+    photo = models.ForeignKey(
+        Photo,
+        on_delete=models.CASCADE,
+        related_name='order_items',
+        verbose_name='Фотография',
     )
 
     class Meta:

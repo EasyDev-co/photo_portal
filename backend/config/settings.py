@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.parent',
     'apps.photo',
+    'apps.order',
+    'apps.promocode',
 ]
 
 MIDDLEWARE = [

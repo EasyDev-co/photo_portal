@@ -1,8 +1,12 @@
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from django.db import models
+from django.contrib.auth import get_user_model
+
 from apps.parent.models import Parent
 from apps.kindergarten.models import Kindergarten
 from apps.order.models.const import OrderStatus
+
+User = get_user_model()
 
 
 class Order(UUIDMixin, TimeStampedMixin):
@@ -13,13 +17,13 @@ class Order(UUIDMixin, TimeStampedMixin):
         default=0,
         verbose_name="Цена заказа",
     )
-    parent = models.ForeignKey(
-        Parent,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name="orders",
-        verbose_name="Родитель",
+        verbose_name="Пользователь",
     )
-    kindergarden = models.ForeignKey(
+    kindergarten = models.ForeignKey(
         Kindergarten,
         on_delete=models.PROTECT,
         related_name="orders",
@@ -36,4 +40,4 @@ class Order(UUIDMixin, TimeStampedMixin):
         verbose_name_plural = "Заказы"
 
     def __str__(self):
-        return f'Заказ {self.id}, {self.parent}'
+        return f'Заказ {self.id}, {self.user}'

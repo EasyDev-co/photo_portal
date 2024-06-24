@@ -1,6 +1,10 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
-from apps.parent.models import ConfirmCode, Parent
+from apps.parent.models import ConfirmCode
+
+
+User = get_user_model()
 
 
 class EmailErrorLog(models.Model):
@@ -21,8 +25,8 @@ class EmailErrorLog(models.Model):
         auto_now_add=True,
         verbose_name='Время создания'
     )
-    parent = models.ForeignKey(
-        Parent,
+    user = models.ForeignKey(
+        User,
         on_delete=models.PROTECT,
         verbose_name='Родитель'
     )
