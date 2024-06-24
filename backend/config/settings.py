@@ -1,10 +1,12 @@
 import os
 from pathlib import Path
+import sentry_sdk
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
+from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv()
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,6 +28,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
+    'django_celery_beat',
+    'drf_yasg',
+
+    # Приложения
+    'apps.kindergarten',
+    'apps.user',
+    'apps.parent',
+    'apps.photo',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +70,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    integrations=[
+            DjangoIntegration(),
+        ],
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -69,7 +89,6 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', 5432),
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -104,9 +123,9 @@ LOGGING = {
     },
 }
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -119,3 +138,40 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+REGISTRATION_URL_FOR_PARENT = os.environ.get('REGISTRATION_URL_FOR_PARENT')
+PHOTO_LINE_URL = os.environ.get('PHOTO_LINE_URL')
+
+AUTH_USER_MODEL = 'user.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_DB_CELERY = os.environ.get('REDIS_DB_CELERY')
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_CELERY}'
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.yandex.ru')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+CELERY_BEAT_SCHEDULE = {
+    "resend_code": {
+        "task": "apps.parent.tasks.ResendConfirmCodeTask",
+        "schedule": crontab(minute="*/1"),
+    },
+}
