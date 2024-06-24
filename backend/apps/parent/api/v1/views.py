@@ -1,17 +1,20 @@
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework import status
+from drf_yasg import openapi
 
 from apps.exceptions.api_exceptions import (MissingKindergartenCode,
                                             KindergartenCodeNotFound,
                                             InvalidCode)
 from apps.kindergarten.models import Kindergarten
-from apps.parent.api.v1.serializers import (ParentTokenObtainPairSerializer,
+from apps.parent.api.v1.serializers import (EmailAndCodeSerializer,
+                                            ParentTokenObtainPairSerializer,
                                             EmailSerializer,
                                             PasswordChangeSerializer)
 from apps.parent.models import ConfirmCode
@@ -71,6 +74,7 @@ class ParentLogoutAPIView(APIView):
     View для логаута пользователя.
     """
 
+    @swagger_auto_schema(responses={"205": openapi.Response(description="")})
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
@@ -79,7 +83,10 @@ class ParentLogoutAPIView(APIView):
 
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
-            return Response({'message': str(e), 'status': status.HTTP_400_BAD_REQUEST})
+            return Response(
+                {'message': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class ConfirmCodeMixin:
@@ -104,15 +111,15 @@ class EmailVerificationCodeAPIView(ConfirmCodeMixin, APIView):
     """
     View для верификации кода при регистрации родителя.
     """
-    email_serializer = EmailSerializer
+    email_serializer = EmailAndCodeSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.email_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
-
-        code = request.data.get('code')
+        code = serializer.validated_data['code']
         parent = Parent.objects.get(user__email=email)
+
         try:
             self.validate_code(
                 parent=parent,
@@ -147,6 +154,8 @@ class ResetPasswordAPIView(APIView):
     """
     email_serializer = EmailSerializer
 
+    @swagger_auto_schema(responses={"200": openapi.Response(description="")},
+                         request_body=EmailSerializer)
     def post(self, request, *args, **kwargs):
         serializer = self.email_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -160,10 +169,9 @@ class ResetPasswordAPIView(APIView):
         )
 
         return Response(
-            {
-                "message": "Код для восстановления пароля был отправлен на указанный email."
-            },
-            status=status.HTTP_200_OK)
+            data={"message": "Код для восстановления пароля был отправлен на указанный email."},
+            status=status.HTTP_200_OK
+        )
 
 
 class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
@@ -172,12 +180,13 @@ class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
     """
     email_serializer = EmailSerializer
 
+    @swagger_auto_schema(responses={"200": openapi.Response(description="")},
+                         request_body=EmailAndCodeSerializer)
     def post(self, request, *args, **kwargs):
         serializer = self.email_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         email = serializer.validated_data['email']
-        code = request.data.get('code')
+        code = serializer.validated_data['code']
         parent = Parent.objects.get(user__email=email)
 
         try:
@@ -204,6 +213,8 @@ class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
     """
     password_change_serializer = PasswordChangeSerializer
 
+    @swagger_auto_schema(responses={"200": openapi.Response(description="")},
+                         request_body=PasswordChangeSerializer)
     def post(self, request, *args, **kwargs):
         serializer = self.password_change_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

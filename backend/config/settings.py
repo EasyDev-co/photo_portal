@@ -1,8 +1,10 @@
 import os
 from pathlib import Path
+import sentry_sdk
 
 from celery.schedules import crontab
 from dotenv import load_dotenv
+from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv()
 
@@ -28,12 +30,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     'django_celery_beat',
+    'drf_yasg',
 
     # Приложения
     'apps.kindergarten',
     'apps.user',
     'apps.parent',
-    'apps.order',
+    'apps.photo',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +69,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    integrations=[
+            DjangoIntegration(),
+        ],
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 DATABASES = {
     'default': {
@@ -128,6 +140,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 REGISTRATION_URL_FOR_PARENT = os.environ.get('REGISTRATION_URL_FOR_PARENT')
+PHOTO_LINE_URL = os.environ.get('PHOTO_LINE_URL')
 
 AUTH_USER_MODEL = 'user.User'
 

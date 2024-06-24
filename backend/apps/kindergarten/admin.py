@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 from apps.kindergarten.models.region import Region
 from apps.kindergarten.models.kindergarten import Kindergarten
-from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
+from apps.kindergarten.models.photo_price import PhotoPrice
 
 
 class KindergartenInline(admin.TabularInline):
@@ -20,8 +20,8 @@ class PhotoPriceInline(admin.TabularInline):
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
     list_display = (
-        'region',
         'name',
+        'region',
         'code',
         'has_photobook'
     )
