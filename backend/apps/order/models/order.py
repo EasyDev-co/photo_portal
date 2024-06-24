@@ -1,11 +1,11 @@
-from apps.utils.models_mixins.models_mixins import UUIDMixin
+from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from django.db import models
 from apps.parent.models import Parent
 from apps.kindergarten.models import Kindergarten
-from apps.order.models.const import ORDER_STATUSES
+from apps.order.models.const import OrderStatus
 
 
-class Order(UUIDMixin):
+class Order(UUIDMixin, TimeStampedMixin):
     """Модель заказа."""
     order_price = models.DecimalField(
         max_digits=10,
@@ -25,10 +25,9 @@ class Order(UUIDMixin):
         related_name="orders",
         verbose_name="Детский сад",
     )
-    status = models.CharField(
-        max_length=200,
-        default="Не задан",
-        choices=ORDER_STATUSES,
+    status = models.PositiveSmallIntegerField(
+        choices=OrderStatus.choices,
+        default=OrderStatus.created,
         verbose_name="Статус заказа",
     )
 

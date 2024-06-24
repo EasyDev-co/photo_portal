@@ -1,14 +1,16 @@
-# Какие должны быть статусы заказа?
-ORDER_STATUSES = {
-    "created": "Создан",
-    "paid_for": "Оплачен",
-}
+from django.db import models
 
-# Уточнить, как указывать электронное фото
-PHOTO_TYPES = {
-    "10x15": "10x15",
-    "15x20": "15x20",
-    "20x30": "20x30",
-    "magnet": "Магнит",
-    "calendar": "Календарь",
-}
+
+class OrderStatus(models.IntegerChoices):
+    """Статус заказа."""
+    created = 1, 'Создан'
+    paid_for = 2, 'Оплачен'
+
+
+class PhotoType(models.IntegerChoices):
+    """Тип фото."""
+    size_10x15 = 1, '10x15'
+    size_15x20 = 2, '15x20'
+    size_20x30 = 3, '20x30'
+    magnet = 4, 'Магнит'
+    calendar = 5, 'Календарь'

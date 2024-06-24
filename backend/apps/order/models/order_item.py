@@ -1,19 +1,16 @@
-from apps.utils.models_mixins.models_mixins import UUIDMixin
+from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from django.db import models
 from apps.order.models import Order
-from apps.order.models.const import PHOTO_TYPES
+from apps.order.models.const import PhotoType
 # импорт apps.photo.models import Photo
 
 
-class OrderItem(UUIDMixin):
+class OrderItem(UUIDMixin, TimeStampedMixin):
     """Модель части (позиции) заказа."""
-    photo_type = models.CharField(
-        max_length=200,
-        choices=PHOTO_TYPES,
-        default="10x15",
+    photo_type = models.PositiveSmallIntegerField(
+        choices=PhotoType.choices,
+        default=PhotoType.size_20x30,
         verbose_name="Тип фото",
-        null=True,
-        blank=True,
     )
     is_digital = models.BooleanField(
         default=False,
