@@ -1,6 +1,5 @@
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 from django.db import models
-
 from apps.kindergarten.models import Kindergarten
 
 from apps.user.models import User
