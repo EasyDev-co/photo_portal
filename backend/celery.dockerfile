@@ -23,4 +23,4 @@ COPY celery_start.sh /celery_start.sh
 
 RUN chmod +x /celery_start.sh
 
-ENTRYPOINT ["/celery_start.sh"]
+ENTRYPOINT ["sh", "/celery_start.sh"]
