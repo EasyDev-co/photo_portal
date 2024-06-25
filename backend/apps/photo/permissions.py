@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import BasePermission
 
-# from apps.parent.models import Parent
 from apps.user.models.user import UserRole
 
 User = get_user_model()
