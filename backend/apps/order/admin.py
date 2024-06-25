@@ -16,7 +16,7 @@ class OrderAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', 'kindergarten')
     search_fields = ('user',)
-    raw_id_fields = ('kindergarten',)
+    raw_id_fields = ('user', 'kindergarten')
     readonly_fields = (
         'order_price',
         'status',
