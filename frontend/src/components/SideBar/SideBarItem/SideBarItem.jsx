@@ -1,5 +1,7 @@
+import { useDispatch } from "react-redux";
 import styles from "./SideBarItem.module.css";
 import { Link, useLocation } from "react-router-dom";
+import { removeUser } from "../../../store/authSlice";
 
 export const SideBarItem = ({
   sty,
@@ -15,13 +17,15 @@ export const SideBarItem = ({
   svgStrokeWidth,
   svgStrokeLinecap,
   secondPathD,
+  isLogOut
 }) => {
   const location = useLocation();
-
+  const dispatch = useDispatch();
   const isActive = location.pathname === router; // проверяем, соответствует ли текущий путь маршруту элемента
 
   return (
     <li
+      onClick={()=> isLogOut && dispatch(removeUser())}
       className={`${styles.navItem} ${sty ? sty : ""} ${
         isActive ? styles.active : ""
       }`}

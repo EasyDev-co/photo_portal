@@ -6,34 +6,56 @@ import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
 import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 export const Registration = () => {
-  const[activeBlur,setActiveBlur] = useState(false)
-  const [inputValue, setInputValue] = useState({
+  const initialState = {
     gardenCode: '',
     pictureNumbers: '',
     fullName: '',
     email: '',
     password: '',
     repeatPassword: ''
-  });
+  }
+  const [activeBlur, setActiveBlur] = useState(false)
+  const [inputValue, setInputValue] = useState(initialState);
+  const [responseData, setResponseData] = useState(null);
+  const [error, setError] = useState(null);
+  const navigation = useNavigate();
+
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
   }
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(inputValue)
-  }
+    const words = inputValue.fullName.split(' ');
+    const { gardenCode, pictureNumbers, fullName, email, password } = inputValue;
 
+    try {
+      const response = await parentRegisterCreate(email, words[1], words[2], words[0], password, gardenCode)
+      if (response.ok) {
+        const data = await response.json();
+        setResponseData(data);
+        navigation('/verification');
+      } else {
+        const data = await response.json();
+        setError(data);
+      }
+    } catch (error) {
+     
+    }
+    setInputValue(initialState);
+  }
+  console.log(responseData, error)
   return <>
     <div className={styles.login}>
       <div className={styles.container}>
-        <div className={activeBlur?styles.blurContainer:' '}></div>
+        <div className={activeBlur ? styles.blurContainer : ' '}></div>
         <div className={styles.regFormWrap}>
           <div className={styles.regFormContainer}>
             <h1 className={styles.formHeader}>Регистрация</h1>
-            <form onSubmit={(e)=>onSubmitHandler(e)} className={styles.regForm} action="">
+            <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
                 name={'gardenCode'}
                 placeholder={'Код сада'}

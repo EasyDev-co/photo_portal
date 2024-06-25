@@ -8,26 +8,57 @@ import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link } from "react-router-dom";
 import danger from '../../assets/images/Auth/DangerCircle.svg'
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../store/authSlice";
+import { parentLoginCreate } from "../../http/parentLoginCreate";
+
 export const Login = () => {
   const [activeBlur, setActiveBlur] = useState(false);
   const [wrongPassord, setWrongPassword] = useState(false);
   const [isActiveAuth, setIsActiveAuth] = useState(true);
-  const [isActiveReset, setIsActiveReset] = useState(false)
-  const [inputValue, setInputValue] = useState({
+  const [isActiveReset, setIsActiveReset] = useState(false);
+  const [error, setError] = useState(null);
+
+  const dispatch = useDispatch();
+  const navigation = useNavigate();
+  const initialState = {
     gardenCode: '',
     pictureNumbers: '',
     fullName: '',
     email: '',
     password: '',
     repeatPassword: ''
-  });
+  }
+  const [inputValue, setInputValue] = useState(initialState);
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
   }
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(inputValue)
+
+    try {
+        const response = await parentLoginCreate(inputValue.email,inputValue.password)
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data)
+            dispatch(
+                setUser({
+                    access: data.access,
+                    refresh: data.refresh
+                })
+            )
+            navigation('/')
+        } else {
+            const data = await response.json();
+            setError(data);
+        }
+    } catch (error) {
+
+    }
+    setInputValue(initialState);
+
   }
   return (
     <>

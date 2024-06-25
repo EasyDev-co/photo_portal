@@ -1,8 +1,12 @@
 import styles from "./Orders.module.css";
 import React, { useState } from 'react';
+import {useAuth} from '../../utils/useAuth';
+import { addAccessTokenToHeaders } from "../../http/addAccessToken";
 export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
-
+  const {isAuth} = useAuth();
+  console.log(isAuth)
+  console.log(addAccessTokenToHeaders({}))
   const addBlock = () => {
     if (blocks.length < 3) {
       setBlocks([...blocks, { id: blocks.length + 1 }]);

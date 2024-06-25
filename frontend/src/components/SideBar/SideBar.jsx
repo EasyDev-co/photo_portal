@@ -79,6 +79,7 @@ export const SideBar = () => {
               pathFill="#6E6E6E"
             />
             <SideBarItem
+              isLogOut
               sty={styles.navLinkExit}
               router="/sign-in"
               svgWidth="24"
