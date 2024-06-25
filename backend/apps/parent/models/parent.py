@@ -5,26 +5,26 @@ from apps.kindergarten.models import Kindergarten
 from apps.user.models import User
 
 
-class Parent(UUIDMixin):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='parent',
-        verbose_name='Пользователь'
-    )
-    kindergarten = models.ManyToManyField(
-        Kindergarten,
-        related_name='parents',
-        verbose_name='Детский сад'
-    )
-    is_verified = models.BooleanField(
-        default=False,
-        verbose_name='Подтверждение email'
-    )
-
-    def __str__(self):
-        return f'Родитель {self.user}'
-
-    class Meta:
-        verbose_name = 'Родитель'
-        verbose_name_plural = 'Родители'
+# class Parent(UUIDMixin):
+#     user = models.OneToOneField(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='parent',
+#         verbose_name='Пользователь'
+#     )
+#     kindergarten = models.ManyToManyField(
+#         Kindergarten,
+#         related_name='parents',
+#         verbose_name='Детский сад'
+#     )
+#     is_verified = models.BooleanField(
+#         default=False,
+#         verbose_name='Подтверждение email'
+#     )
+#
+#     def __str__(self):
+#         return f'Родитель {self.user}'
+#
+#     class Meta:
+#         verbose_name = 'Родитель'
+#         verbose_name_plural = 'Родители'

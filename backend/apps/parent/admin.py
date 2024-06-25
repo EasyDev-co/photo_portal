@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from apps.parent.models.parent import Parent
+# from apps.parent.models.parent import Parent
 
 from apps.kindergarten.models import Kindergarten
 
 
 class KindergartenInline(admin.TabularInline):
-    model = Kindergarten.parents.through
+    # model = Kindergarten.parents.through
     extra = 0
     verbose_name = "Детский сад"
     verbose_name_plural = "Детские сады"
