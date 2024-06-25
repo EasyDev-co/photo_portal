@@ -72,14 +72,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[
-            DjangoIntegration(),
-        ],
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+# Настройки SENTRY
+SENTRY_IS_ON = os.environ.get('SENTRY_IS_ON')
+
+if SENTRY_IS_ON:
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        integrations=[
+                DjangoIntegration(),
+            ],
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 DATABASES = {
     'default': {
