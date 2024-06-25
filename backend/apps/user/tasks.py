@@ -77,7 +77,7 @@ class ResendConfirmCodeTask(BaseTask):
         )
         for email_error_log in email_error_logs:
             send_confirm_code.delay(
-                user_id=email_error_log.user.user.id,
+                user_id=email_error_log.user.id,
                 code_purpose=email_error_log.confirm_code.purpose
             )
         email_error_logs.update(is_sent=True)
