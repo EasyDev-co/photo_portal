@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 
 from apps.user.models import User
+from apps.user.models.user import UserRole
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -14,6 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[validate_password]
     )
     kindergarten_code = serializers.CharField(max_length=255, required=False)
+
+    role = serializers.CharField(source='get_role_display')
 
     class Meta:
         model = User
