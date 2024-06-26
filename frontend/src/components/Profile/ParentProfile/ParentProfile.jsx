@@ -173,7 +173,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     value={"Сохранить"}
                 />
             </form>
-            <PaymentTimer />
+            <PaymentTimer 
+            count={'3 500'}/>
         </div>
     );
 }
