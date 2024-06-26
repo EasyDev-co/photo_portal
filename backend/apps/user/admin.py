@@ -26,5 +26,14 @@ class UserAdmin(admin.ModelAdmin):
         'promocode',
         'is_verified',
     )
+    search_fields = (
+        'email',
+        'first_name',
+        'second_name',
+        'lastname',
+        'promocode',
+    )
+    list_filter = ('role', 'is_verified')
+    raw_id_fields = ('promocode',)
 
     inlines = [KindergartenInLine]

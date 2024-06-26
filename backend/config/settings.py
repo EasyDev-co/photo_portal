@@ -72,14 +72,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[
-            DjangoIntegration(),
-        ],
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+# Настройки SENTRY
+SENTRY_IS_ON = os.environ.get('SENTRY_IS_ON')
+
+if SENTRY_IS_ON:
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        integrations=[
+                DjangoIntegration(),
+            ],
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 DATABASES = {
     'default': {
@@ -173,7 +177,10 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 
 CELERY_BEAT_SCHEDULE = {
     "resend_code": {
-        "task": "apps.parent.tasks.ResendConfirmCodeTask",
+        "task": "apps.user.tasks.ResendConfirmCodeTask",
         "schedule": crontab(minute="*/1"),
     },
 }
+
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')

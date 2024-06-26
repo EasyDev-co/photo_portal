@@ -4,6 +4,7 @@ from django.db import models
 from apps.kindergarten.models import Kindergarten
 from apps.promocode.models import Promocode
 from apps.user.managers import UserManager
+from apps.utils.models_mixins.models_mixins import UUIDMixin
 
 
 class UserRole(models.IntegerChoices):
@@ -14,7 +15,7 @@ class UserRole(models.IntegerChoices):
     manager = 2, 'Заведующий'
 
 
-class User(AbstractUser):
+class User(UUIDMixin, AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     first_name = models.CharField(
