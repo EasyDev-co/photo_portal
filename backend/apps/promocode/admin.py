@@ -10,6 +10,7 @@ class PromocodeAdmin(admin.ModelAdmin):
         'code',
         'created',
         'modified',
+        'is_active',
     )
     readonly_fields = (
         'created',

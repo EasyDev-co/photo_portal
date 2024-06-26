@@ -2,7 +2,6 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from apps.parent.models import Parent
 from apps.kindergarten.models import Kindergarten
 from apps.order.models.const import OrderStatus
 
