@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.parent',
     'apps.photo',
+    'apps.order',
+    'apps.promocode',
 ]
 
 MIDDLEWARE = [
@@ -175,3 +177,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="*/1"),
     },
 }
+
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
