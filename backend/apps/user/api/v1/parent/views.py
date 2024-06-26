@@ -17,9 +17,8 @@ from apps.exceptions.api_exceptions import (MissingKindergartenCode,
                                             KindergartenCodeNotFound,
                                             InvalidCode)
 from apps.kindergarten.models import Kindergarten
-from apps.user.api.v1.serializers import UserSerializer
+from apps.user.api.v1.serializers import UserSerializer, UserTokenObtainPairSerializer
 from apps.user.api.v1.parent.serializers import (EmailAndCodeSerializer,
-                                                 ParentTokenObtainPairSerializer,
                                                  EmailSerializer,
                                                  PasswordChangeSerializer)
 
@@ -61,11 +60,6 @@ class ParentRegisterAPIView(CreateAPIView):
             code_purpose=CodePurpose.CONFIRM_EMAIL
         )
         return user
-
-
-class ParentLoginAPIView(TokenObtainPairView):
-    """Представление для авторизации родителя."""
-    serializer_class = ParentTokenObtainPairSerializer
 
 
 class ParentLogoutAPIView(APIView):
