@@ -8,6 +8,10 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         max_length=200,
         verbose_name="Промокод",
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активен",
+    )
 
     class Meta:
         verbose_name = "Промокод"

@@ -1,7 +1,7 @@
 from django.urls import path
 
+from apps.user.api.v1.views import UserLoginAPIView
 from apps.user.api.v1.parent.views import (ParentRegisterAPIView,
-                                           ParentLoginAPIView,
                                            ParentLogoutAPIView,
                                            EmailVerificationCodeAPIView,
                                            ResetPasswordAPIView,
@@ -12,7 +12,7 @@ from apps.user.api.v1.parent.views import (ParentRegisterAPIView,
 
 urlpatterns = [
     path('register/', ParentRegisterAPIView.as_view(), name='parent_register'),
-    path('login/', ParentLoginAPIView.as_view(), name='parent_login'),
+    path('login/', UserLoginAPIView.as_view(), name='parent_login'),
     path('logout/', ParentLogoutAPIView.as_view(), name='parent_logout'),
     path('email_verification_code/', EmailVerificationCodeAPIView.as_view(), name='email_verification_code'),
     path('reset_password/', ResetPasswordAPIView.as_view(), name='reset_password'),
