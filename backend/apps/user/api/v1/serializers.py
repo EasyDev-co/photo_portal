@@ -22,8 +22,6 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise ValidationError('Нет такого пользователя.')
 
         refresh = RefreshToken.for_user(user)
-
-        refresh['id'] = user.id
         refresh['email'] = user.email
         refresh['role'] = user.role
 
