@@ -196,7 +196,7 @@ class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.password_change_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['new_password']
+        email = serializer.validated_data['email']
         new_password = serializer.validated_data['new_password']
         code = request.data.get('code')
         user = User.objects.get(email=email)
