@@ -158,7 +158,7 @@ class ResetPasswordAPIView(APIView):
 
 class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
     """Представление для верификации кода восстановления пароля."""
-    email_serializer = EmailSerializer
+    email_serializer = EmailAndCodeSerializer
 
     @swagger_auto_schema(responses={"200": openapi.Response(description="")},
                          request_body=EmailAndCodeSerializer)
@@ -167,7 +167,7 @@ class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         code = serializer.validated_data['code']
-        user = User.objects.get(user__email=email)
+        user = User.objects.get(email=email)
 
         try:
             self.validate_code(
