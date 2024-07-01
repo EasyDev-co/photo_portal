@@ -1,8 +1,8 @@
 import styles from './MainButton.module.css'
 
-const PaymentButton = ({value}) => {
+const PaymentButton = ({value, onSubmitHandler,formId}) => {
     return ( 
-        <button className={styles.paymentButton}>{value}</button>
+        <button form={formId} type='submit'  className={styles.paymentButton}>{value}</button>
     );
 }
  

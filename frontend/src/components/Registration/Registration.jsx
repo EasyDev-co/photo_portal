@@ -1,6 +1,6 @@
 import InputField from "../InputField/InputField";
 import styles from "./Registration.module.css";
-import { useState } from "react";
+import { useState,useRef } from "react";
 import yandex from '../../assets/images/socials/Я.svg'
 import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
@@ -8,6 +8,9 @@ import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parentRegisterCreate";
+import { useDispatch, useSelector } from "react-redux";
+import { setEmail } from "../../store/authSlice";
+import { useClickOutside } from "../../utils/useClickOutside";
 export const Registration = () => {
   const initialState = {
     gardenCode: '',
@@ -22,20 +25,29 @@ export const Registration = () => {
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const navigation = useNavigate();
-
+  const email = useSelector(action=>action.user.email);
+  const dispatch = useDispatch();
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
   }
+  const blurRef = useRef(null);
+
+  useClickOutside(blurRef, () => {
+     setActiveBlur(false)
+  })
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const words = inputValue.fullName.split(' ');
     const { gardenCode, pictureNumbers, fullName, email, password } = inputValue;
-
+ 
     try {
       const response = await parentRegisterCreate(email, words[1], words[2], words[0], password, gardenCode)
       if (response.ok) {
         const data = await response.json();
+        dispatch(
+          setEmail(inputValue.email)
+        )
         setResponseData(data);
         navigation('/verification');
       } else {
@@ -47,7 +59,7 @@ export const Registration = () => {
     }
     setInputValue(initialState);
   }
-  console.log(responseData, error)
+
   return <>
     <div className={styles.login}>
       <div className={styles.container}>
@@ -55,7 +67,7 @@ export const Registration = () => {
         <div className={styles.regFormWrap}>
           <div className={styles.regFormContainer}>
             <h1 className={styles.formHeader}>Регистрация</h1>
-            <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
+            <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
                 name={'gardenCode'}
                 placeholder={'Код сада'}
@@ -65,6 +77,7 @@ export const Registration = () => {
                 value={inputValue.gardenCode}
                 activeBlur={activeBlur}
                 setActiveBlur={setActiveBlur}
+                blurRef={blurRef}
               />
               <InputField
                 name={'pictureNumbers'}
@@ -75,6 +88,7 @@ export const Registration = () => {
                 value={inputValue.pictureNumbers}
                 activeBlur={activeBlur}
                 setActiveBlur={setActiveBlur}
+                blurRef={blurRef}
               />
               <InputField
                 name={'fullName'}

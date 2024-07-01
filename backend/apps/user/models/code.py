@@ -1,7 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from apps.parent.models import Parent
+User = get_user_model()
 
 
 class CodePurpose(models.IntegerChoices):
@@ -10,32 +11,37 @@ class CodePurpose(models.IntegerChoices):
 
 
 class ConfirmCode(models.Model):
-    parent = models.ForeignKey(
-        Parent,
+    """Модель кода подтверждения"""
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
-        verbose_name='Родитель'
+        verbose_name='Пользователь',
     )
     code = models.CharField(
         max_length=100,
         unique=True,
         verbose_name='Код',
-        null=True
+        null=True,
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Время создания'
     )
-    purpose = models.IntegerField(
+    purpose = models.PositiveSmallIntegerField(
         choices=CodePurpose.choices,
-        verbose_name='Цель'
+        verbose_name='Цель',
     )
     is_used = models.BooleanField(
         default=False,
-        verbose_name='Использован'
+        verbose_name='Использован',
     )
 
+    class Meta:
+        verbose_name = 'Код подтверждения'
+        verbose_name_plural = 'Коды подтверждения'
+
     def __str__(self):
-        return f"Код для {self.parent}"
+        return f"Код для {self.user}"
 
     @property
     def is_expired(self):

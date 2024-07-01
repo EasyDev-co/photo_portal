@@ -1,8 +1,11 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useAuth } from "../utils/useAuth";
 export const addAccessTokenToHeaders = (headers) => {
-    const accessToken = localStorage.getItem('accessToken');
+    const {acces} = useAuth();
   
-    if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
+    if (acces) {
+        headers['Authorization'] = `Bearer ${acces}`;
+        headers['Content-Type'] = 'application/json';
     }
   
     return headers;

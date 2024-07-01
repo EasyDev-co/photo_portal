@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 import sentry_sdk
 
@@ -20,6 +21,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
     "http://localhost:8001",
+    "http://localhost:8080",
 ]
 
 INSTALLED_APPS = [
@@ -43,17 +45,19 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.parent',
     'apps.photo',
+    'apps.order',
+    'apps.promocode',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -76,14 +80,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[
-            DjangoIntegration(),
-        ],
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+# Настройки SENTRY
+SENTRY_IS_ON = os.environ.get('SENTRY_IS_ON')
+
+if SENTRY_IS_ON:
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        integrations=[
+                DjangoIntegration(),
+            ],
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 DATABASES = {
     'default': {
@@ -177,7 +185,17 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 
 CELERY_BEAT_SCHEDULE = {
     "resend_code": {
-        "task": "apps.parent.tasks.ResendConfirmCodeTask",
+        "task": "apps.user.tasks.ResendConfirmCodeTask",
         "schedule": crontab(minute="*/1"),
     },
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
+
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')

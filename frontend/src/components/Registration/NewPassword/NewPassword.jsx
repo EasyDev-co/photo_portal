@@ -1,27 +1,43 @@
 import styles from '../Registration.module.css'
 import { useState } from "react";
 import InputField from "../../InputField/InputField";
-
+import { parentChangePass } from '../../../http/parentChangePass';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 const NewPassword = () => {
-    const [inputValue, setInputValue] = useState({
+    const initialState = {
         newPassword: '',
-        resetCode: ''
-    });
-    const [onReset, setOnReset] = useState(false)
+        repeatNewPass: ''
+    }
+    const [inputValue, setInputValue] = useState(initialState);
+    const [onReset, setOnReset] = useState(false);
+    const email = useSelector(action => action.user.email);
+    const code = useSelector(action => action.user.code);
+    const navigation = useNavigate();
+
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
     }
-    const onSubmitHandler = (e) => {
+    const onSubmitHandler = async (e) => {
         e.preventDefault();
+        try {
+            const response = await parentChangePass(code, email, inputValue.newPassword)
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                setInputValue(initialState);
+                navigation('/sign-in')
+            } else {
+                const data = await response.json();
+                console.log(data)
+            }
+        } catch (error) {
+
+        }
         console.log(inputValue)
     }
-    const sendToResetPass = () => {
-        setTimeout(() => {
-            setOnReset(!onReset)
-        }, 1000)
 
-    }
     return (
         <>
             <div className={styles.login}>
@@ -30,7 +46,6 @@ const NewPassword = () => {
                         <div className={styles.regFormContainer}>
                             <h1 className={styles.formHeader}>Восстановление пароля</h1>
                             <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
-
                                 <InputField
                                     name={'newPassword'}
                                     onChangeHandler={onChangeHandler}
@@ -49,7 +64,7 @@ const NewPassword = () => {
                                     isNone
                                     value={inputValue.repeatNewPass}
                                 />
-                                <button onClick={() => sendToResetPass()} className={styles.authButton}>Продолжить</button>
+                                <button className={styles.authButton}>Продолжить</button>
                             </form>
                         </div>
                     </div>

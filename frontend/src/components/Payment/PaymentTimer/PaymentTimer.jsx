@@ -4,21 +4,26 @@ import PaymentDiagram from '../PaymentDiagram/PaymentDiagram';
 import styles from './PaymentTimer.module.css'
 import Timer from './Timer';
 
-const PaymentTimer = () => {
+const PaymentTimer = ({count,onSubmitHandler,formId}) => {
+    const addDays = 3;
+    const date = new Date()
+    
     return (
         <div className={styles.paymentTimerWrap}>
             <Timer
-                date={'Sat Jun 22 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}
+                date={date.setDate(date.getDate() + addDays)}
                 desc={':'}
             />
             <PaymentDiagram
-                count={'3 500'}
+                count={count}
             />
-            <Link to={'/payment'}>
+            {/* <Link to={'/payment'}> */}
                 <PaymentButton
+                    formId={'orderForm'}
+                    onSubmitHandler={onSubmitHandler}
                     value={'Оплатить'}
                 />
-            </Link>
+            {/* </Link> */}
 
         </div>
     );

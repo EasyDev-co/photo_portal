@@ -15,9 +15,10 @@ const Verification = () => {
     const [inputValue, setInputValue] = useState(initialState);
     const [error, setError] = useState(null);
     const {isAuth} = useAuth();
-    console.log(isAuth);
-    
+
+    const email = useSelector(action=>action.user.email);
     const navigation = useNavigate();
+    console.log(email);
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
@@ -25,7 +26,7 @@ const Verification = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         try {
-            const response = await parentEmailVerification(inputValue.code,inputValue.email)
+            const response = await parentEmailVerification(inputValue.code,email)
             if (response.ok) {
                 const data = await response.json();
                 dispatch(
@@ -61,15 +62,6 @@ const Verification = () => {
                                     isAuthForm
                                     isNone
                                     value={inputValue.code}
-                                />
-                                <InputField
-                                    name={'email'}
-                                    onChangeHandler={onChangeHandler}
-                                    type={'text'}
-                                    placeholder={'Введите Email'}
-                                    isAuthForm
-                                    isNone
-                                    value={inputValue.email}
                                 />
                                 <button className={styles.authButton}>Продолжить</button>
                             </form>
