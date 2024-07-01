@@ -19,7 +19,7 @@ services:
       - static_dir:/opt/backend/static/
       - media_dir:/opt/backend/media/
     ports:
-      - "8000:8000"
+      - "8080:8080"
     depends_on:
       - web
     networks:

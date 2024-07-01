@@ -1,15 +1,17 @@
 import traceback
-from celery import shared_task
 from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 
-from apps.parent.models import ConfirmCode, Parent
-from apps.parent.models.code import CodePurpose
-from apps.parent.models.email_error_log import EmailErrorLog
-from apps.user.models import User
+from apps.user.models import ConfirmCode
+from apps.user.models.code import CodePurpose
+from apps.user.models.email_error_log import EmailErrorLog
+
 from config.celery import BaseTask, app
 from config.settings import EMAIL_HOST_USER
+
+User = get_user_model()
 
 
 class SendConfirmCodeTask(BaseTask):
@@ -18,8 +20,6 @@ class SendConfirmCodeTask(BaseTask):
     def process(self, user_id, code_purpose, *args, **kwargs):
         user: User = User.objects.get(id=user_id)
         code = default_token_generator.make_token(user)
-        parent = Parent.objects.get(user=user)
-
         if code_purpose == CodePurpose.RESET_PASSWORD:
             subject = 'Восстановление пароля'
             message = 'Код восстановления пароля:\n'
@@ -31,13 +31,13 @@ class SendConfirmCodeTask(BaseTask):
 
         with transaction.atomic():
             ConfirmCode.objects.filter(
-                parent=parent,
+                user=user,
                 purpose=code_purpose,
                 is_used=False
             ).update(is_used=True)
 
             confirm_code = ConfirmCode.objects.create(
-                parent=parent,
+                user=user,
                 code=code,
                 purpose=code_purpose,
             )
@@ -55,7 +55,7 @@ class SendConfirmCodeTask(BaseTask):
                 exc=e,
                 task_id=self.request.id,
                 args=(),
-                kwargs={"confirm_code": confirm_code, "parent": parent},
+                kwargs={"confirm_code": confirm_code, "user": user},
                 einfo=traceback.format_exc()
             )
 
@@ -64,20 +64,20 @@ class SendConfirmCodeTask(BaseTask):
             confirm_code=kwargs['confirm_code'],
             message=str(exc),
             is_sent=False,
-            parent=kwargs['parent'],
+            user=kwargs['user'],
         )
         super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
 class ResendConfirmCodeTask(BaseTask):
-    def process(self):
+    def process(self, *args, **kwargs):
         email_error_logs = EmailErrorLog.objects.filter(
             confirm_code__is_used=False,
-            is_sent=False
+            is_sent=False,
         )
         for email_error_log in email_error_logs:
             send_confirm_code.delay(
-                user_id=email_error_log.parent.user.id,
+                user_id=email_error_log.user.id,
                 code_purpose=email_error_log.confirm_code.purpose
             )
         email_error_logs.update(is_sent=True)
