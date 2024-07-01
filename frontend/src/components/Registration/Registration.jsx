@@ -8,6 +8,8 @@ import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parentRegisterCreate";
+import { useDispatch } from "react-redux";
+import { setEmail } from "../../store/authSlice";
 export const Registration = () => {
   const initialState = {
     gardenCode: '',
@@ -22,7 +24,7 @@ export const Registration = () => {
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const navigation = useNavigate();
-
+  const dispatch = useDispatch();
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
@@ -36,6 +38,9 @@ export const Registration = () => {
       const response = await parentRegisterCreate(email, words[1], words[2], words[0], password, gardenCode)
       if (response.ok) {
         const data = await response.json();
+        dispatch(
+          setEmail(email)
+        )
         setResponseData(data);
         navigation('/verification');
       } else {

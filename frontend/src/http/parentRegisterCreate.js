@@ -1,5 +1,5 @@
 export const parentRegisterCreate = async (email, first_name, second_name, last_name, password, kindergarten_code) => {
-    const url = 'http://127.0.0.1:8001/api/v1/parent/register/';
+    const url = 'http://127.0.0.1:8080/api/v1/parent/register/';
 
     const sendData = {
         email: email,

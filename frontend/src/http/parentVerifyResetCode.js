@@ -1,9 +1,9 @@
-export const parentLoginCreate = async (email, password) => {
-    const url = 'http://127.0.0.1:8080/api/v1/parent/login/';
+export const parentVerifyResetCode = async (email, code) => {
+    const url = 'http://127.0.0.1:8080/api/v1/parent/verify_reset_code/';
 
     const sendData = {
         email: email,
-        password: password
+        code: code,
     };
 
     const response = await fetch(url, {

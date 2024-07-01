@@ -24,10 +24,13 @@ const authSlice = createSlice({
         },
         addBlur:(state, action)=>{
             state.blur = action.payload
+        },
+        setEmail(state, action){
+            state.email = action.payload.email
         }
     }
 })
 
-export const { setUser, removeUser,addBlur} = authSlice.actions;
+export const { setUser, removeUser,addBlur,setEmail} = authSlice.actions;
 
 export default authSlice.reducer;
