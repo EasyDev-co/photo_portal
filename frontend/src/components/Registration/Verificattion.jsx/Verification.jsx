@@ -15,9 +15,10 @@ const Verification = () => {
     const [inputValue, setInputValue] = useState(initialState);
     const [error, setError] = useState(null);
     const {isAuth} = useAuth();
-    console.log(isAuth);
+
     const email = useSelector(action=>action.user.email);
     const navigation = useNavigate();
+    console.log(email);
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);

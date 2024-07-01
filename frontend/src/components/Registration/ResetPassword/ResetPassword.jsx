@@ -6,39 +6,43 @@ import { parentResetPassCreate } from '../../../http/parentResetPassCreate';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { parentVerifyResetCode } from '../../../http/parentVerifyResetCode';
-import { setEmail } from '../../../store/authSlice';
+import { setEmail, setCode } from '../../../store/authSlice';
 const ResetPassword = () => {
   const navigation = useNavigate();
-  const [inputValue, setInputValue] = useState({
+  const initialState = {
     resetEmail: '',
     resetCode: ''
-  });
+  }
+  const [inputValue, setInputValue] = useState(initialState);
   const [onReset, setOnReset] = useState(false);
   const dispatch = useDispatch();
-  const email = useSelector(action=>action.user.email);
-  console.log(email)
+  const email = useSelector(action => action.user.email);
+
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
   }
+
   const onSubmitHandler = async (e) => {
 
     e.preventDefault();
     if (!onReset) {
-      
+      dispatch(
+        setEmail({
+          email: inputValue.resetEmail
+        })
+      )
       try {
         const response = await parentResetPassCreate(inputValue.resetEmail)
         if (response.ok) {
           const data = await response.json();
           dispatch(
-            setEmail({
-              email: inputValue.resetEmail
-            })
+            setEmail(inputValue.resetEmail)
           )
           console.log(data);
           setOnReset(true);
-          
-          setInputValue({ resetEmail: '', resetCode: '' });
+
+          setInputValue(initialState);
         } else {
           const data = await response.json();
           console.log(data)
@@ -49,18 +53,17 @@ const ResetPassword = () => {
     }
     if (onReset) {
       try {
-      
+
         const response = await parentVerifyResetCode(email, inputValue.resetCode)
         if (response.ok) {
           const data = await response.json();
           console.log(data);
           navigation('/password-reset/new-password')
-          // dispatch(
-          //   setUser({
-          //     access: data.access,
-          //     refresh: data.refresh
-          //   })
-          // )
+          dispatch(
+            setCode({
+              code: inputValue.resetCode
+            })
+          )
           setInputValue({ resetEmail: '', resetCode: '' });
         } else {
           const data = await response.json();
@@ -104,7 +107,7 @@ const ResetPassword = () => {
                   />
                 }
 
-                <button className={styles.authButton}>Продолжить</button> 
+                <button className={styles.authButton}>Продолжить</button>
 
               </form>
             </div>

@@ -39,21 +39,21 @@ export const Login = () => {
     e.preventDefault();
 
     try {
-        const response = await parentLoginCreate(inputValue.email,inputValue.password)
-        if (response.ok) {
-            const data = await response.json();
-            console.log(data)
-            dispatch(
-                setUser({
-                    access: data.access,
-                    refresh: data.refresh
-                })
-            )
-            navigation('/')
-        } else {
-            const data = await response.json();
-            setError(data);
-        }
+      const response = await parentLoginCreate(inputValue.email, inputValue.password)
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data)
+        dispatch(
+          setUser({
+            access: data.access,
+            refresh: data.refresh
+          })
+        )
+        navigation('/')
+      } else {
+        const data = await response.json();
+        setError(data);
+      }
     } catch (error) {
 
     }
@@ -67,10 +67,7 @@ export const Login = () => {
           <div className={activeBlur ? styles.blurContainer : ' '}></div>
           <div className={styles.regFormWrap}>
             <div className={styles.regFormContainer}>
-              {!isActiveAuth ?
-                <h1 className={styles.formHeader}>Вход</h1> :
-                <h1 className={styles.formHeader}>Авторизация</h1>
-              }
+              <h1 className={styles.formHeader}>Вход</h1>
               <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
                 {!isActiveAuth &&
                   <>

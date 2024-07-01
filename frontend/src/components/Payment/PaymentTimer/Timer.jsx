@@ -12,14 +12,14 @@ const Timer = ({ date, desc }) => {
 
     useEffect(() => {
         let timeInterval = setInterval(() => {
-            const { total, days, hours, minutes } = getTimeRemaining(date)
-            setTime({ days, hours, minutes })
+            const { total, days, hours, minutes } = getTimeRemaining(date);
+            setTime({ days, hours, minutes });
             if (total <= 0) {
                 clearInterval(timeInterval);
             }
         }, 1000)
-    }, [time])
-    
+    }, [])
+
     return (
         <div className={styles.timerWidget}>
             <span className={styles.timerDesc}>
