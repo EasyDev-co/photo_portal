@@ -199,7 +199,7 @@ class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
         email = serializer.validated_data['new_password']
         new_password = serializer.validated_data['new_password']
         code = request.data.get('code')
-        user = User.objects.get(user__email=email)
+        user = User.objects.get(email=email)
 
         self.validate_code(
             user=user,
