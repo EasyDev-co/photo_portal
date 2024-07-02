@@ -36,7 +36,7 @@ class UserAdmin(admin.ModelAdmin):
         'first_name',
         'second_name',
         'last_name',
-        'promocode',
+        'promocode__code',
     )
     list_filter = ('role', 'is_verified')
     raw_id_fields = ('promocode',)

@@ -28,7 +28,7 @@ class OrderAdmin(admin.ModelAdmin):
         'modified',
     )
     list_filter = ('status', 'kindergarten')
-    search_fields = ('user',)
+    search_fields = ('user__email',)
     raw_id_fields = ('user', 'kindergarten')
     ordering = ('created', 'modified')
     readonly_fields = (
