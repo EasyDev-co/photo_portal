@@ -58,12 +58,30 @@ class CartService:
             return len(self.cart[user_id])
 
     def get_photo_ids(self, user):
-        """Получить все id """
+        """Получить все id фотографий"""
         if self.check_cart_exists(user):
             user_id = str(user.id)
             photo_ids = []
             for position in self.cart[user_id]:
                 photo_ids.append(position['photo_id'])
+                return photo_ids
+
+    def get_kindergarten_ids(self, user):
+        """Получить все id детских садов, имеющихся в корзине."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            kindergarten_ids = []
+            for position in self.cart[user_id]:
+                kindergarten_ids.append(position['kindergarten_id'])
+            return kindergarten_ids
+
+    def get_cart_list(self, user):
+        """Получить все позиции корзины в list."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            return self.cart[user_id]
+        return []
+
 
     # Методы для позиций корзины
 
