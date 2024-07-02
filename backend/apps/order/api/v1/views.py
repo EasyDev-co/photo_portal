@@ -35,26 +35,18 @@ class CartGetAddAPIView(APIView):
                          request_body=CartSerializer)
     def post(self, request):
         """Добавление фото в корзину."""
-        # serializer = CartSerializer(data=request.data)
-        # serializer.is_valid(raise_exception=True)
-        loguru.logger.info(request.data)
         cart = CartService(request)
         photo = get_object_or_404(Photo, id=request.data.get('id'))
-        loguru.logger.info(photo.id)
-        cart.add(
-            photo=photo,
-        )
-        return Response({'message': f'Фото {photo.id} успешно добавлено в корзину'})
+        if photo:
+            cart.add(
+                photo=photo,
+            )
+            return Response({'message': f'Фото {photo.id} успешно добавлено в корзину'})
+        return Response({'message': f'Фото не найдено в БД'})
 
     def get(self, request):
         """Показать корзину."""
         cart = CartService(request)
-        loguru.logger.info(cart.cart.keys())
-        all_photos = Photo.objects.all()
         photos = Photo.objects.filter(id__in=cart.cart.keys())
-        loguru.logger.info(all_photos)
-        loguru.logger.info(photos)
         serializer = CartSerializer(photos, many=True)
-        loguru.logger.info(serializer.data)
-        # serializer.is_valid(raise_exception=True)
         return Response(serializer.data)
