@@ -2,7 +2,16 @@ from rest_framework import serializers
 
 from apps.order.models import Order, OrderItem
 from apps.order.models.const import OrderStatus
+from apps.photo.models import Photo
 from apps.user.models.user import UserRole
+
+
+class CartSerializer(serializers.ModelSerializer):
+    """Сериализатор корзины."""
+
+    class Meta:
+        model = Photo
+        fields = ('id',)
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

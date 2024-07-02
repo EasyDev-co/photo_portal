@@ -184,3 +184,5 @@ CELERY_BEAT_SCHEDULE = {
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+
+CART_SESSION_ID = 'cart'

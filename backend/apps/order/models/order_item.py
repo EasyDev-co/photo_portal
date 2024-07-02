@@ -9,7 +9,7 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
     """Модель части (позиции) заказа."""
     photo_type = models.PositiveSmallIntegerField(
         choices=PhotoType.choices,
-        default=PhotoType.size_20x30,
+        default=PhotoType.large_photo,
         verbose_name="Тип фото",
     )
     is_digital = models.BooleanField(
