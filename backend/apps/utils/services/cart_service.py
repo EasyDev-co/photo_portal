@@ -12,12 +12,15 @@ class CartService:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
 
-    def add(self, photo, quatity=1, update_quantity=False):
+    def add(self, photo, price, is_digital=False, photo_type=None, quatity=1, update_quantity=False):
         """Добавить фото в корзину."""
         photo_id = str(photo.id)
         if photo_id not in self.cart:
             self.cart[photo_id] = {
                 'quantity': 0,
+                'photo_type': photo_type,
+                'is_digital': is_digital,
+                'total_price': price,
             }
 
         if update_quantity:

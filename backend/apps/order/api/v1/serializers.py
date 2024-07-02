@@ -14,6 +14,13 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ('id',)
 
 
+class CartAddSerializer(CartSerializer):
+    """Сериализатор добавления фото в корзину."""
+
+    amount = serializers.IntegerField()
+    photo_type = serializers.IntegerField()
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
     """Сериализатор для получения позиций (частей) заказа."""
 
@@ -22,7 +29,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderListSerializer(serializers.ModelSerializer):
     """Сериализатор для получения заказов."""
     is_more_ransom_amount = serializers.SerializerMethodField()
     user_role = serializers.SerializerMethodField()
@@ -53,3 +60,20 @@ class OrderSerializer(serializers.ModelSerializer):
         return OrderStatus(status).label
 
 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+# Order
+# order_price
+# user - fk
+# kindergarten
+# status
+
+# OrderItem
+# photo_type
+# is_digital
+# amount
+# order - fk
+# photo - fk

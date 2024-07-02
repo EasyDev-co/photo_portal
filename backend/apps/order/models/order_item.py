@@ -11,6 +11,7 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
         choices=PhotoType.choices,
         default=PhotoType.large_photo,
         verbose_name="Тип фото",
+        blank=True,
     )
     is_digital = models.BooleanField(
         default=False,

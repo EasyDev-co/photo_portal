@@ -99,12 +99,12 @@ class EmailVerificationCodeAPIView(ConfirmCodeMixin, APIView):
     """Представление для верификации кода при регистрации родителя."""
     email_serializer = EmailAndCodeSerializer
 
-    def post(self, request, *args, kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.email_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         code = serializer.validated_data['code']
-        user = User.objects.get(user__email=email)
+        user = User.objects.get(email=email)
 
         try:
             self.validate_code(

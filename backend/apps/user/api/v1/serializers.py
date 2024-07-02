@@ -24,7 +24,7 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         refresh = RefreshToken.for_user(user)
 
-        refresh['id'] = user.id
+        refresh['id'] = str(user.id)
         refresh['email'] = user.email
         refresh['role'] = user.role
 
@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
     )
     kindergarten_code = serializers.CharField(max_length=255, required=False)
 
-    role = serializers.CharField(source='get_role_display')
+    # role = serializers.CharField(source='get_role_display')
 
     class Meta:
         model = User

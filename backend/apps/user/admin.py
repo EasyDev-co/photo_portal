@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
+from apps.user.models import ConfirmCode
 from apps.kindergarten.models import Kindergarten
 
 User = get_user_model()
@@ -37,3 +38,14 @@ class UserAdmin(admin.ModelAdmin):
     raw_id_fields = ('promocode',)
 
     inlines = [KindergartenInLine]
+
+
+@admin.register(ConfirmCode)
+class ConfirmCodeAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'code',
+        'created_at',
+        'purpose',
+        'is_used',
+    )
