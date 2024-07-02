@@ -3,7 +3,9 @@
     padding: 8px;
     border: 1px solid rgb(229, 229, 229);
     border-radius: 8px;
-
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 @media (max-width: 460px) {

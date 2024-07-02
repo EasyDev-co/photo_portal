@@ -99,45 +99,6 @@ export const Orders = () => {
                   />
                 )
               })}
-              {/* <PhotoCard
-                blurRef={blurRef}
-                setIsBlur={setIsBlur}
-                photo={children1}
-                onChangeHandler={onChangeHandler}
-                inputValue={inputValue}
-              />
-              <PhotoCard
-                setIsBlur={setIsBlur}
-                photo={children2}
-                onChangeHandler={onChangeHandler}
-                inputValue={inputValue}
-              />
-              <PhotoCard
-                setIsBlur={setIsBlur}
-                photo={children3}
-                onChangeHandler={onChangeHandler}
-                inputValue={inputValue}
-              />
-              <PhotoCard
-
-                setIsBlur={setIsBlur}
-                photo={children4}
-                onChangeHandler={onChangeHandler}
-                inputValue={inputValue}
-              />
-              <PhotoCard
-
-                setIsBlur={setIsBlur}
-                photo={children5}
-                onChangeHandler={onChangeHandler}
-                inputValue={inputValue}
-              />
-              <PhotoCard
-                setIsBlur={setIsBlur}
-                photo={children6}
-                onChangeHandler={onChangeHandler}
-                inputValue={inputValue}
-              /> */}
             </div>
             {blocks.map((block, i) => (
               <div key={i}>
