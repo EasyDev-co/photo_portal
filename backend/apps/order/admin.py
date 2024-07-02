@@ -33,7 +33,6 @@ class OrderAdmin(admin.ModelAdmin):
     ordering = ('created', 'modified')
     readonly_fields = (
         'order_price',
-        'status',
         'created',
         'modified',
     )
