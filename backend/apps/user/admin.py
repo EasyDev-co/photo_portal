@@ -40,6 +40,7 @@ class UserAdmin(admin.ModelAdmin):
     )
     list_filter = ('role', 'is_verified')
     raw_id_fields = ('promocode',)
+    ordering = ('email', 'last_name', 'first_name')
 
     inlines = [KindergartenInLine]
 

@@ -29,6 +29,7 @@ class KindergartenAdmin(admin.ModelAdmin):
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('region',)
+    ordering = ('name',)
 
     def qr_image(self, obj):
         if obj.qr_code:
@@ -55,6 +56,8 @@ class KindergartenAdmin(admin.ModelAdmin):
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
     list_display = ('name', 'ransom_amount')
+    ordering = ('name',)
+    search_fields = ('name', 'ransom_amount',)
     inlines = [
         KindergartenInline,
         PhotoPriceInline
@@ -65,3 +68,4 @@ class RegionAdmin(admin.ModelAdmin):
 class PhotoPriceAdmin(admin.ModelAdmin):
     list_display = ('price', 'photo_type', 'region')
     raw_id_fields = ('region',)
+    ordering = ('region',)

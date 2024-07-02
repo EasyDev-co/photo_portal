@@ -30,6 +30,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'kindergarten')
     search_fields = ('user',)
     raw_id_fields = ('user', 'kindergarten')
+    ordering = ('created', 'modified')
     readonly_fields = (
         'order_price',
         'status',
@@ -54,6 +55,7 @@ class OrderItemAdmin(admin.ModelAdmin):
         'modified'
     )
     list_filter = ('order', 'photo_type')
+    ordering = ('created', 'modified')
     readonly_fields = (
         'created',
         'modified',
