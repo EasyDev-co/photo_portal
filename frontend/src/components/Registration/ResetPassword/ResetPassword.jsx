@@ -9,11 +9,11 @@ import { parentVerifyResetCode } from '../../../http/parentVerifyResetCode';
 import { setEmail, setCode } from '../../../store/authSlice';
 const ResetPassword = () => {
   const navigation = useNavigate();
-  const initialState = {
+
+  const [inputValue, setInputValue] = useState({
     resetEmail: '',
     resetCode: ''
-  }
-  const [inputValue, setInputValue] = useState(initialState);
+  });
   const [onReset, setOnReset] = useState(false);
   const dispatch = useDispatch();
   const email = useSelector(action => action.user.email);
@@ -26,6 +26,7 @@ const ResetPassword = () => {
   const onSubmitHandler = async (e) => {
 
     e.preventDefault();
+        setInputValue({ resetEmail: '', resetCode: '' });
     if (!onReset) {
       dispatch(
         setEmail({
@@ -39,10 +40,9 @@ const ResetPassword = () => {
           dispatch(
             setEmail(inputValue.resetEmail)
           )
-          console.log(data);
           setOnReset(true);
-
-          setInputValue(initialState);
+          console.log(data)
+      
         } else {
           const data = await response.json();
           console.log(data)
@@ -53,12 +53,11 @@ const ResetPassword = () => {
     }
     if (onReset) {
       try {
-
         const response = await parentVerifyResetCode(email, inputValue.resetCode)
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          navigation('/password-reset/new-password')
+          navigation('/password-reset/new-password');
           dispatch(
             setCode({
               code: inputValue.resetCode
@@ -73,9 +72,6 @@ const ResetPassword = () => {
 
       }
     }
-
-
-    console.log(inputValue)
   }
 
   return (

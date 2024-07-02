@@ -1,5 +1,5 @@
 import styles from "./Orders.module.css";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../utils/useAuth';
 import { addAccessTokenToHeaders } from "../../http/addAccessToken";
 import PhotoCard from "./PhotoCard/PhotoCard";
@@ -11,13 +11,40 @@ import children5 from '../../assets/images/Auth/kids/children5.png'
 import children6 from '../../assets/images/Auth/kids/children6.png'
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer'
 import { useClickOutside } from "../../utils/useClickOutside";
+import { getPhotoLine } from "../../http/getPhotoLine";
+import { tokenRefreshCreate } from "../../http/tokenRefreshCreate";
+import { getCookie, setCookie } from "../../utils/setCookie";
+import { useDispatch, useSelector } from "react-redux";
+import { setAccessToken } from "../../store/authSlice";
 
 export const Orders = () => {
 
+  const dispatch = useDispatch();
+  const [photos, setPhotos] = useState([]);
+  useEffect(() => {
+    tokenRefreshCreate()
+      .then(res => res.json())
+      .then(res => {
+        if (res.refresh) {
+          setCookie('refresh', res.refresh);
+          dispatch(
+            setAccessToken(res.access)
+          )
+        }
+        return res.access
+      })
+      .then(access => {
+        getPhotoLine('0472faa8-1e9d-485c-973a-15664608ff31', access)
+          .then(res => res.json())
+          .then(res => {
+            if(res.photos){
+              setPhotos(res);
+            }
+          })
+      })
+  }, []);
+
   const [blocks, setBlocks] = useState([]);
-  const { isAuth } = useAuth();
-  console.log(isAuth)
-  console.log(addAccessTokenToHeaders({}))
   const addBlock = () => {
     if (blocks.length < 2) {
       setBlocks([...blocks, { id: blocks.length + 1 }]);
@@ -40,13 +67,13 @@ export const Orders = () => {
     const newInput = (data) => ({ ...data, [name]: count });
     setInputValue(newInput);
   }
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(inputValue)
   }
+
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
-  
+
   useClickOutside(blurRef, () => {
     setIsBlur(false);
   })
@@ -56,9 +83,23 @@ export const Orders = () => {
       <div className={styles.orderWidggetWrap}>
         <div className={styles.orderWidggetContainer}>
           <h1 className={styles.profileTitle}>Выбор фотографии</h1>
-          <form  onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur?styles.photoCardsFormBlur:styles.photoCardsForm}>
+          <form onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
-              <PhotoCard
+              {console.log(photos)}
+
+              {photos.photos?.map((photo,i) => {
+                return (
+                  <PhotoCard
+                    key={i}
+                    blurRef={blurRef}
+                    setIsBlur={setIsBlur}
+                    photo={photo.photo}
+                    onChangeHandler={onChangeHandler}
+                    inputValue={inputValue}
+                  />
+                )
+              })}
+              {/* <PhotoCard
                 blurRef={blurRef}
                 setIsBlur={setIsBlur}
                 photo={children1}
@@ -72,21 +113,20 @@ export const Orders = () => {
                 inputValue={inputValue}
               />
               <PhotoCard
-             
                 setIsBlur={setIsBlur}
                 photo={children3}
                 onChangeHandler={onChangeHandler}
                 inputValue={inputValue}
               />
               <PhotoCard
-      
+
                 setIsBlur={setIsBlur}
                 photo={children4}
                 onChangeHandler={onChangeHandler}
                 inputValue={inputValue}
               />
               <PhotoCard
-      
+
                 setIsBlur={setIsBlur}
                 photo={children5}
                 onChangeHandler={onChangeHandler}
@@ -97,49 +137,49 @@ export const Orders = () => {
                 photo={children6}
                 onChangeHandler={onChangeHandler}
                 inputValue={inputValue}
-              />
+              /> */}
             </div>
             {blocks.map((block, i) => (
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
                   <PhotoCard
 
-                   setIsBlur={setIsBlur}
+                    setIsBlur={setIsBlur}
                     photo={children1}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
                   />
                   <PhotoCard
-      
-                   setIsBlur={setIsBlur}
+
+                    setIsBlur={setIsBlur}
                     photo={children2}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
                   />
                   <PhotoCard
 
-                   setIsBlur={setIsBlur}
+                    setIsBlur={setIsBlur}
                     photo={children3}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
                   />
                   <PhotoCard
 
-                   setIsBlur={setIsBlur}
+                    setIsBlur={setIsBlur}
                     photo={children4}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
                   />
                   <PhotoCard
 
-                   setIsBlur={setIsBlur}
+                    setIsBlur={setIsBlur}
                     photo={children5}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
                   />
                   <PhotoCard
-      
-                   setIsBlur={setIsBlur}
+
+                    setIsBlur={setIsBlur}
                     photo={children6}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}

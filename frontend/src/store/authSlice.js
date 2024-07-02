@@ -32,10 +32,14 @@ const authSlice = createSlice({
         },
         setCode(state,action){
             state.code = action.payload.code
+        },
+        setAccessToken(state,action){
+            state.access = action.payload
+            console.log(action.payload)
         }
     }
 })
 
-export const { setUser, removeUser,addBlur,setEmail, setCode} = authSlice.actions;
+export const { setUser, removeUser,addBlur,setEmail, setCode, setAccessToken} = authSlice.actions;
 
 export default authSlice.reducer;
