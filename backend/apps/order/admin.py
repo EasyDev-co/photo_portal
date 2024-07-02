@@ -55,7 +55,6 @@ class OrderItemAdmin(admin.ModelAdmin):
     )
     list_filter = ('order', 'photo_type')
     readonly_fields = (
-        'amount',
         'created',
         'modified',
     )
