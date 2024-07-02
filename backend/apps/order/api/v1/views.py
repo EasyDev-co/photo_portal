@@ -79,7 +79,7 @@ class PhotoCartAPIView(APIView):
         """Добавление фото в корзину."""
         cart = CartService(request)
         user = request.user
-        photo = get_object_or_404(Photo, id=request.data.get('id'))
+        photo = get_object_or_404(Photo, id=request.data['photo_id'])
 
         if photo:
             region = photo.photo_line.kindergarten.region
@@ -88,7 +88,7 @@ class PhotoCartAPIView(APIView):
                 'photo_id': str(photo.id),
                 'photo_type': request.data['photo_type'],
                 'is_digital': request.data['is_digital'],
-                'quantity': request.data['is_digital'],
+                'quantity': request.data['quantity'],
                 'price_per_piece': float(price_per_piece),
             }
             cart.add_product_to_cart(user, photo_data)
@@ -102,7 +102,7 @@ class PhotoCartAPIView(APIView):
         photo_ids = []
         user_id = str(request.user.id)
         loguru.logger.info(cart.cart[user_id])
-        for position in cart.cart[user_id].values():
+        for position in cart.cart[user_id]:
             photo_ids.append(position['photo_id'])
         photos = Photo.objects.filter(id__in=photo_ids)
         serializer = PhotoCartSerializer(photos, many=True)
@@ -111,10 +111,11 @@ class PhotoCartAPIView(APIView):
 
     def delete(self, request):
         cart = CartService(request)
-        user = request.user
-        cart.remove_product_from_cart(
-            user=user,
-            product_id=request.data['photo_id'],
-            photo_type=request.data['photo_type'],
-        )
-        return Response({'message': f'Фото {request.data["photo_id"]} удалено из корзины'})
+        cart.remove_cart(request.user)
+        # user = request.user
+        # cart.remove_product_from_cart(
+        #     user=user,
+        #     product_id=request.data['photo_id'],
+        #     photo_type=request.data['photo_type'],
+        # )
+        return Response({'message': 'Удалено'})

@@ -31,7 +31,7 @@ class CartService:
     def create_cart(self, user):
         """Cоздать корзину."""
         user_id = str(user.id)
-        self.cart[user_id] = {}
+        self.cart[user_id] = []
         self.save()
 
     def remove_cart(self, user):
@@ -58,7 +58,7 @@ class CartService:
         user_id = str(user.id)
 
         product_key = str(cart_length + 1)
-        self.cart[user_id][product_key] = product_data
+        self.cart[user_id].append(product_data)
         self.save()
 
     def remove_product_from_cart(self, user, product_id, photo_type):
