@@ -109,8 +109,12 @@ class PhotoCartAPIView(APIView):
 
         return Response(serializer.data)
 
-    def delete(self, request, pk):
+    def delete(self, request):
         cart = CartService(request)
-        photo = get_object_or_404(Photo, id=pk)
-        cart.remove(photo=photo)
-        return Response({'message': f'Фото {photo.id} удалено из корзины'})
+        user = request.user
+        cart.remove_product_from_cart(
+            user=user,
+            product_id=request.data['photo_id'],
+            photo_type=request.data['photo_type'],
+        )
+        return Response({'message': f'Фото {request.data["photo_id"]} удалено из корзины'})

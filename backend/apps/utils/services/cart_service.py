@@ -61,9 +61,16 @@ class CartService:
         self.cart[user_id][product_key] = product_data
         self.save()
 
-    def remove_product_from_cart(self, user, product_id):
-        # сначала сделать find_product_in_cart
-        pass
+    def remove_product_from_cart(self, user, product_id, photo_type):
+        """Временный метод удаления товара из корзины."""
+        user_id = str(user.id)
+        cart_dict = self.cart[user_id].copy()
+        for index, product in cart_dict.items():
+            if product_id == product['photo_id'] and photo_type == product['photo_type']:
+                del self.cart[user_id][index]
+        self.save()
+
+
 
 
     def is_photo_in_cart(self, user, photo, photo_type):
