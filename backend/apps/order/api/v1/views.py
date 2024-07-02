@@ -50,3 +50,9 @@ class CartGetAddAPIView(APIView):
         photos = Photo.objects.filter(id__in=cart.cart.keys())
         serializer = CartSerializer(photos, many=True)
         return Response(serializer.data)
+
+    def delete(self, request, pk):
+        cart = CartService(request)
+        photo = get_object_or_404(Photo, id=pk)
+        cart.remove(photo=photo)
+        return Response({'message': f'Фото {photo.id} удалено из корзины'})
