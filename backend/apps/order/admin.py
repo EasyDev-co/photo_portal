@@ -1,6 +1,19 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from apps.order.models import Order, OrderItem
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    verbose_name = 'Часть заказа'
+    verbose_name_plural = 'Части заказа'
+    readonly_fields = ('photo_img',)
+
+    @admin.display(description='Фото')
+    def photo_img(self, obj):
+        return mark_safe(f'<img src="{obj.photo.photo.url}" width="200" height="200" />')
 
 
 @admin.register(Order)
@@ -23,6 +36,9 @@ class OrderAdmin(admin.ModelAdmin):
         'created',
         'modified',
     )
+    inlines = [
+        OrderItemInline
+    ]
 
 
 @admin.register(OrderItem)
