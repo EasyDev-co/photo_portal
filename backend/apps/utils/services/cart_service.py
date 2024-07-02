@@ -12,9 +12,83 @@ class CartService:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
 
-    def add(self, photo, price, is_digital=False, photo_type=None, quatity=1, update_quantity=False):
+    # Общие методы
+
+    def save(self):
+        """Сохранение состояния корзины в сессии."""
+        self.session[settings.CART_SESSION_ID] = self.cart
+        self.session.modified = True
+
+    # Методы для корзины в целом
+
+    def check_cart_exists(self, user):
+        """Проверить наличие корзины пользователя в сессии."""
+        user_id = str(user.id)
+        if user_id in self.cart:
+            return True
+        return False
+
+    def create_cart(self, user):
+        """Cоздать корзину."""
+        user_id = str(user.id)
+        self.cart[user_id] = {}
+        self.save()
+
+    def remove_cart(self, user):
+        """Удалить корзину из сессии."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            del self.cart[user_id]
+            self.save()
+
+    def get_cart_length(self, user):
+        """Получить количество позиций в корзине."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            return len(self.cart[user_id])
+
+    # Методы для позиций корзины
+
+    def add_product_to_cart(self, user, product_data):
+        """Добавить товар в корзину."""
+        if not self.check_cart_exists(user):
+            self.create_cart(user=user)
+
+        cart_length = self.get_cart_length(user)
+        user_id = str(user.id)
+
+        product_key = str(cart_length + 1)
+        self.cart[user_id][product_key] = product_data
+        self.save()
+
+    def remove_product_from_cart(self, user, product_id):
+        # сначала сделать find_product_in_cart
+        pass
+
+
+    def is_photo_in_cart(self, user, photo, photo_type):
+        """Проверить наличие фотографии в корзине пользователя указанного типа."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            photo_id = str(photo.id)
+            if photo_id in self.cart[user_id] and photo_type in self.cart[user_id][photo_id]:
+                return True
+        return False
+
+
+
+
+
+    def add(self, user, photo, price, is_digital=False, photo_type=None, quatity=1, update_quantity=False):
         """Добавить фото в корзину."""
+        user_id = str(user.id)
+
+        if user_id not in self.cart:
+            self.cart[user_id] = {}
+
         photo_id = str(photo.id)
+
+
         if photo_id not in self.cart:
             self.cart[photo_id] = {
                 'quantity': 0,
@@ -28,18 +102,6 @@ class CartService:
         else:
             self.cart[photo_id]['quantity'] += quatity
         self.save()
-
-    def save(self):
-        """Обновление сессии cart."""
-        self.session[settings.CART_SESSION_ID] = self.cart
-        self.session.modified = True
-
-    def remove(self, photo):
-        """Удаление фото из корзины."""
-        photo_id = str(photo.id)
-        if photo_id in self.cart:
-            del self.cart[photo_id]
-            self.save()
 
     # def __iter__(self):
     #     """Перебор элементов в корзине."""

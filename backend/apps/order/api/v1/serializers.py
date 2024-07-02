@@ -6,7 +6,7 @@ from apps.photo.models import Photo
 from apps.user.models.user import UserRole
 
 
-class CartSerializer(serializers.ModelSerializer):
+class PhotoCartSerializer(serializers.ModelSerializer):
     """Сериализатор корзины."""
 
     class Meta:
@@ -14,7 +14,7 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ('id',)
 
 
-class CartAddSerializer(CartSerializer):
+class CartAddSerializer(PhotoCartSerializer):
     """Сериализатор добавления фото в корзину."""
 
     amount = serializers.IntegerField()

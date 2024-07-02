@@ -1,8 +1,5 @@
 import loguru
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
-
 from django.shortcuts import get_object_or_404, get_list_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -14,7 +11,7 @@ from apps.order.models import Order, OrderItem
 from apps.order.models.const import PhotoType
 from apps.photo.models import Photo
 
-from apps.order.api.v1.serializers import CartSerializer, OrderSerializer
+from apps.order.api.v1.serializers import PhotoCartSerializer, OrderSerializer
 
 from apps.utils.services import CartService
 
@@ -73,33 +70,42 @@ class OrderAPIView(APIView):
         return Response({'message': f'Заказ от {order.created} создан'})
 
 
-class CartAPIView(APIView):
+class PhotoCartAPIView(APIView):
     """Представление для отображения корзины."""
 
     @swagger_auto_schema(responses={"200": openapi.Response(description="")},
-                         request_body=CartSerializer)
+                         request_body=PhotoCartSerializer)
     def post(self, request):
         """Добавление фото в корзину."""
         cart = CartService(request)
+        user = request.user
         photo = get_object_or_404(Photo, id=request.data.get('id'))
-        region = photo.photo_line.kindergarten.region
-        price = region.photo_prices.select_related('region').get(photo_type=request.data['photo_type']).price
+
         if photo:
-            cart.add(
-                photo=photo,
-                photo_type=request.data['photo_type'],
-                is_digital=request.data['is_digital'],
-                price=float(price),
-            )
+            region = photo.photo_line.kindergarten.region
+            price_per_piece = region.photo_prices.select_related('region').get(photo_type=request.data['photo_type']).price
+            photo_data = {
+                'photo_id': str(photo.id),
+                'photo_type': request.data['photo_type'],
+                'is_digital': request.data['is_digital'],
+                'quantity': request.data['is_digital'],
+                'price_per_piece': float(price_per_piece),
+            }
+            cart.add_product_to_cart(user, photo_data)
             return Response({'message': f'Фото {photo.id} успешно добавлено в корзину'})
         return Response({'message': f'Фото не найдено в БД'})
 
     def get(self, request):
         """Показать корзину."""
         cart = CartService(request)
-        photos = Photo.objects.filter(id__in=cart.cart.keys())
-        serializer = CartSerializer(photos, many=True)
-        loguru.logger.info(cart.cart)
+
+        photo_ids = []
+        user_id = str(request.user.id)
+        loguru.logger.info(cart.cart[user_id])
+        for position in cart.cart[user_id].values():
+            photo_ids.append(position['photo_id'])
+        photos = Photo.objects.filter(id__in=photo_ids)
+        serializer = PhotoCartSerializer(photos, many=True)
 
         return Response(serializer.data)
 
