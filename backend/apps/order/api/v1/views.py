@@ -1,6 +1,3 @@
-import loguru
-from pprint import pformat
-
 from django.shortcuts import get_object_or_404, get_list_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -9,25 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.order.models import Order, OrderItem
-from apps.order.models.const import PhotoType
 from apps.photo.models import Photo
 
-from apps.order.api.v1.serializers import PhotoCartSerializer, OrderSerializer
-
 from apps.utils.services import CartService
-
-# Order
-# order_price
-# user - fk V
-# kindergarten
-# status
-
-# OrderItem
-# photo_type
-# is_digital
-# amount
-# order - fk
-# photo - fk
 
 
 class OrderAPIView(APIView):
@@ -74,8 +55,7 @@ class OrderAPIView(APIView):
 class PhotoCartAPIView(APIView):
     """Представление для отображения корзины."""
 
-    @swagger_auto_schema(responses={"200": openapi.Response(description="")},
-                         request_body=PhotoCartSerializer)
+    @swagger_auto_schema(responses={"200": openapi.Response(description="")})
     def post(self, request):
         """Добавление фото в корзину."""
         cart = CartService(request)
@@ -99,28 +79,15 @@ class PhotoCartAPIView(APIView):
     def get(self, request):
         """Показать корзину."""
         cart = CartService(request)
-
-        photo_ids = []
         user_id = str(request.user.id)
-
-        target_id = "0e3050a6-dcb9-4abb-9606-e96bfcf57251"
-        target_product_index = cart.find_product_index_by_id(request.user, target_id)
-        loguru.logger.info(pformat(target_product_index))
-
-        for position in cart.cart[user_id]:
-            photo_ids.append(position['photo_id'])
-        photos = Photo.objects.filter(id__in=photo_ids)
-        serializer = PhotoCartSerializer(photos, many=True)
-
-        return Response(serializer.data)
+        return Response(cart.cart[user_id])
 
     def delete(self, request):
         cart = CartService(request)
-        cart.remove_cart(request.user)
-        # user = request.user
-        # cart.remove_product_from_cart(
-        #     user=user,
-        #     product_id=request.data['photo_id'],
-        #     photo_type=request.data['photo_type'],
-        # )
+        user = request.user
+        cart.remove_product_from_cart(
+            user=user,
+            product_id=request.data['photo_id'],
+            photo_type=request.data['photo_type'],
+        )
         return Response({'message': 'Удалено'})
