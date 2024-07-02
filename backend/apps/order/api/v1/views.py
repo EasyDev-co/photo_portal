@@ -1,4 +1,5 @@
 import loguru
+from pprint import pformat
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 from drf_yasg import openapi
@@ -101,7 +102,11 @@ class PhotoCartAPIView(APIView):
 
         photo_ids = []
         user_id = str(request.user.id)
-        loguru.logger.info(cart.cart[user_id])
+
+        target_id = "0e3050a6-dcb9-4abb-9606-e96bfcf57251"
+        target_product_index = cart.find_product_index_by_id(request.user, target_id)
+        loguru.logger.info(pformat(target_product_index))
+
         for position in cart.cart[user_id]:
             photo_ids.append(position['photo_id'])
         photos = Photo.objects.filter(id__in=photo_ids)

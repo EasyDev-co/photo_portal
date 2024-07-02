@@ -49,17 +49,56 @@ class CartService:
 
     # Методы для позиций корзины
 
+    def sort_products_in_cart(self, user):
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            self.cart[user_id] = sorted(self.cart[user_id], key=lambda p: p['photo_id'])
+            self.save()
+
     def add_product_to_cart(self, user, product_data):
         """Добавить товар в корзину."""
         if not self.check_cart_exists(user):
             self.create_cart(user=user)
 
-        cart_length = self.get_cart_length(user)
         user_id = str(user.id)
-
-        product_key = str(cart_length + 1)
         self.cart[user_id].append(product_data)
+        self.sort_products_in_cart(user)
         self.save()
+
+    def find_product_by_id(self, user, product_id):
+        """Найти товар в корзине пользователя по id товара."""
+        if self.check_cart_exists(user):
+            self.sort_products_in_cart(user)
+            user_id = str(user.id)
+
+            start_index, end_index = 0, len(self.cart[user_id]) - 1
+            while start_index <= end_index:
+                mid = (start_index + end_index) // 2
+                mid_value = self.cart[user_id][mid]['photo_id']
+
+                if mid_value == product_id:
+                    return self.cart[user_id][mid]
+                if mid_value < product_id:
+                    start_index = mid + 1
+                else:
+                    end_index = mid - 1
+            return self.cart[user_id]
+
+    def find_product_index_by_id(self, user, product_id):
+        """Найти индекс товара в списке (корзине) по id товара."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            start_index, end_index = 0, len(self.cart[user_id]) - 1
+            while start_index <= end_index:
+                mid = (start_index + end_index) // 2
+                mid_value = self.cart[user_id][mid]['photo_id']
+
+                if mid_value == product_id:
+                    return mid
+                if mid_value < product_id:
+                    start_index = mid + 1
+                else:
+                    end_index = mid - 1
 
     def remove_product_from_cart(self, user, product_id, photo_type):
         """Временный метод удаления товара из корзины."""
@@ -69,9 +108,6 @@ class CartService:
             if product_id == product['photo_id'] and photo_type == product['photo_type']:
                 del self.cart[user_id][index]
         self.save()
-
-
-
 
     def is_photo_in_cart(self, user, photo, photo_type):
         """Проверить наличие фотографии в корзине пользователя указанного типа."""
