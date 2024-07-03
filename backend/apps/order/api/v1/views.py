@@ -72,10 +72,21 @@ class OrderAPIView(APIView):
         serializer = OrderListSerializer(orders, many=True)
         return Response(serializer.data)
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         """Получение списка заказов пользователя."""
         orders = Order.objects.filter(user=request.user)
         serializer = OrderListSerializer(orders, many=True)
+        return Response(serializer.data)
+
+
+class OrderOneAPIView(APIView):
+    """Представление для одного заказа."""
+    @staticmethod
+    def get(request, pk):
+        """Получение заказа."""
+        order = get_object_or_404(Order, id=pk)
+        serializer = OrderListSerializer(order)
         return Response(serializer.data)
 
 
