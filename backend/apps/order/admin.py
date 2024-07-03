@@ -55,6 +55,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     )
     list_filter = ('order', 'photo_type')
     ordering = ('created', 'modified')
+    search_fields = ('order__id',)
     readonly_fields = (
         'created',
         'modified',
