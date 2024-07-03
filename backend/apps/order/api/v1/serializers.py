@@ -13,7 +13,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class OrderListSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     """Сериализатор для получения заказов."""
     is_more_ransom_amount = serializers.SerializerMethodField()
     user_role = serializers.SerializerMethodField()

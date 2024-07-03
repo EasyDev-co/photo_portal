@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.kindergarten.models import Kindergarten
-from apps.order.api.v1.serializers import OrderListSerializer
+from apps.order.api.v1.serializers import OrderSerializer
 from apps.order.models import Order, OrderItem
 from apps.photo.models import Photo
 
@@ -20,6 +20,12 @@ from apps.utils.services import CartService
 class OrderAPIView(APIView):
     """Представление для заказа."""
 
+    @swagger_auto_schema(responses={
+        "201": openapi.Response(
+            description="Отправляется пустой POST-запрос. Нужные данные "
+                        "подтягиваются из корзины, хранящейся в сессии"
+            )
+        })
     def post(self, request):
         """Создание заказа из товаров корзины."""
 
@@ -69,14 +75,14 @@ class OrderAPIView(APIView):
         OrderItem.objects.bulk_create(order_items)
 
         # сериализуем данные для ответа на POST-запрос
-        serializer = OrderListSerializer(orders, many=True)
+        serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     @staticmethod
     def get(request):
         """Получение списка заказов пользователя."""
         orders = Order.objects.filter(user=request.user)
-        serializer = OrderListSerializer(orders, many=True)
+        serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
 
