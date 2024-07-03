@@ -21,7 +21,7 @@ class OrderAPIView(APIView):
     """Представление для заказа."""
 
     def post(self, request):
-        """Создание заказа из корзины."""
+        """Создание заказа из товаров корзины."""
 
         # создаем объект сервиса управления корзиной
         cart = CartService(request)
@@ -69,6 +69,12 @@ class OrderAPIView(APIView):
         OrderItem.objects.bulk_create(order_items)
 
         # сериализуем данные для ответа на POST-запрос
+        serializer = OrderListSerializer(orders, many=True)
+        return Response(serializer.data)
+
+    def get(self, request):
+        """Получение списка заказов пользователя."""
+        orders = Order.objects.filter(user=request.user)
         serializer = OrderListSerializer(orders, many=True)
         return Response(serializer.data)
 
