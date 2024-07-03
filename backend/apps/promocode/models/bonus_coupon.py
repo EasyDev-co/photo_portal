@@ -19,6 +19,10 @@ class BonusCoupon(UUIDMixin, TimeStampedMixin):
         decimal_places=0,
         verbose_name="Баланс купона",
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активен",
+    )
 
     class Meta:
         verbose_name = 'Бонусный купон'
