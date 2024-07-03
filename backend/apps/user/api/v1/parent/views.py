@@ -9,7 +9,6 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -17,7 +16,7 @@ from apps.exceptions.api_exceptions import (MissingKindergartenCode,
                                             KindergartenCodeNotFound,
                                             InvalidCode)
 from apps.kindergarten.models import Kindergarten
-from apps.user.api.v1.serializers import UserSerializer, UserTokenObtainPairSerializer
+from apps.user.api.v1.serializers import UserSerializer
 from apps.user.api.v1.parent.serializers import (EmailAndCodeSerializer,
                                                  EmailSerializer,
                                                  PasswordChangeSerializer)
@@ -159,7 +158,7 @@ class ResetPasswordAPIView(APIView):
 
 class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
     """Представление для верификации кода восстановления пароля."""
-    email_serializer = EmailSerializer
+    email_serializer = EmailAndCodeSerializer
 
     @swagger_auto_schema(responses={"200": openapi.Response(description="")},
                          request_body=EmailAndCodeSerializer)
@@ -168,7 +167,7 @@ class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         code = serializer.validated_data['code']
-        user = User.objects.get(user__email=email)
+        user = User.objects.get(email=email)
 
         try:
             self.validate_code(
@@ -197,10 +196,10 @@ class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.password_change_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['new_password']
+        email = serializer.validated_data['email']
         new_password = serializer.validated_data['new_password']
         code = request.data.get('code')
-        user = User.objects.get(user__email=email)
+        user = User.objects.get(email=email)
 
         self.validate_code(
             user=user,

@@ -7,7 +7,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 
 from apps.user.models import User
-from apps.user.models.user import UserRole
 
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -23,8 +22,6 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise ValidationError('Нет такого пользователя.')
 
         refresh = RefreshToken.for_user(user)
-
-        refresh['id'] = str(user.id)
         refresh['email'] = user.email
         refresh['role'] = user.role
 
@@ -44,8 +41,6 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[validate_password]
     )
     kindergarten_code = serializers.CharField(max_length=255, required=False)
-
-    # role = serializers.CharField(source='get_role_display')
 
     class Meta:
         model = User

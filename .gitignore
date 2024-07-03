@@ -162,3 +162,4 @@ docker-compose.override.yml
 
 backend.dockerfile
 celery.dockerfile
+static
