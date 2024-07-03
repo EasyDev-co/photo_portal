@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -30,3 +32,13 @@ class BonusCoupon(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return f'Бонусный купон {self.user}, баланс {self.balance}'
+
+    def use_bonus_coupon_to_price(self, price):
+        price = Decimal(price) - self.balance
+        if price > Decimal(0):
+            self.balance = Decimal(0)
+            self.save()
+            return price
+        self.balance = abs(price)
+        self.save()
+        return Decimal(0)

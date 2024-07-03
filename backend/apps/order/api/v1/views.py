@@ -13,6 +13,8 @@ from apps.kindergarten.models import Kindergarten
 from apps.order.api.v1.serializers import OrderSerializer, PhotoCartSerializer, PhotoCartRemoveSerializer
 from apps.order.models import Order, OrderItem
 from apps.photo.models import Photo
+from apps.promocode.models import Promocode
+from apps.promocode.models.bonus_coupon import BonusCoupon
 
 from apps.utils.services import CartService
 
@@ -51,16 +53,23 @@ class OrderAPIView(APIView):
             order_ids.append(order.id)
         orders = Order.objects.filter(id__in=order_ids)
 
-        # создаем OrderItems
+        # создаем OrderItems и формируем цену заказа
         cart_list = cart.get_cart_list(user)
         order_items = []
+
+        bonus_coupon = get_object_or_404(BonusCoupon, user=user, is_active=True, balance__gt=0)
+        # promocode = get_object_or_404(Promocode, user=user, is_active=True)
 
         for position in cart_list:
             order = orders.get(kindergarten__id=position['kindergarten_id'])
             photo = photos.get(id=position['photo_id'])
 
             # т.к. разделение Orders по детским садам, никак не смог уйти от order.save() на каждой итерации цикла
-            order.order_price += Decimal(position['price_per_piece'] * position['quantity'])
+            price = Decimal(position['price_per_piece'] * position['quantity'])
+            if bonus_coupon:
+                price = bonus_coupon.use_bonus_coupon_to_price(price)
+
+            order.order_price += price
             order.save()
 
             order_items.append(
@@ -76,6 +85,10 @@ class OrderAPIView(APIView):
 
         # удаляем корзину из сессии
         cart.remove_cart(user)
+
+        # проверяем, есть ли купон и скидка
+
+
 
         # сериализуем данные для ответа на POST-запрос
         serializer = OrderSerializer(orders, many=True)
@@ -119,16 +132,15 @@ class PhotoCartAPIView(APIView):
                 'region'
             ).get(photo_type=serializer.data['photo_type']).price
             loguru.logger.info(price_per_piece)
-            new_serializer_data = {
+            photo_data = {
                 'price_per_piece': float(price_per_piece),
                 'kindergarten_id': str(kindergarten.id),
 
             }
-            # serializer.data['photo_id'] = str(photo.id)
-            new_serializer_data.update(serializer.data)
-            loguru.logger.info(new_serializer_data)
-            cart.add_product_to_cart(user, new_serializer_data)
-            return Response(new_serializer_data)
+            photo_data.update(serializer.data)
+            loguru.logger.info(photo_data)
+            cart.add_product_to_cart(user, photo_data)
+            return Response(photo_data)
         return Response({'message': f'Фото не найдено в БД'})
 
     @staticmethod
