@@ -34,11 +34,11 @@ INSTALLED_APPS = [
 
     # Приложения
     'apps.kindergarten',
-    'apps.user',
     'apps.parent',
     'apps.photo',
     'apps.order',
     'apps.promocode',
+    'apps.user',
 ]
 
 MIDDLEWARE = [

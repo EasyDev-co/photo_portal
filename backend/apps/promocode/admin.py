@@ -1,6 +1,9 @@
 from django.contrib import admin
 
 from apps.promocode.models import Promocode, PromocodePhotoTypes
+# если BonusCoupon убрать в init и импортировать из model
+# вылетает circular import
+from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
 class PromocodePhotoTypesInLine(admin.TabularInline):
@@ -33,3 +36,14 @@ class PromocodeAdmin(admin.ModelAdmin):
         'modified',
     )
     inlines = (PromocodePhotoTypesInLine,)
+
+
+@admin.register(BonusCoupon)
+class BonusCouponAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'balance',
+        'created',
+        'modified',
+    )
+    raw_id_fields = ('user',)
