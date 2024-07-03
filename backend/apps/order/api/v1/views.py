@@ -114,16 +114,21 @@ class PhotoCartAPIView(APIView):
 
         if photo:
             kindergarten = photo.photo_line.kindergarten
+            loguru.logger.info(kindergarten)
             price_per_piece = kindergarten.region.photo_prices.select_related(
                 'region'
             ).get(photo_type=serializer.data['photo_type']).price
+            loguru.logger.info(price_per_piece)
+            new_serializer_data = {
+                'price_per_piece': float(price_per_piece),
+                'kindergarten_id': str(kindergarten.id),
 
-            serializer.data['photo_id'] = str(photo.id)
-            serializer.data['price_per_piece'] = float(price_per_piece)
-            serializer.data['kindergarten_id'] = str(kindergarten.id)
-
-            cart.add_product_to_cart(user, serializer.data)
-            return Response(serializer.data)
+            }
+            # serializer.data['photo_id'] = str(photo.id)
+            new_serializer_data.update(serializer.data)
+            loguru.logger.info(new_serializer_data)
+            cart.add_product_to_cart(user, new_serializer_data)
+            return Response(new_serializer_data)
         return Response({'message': f'Фото не найдено в БД'})
 
     @staticmethod

@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 
 from apps.user.models import ConfirmCode
+from apps.user.models.manager_bonus import ManagerBonus
 from apps.kindergarten.models import Kindergarten
 
 User = get_user_model()
@@ -49,3 +50,16 @@ class ConfirmCodeAdmin(admin.ModelAdmin):
         'purpose',
         'is_used',
     )
+
+
+@admin.register(ManagerBonus)
+class ManagerBonus(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'start_period_date',
+        'end_period_date',
+        'bonus_size',
+        'total_bonus',
+        'paid_for',
+    )
+    raw_id_fields = ('user',)
