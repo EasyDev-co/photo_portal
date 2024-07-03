@@ -34,6 +34,7 @@ class BonusCoupon(UUIDMixin, TimeStampedMixin):
         return f'Бонусный купон {self.user}, баланс {self.balance}'
 
     def use_bonus_coupon_to_price(self, price):
+        """Применить купон к цене."""
         price = Decimal(price) - self.balance
         if price > Decimal(0):
             self.balance = Decimal(0)

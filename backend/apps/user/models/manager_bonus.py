@@ -41,3 +41,10 @@ class ManagerBonus(UUIDMixin, TimeStampedMixin):
         default=False,
         verbose_name="Выплачен",
     )
+
+    class Meta:
+        verbose_name = "Бонус заведующей с продаж"
+        verbose_name_plural = "Бонусы заведующих с продаж"
+
+    def __str__(self):
+        return f"Бонус с продаж {self.user} за период {self.start_period_date} - {self.end_period_date}"
