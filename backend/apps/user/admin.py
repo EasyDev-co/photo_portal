@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from apps.kindergarten.models import Kindergarten
+from apps.user.models.user import UserRole, StaffUser
 
 User = get_user_model()
 
@@ -30,10 +33,81 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'first_name',
         'second_name',
-        'lastname',
+        'last_name',
         'promocode',
     )
     list_filter = ('role', 'is_verified')
     raw_id_fields = ('promocode',)
 
     inlines = [KindergartenInLine]
+
+
+@admin.register(StaffUser)
+class StaffAdmin(BaseUserAdmin):
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        (
+            _("Personal info"),
+            {
+                "fields": (
+                    "first_name",
+                    "last_name"
+                )
+            }
+        ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (
+            _("Important dates"),
+            {
+                "fields": (
+                    "last_login",
+                    "date_joined"
+                )
+            }
+        ),
+    )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "password1",
+                    "password2",
+                    "first_name",
+                    "last_name"
+                ),
+            },
+        ),
+    )
+    list_display = (
+        'id',
+        'first_name',
+        'last_name',
+        'email'
+    )
+    search_fields = (
+        'email',
+        'first_name',
+        'last_name',
+    )
+    ordering = ('email',)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(is_staff=True, is_superuser=False)
+
+    def save_model(self, request, obj, form, change):
+        obj.is_staff = True
+        obj.role = UserRole.manager
+        obj.is_verified = True
+        super().save_model(request, obj, form, change)

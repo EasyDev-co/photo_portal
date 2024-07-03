@@ -66,3 +66,13 @@ class User(UUIDMixin, AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.second_name} {self.last_name}"
+
+
+class StaffUser(User):
+    """
+    Прокси-модель для персонала для представления в админке.
+    """
+    class Meta:
+        proxy = True
+        verbose_name = 'Персонал'
+        verbose_name_plural = 'Персонал'
