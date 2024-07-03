@@ -1,4 +1,7 @@
 import loguru
+
+from decimal import Decimal
+
 from django.shortcuts import get_object_or_404, get_list_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -7,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.kindergarten.models import Kindergarten
+from apps.order.api.v1.serializers import OrderListSerializer
 from apps.order.models import Order, OrderItem
 from apps.photo.models import Photo
 
@@ -18,37 +22,55 @@ class OrderAPIView(APIView):
 
     def post(self, request):
         """Создание заказа из корзины."""
+
+        # создаем объект сервиса управления корзиной
         cart = CartService(request)
+
+        # подготавливаем нужные данные
         user = request.user
-
         kindergarten_ids = cart.get_kindergarten_ids(user)
-        loguru.logger.info(kindergarten_ids)
-        kindergartens = get_list_or_404(Kindergarten, id__in=kindergarten_ids)
+        photo_ids = cart.get_photo_ids(user)
 
+        # получаем нужные queryset'ы
+        kindergartens = Kindergarten.objects.filter(id__in=kindergarten_ids)
+        photos = Photo.objects.filter(id__in=photo_ids)
+
+        # создаем Orders
         orders = [Order(user=user, kindergarten=kindergarten) for kindergarten in kindergartens]
         orders = Order.objects.bulk_create(orders)
-        cart.remove_cart(user)
-        # order_price = 0
-        #
-        # for photo in photos:
-        #     photo_type = cart.cart[str(photo.id)]['photo_type']
-        #     photo_price = photo.photo_line.kindergarten.region.photo_prices.select_related('region').get(photo_type=photo_type).price
-        #     is_digital = cart.cart[str(photo.id)]['is_digital']
-        #     amount = cart.cart[str(photo.id)]['quantity']
-        #
-        #     order_price += (photo_price*amount)
-        #     OrderItem.objects.create(
-        #         photo_type=photo_type,
-        #         is_digital=is_digital,
-        #         amount=amount,
-        #         order=order,
-        #         photo=photo,
-        #     )
-        #
-        # order.order_price = order_price
-        # order.save()
-        # cart.clear()
-        return Response({'message': f'Заказ(ы) создан(ы)'})
+
+        # bulk_create возвращает list, поэтому достаем queryset через objects.filter
+        order_ids = []
+        for order in orders:
+            order_ids.append(order.id)
+        orders = Order.objects.filter(id__in=order_ids)
+
+        # создаем OrderItems
+        cart_list = cart.get_cart_list(user)
+        order_items = []
+
+        for position in cart_list:
+            order = orders.get(kindergarten__id=position['kindergarten_id'])
+            photo = photos.get(id=position['photo_id'])
+
+            # т.к. разделение Orders по детским садам, никак не смог уйти от order.save() на каждой итерации цикла
+            order.order_price += Decimal(position['price_per_piece'] * position['quantity'])
+            order.save()
+
+            order_items.append(
+                OrderItem(
+                    photo_type=position['photo_type'],
+                    is_digital=position['is_digital'],
+                    amount=position['quantity'],
+                    order=order,
+                    photo=photo,
+                )
+            )
+        OrderItem.objects.bulk_create(order_items)
+
+        # сериализуем данные для ответа на POST-запрос
+        serializer = OrderListSerializer(orders, many=True)
+        return Response(serializer.data)
 
 
 class PhotoCartAPIView(APIView):

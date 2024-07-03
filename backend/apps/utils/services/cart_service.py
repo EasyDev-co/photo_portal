@@ -64,7 +64,7 @@ class CartService:
             photo_ids = []
             for position in self.cart[user_id]:
                 photo_ids.append(position['photo_id'])
-                return photo_ids
+            return photo_ids
 
     def get_kindergarten_ids(self, user):
         """Получить все id детских садов, имеющихся в корзине."""
@@ -81,6 +81,15 @@ class CartService:
             user_id = str(user.id)
             return self.cart[user_id]
         return []
+
+    def get_total_price(self, user):
+        """Получить итоговую стоимость всех позиций корзины"""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            total_price = 0.0
+            for position in self.cart[user_id]:
+                total_price += (position['quantity'] * position['price_per_piece'])
+            return total_price
 
 
     # Методы для позиций корзины
