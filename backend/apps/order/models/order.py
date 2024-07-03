@@ -8,8 +8,9 @@ from apps.order.models.const import OrderStatus
 User = get_user_model()
 
 
-class Order(UUIDMixin, TimeStampedMixin):
+class Order(TimeStampedMixin):
     """Модель заказа."""
+    id = models.AutoField(primary_key=True, editable=False, verbose_name="Номер заказа")
     order_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
