@@ -1,7 +1,7 @@
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from django.db import models
 from apps.order.models import Order
-from apps.order.models.const import PhotoType
+from apps.kindergarten.models import PhotoType
 from apps.photo.models import Photo
 
 
