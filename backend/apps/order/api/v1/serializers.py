@@ -34,12 +34,13 @@ class OrderListSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_user_role(obj):
-        """Метод для получения роли заказчика."""
+        """Метод для получения названия роли заказчика."""
         role = obj.user.role
         return UserRole(role).label
 
     @staticmethod
     def get_status(obj):
+        """Метод для получения названия статуса заказа."""
         status = obj.status
         return OrderStatus(status).label
 
@@ -48,16 +49,3 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
-
-# Order
-# order_price
-# user - fk
-# kindergarten
-# status
-
-# OrderItem
-# photo_type
-# is_digital
-# amount
-# order - fk
-# photo - fk

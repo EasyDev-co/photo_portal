@@ -85,7 +85,6 @@ class PhotoCartAPIView(APIView):
 
         if photo:
             kindergarten = photo.photo_line.kindergarten
-
             price_per_piece = kindergarten.region.photo_prices.select_related(
                 'region'
             ).get(photo_type=request.data['photo_type']).price
@@ -98,8 +97,10 @@ class PhotoCartAPIView(APIView):
                 'price_per_piece': float(price_per_piece),
                 'kindergarten_id': str(kindergarten.id)
             }
+
             cart.add_product_to_cart(user, photo_data)
             return Response({'message': f'Фото {photo.id} успешно добавлено в корзину'})
+
         return Response({'message': f'Фото не найдено в БД'})
 
     @staticmethod
