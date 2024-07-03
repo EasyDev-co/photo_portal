@@ -73,7 +73,10 @@ class OrderAPIView(APIView):
                 )
             )
         OrderItem.objects.bulk_create(order_items)
+
+        # удаляем корзину из сессии
         cart.remove_cart(user)
+
         # сериализуем данные для ответа на POST-запрос
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
