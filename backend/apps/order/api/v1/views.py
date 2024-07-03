@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.kindergarten.models import Kindergarten
-from apps.order.api.v1.serializers import OrderSerializer
+from apps.order.api.v1.serializers import OrderSerializer, PhotoCartSerializer, PhotoCartRemoveSerializer
 from apps.order.models import Order, OrderItem
 from apps.photo.models import Photo
 
@@ -73,7 +73,7 @@ class OrderAPIView(APIView):
                 )
             )
         OrderItem.objects.bulk_create(order_items)
-
+        cart.remove_cart(user)
         # сериализуем данные для ответа на POST-запрос
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
@@ -92,38 +92,35 @@ class OrderOneAPIView(APIView):
     def get(request, pk):
         """Получение заказа."""
         order = get_object_or_404(Order, id=pk)
-        serializer = OrderListSerializer(order)
+        serializer = OrderSerializer(order)
         return Response(serializer.data)
 
 
 class PhotoCartAPIView(APIView):
     """Представление для отображения корзины."""
 
-    @swagger_auto_schema(responses={"200": openapi.Response(description="")})
+    @swagger_auto_schema(responses={"201": openapi.Response(description="")}, request_body=PhotoCartSerializer)
     def post(self, request):
         """Добавление фото в корзину."""
         cart = CartService(request)
         user = request.user
-        photo = get_object_or_404(Photo, id=request.data['photo_id'])
+        serializer = PhotoCartSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        photo = get_object_or_404(Photo, id=serializer.data['photo_id'])
 
         if photo:
             kindergarten = photo.photo_line.kindergarten
             price_per_piece = kindergarten.region.photo_prices.select_related(
                 'region'
-            ).get(photo_type=request.data['photo_type']).price
+            ).get(photo_type=serializer.data['photo_type']).price
 
-            photo_data = {
-                'photo_id': str(photo.id),
-                'photo_type': request.data['photo_type'],
-                'is_digital': request.data['is_digital'],
-                'quantity': request.data['quantity'],
-                'price_per_piece': float(price_per_piece),
-                'kindergarten_id': str(kindergarten.id)
-            }
+            serializer.data['photo_id'] = str(photo.id)
+            serializer.data['price_per_piece'] = float(price_per_piece)
+            serializer.data['kindergarten_id'] = str(kindergarten.id)
 
-            cart.add_product_to_cart(user, photo_data)
-            return Response({'message': f'Фото {photo.id} успешно добавлено в корзину'})
-
+            cart.add_product_to_cart(user, serializer.data)
+            return Response(serializer.data)
         return Response({'message': f'Фото не найдено в БД'})
 
     @staticmethod
@@ -131,15 +128,21 @@ class PhotoCartAPIView(APIView):
         """Показать корзину."""
         cart = CartService(request)
         cart_list = cart.get_cart_list(request.user)
-        return Response(cart_list)
+        serializer = PhotoCartSerializer(cart_list, many=True)
+        return Response(serializer.data)
 
     @staticmethod
+    @swagger_auto_schema(responses={"204": openapi.Response(description="")}, request_body=PhotoCartRemoveSerializer)
     def delete(request):
         cart = CartService(request)
         user = request.user
+
+        serializer = PhotoCartRemoveSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         cart.remove_product_from_cart(
             user=user,
-            product_id=request.data['photo_id'],
-            photo_type=request.data['photo_type'],
+            product_id=serializer.data['photo_id'],
+            photo_type=serializer.data['photo_type'],
         )
-        return Response({'message': 'Удалено'})
+        return Response(serializer.data)

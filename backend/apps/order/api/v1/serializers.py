@@ -5,6 +5,19 @@ from apps.order.models.const import OrderStatus
 from apps.user.models.user import UserRole
 
 
+class PhotoCartSerializer(serializers.Serializer):
+    photo_id = serializers.CharField()
+    photo_type = serializers.IntegerField()
+    is_digital = serializers.BooleanField()
+    quantity = serializers.IntegerField()
+    price_per_piece = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    kindergarten_id = serializers.CharField(required=False)
+
+
+class PhotoCartRemoveSerializer(serializers.Serializer):
+    photo_id = serializers.CharField()
+    photo_type = serializers.IntegerField()
+
 class OrderItemSerializer(serializers.ModelSerializer):
     """Сериализатор для получения позиций (частей) заказа."""
 
