@@ -10,7 +10,7 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ('id', 'number', 'photo')
+        fields = ('number', 'photo')
 
 
 class PhotoLineRetrieveSerializer(serializers.ModelSerializer):

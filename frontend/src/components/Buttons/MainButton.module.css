@@ -1,0 +1,38 @@
+.mainButton{
+    background-color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+.resetButton{
+    background-color: #fff;
+    padding: 24px 24px;
+    color: rgb(17, 187, 209);
+    font-size: 15px;
+    font-weight: 700;
+    outline: none;
+    border: none;
+}
+.paymentButton{
+    background-color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    width: 200px;
+   
+}
+.inputField{
+    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    height: 40px;
+    outline: none;
+    /* width: 100%; */
+    transition: .3s;
+}
+
+.inputField:required:invalid {
+    border: 1px solid rgb(240, 149, 149);
+}
