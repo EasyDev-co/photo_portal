@@ -91,7 +91,6 @@ class CartService:
                 total_price += (position['quantity'] * position['price_per_piece'])
             return total_price
 
-
     # Методы для позиций корзины
 
     def add_product_to_cart(self, user, product_data):
@@ -101,6 +100,14 @@ class CartService:
 
         user_id = str(user.id)
         self.cart[user_id].append(product_data)
+        self.save()
+
+    def add_product_list_to_cart(self, user, product_list):
+        if not self.check_cart_exists(user):
+            self.create_cart(user=user)
+
+        user_id =str(user.id)
+        self.cart[user_id] = product_list
         self.save()
 
     def get_photo_index_in_cart(self, user, product_id, photo_type):

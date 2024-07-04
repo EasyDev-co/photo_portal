@@ -112,30 +112,29 @@ class OrderOneAPIView(APIView):
 class PhotoCartAPIView(APIView):
     """Представление для отображения корзины."""
 
-    @swagger_auto_schema(responses={"201": openapi.Response(description="")}, request_body=PhotoCartSerializer)
+    @swagger_auto_schema(responses={"201": openapi.Response(description="Принимает список (list) с данными фото")}, request_body=PhotoCartSerializer)
     def post(self, request):
         """Добавление фото в корзину."""
         cart = CartService(request)
         user = request.user
-        serializer = PhotoCartSerializer(data=request.data)
+        serializer = PhotoCartSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
 
-        photo = get_object_or_404(Photo, id=serializer.data['photo_id'])
+        photo_list = serializer.data
 
-        if photo:
-            kindergarten = photo.photo_line.kindergarten
-            price_per_piece = kindergarten.region.photo_prices.select_related(
-                'region'
-            ).get(photo_type=serializer.data['photo_type']).price
-            photo_data = {
-                'price_per_piece': float(price_per_piece),
-                'kindergarten_id': str(kindergarten.id),
-
-            }
-            photo_data.update(serializer.data)
-            cart.add_product_to_cart(user, photo_data)
-            return Response(photo_data)
-        return Response({'message': f'Фото не найдено в БД'})
+        for photo in photo_list:
+            photo_obj = get_object_or_404(Photo, id=photo['photo_id'])
+            if photo_obj:
+                kindergarten = photo_obj.photo_line.kindergarten
+                loguru.logger.info(str(kindergarten.id))
+                price_per_piece = kindergarten.region.photo_prices.select_related(
+                    'region'
+                ).get(photo_type=photo['photo_type']).price
+                loguru.logger.info(float(price_per_piece))
+                photo.update({'price_per_piece': float(price_per_piece)}),
+                photo.update({'kindergarten_id': str(kindergarten.id)}),
+        cart.add_product_list_to_cart(user=user, product_list=photo_list)
+        return Response(photo_list)
 
     @staticmethod
     def get(request):
