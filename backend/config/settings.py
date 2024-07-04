@@ -42,11 +42,11 @@ INSTALLED_APPS = [
 
     # Приложения
     'apps.kindergarten',
-    'apps.user',
     'apps.parent',
     'apps.photo',
     'apps.order',
     'apps.promocode',
+    'apps.user',
 ]
 
 MIDDLEWARE = [
@@ -199,3 +199,5 @@ SIMPLE_JWT = {
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+
+CART_SESSION_ID = 'cart'
