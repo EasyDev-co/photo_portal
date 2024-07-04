@@ -1,6 +1,6 @@
 import InputField from "../InputField/InputField";
 import styles from "./Registration.module.css";
-import { useState,useRef } from "react";
+import { useState,useRef,useEffect } from "react";
 import yandex from '../../assets/images/socials/Я.svg'
 import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
@@ -11,6 +11,7 @@ import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
 import { setEmail } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
+
 export const Registration = () => {
   const initialState = {
     gardenCode: '',
@@ -27,6 +28,19 @@ export const Registration = () => {
   const navigation = useNavigate();
   const email = useSelector(action=>action.user.email);
   const dispatch = useDispatch();
+
+  const [formData, setFormData] = useState({ name: '', email: '' });
+   
+  // Обновляем состояние с данными из URL
+  useEffect(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      // setFormData({
+      //     name: urlParams.get('name') || '',
+      //     email: urlParams.get('email') || '',
+      // });
+      console.log(urlParams.get('name'))
+  }, []);
+
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
