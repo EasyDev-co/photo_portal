@@ -1,6 +1,6 @@
 import InputField from "../InputField/InputField";
 import styles from "./Registration.module.css";
-import { useState,useRef,useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import yandex from '../../assets/images/socials/Я.svg'
 import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
@@ -11,8 +11,13 @@ import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
 import { setEmail } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
+import { useLocation } from "react-router-dom";
 
 export const Registration = () => {
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -21,40 +26,40 @@ export const Registration = () => {
     password: '',
     repeatPassword: ''
   }
+
   const [activeBlur, setActiveBlur] = useState(false)
   const [inputValue, setInputValue] = useState(initialState);
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const navigation = useNavigate();
-  const email = useSelector(action=>action.user.email);
+  const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
 
-  const [formData, setFormData] = useState({ name: '', email: '' });
-   
-  // Обновляем состояние с данными из URL
+  const [urlData, setUrlData] = useState({
+    kindergarden_code:'',
+  });
+
   useEffect(() => {
-      const urlParams = new URLSearchParams(window.location.search);
-      // setFormData({
-      //     name: urlParams.get('name') || '',
-      //     email: urlParams.get('email') || '',
-      // });
-      console.log(urlParams.get('name'))
-  }, []);
+    setUrlData({
+      kindergarden_code: searchParams.get('kindergarden_code') || '',
+    })
+  }, [location.search]);
 
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
-  }
+  };
+
   const blurRef = useRef(null);
 
   useClickOutside(blurRef, () => {
-     setActiveBlur(false)
+    setActiveBlur(false)
   })
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const words = inputValue.fullName.split(' ');
     const { gardenCode, pictureNumbers, fullName, email, password } = inputValue;
- 
+
     try {
       const response = await parentRegisterCreate(email, words[1], words[2], words[0], password, gardenCode)
       if (response.ok) {
@@ -69,7 +74,7 @@ export const Registration = () => {
         setError(data);
       }
     } catch (error) {
-     
+
     }
     setInputValue(initialState);
   }
@@ -83,6 +88,7 @@ export const Registration = () => {
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
+                urlData={urlData.kindergarden_code}
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}
