@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import styles from './Counter.module.css'
 
 const Counter = ({ onChangeHandler, inputValue, name, id }) => {
-    const [count, setCount] = useState(1);
+    const [count, setCount] = useState(0);
     const inputRef = useRef(null);
     const [showBtn, setShowBtn] = useState(false);
     
