@@ -23,3 +23,9 @@ class InvalidCode(APIException):
     status_code = 400
     default_detail = 'Неверный код или истек срок его действия.'
     default_code = 'invalid_code'
+
+
+class PhotoPriceDoesNotExist(APIException):
+    status_code = 400
+    default_detail = 'Цена на фото этого типа не найдена.'
+    default_code = 'photo_price_not_found'

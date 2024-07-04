@@ -1,7 +1,10 @@
-from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
+from django.contrib import admin
 from django.db import models
+
+from apps.exceptions.api_exceptions import PhotoPriceDoesNotExist
+from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from apps.order.models import Order
-from apps.kindergarten.models import PhotoType
+from apps.kindergarten.models import PhotoType, PhotoPrice
 from apps.photo.models import Photo
 
 
@@ -40,3 +43,14 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return f"{self.photo_type}, {self.amount}"
+
+    @property
+    @admin.display(description='Цена')
+    def price(self):
+        region = self.order.kindergarten.region
+        try:
+            photo_price = region.photo_prices.get(photo_type=self.photo_type).price
+            price = self.amount * photo_price
+        except PhotoPrice.DoesNotExist:
+            raise PhotoPriceDoesNotExist
+        return price

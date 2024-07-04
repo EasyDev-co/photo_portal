@@ -48,6 +48,7 @@ class OrderItemAdmin(admin.ModelAdmin):
         'photo_type',
         'is_digital',
         'amount',
+        'price',
         'order',
         'photo',
         'created',
@@ -55,7 +56,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     )
     list_filter = ('order', 'photo_type')
     ordering = ('created', 'modified')
-    search_fields = ('order__id',)
+    search_fields = ('order__id', 'order__user__email')
     readonly_fields = (
         'created',
         'modified',

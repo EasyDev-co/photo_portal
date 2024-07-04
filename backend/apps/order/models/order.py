@@ -1,4 +1,4 @@
-from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
+from apps.utils.models_mixins.models_mixins import TimeStampedMixin
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -45,3 +45,8 @@ class Order(TimeStampedMixin):
 
     def __str__(self):
         return f'Заказ {self.id}, {self.user}'
+
+    def update_order_price(self):
+        order_items = self.order_items.filter(order_id=self.id)
+        self.order_price = sum(order_item.price for order_item in order_items)
+        self.save(update_fields=['order_price'])
