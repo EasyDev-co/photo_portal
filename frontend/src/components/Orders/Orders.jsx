@@ -26,7 +26,7 @@ export const Orders = () => {
             setAccessToken(res.access)
           )
         }
-        return res.access
+        return res.access;
       })
       .then(access => {
         getPhotoLine('0472faa8-1e9d-485c-973a-15664608ff31', access)
@@ -60,20 +60,24 @@ export const Orders = () => {
     calendar: 1,
     photo_book: 1
   });
+
   const onChangeHandler = (name, count) => {
     const newInput = (data) => ({ ...data, [name]: count });
     setInputValue(newInput);
-  }
+  };
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-  }
+    console.log(inputValue)
+  };
 
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
 
   useClickOutside(blurRef, () => {
     setIsBlur(false);
-  })
+  });
+
   const [isActiveForm, setIsActiveForm] = useState(false);
   return (
     <div className={styles.ordersWrap}>
@@ -98,10 +102,11 @@ export const Orders = () => {
             {blocks.map((block, i) => (
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
-                  {addPhoto?.map((elem,i)=>{
+                  {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem,i)=>{
                     return(
                       <PhotoCard
                       key={i}
+                      blurRef={blurRef}
                       setIsBlur={setIsBlur}
                       photo={elem.photo}
                       onChangeHandler={onChangeHandler}
@@ -135,7 +140,6 @@ export const Orders = () => {
               </div>
               <div className={styles.promoStringWrap}>
                 <div className={styles.dot}>
-
                 </div>
                 <span style={styles.promoString}>
                   При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде

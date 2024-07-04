@@ -10,6 +10,7 @@ import { useClickOutside } from '../../../utils/useClickOutside';
 const AddKidsForm = ({ addBlock,isActiveForm,setIsActiveForm }) => {
     
     const activeRef = useRef(null);
+
     useClickOutside(activeRef,()=>{
         setIsActiveForm(false)
     })
@@ -18,6 +19,7 @@ const AddKidsForm = ({ addBlock,isActiveForm,setIsActiveForm }) => {
     });
 
     const dispatch = useDispatch();
+
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
@@ -52,6 +54,7 @@ const AddKidsForm = ({ addBlock,isActiveForm,setIsActiveForm }) => {
             addKids: ''
         });
     }
+
     return (
         <form ref={activeRef} onSubmit={onSubmitHandler} className={isActiveForm?styles.addKidsFormActive:styles.addKidsForm} action="">
             <div className={styles.addKidsWrap}>
