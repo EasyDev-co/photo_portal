@@ -1,0 +1,40 @@
+.sideBar {
+  width: 100px;
+  height: fit-content;
+  background-color: #fff;
+  border-right: 1px solid #e5e5e5;
+  position: absolute;
+}
+
+.firstBlock {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.nav {
+  padding: 80px 0 0 0;
+}
+
+.navList {
+  display: flex;
+  gap: 40px;
+  flex-direction: column;
+}
+
+.navLinkExit {
+  height: 48px;
+  margin: 104px 0 40px 0;
+}
+
+.socialList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 0;
+}
+
+@media screen and (max-width: 768px) {
+  .sideBar {
+    display: none;
+  }
+}

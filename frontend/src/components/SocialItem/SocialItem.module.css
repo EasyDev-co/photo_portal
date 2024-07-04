@@ -1,0 +1,12 @@
+.socialItem {
+  width: 32px;
+  height: 32px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}

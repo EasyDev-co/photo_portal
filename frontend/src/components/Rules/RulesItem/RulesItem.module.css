@@ -1,0 +1,40 @@
+.item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.numBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 56px;
+  width: 100%;
+  height: 56px;
+  border: 1px solid #11bbd1;
+  border-radius: 4px;
+}
+
+.num {
+  color: #090909;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text {
+  width: 100%;
+  color: #090909;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+@media screen and (max-width: 768px) {
+  .item {
+    align-items: flex-start;
+  }
+}

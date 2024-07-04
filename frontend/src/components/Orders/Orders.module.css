@@ -1,0 +1,225 @@
+.ordersWrap {
+    margin: 0 0 0 140px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media screen and (max-width: 1000px) {
+    .ordersWrap {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .ordersWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .ordersWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+.orderWidggetWrap {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media screen and (max-width: 968px) {
+    .orderWidggetWrap {
+        flex-direction: column;
+    }
+}
+
+.mainButton {
+    background-color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.profileTitle {
+    color: #090909;
+    font-family: "Nunito";
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 20px;
+    padding: 60px 40px 40px 0;
+}
+
+@media screen and (max-width: 768px) {
+    .profileTitle {
+        margin-left: 0;
+        padding: 40px 20px 40px 0;
+    }
+}
+
+.photoCardsWrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+/* .photoCardsWrapBlur{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+   position: relative;
+} */
+.photoCardsForm{
+    position: relative;
+}
+.photoCardsFormBlur{
+    position: relative;
+}
+.photoCardsFormBlur::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(4px);
+}
+@media (max-width: 1440px) {
+    .photoCardsWrap {
+        justify-content: center;
+    }
+    .photoCardsWrapBlur{
+        justify-content: center;
+    }
+}
+
+.orderPromoWrap {
+    margin-bottom: 24px;
+    /* margin-right: 40px; */
+    display: flex;
+    gap: 24px;
+}
+
+@media (max-width: 1670px) {}
+
+@media (max-width: 1440px) {
+    .orderPromoWrap {
+        flex-direction: column;
+    }
+}
+
+.orderPromo {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid rgb(229, 229, 229);
+    border-radius: 8px;
+    padding: 24px;
+    justify-content: center;
+    flex-grow: 1;
+}
+@media (max-width: 380px) {
+    .orderPromo{
+        align-items: start;
+    }
+}
+.promoStringWrap {
+    display: flex;
+    align-items: center;
+}
+
+.promoStringWrap:nth-child(1)>span {
+    margin-right: 16px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgb(17, 187, 209);
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.promoInput {
+    padding: 12px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    outline: none;
+    border-radius: 8px;
+}
+
+.promoInput::placeholder {
+    color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+
+.promoInputWrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+@media (max-width: 380px) {
+    .promoInputWrap{
+        flex-direction: column;
+    }
+}
+.promoInputWrap>span {
+    color: rgb(17, 187, 209);
+    font-size: 15px;
+}
+
+.deleteBlockBtn {
+    border: 1px solid rgb(17, 187, 209);
+    color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.addBtnWrap {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 24px;
+}
+
+.paymentTimerWrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    /* padding: 0px 40px 0px 40px; */
+    gap: 80px;
+    border-left: 1px solid rgb(229, 229, 229);
+}
+
+@media screen and (max-width: 968px) {
+    .paymentTimerWrap {
+        border: none;
+    }
+
+    .paymentTimerWrap>div {
+        border: none;
+    }
+}
+
+.promoButtonWrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.promoButtonWrap>span {
+    color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+
+.orderWidggetContainer {
+    display: flex;
+    flex-direction: column;
+    margin-right: 40px;
+}
+@media (max-width: 520px) {
+    .orderWidggetContainer {
+        margin: 0;
+    }
+}

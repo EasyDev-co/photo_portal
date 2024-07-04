@@ -1,0 +1,51 @@
+.aboutUsItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.img {
+  border-radius: 20px;
+}
+
+.textBlock {
+  position: absolute;
+  right: 64px;
+  max-width: 428px;
+  width: 100%;
+  background-color: #fff;
+  box-sizing: border-box;
+  border-radius: 20px;
+  padding: 80px 40px 48px 48px;
+}
+
+.line {
+  display: block;
+  width: 80px;
+  height: 3px;
+  background-color: #11bbd1;
+  border-radius: 2px;
+}
+
+.text {
+  color: #090909;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 160%;
+  margin: 24px 0;
+}
+
+@media screen and (max-width: 1400px) {
+  .textBlock {
+    position: static;
+    max-width: 100%;
+    padding: 48px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .textBlock {
+    padding: 40px 32px;
+  }
+}
