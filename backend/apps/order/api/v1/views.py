@@ -1,22 +1,16 @@
-import loguru
-
-from decimal import Decimal
-
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.kindergarten.models import Kindergarten, PhotoPrice, PhotoType
 from apps.order.api.v1.serializers import OrderSerializer, PhotoCartSerializer, PhotoCartRemoveSerializer
-from apps.order.models import Order, OrderItem
+from apps.order.models import Order
 from apps.photo.models import Photo
-from apps.promocode.models import Promocode
-from apps.promocode.models.bonus_coupon import BonusCoupon
 
 from apps.utils.services import CartService
+from apps.utils.services.order_service import OrderService
 
 
 class OrderAPIView(APIView):
@@ -30,118 +24,16 @@ class OrderAPIView(APIView):
     def post(self, request):
         """Создание заказа из товаров корзины."""
 
-        # создаем объект сервиса управления корзиной
         cart = CartService(request)
+        order_service = OrderService(request=request, cart=cart)
 
-        # подготавливаем нужные данные
         user = request.user
-        kindergarten_ids = cart.get_kindergarten_ids(user)
-        photo_ids = cart.get_photo_ids(user)
+        photos, bonus_coupon, promocode = order_service.prepare_the_order_data()
 
-        # получаем нужные queryset'ы по подготовленным данным
-        kindergartens = Kindergarten.objects.filter(id__in=kindergarten_ids)
-        photos = Photo.objects.filter(id__in=photo_ids)
-        is_digital_dict = {}
-        # проверяем, должны ли быть электронные фотографии:
-        if not request.data['is_digital']:
-            # если нет
-            # проверяем, превышает ли стоимость заказа сумму выкупа
-            total_prices_without_discount = cart.get_total_price(user)
-            loguru.logger.info(total_prices_without_discount)
-
-            for kindergarten in kindergartens:
-                ransom_amount = kindergarten.region.ransom_amount
-                exceeding_ransom_amount = total_prices_without_discount[str(kindergarten.id)] >= Decimal(ransom_amount)
-                is_digital_dict[str(kindergarten.id)].update(
-                    {
-                        'is_digital': exceeding_ransom_amount,
-                        'digital_cost': Decimal(0),
-                    }
-                )
-        else:
-            # если есть
-
-            # проверяем, превышает ли стоимость заказа сумму выкупа
-            total_prices_without_discount = cart.get_total_price(user)
-            loguru.logger.info(total_prices_without_discount)
-
-            for kindergarten in kindergartens:
-                ransom_amount = kindergarten.region.ransom_amount
-                exceeding_ransom_amount = total_prices_without_discount[str(kindergarten.id)] >= Decimal(ransom_amount)
-                if exceeding_ransom_amount:
-                    is_digital_dict[str(kindergarten.id)] = {
-                        'is_digital': True,
-                        'digital_cost': Decimal(0),
-                    }
-                else:
-                    photo_price = get_object_or_404(
-                        PhotoPrice,
-                        photo_type=PhotoType.digital,
-                        region=kindergarten.region
-                    )
-                    is_digital_dict[str(kindergarten.id)] = {
-                        'is_digital': True,
-                        'digital_cost': Decimal(photo_price.price),
-                    }
-
-        # создаем Orders, указывает is_digital и добавляем сразу в order_price - digital_cost
-        orders = [
-            Order(
-                user=user,
-                kindergarten=kindergarten,
-                is_digital=is_digital_dict[str(kindergarten.id)]['is_digital'],
-                order_price=is_digital_dict[str(kindergarten.id)]['digital_cost'],
-            ) for kindergarten in kindergartens
-        ]
-        orders = Order.objects.bulk_create(orders)
-
-        # bulk_create возвращает list, поэтому достаем queryset через objects.filter
-        order_ids = []
-        for order in orders:
-            order_ids.append(order.id)
-        orders = Order.objects.filter(id__in=order_ids)
-
-        # готовим данные для создания OrderItems
-        cart_list = cart.get_cart_list(user)
-        order_items = []
-
-        # проверяем, есть ли не пустые купоны и промокоды
-        bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
-        promocode = user.promocode
-
-        # готовим список объектов OrderItem для bulk_create и считаем цену Заказа
-        for position in cart_list:
-            order = orders.get(kindergarten__id=position['kindergarten_id'])
-            photo = photos.get(id=position['photo_id'])
-            price = Decimal(position['price_per_piece'] * position['quantity'])
-
-            # применяем купоны и скидки
-            if bonus_coupon:
-                price = bonus_coupon.use_bonus_coupon_to_price(price)
-            if promocode:
-                price = promocode.use_promocode_to_price(price, photo_type=position['photo_type'])
-
-            # добавляем получившуюся стоимость в Заказ
-            order.order_price += price
-            order.save()
-
-            order_items.append(
-                OrderItem(
-                    photo_type=position['photo_type'],
-                    # is_digital=position['is_digital'],
-                    amount=position['quantity'],
-                    order=order,
-                    photo=photo,
-                )
-            )
-
-        # создаем OrderItems
-        OrderItem.objects.bulk_create(order_items)
-
-        # удаляем корзину из сессии
+        orders = order_service.create_orders()
+        order_service.create_order_items(orders, photos, bonus_coupon, promocode)
         cart.remove_cart(user)
 
-        # сериализуем данные для ответа на POST-запрос
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 

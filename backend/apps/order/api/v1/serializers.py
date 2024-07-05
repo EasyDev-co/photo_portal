@@ -56,9 +56,3 @@ class OrderSerializer(serializers.ModelSerializer):
         """Метод для получения названия статуса заказа."""
         status = obj.status
         return OrderStatus(status).label
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = '__all__'
