@@ -29,7 +29,7 @@ export const Orders = () => {
         return res.access;
       })
       .then(access => {
-        getPhotoLine('dba30881-4eed-40ae-bf83-4c8d0befe9d4', access)
+        getPhotoLine('8b4b9284-8c05-4fa0-9168-fa398eb99854', access)
           .then(res => res.json())
           .then(res => {
             if(res.photos){
@@ -116,7 +116,6 @@ export const Orders = () => {
                     />
                     )
                   })}
-              {console.log(addPhoto)}
                 </div>
                 <div className={styles.addBtnWrap}>
                   <button className={styles.deleteBlockBtn} onClick={() => deleteBlock(block.id)}>Удалить блок</button>
