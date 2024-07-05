@@ -9,17 +9,24 @@ import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
-import { setEmail } from "../../store/authSlice";
+import { addQrIdPhoto, setEmail } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
 import { useLocation } from "react-router-dom";
+import Scaner from "../Scaner/Scaner";
 
 export const Registration = () => {
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
+  // const [urlData, setUrlData] = useState({
+  //   kindergarten_code: '',
+  //   photo_line_id: '',
+  //   photo: []
+  // });
+
   const initialState = {
-    gardenCode: '',
+    gardenCode:  '',
     pictureNumbers: '',
     fullName: '',
     email: '',
@@ -34,15 +41,20 @@ export const Registration = () => {
   const navigation = useNavigate();
   const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
-
-  const [urlData, setUrlData] = useState({
-    kindergarden_code:'',
-  });
+  const [scanActive, setScanActive] = useState(false);
 
   useEffect(() => {
-    setUrlData({
-      kindergarden_code: searchParams.get('kindergarden_code') || '',
+    let photos = [];
+    searchParams.forEach((value, key) => {
+      if (key === "photo") {
+        photos.push(value);
+      }
+    });
+    setInputValue({
+      gardenCode: searchParams.get('kindergarten_code') || '',
+      pictureNumbers: photos.join('-') || ''
     })
+    dispatch(addQrIdPhoto(searchParams.get('photo_line_id')))
   }, [location.search]);
 
   const onChangeHandler = (event) => {
@@ -55,6 +67,7 @@ export const Registration = () => {
   useClickOutside(blurRef, () => {
     setActiveBlur(false)
   })
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const words = inputValue.fullName.split(' ');
@@ -81,14 +94,18 @@ export const Registration = () => {
 
   return <>
     <div className={styles.login}>
+      <Scaner
+        scanActive={scanActive}
+        setScanActive={setScanActive}
+      />
       <div className={styles.container}>
         <div className={activeBlur ? styles.blurContainer : ' '}></div>
         <div className={styles.regFormWrap}>
+          <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           <div className={styles.regFormContainer}>
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
-                urlData={urlData.kindergarden_code}
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}

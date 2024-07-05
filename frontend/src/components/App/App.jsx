@@ -19,6 +19,7 @@ export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuth } = useAuth();
+  
   useEffect(() => {
     // Перенаправляем на "/orders" при входе на сайт
     if (location.pathname === "/") {

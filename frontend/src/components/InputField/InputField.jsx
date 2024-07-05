@@ -8,7 +8,6 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
     const [highlight, setHighlight] = useState(false);
 
     const inputRef = useRef(null);
-    // console.log(urlData.kindergarden_code)
     const clickMarker = (e) => {
         setIsActiveInput(!activeInput);
     
@@ -25,7 +24,9 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
         }
 
     }
+
     const radioRef = useRef(null);
+
     useClickOutside(radioRef, () => {
         setActiveWidget(false);
     })
@@ -43,7 +44,7 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
                     placeholder={placeholder}
                     name={name}
                     id={id}
-                    value={urlData || inputValue}
+                    value={value}
                     required />
                 <div
                     onClick={(e) => { clickMarker(e) }}
@@ -51,7 +52,6 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
                                     isMarker ? style.inputMarker :
                                         isQuestions ? style.inputQuestion : 
                                             isNone ? '' : activeInput ? style.inputMarker : style.inputIsShow}>
-
                 </div>
                 <div ref={radioRef} className={activeWidget ? style.showWidget : style.hideWidget}>
                     <Prompt
