@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
+from apps.user.models import ConfirmCode
+from apps.user.models.manager_bonus import ManagerBonus
 from apps.kindergarten.models import Kindergarten
 from apps.user.models.user import UserRole, StaffUser
 
@@ -111,3 +113,27 @@ class StaffAdmin(BaseUserAdmin):
         obj.role = UserRole.manager
         obj.is_verified = True
         super().save_model(request, obj, form, change)
+
+
+@admin.register(ConfirmCode)
+class ConfirmCodeAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'code',
+        'created_at',
+        'purpose',
+        'is_used',
+    )
+
+
+@admin.register(ManagerBonus)
+class ManagerBonus(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'start_period_date',
+        'end_period_date',
+        'bonus_size',
+        'total_bonus',
+        'paid_for',
+    )
+    raw_id_fields = ('user',)

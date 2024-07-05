@@ -11,6 +11,7 @@ class OrderAdmin(admin.ModelAdmin):
         'user',
         'kindergarten',
         'status',
+        'is_digital',
         'created',
         'modified',
     )
@@ -30,7 +31,6 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'photo_type',
-        'is_digital',
         'amount',
         'order',
         'photo',
