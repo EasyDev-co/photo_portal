@@ -14,6 +14,7 @@ class PhotoType(models.IntegerChoices):
     magnet = 4, 'Магнит'
     calendar = 5, 'Календарь'
     photobook = 6, 'Фотокнига'
+    digital = 0, 'Электронные фото'
 
 
 class PhotoPrice(UUIDMixin):
