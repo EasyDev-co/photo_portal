@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import {tokenRefreshCreate} from '../../http/tokenRefreshCreate'
 import { setCookie } from "../../utils/setCookie";
-import {setAccessToken} from '../../store/authSlice'
+import {addPhotoLine, addPhotos, setAccessToken} from '../../store/authSlice'
 import {getPhotoLine} from '../../http/getPhotoLine'
 
 export const Orders = () => {
@@ -15,7 +15,7 @@ export const Orders = () => {
   const dispatch = useDispatch();
   const addPhoto = useSelector(state=>state.user.photos);
   const [photos, setPhotos] = useState([]);
-
+  const photosLine = useSelector(state=>state.user.photosLine);
   useEffect(() => {
     tokenRefreshCreate()
       .then(res => res.json())
@@ -29,11 +29,12 @@ export const Orders = () => {
         return res.access;
       })
       .then(access => {
-        getPhotoLine('0472faa8-1e9d-485c-973a-15664608ff31', access)
+        getPhotoLine('dba30881-4eed-40ae-bf83-4c8d0befe9d4', access)
           .then(res => res.json())
           .then(res => {
             if(res.photos){
               setPhotos(res);
+              dispatch(addPhotoLine(res.photos))
             }
           })
       })
@@ -79,6 +80,7 @@ export const Orders = () => {
   });
 
   const [isActiveForm, setIsActiveForm] = useState(false);
+
   return (
     <div className={styles.ordersWrap}>
       <div className={styles.orderWidggetWrap}>
@@ -114,6 +116,7 @@ export const Orders = () => {
                     />
                     )
                   })}
+              {console.log(addPhoto)}
                 </div>
                 <div className={styles.addBtnWrap}>
                   <button className={styles.deleteBlockBtn} onClick={() => deleteBlock(block.id)}>Удалить блок</button>

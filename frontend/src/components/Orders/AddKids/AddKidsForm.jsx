@@ -26,6 +26,7 @@ const AddKidsForm = ({ addBlock,isActiveForm,setIsActiveForm }) => {
     }
 
     const onSubmitHandler = async (e) => {
+
         e.preventDefault();
         inputValue.addKids.split(',').forEach(num => {
             tokenRefreshCreate()
@@ -43,9 +44,7 @@ const AddKidsForm = ({ addBlock,isActiveForm,setIsActiveForm }) => {
                     getOnePhoto(num, access)
                         .then(res => res.json())
                         .then(res => {
-                            dispatch(
-                                addPhotos(res)
-                            )
+                            dispatch(addPhotos(res))
                         })
                 })
         });
@@ -56,7 +55,7 @@ const AddKidsForm = ({ addBlock,isActiveForm,setIsActiveForm }) => {
     }
 
     return (
-        <form ref={activeRef} onSubmit={onSubmitHandler} className={isActiveForm?styles.addKidsFormActive:styles.addKidsForm} action="">
+        <form ref={activeRef} onSubmit={(e)=>onSubmitHandler(e)} className={isActiveForm?styles.addKidsFormActive:styles.addKidsForm} action="">
             <div className={styles.addKidsWrap}>
                 <h1 className={styles.profileTitle}>Введите номера фотографий</h1>
                 <div>

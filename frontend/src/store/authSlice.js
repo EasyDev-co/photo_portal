@@ -9,7 +9,8 @@ const authSlice = createSlice({
         refresh: null,
         blur:false,
         code: null,
-        photos:[]
+        photos:[],
+        photosLine:[]
     },
     reducers:{
         setUser:(state,action)=>{
@@ -35,10 +36,13 @@ const authSlice = createSlice({
         },
         addPhotos(state,action){
             state.photos.push(action.payload);
+        },
+        addPhotoLine(state,action){
+            state.photosLine = action.payload;
         }
     }
 });
 
-export const { setUser, removeUser,addBlur,setEmail, setCode, setAccessToken,addPhotos} = authSlice.actions;
+export const { setUser, removeUser,addBlur,setEmail, setCode, setAccessToken,addPhotos, addPhotoLine} = authSlice.actions;
 
 export default authSlice.reducer;
