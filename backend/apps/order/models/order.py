@@ -28,6 +28,10 @@ class Order(UUIDMixin, TimeStampedMixin):
         related_name="orders",
         verbose_name="Детский сад",
     )
+    is_digital = models.BooleanField(
+        default=False,
+        verbose_name="Электронные фотографии",
+    )
     status = models.PositiveSmallIntegerField(
         choices=OrderStatus.choices,
         default=OrderStatus.created,
