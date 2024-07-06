@@ -29,3 +29,10 @@ class EmailErrorLog(models.Model):
         on_delete=models.PROTECT,
         verbose_name='Пользователь',
     )
+
+    def __str__(self):
+        return self.message
+
+    class Meta:
+        verbose_name = 'Ошибка отправки email'
+        verbose_name_plural = 'Ошибки отправки email'
