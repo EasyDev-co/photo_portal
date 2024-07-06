@@ -16,10 +16,10 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
         verbose_name="Тип фото",
         blank=True,
     )
-    is_digital = models.BooleanField(
-        default=False,
-        verbose_name="В электронном виде",
-    )
+    # is_digital = models.BooleanField(
+    #     default=False,
+    #     verbose_name="В электронном виде",
+    # )
     amount = models.PositiveIntegerField(
         default=1,
         verbose_name="Количество",
