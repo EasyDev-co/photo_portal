@@ -9,3 +9,7 @@ class PhotoPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotoPrice
         fields = '__all__'
+
+
+class PhotoPriceByRegionSerializer(serializers.Serializer):
+    region = serializers.CharField(max_length=200)
