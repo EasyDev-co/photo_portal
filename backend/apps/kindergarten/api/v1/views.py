@@ -8,7 +8,6 @@ from apps.kindergarten.api.v1.serializers import PhotoPriceSerializer, PhotoPric
 class PhotoPriceAPIView(APIView):
     """
     Представление для цен на фото.
-    Опционально принимает query-параметр 'region=[название_региона]'.
     """
     def get(self, request):
         serializer = PhotoPriceByRegionSerializer(data=request.data)
