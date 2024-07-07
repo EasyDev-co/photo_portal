@@ -20,6 +20,7 @@ export const Orders = () => {
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const location = useLocation();
+
   useEffect(() => {
     tokenRefreshCreate()
       .then(res => res.json())
@@ -41,7 +42,7 @@ export const Orders = () => {
             }
           })
       })
-  }, [sessionData,photoLineId,location.pathname]);
+  }, [sessionData, photoLineId, location.pathname, scanActive]);
 
   const [blocks, setBlocks] = useState([]);
   
@@ -89,11 +90,9 @@ export const Orders = () => {
          setScanActive={setScanActive}
       />
       <div className={styles.orderWidggetWrap}>
-     
         <div className={styles.orderWidggetContainer}>
-          
           <h1 className={styles.profileTitle}>Выбор фотографии  <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button></h1>
-          <form onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
+          <form key={photos.length} onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
               {photos.photos?.map((photo,i) => {
                 return (
