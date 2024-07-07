@@ -1,9 +1,9 @@
 from django.db import models
 
-from apps.utils.models_mixins.models_mixins import UUIDMixin
+from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
 
-class PhotoTheme(UUIDMixin):
+class PhotoTheme(UUIDMixin, TimeStampedMixin):
     name = models.CharField(
         max_length=255,
         verbose_name='Название'

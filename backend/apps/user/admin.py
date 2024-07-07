@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.user.models import ConfirmCode
 from apps.user.models.manager_bonus import ManagerBonus
 from apps.kindergarten.models import Kindergarten
+from apps.user.models.email_error_log import EmailErrorLog
 from apps.user.models.user import UserRole, StaffUser
 
 User = get_user_model()
@@ -36,10 +37,11 @@ class UserAdmin(admin.ModelAdmin):
         'first_name',
         'second_name',
         'last_name',
-        'promocode',
+        'promocode__code',
     )
     list_filter = ('role', 'is_verified')
     raw_id_fields = ('promocode',)
+    ordering = ('email', 'last_name', 'first_name')
 
     inlines = [KindergartenInLine]
 
@@ -113,6 +115,30 @@ class StaffAdmin(BaseUserAdmin):
         obj.role = UserRole.manager
         obj.is_verified = True
         super().save_model(request, obj, form, change)
+
+
+@admin.register(EmailErrorLog)
+class EmailErrorLogAdmin(admin.ModelAdmin):
+    list_display = (
+        'confirm_code',
+        'message',
+        'is_sent',
+        'created_at',
+        'user'
+    )
+    search_fields = (
+        'user__email',
+    )
+    ordering = ('created_at',)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(ConfirmCode)

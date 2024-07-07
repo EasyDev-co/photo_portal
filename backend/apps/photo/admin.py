@@ -43,6 +43,7 @@ class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
     )
     list_filter = ('is_active',)
     search_fields = ('name',)
+    ordering = ('name', 'date_start', 'date_end')
 
 
 @admin.register(PhotoLine)
