@@ -11,6 +11,7 @@ from apps.user.models import User
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Сериализатор для авторизации пользователя."""
+
     def validate(self, attrs):
         authenticate_kwargs = {
             'email': attrs['email'],
@@ -59,3 +60,14 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=255, required=False)
+    last_name = serializers.CharField(max_length=255, required=False)
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(write_only=True, validators=[validate_password], required=False)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'password')
