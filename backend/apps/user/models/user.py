@@ -54,11 +54,6 @@ class User(UUIDMixin, AbstractUser):
         default=False,
         verbose_name='Подтверждение email',
     )
-    phone_number = models.CharField(
-        max_length=20,
-        blank=True,
-        verbose_name="Номер телефона",
-    )
 
     objects = UserManager()
 
