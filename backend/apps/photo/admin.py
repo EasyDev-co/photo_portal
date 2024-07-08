@@ -87,7 +87,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
-    list_display = ('photo_line', 'number', 'photo')
+    list_display = ('photo_line', 'number', 'photo', 'child')
     raw_id_fields = ('photo_line',)
     readonly_fields = ('photo_img',)
 
