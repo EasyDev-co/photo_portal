@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='phone_number',
-            field=models.CharField(null=True, unique=True, validators=[apps.user.validators.validate_phone_number], verbose_name='Номер телефона'),
+            field=models.CharField(max_length=12, null=True, unique=True, validators=[apps.user.validators.validate_phone_number], verbose_name='Номер телефона'),
         ),
     ]

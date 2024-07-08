@@ -57,6 +57,7 @@ class User(UUIDMixin, AbstractUser):
         verbose_name='Подтверждение email',
     )
     phone_number = models.CharField(
+        max_length=12,
         validators=[validate_phone_number],
         unique=True,
         verbose_name='Номер телефона',
