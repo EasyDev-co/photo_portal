@@ -7,11 +7,15 @@ from rest_framework.views import APIView
 
 from apps.order.api.v1.serializers import OrderSerializer, PhotoCartSerializer, PhotoCartRemoveSerializer
 from apps.order.models import Order
+from apps.order.tasks import digital_photos_notification
 from apps.photo.models import Photo
+
 
 from apps.utils.services import CartService
 from apps.utils.services.order_service import OrderService
 
+from django.core.mail import send_mail
+from config.settings import EMAIL_HOST_USER
 
 class OrderAPIView(APIView):
     """Представление для заказа."""
@@ -103,3 +107,10 @@ class PhotoCartAPIView(APIView):
             photo_type=serializer.data['photo_type'],
         )
         return Response(serializer.data)
+
+
+class TestMainAPIView(APIView):
+    def post(self, request):
+        user = request.user
+        digital_photos_notification.delay(user_id=user.id)
+        return Response({"message": "Письмо отправлено"})
