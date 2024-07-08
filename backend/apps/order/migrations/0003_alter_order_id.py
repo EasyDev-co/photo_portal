@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('order', '0001_initial'),
+        ('order', '0002_alter_orderitem_photo_type'),
     ]
 
     operations = [
