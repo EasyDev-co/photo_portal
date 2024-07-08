@@ -6,30 +6,65 @@ import { userInfoProfile } from "../../../constants/constants";
 import { useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
+import { useSelector } from "react-redux";
+import { tokenRefreshCreate } from "../../../http/tokenRefreshCreate";
+import { setCookie } from "../../../utils/setCookie";
+import { useDispatch } from "react-redux";
+import { setAccessToken } from "../../../store/authSlice";
+import { userPartialUpdate } from "../../../http/userPartialUpdate";
 
 const ParentProfile = ({ nurseryIsAuth }) => {
-    const [resetPassActive, setResetActive] = useState(false)
-    const [generatePass, setPass] = useState(gen_password(12))
+    const [resetPassActive, setResetActive] = useState(false);
+    const [generatePass, setPass] = useState(gen_password(12));
+
     const [inputValue, setInputValue] = useState({
-        parentSurname: '',
-        parentName: '',
-        parentPatronymic: '',
+        parentSurname: localStorage.getItem('last_name') || '',
+        parentName: localStorage.getItem('first_name') || '',
+        parentPatronymic: localStorage.getItem('second_name') || '',
         parentPhone: '',
-        parentEmail: '',
+        parentEmail: localStorage.getItem('email') || '',
         kindergarten: '',
         parentCity: '',
         parentPass: '',
-        parentNewPass: '',
+        parentNewPass: generatePass,
         resetEmail: ''
     });
+    const dispatch = useDispatch();
 
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
     }
+    
     const onSubmitHandler = (e) => {
         e.preventDefault();
-        console.log(inputValue)
+        tokenRefreshCreate()
+            .then(res => res.json())
+            .then(res => {
+                if (res.refresh) {
+                    setCookie('refresh', res.refresh);
+                    dispatch(
+                        setAccessToken(res.access)
+                    )
+                }
+                return res.access
+            })
+            .then(access => {
+                userPartialUpdate(access,{
+                    email:inputValue.parentEmail,
+                    first_name:inputValue.parentName,
+                    last_name: inputValue.parentSurname
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res) {
+                            // dispatch(addUserData(res))
+                            console.log(res)
+                        }
+                    })
+            })
+
+        // console.log(inputValue)
     }
     return (
         <div className={styles.profileWrap}>
@@ -42,10 +77,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"parentSurname"}
                         id={"parentSurname"}
-                        value={userInfoProfile.surname}
+                        value={inputValue.parentSurname}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentSurname}
+                    // inputValue={inputValue.parentSurname}
                     />
                     <InputField
                         placeholder={"Имя"}
@@ -53,10 +88,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"parentName"}
                         id={"parentName"}
-                        value={userInfoProfile.name}
+                        value={inputValue.parentName}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentName}
+                    // inputValue={inputValue.parentName}
                     />
                     <InputField
                         placeholder={"Отчество"}
@@ -64,10 +99,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"parentPatronymic"}
                         id={"parentPatronymic"}
-                        value={userInfoProfile.patronymic}
+                        value={inputValue.parentPatronymic}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentPatronymic}
+                    // inputValue={inputValue.parentPatronymic}
                     />
                 </div>
                 <div className={styles.profileInputWrap}>
@@ -77,10 +112,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"parentPhone"}
                         id={"parentPhone"}
-                        value={userInfoProfile.tel}
+                        value={inputValue.parentPhone}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentPhone}
+                    // inputValue={inputValue.parentPhone}
                     />
                     <InputField
                         placeholder={"mail@mail.ru"}
@@ -88,10 +123,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"parentEmail"}
                         id={"parentEmail"}
-                        value={userInfoProfile.email}
+                        value={inputValue.parentEmail}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentEmail}
+                    // inputValue={inputValue.parentEmail}
                     />
 
                 </div>
@@ -102,10 +137,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"parentCity"}
                         id={"parentCity"}
-                        value={userInfoProfile.city}
+                        value={inputValue.parentCity}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentCity}
+                    // inputValue={inputValue.parentCity}
                     />
                     <InputField
                         placeholder={"Детский сад “Ромашка”"}
@@ -113,10 +148,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"text"}
                         name={"kindergarten"}
                         id={"kindergarten"}
-                        value={userInfoProfile.kindergarten}
+                        value={inputValue.kindergarten}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.kindergarten}
+                    // inputValue={inputValue.kindergarten}
                     />
 
                 </div>
@@ -136,10 +171,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         type={"password"}
                         name={"parentPass"}
                         id={"parentPass"}
-                        value={userInfoProfile.password}
+                        value={inputValue.parentPass}
                         isMarker
                         onChangeHandler={onChangeHandler}
-                        inputValue={inputValue.parentPass}
+                    // inputValue={inputValue.parentPass}
                     />
                     <InputField
                         placeholder={generatePass}
@@ -149,8 +184,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         id={"parentNewPass"}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        value={generatePass}
-                        inputValue={inputValue.parentNewPass}
+                        value={inputValue.parentNewPass}
+                    // inputValue={inputValue.parentNewPass}
                     />
                     {resetPassActive ? <InputField
                         placeholder={'mail@mail.ru'}
@@ -160,8 +195,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         id={"resetEmail"}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                        value={''}
-                        inputValue={inputValue.resetEmail}
+                        value={inputValue.resetEmail}
+                    // inputValue={inputValue.resetEmail}
                     /> :
                         <ResetPassButton
                             setResetActive={setResetActive}
@@ -173,8 +208,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     value={"Сохранить"}
                 />
             </form>
-            <PaymentTimer 
-            count={'3 500'}/>
+            <PaymentTimer
+                count={'3 500'} />
         </div>
     );
 }

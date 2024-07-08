@@ -6,6 +6,7 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
     const [activeInput, setIsActiveInput] = useState(false);
     const [activeWidget, setActiveWidget] = useState(false);
     const [highlight, setHighlight] = useState(false);
+    const [inputChange, setInputChange] = useState(true);
 
     const inputRef = useRef(null);
 
@@ -13,6 +14,7 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
         setIsActiveInput(!activeInput);
     
         const siblingInput = inputRef.current;
+
         if (isQuestions) {
             setActiveWidget(!activeWidget)
             setActiveBlur(true);
@@ -23,7 +25,9 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
                 setHighlight(false)
             }
         }
-
+        if(isPencil){
+            setInputChange(!inputChange)
+        }
     }
     const radioRef = useRef(null);
     useClickOutside(radioRef, () => {
@@ -43,10 +47,10 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
                     placeholder={placeholder}
                     name={name}
                     id={id}
-                    value={inputValue}
+                    value={value}
+                    disabled={isPencil && inputChange}
                     required />
                 <div
-                    
                     onClick={(e) => { clickMarker(e) }}
                     className={isPencil ? style.inputPencil :
                                     isMarker ? style.inputMarker :
