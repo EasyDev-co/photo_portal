@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     # Приложения
+    'apps.child',
     'apps.kindergarten',
     'apps.parent',
     'apps.photo',
