@@ -1,6 +1,23 @@
 from rest_framework import serializers
 
-from apps.kindergarten.models import PhotoPrice
+from apps.kindergarten.models import PhotoPrice, Kindergarten, Region
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения информации о регионе у пользователя."""
+
+    class Meta:
+        model = Region
+        fields = ('country', 'name')
+
+
+class KindergartenSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения информации о детском саде у пользователя."""
+    region = RegionSerializer(read_only=True)
+
+    class Meta:
+        model = Kindergarten
+        fields = ('region', 'name')
 
 
 class PhotoPriceSerializer(serializers.ModelSerializer):

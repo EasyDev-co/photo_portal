@@ -3,6 +3,11 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin
 
 
 class Region(UUIDMixin):
+    country = models.CharField(
+        verbose_name="Страна",
+        max_length=255,
+        default='Россия'
+    )
     name = models.CharField(
         max_length=255,
         verbose_name='Название региона',
