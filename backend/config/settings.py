@@ -188,6 +188,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.user.tasks.ResendConfirmCodeTask",
         "schedule": crontab(minute="*/1"),
     },
+    "check_photo_theme_deadlines": {
+        "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
+        "schedule": crontab(), # проверка каждую минуту для демонстрации - потом изменить периодичность
+    },
 }
 
 SIMPLE_JWT = {
