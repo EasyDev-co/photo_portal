@@ -20,7 +20,7 @@ class Child(UUIDMixin, TimeStampedMixin):
         User,
         on_delete=models.CASCADE,
         blank=True,
-        related_name='childs',
+        related_name='children',
         verbose_name='Родитель',
     )
     kindergarten = models.ForeignKey(

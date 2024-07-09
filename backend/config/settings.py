@@ -138,7 +138,7 @@ LOGGING = {
     },
 }
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'Europe/Moscow'
 
@@ -170,7 +170,7 @@ REDIS_PORT = os.environ.get('REDIS_PORT')
 REDIS_DB_CELERY = os.environ.get('REDIS_DB_CELERY')
 
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_CELERY}'
-CELERY_TIMEZONE = "Europe/Moscow"
+# CELERY_TIMEZONE = "Europe/Moscow"
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -188,6 +188,10 @@ CELERY_BEAT_SCHEDULE = {
     "resend_code": {
         "task": "apps.user.tasks.ResendConfirmCodeTask",
         "schedule": crontab(minute="*/1"),
+    },
+    "check_photo_themes_deadlines": {
+        "task": "apps.order.tasks.CheckPhotoThemeDeadlines",
+        "schedule": crontab(), # каждую минуту стоит для демонстрации - позже изменить периодичность
     },
 }
 
