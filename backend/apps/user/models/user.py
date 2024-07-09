@@ -79,7 +79,7 @@ class User(UUIDMixin, AbstractUser):
     def save(self, *args, **kwargs):
         if self.phone_number:
             self.phone_number = normalize_phone_number(self.phone_number)
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class StaffUser(User):
