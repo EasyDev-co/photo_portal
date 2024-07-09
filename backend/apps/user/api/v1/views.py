@@ -3,14 +3,18 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.user.api.v1.serializers import UserTokenObtainPairSerializer, UserSerializer, UserUpdateSerializer
+from apps.user.api.v1.serializers import UserTokenObtainPairSerializer, UserUpdateSerializer, \
+    UserGetSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
+
+from apps.user.models import User
 
 
 class UserLoginAPIView(TokenObtainPairView):
     """Представление для авторизации пользователя."""
     serializer_class = UserTokenObtainPairSerializer
+
 
 class UserAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -18,8 +22,9 @@ class UserAPIView(APIView):
     def get(self, request, *args, **kwargs):
         """Получение детальной информации о пользователе."""
         instance = request.user
-        serializer = UserSerializer(instance=instance)
-        return Response(serializer.data)
+        user_data = User.objects.get(pk=instance.pk)
+        user_serializer = UserGetSerializer(user_data)
+        return Response(user_serializer.data)
 
     def patch(self, request, *args, **kwargs):
         """Изменение информации о пользователе."""
