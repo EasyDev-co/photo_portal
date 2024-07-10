@@ -8,6 +8,15 @@ from apps.photo.models import Photo, PhotoLine, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 
 
+class PhotoRetieveByIdAPIView(RetrieveAPIView):
+    """
+    Получение фотографии по id
+    """
+    queryset = Photo.objects.all()
+    serializer_class = PhotoRetrieveSerializer
+    permission_classes = [IsAuthenticated]
+
+
 class PhotoRetrieveAPIView(RetrieveAPIView):
     """
     Получение фотографии по введенному номеру.

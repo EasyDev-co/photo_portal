@@ -111,10 +111,10 @@ class CartService:
         self.save()
 
     def add_product_list_to_cart(self, user, product_list):
-        if not self.check_cart_exists(user):
-            self.create_cart(user=user)
-
-        user_id =str(user.id)
+        if self.check_cart_exists(user):
+            self.remove_cart(user=user)
+        self.create_cart(user=user)
+        user_id = str(user.id)
         self.cart[user_id] = product_list
         self.save()
 
