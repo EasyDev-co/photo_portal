@@ -199,3 +199,12 @@
 .loginLinkWrap>p>span {
   color: rgb(17, 187, 209);
 }
+.qrCodeBtn{
+  background-image: url(../../assets/images/Auth/6e45a5a3e5fadc8600c67a0aaaa5f737.png);
+  width: 40px;
+  height: 40px;
+  background-size: 40px;
+  right: 50px;
+  top: 50px;
+  position: absolute;
+}

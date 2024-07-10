@@ -2,13 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import style from './InputField.module.css'
 import { useClickOutside } from '../../utils/useClickOutside';
 import Prompt from '../Registration/Prompt/Prompt';
-const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPencil, isMarker, isNone, isQuestions, setActiveBlur, activeBlur, onChangeHandler, inputValue, isAuthForm }) => {
+const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPencil, isMarker, isNone, isQuestions, setActiveBlur, activeBlur, onChangeHandler, inputValue, isAuthForm, urlData}) => {
     const [activeInput, setIsActiveInput] = useState(false);
     const [activeWidget, setActiveWidget] = useState(false);
     const [highlight, setHighlight] = useState(false);
 
     const inputRef = useRef(null);
-
     const clickMarker = (e) => {
         setIsActiveInput(!activeInput);
     
@@ -25,7 +24,9 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
         }
 
     }
+
     const radioRef = useRef(null);
+
     useClickOutside(radioRef, () => {
         setActiveWidget(false);
     })
@@ -43,16 +44,14 @@ const InputField = ({ placeholder, type, label, name, id, blurRef, value, isPenc
                     placeholder={placeholder}
                     name={name}
                     id={id}
-                    value={inputValue}
+                    value={value}
                     required />
                 <div
-                    
                     onClick={(e) => { clickMarker(e) }}
                     className={isPencil ? style.inputPencil :
                                     isMarker ? style.inputMarker :
                                         isQuestions ? style.inputQuestion : 
                                             isNone ? '' : activeInput ? style.inputMarker : style.inputIsShow}>
-
                 </div>
                 <div ref={radioRef} className={activeWidget ? style.showWidget : style.hideWidget}>
                     <Prompt
