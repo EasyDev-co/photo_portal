@@ -8,17 +8,18 @@ const PaymentTimer = () => {
     return (
         <div className={styles.paymentTimerWrap}>
             <Timer
-                date={'Sat Jun 22 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}
+                date={'Sat Jun 30 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}
                 desc={':'}
             />
             <PaymentDiagram
                 count={'3 500'}
             />
-            <Link to={'/payment'}>
-                <PaymentButton
+            {/* <Link to={'/payment'}>
+               
+            </Link> */}
+            <PaymentButton
                     value={'Оплатить'}
                 />
-            </Link>
         </div>
     );
 }

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import {tokenRefreshCreate} from '../../http/tokenRefreshCreate'
 import { setCookie } from "../../utils/setCookie";
-import {setAccessToken} from '../../store/authSlice'
+import {addPhotoLine, addPhotos, setAccessToken} from '../../store/authSlice'
 import {getPhotoLine} from '../../http/getPhotoLine'
 import Scaner from "../Scaner/Scaner";
 import { useLocation } from "react-router-dom";
@@ -31,7 +31,7 @@ export const Orders = () => {
             setAccessToken(res.access)
           )
         }
-        return res.access
+        return res.access;
       })
       .then(access => {
         getPhotoLine(!photoLineId && sessionData, access)
@@ -39,6 +39,7 @@ export const Orders = () => {
           .then(res => {
             if(res.photos){
               setPhotos(res);
+              dispatch(addPhotoLine(res.photos))
             }
           })
       })
@@ -65,13 +66,16 @@ export const Orders = () => {
     calendar: 1,
     photo_book: 1
   });
+
   const onChangeHandler = (name, count) => {
     const newInput = (data) => ({ ...data, [name]: count });
     setInputValue(newInput);
-  }
+  };
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-  }
+    console.log(inputValue)
+  };
 
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
@@ -110,10 +114,11 @@ export const Orders = () => {
             {blocks.map((block, i) => (
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
-                  {addPhoto?.map((elem,i)=>{
+                  {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem,i)=>{
                     return(
                       <PhotoCard
                       key={i}
+                      blurRef={blurRef}
                       setIsBlur={setIsBlur}
                       photo={elem.photo}
                       onChangeHandler={onChangeHandler}
@@ -147,7 +152,6 @@ export const Orders = () => {
               </div>
               <div className={styles.promoStringWrap}>
                 <div className={styles.dot}>
-
                 </div>
                 <span style={styles.promoString}>
                   При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде
