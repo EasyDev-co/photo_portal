@@ -48,6 +48,7 @@
     font-size: 24px;
     line-height: 20px;
     padding: 60px 40px 40px 0;
+    position: relative;
 }
 
 @media screen and (max-width: 768px) {
@@ -222,4 +223,13 @@
     .orderWidggetContainer {
         margin: 0;
     }
+}
+.qrCodeBtn{
+    background-image: url(../../assets/images/Auth/6e45a5a3e5fadc8600c67a0aaaa5f737.png);
+    background-size: 40px;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 40%;
+    left: 260px;
 }

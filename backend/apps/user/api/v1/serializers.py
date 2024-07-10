@@ -6,11 +6,14 @@ from django.contrib.auth import authenticate
 
 from django.contrib.auth.password_validation import validate_password
 
+from apps.kindergarten.api.v1.serializers import KindergartenSerializer
 from apps.user.models import User
+from apps.user.validators import validate_phone_number
 
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Сериализатор для авторизации пользователя."""
+
     def validate(self, attrs):
         authenticate_kwargs = {
             'email': attrs['email'],
@@ -59,3 +62,43 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+
+class UserGetSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для просмотра модели пользователя.
+    """
+    kindergarten = KindergartenSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'first_name',
+            'second_name',
+            'last_name',
+            'phone_number',
+            'role',
+            'kindergarten',
+            'is_verified'
+        )
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=255, required=False)
+    last_name = serializers.CharField(max_length=255, required=False)
+    email = serializers.EmailField(required=False)
+    phone_number = serializers.CharField(
+        max_length=12,
+        required=False,
+        validators=[validate_phone_number]
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number'
+        )

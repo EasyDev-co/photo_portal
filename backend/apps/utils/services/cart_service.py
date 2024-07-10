@@ -1,4 +1,5 @@
 import loguru
+from decimal import Decimal
 from django.conf import settings
 
 # from apps.photo.models.photo import Photo
@@ -86,11 +87,17 @@ class CartService:
         """Получить итоговую стоимость всех позиций корзины"""
         if self.check_cart_exists(user):
             user_id = str(user.id)
-            total_price = 0.0
-            for position in self.cart[user_id]:
-                total_price += (position['quantity'] * position['price_per_piece'])
-            return total_price
+            total_prices = {}
 
+            for position in self.cart[user_id]:
+                total_price = Decimal(0)
+                total_price += (Decimal(position['quantity']) * Decimal(position['price_per_piece']))
+                kindergarten_id = position['kindergarten_id']
+                if kindergarten_id not in total_prices.keys():
+                    total_prices[kindergarten_id] = total_price
+                else:
+                    total_prices[kindergarten_id] += total_price
+            return total_prices
 
     # Методы для позиций корзины
 
@@ -101,6 +108,14 @@ class CartService:
 
         user_id = str(user.id)
         self.cart[user_id].append(product_data)
+        self.save()
+
+    def add_product_list_to_cart(self, user, product_list):
+        if self.check_cart_exists(user):
+            self.remove_cart(user=user)
+        self.create_cart(user=user)
+        user_id = str(user.id)
+        self.cart[user_id] = product_list
         self.save()
 
     def get_photo_index_in_cart(self, user, product_id, photo_type):
