@@ -68,11 +68,6 @@ class UserGetSerializer(serializers.ModelSerializer):
     """
     Сериализатор для просмотра модели пользователя.
     """
-    password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password]
-    )
     kindergarten = KindergartenSerializer(read_only=True, many=True)
 
     class Meta:
@@ -82,15 +77,11 @@ class UserGetSerializer(serializers.ModelSerializer):
             'first_name',
             'second_name',
             'last_name',
-            'password',
             'phone_number',
             'role',
             'kindergarten',
             'is_verified'
         )
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -102,11 +93,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         required=False,
         validators=[validate_phone_number]
     )
-    password = serializers.CharField(
-        write_only=True,
-        validators=[validate_password],
-        required=False
-    )
 
     class Meta:
         model = User
@@ -114,6 +100,5 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
-            'phone_number',
-            'password'
+            'phone_number'
         )
