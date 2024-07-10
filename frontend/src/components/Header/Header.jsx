@@ -16,7 +16,7 @@ export const Header = () => {
 
   const dispatch = useDispatch();
   const userData = useSelector(state=>state.user.userData);
-  
+
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
@@ -37,12 +37,13 @@ export const Header = () => {
         getUserData(access)
           .then(res => res.json())
           .then(res => {
-            if(res){
+            if(res.email){
               dispatch(addUserData(res))
+              console.log(res)
           }
         })
       })
-  },[dispatch])
+  },[])
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -82,11 +83,11 @@ export const Header = () => {
             <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
                 top={`${userData.last_name} ${userData.first_name} ${userData.second_name}`}
-                bottom={userInfo.tel}
+                bottom={userData.phone_number || ''}
               />
               <HeaderUserInfoItem
-                top={`${userInfo.country} ${userInfo.city}`}
-                bottom={userInfo.kindergarten}
+                top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
+                bottom={localStorage.getItem('kindergarten')}
               />
             </ul>
           </div>

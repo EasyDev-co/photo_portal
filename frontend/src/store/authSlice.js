@@ -15,8 +15,15 @@ const authSlice = createSlice({
             is_veried: '',
             last_name: '',
             promocode: '',
-            second_name: ''
-        }
+            second_name: '',
+            kindergarten:'',
+            phone_number:'',
+        },
+        resetDataUser:{
+            emailForReset:'',
+            newPass:''
+        },
+
     },
     reducers: {
         setUser: (state, action) => {
@@ -33,7 +40,6 @@ const authSlice = createSlice({
         },
         setEmail(state, action) {
             state.email = action.payload;
-            console.log(action.payload);
         },
         setCode(state, action) {
             state.code = action.payload.code;
@@ -50,10 +56,22 @@ const authSlice = createSlice({
             localStorage.setItem('last_name', action.payload.last_name);
             localStorage.setItem('second_name', action.payload.second_name);
             localStorage.setItem('email', action.payload.email);
+            localStorage.setItem('phone', action.payload.phone_number);
+
+            action.payload.kindergarten.forEach(elem=>{
+                localStorage.setItem('kindergarten', elem.name);
+                localStorage.setItem('country', elem.region.country)
+                localStorage.setItem('regionName', elem.region.name)
+            })
+        },
+        setResetData(state, action){
+            state.resetDataUser.emailForReset = action.payload.emailForReset;
+            state.resetDataUser.newPass = action.payload.newPass;
+            console.log(action.payload)
         }
     }
 })
 
-export const { setUser, removeUser, addBlur, setEmail, setCode, setAccessToken, addPhotos, addUserData } = authSlice.actions;
+export const { setUser, removeUser, addBlur, setEmail, setCode, setAccessToken, addPhotos, addUserData, setResetData } = authSlice.actions;
 
 export default authSlice.reducer;

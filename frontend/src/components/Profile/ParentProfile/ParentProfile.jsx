@@ -3,17 +3,27 @@ import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
 import styles from "./ParentProfile.module.css";
 import { userInfoProfile } from "../../../constants/constants";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector } from "react-redux";
 import { tokenRefreshCreate } from "../../../http/tokenRefreshCreate";
 import { setCookie } from "../../../utils/setCookie";
 import { useDispatch } from "react-redux";
-import { setAccessToken } from "../../../store/authSlice";
+import { setAccessToken, setResetData } from "../../../store/authSlice";
 import { userPartialUpdate } from "../../../http/userPartialUpdate";
+import { parentResetPassCreate } from "../../../http/parentResetPassCreate";
+import { parentEmailVerification } from "../../../http/parentEmailVerification";
+import { useClickOutside } from "../../../utils/useClickOutside";
 
 const ParentProfile = ({ nurseryIsAuth }) => {
+
+    const [codeWindowActive, setCodeWindow] = useState(false)
+    const codeRef = useRef(null)
+    useClickOutside(codeRef, () => {
+        setCodeWindow(false)
+    })
+
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
 
@@ -21,21 +31,25 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         parentSurname: localStorage.getItem('last_name') || '',
         parentName: localStorage.getItem('first_name') || '',
         parentPatronymic: localStorage.getItem('second_name') || '',
-        parentPhone: '',
+        parentPhone: localStorage.getItem('phone') || '',
         parentEmail: localStorage.getItem('email') || '',
-        kindergarten: '',
-        parentCity: '',
+        kindergarten: localStorage.getItem('kindergarten') || '',
+        parentCity: localStorage.getItem('regionName') || '',
         parentPass: '',
         parentNewPass: generatePass,
         resetEmail: ''
     });
-    const dispatch = useDispatch();
 
+    const [inputValueReset, setResetValue] = useState({
+        code: ''
+    });
+
+    const dispatch = useDispatch();
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
     }
-    
+
     const onSubmitHandler = (e) => {
         e.preventDefault();
         tokenRefreshCreate()
@@ -50,10 +64,11 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 return res.access
             })
             .then(access => {
-                userPartialUpdate(access,{
-                    email:inputValue.parentEmail,
-                    first_name:inputValue.parentName,
-                    last_name: inputValue.parentSurname
+                userPartialUpdate(access, {
+                    email: inputValue.parentEmail,
+                    first_name: inputValue.parentName,
+                    last_name: inputValue.parentSurname,
+                    phone_number: inputValue.parentPhone
                 })
                     .then(res => res.json())
                     .then(res => {
@@ -63,11 +78,66 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         }
                     })
             })
+        if (resetPassActive) {
+            parentResetPassCreate(inputValue.resetEmail)
+                .then(res => res.json())
+                .then(res => {
+                    if (res) {
+                        console.log(res)
+                        if (resetPassActive) {
+                            setCodeWindow(true)
+                        }
+                        dispatch(setResetData({
+                            emailForReset: inputValue.resetEmail,
+                            newPass: inputValue.parentNewPass
+                        }))
+                    }
+                })
+        }
 
-        // console.log(inputValue)
     }
+    const resetDataUser = useSelector(state => state.user.resetDataUser);
+
+    const onResetSubmit = (e) => {
+        e.preventDefault();
+        parentEmailVerification(inputValueReset.code, resetDataUser.emailForReset)
+            .then(res => res.json())
+            .then(res => {
+                if (res) {
+                    console.log(res)
+                    // dispatch(setResetData({
+                    //     emailForReset: inputValue.resetEmail,
+                    //     newPass: inputValue.parentNewPass
+                    // }))
+                }
+            })
+    }
+    
+    const onChangeReset = (event) => {
+        const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
+        setResetValue(newInput);
+    }
+
     return (
         <div className={styles.profileWrap}>
+            {codeWindowActive &&
+                <form ref={codeRef} onSubmit={(e) => onResetSubmit(e)} className={styles.codeResetForm} action="">
+                    <div className={styles.codeResetWrap}>
+                        <InputField
+                            label={"Введите код отпрвленный на Email"}
+                            placeholder={"Код"}
+                            type={"text"}
+                            name={"code"}
+                            id={"parentSurname"}
+                            value={inputValueReset.code}
+                            onChangeHandler={onChangeReset}
+                            isNone
+                        />
+                        <MainButton
+                            value={"Отправить код"}
+                        />
+                    </div>
+                </form>}
             <form onSubmit={(e) => { onSubmitHandler(e) }} className={styles.profileForm} action="">
                 <h1 className={styles.profileTitle}>Личный кабинет</h1>
                 <div className={styles.profileInputWrap}>
@@ -80,7 +150,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentSurname}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentSurname}
                     />
                     <InputField
                         placeholder={"Имя"}
@@ -91,7 +160,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentName}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentName}
                     />
                     <InputField
                         placeholder={"Отчество"}
@@ -102,7 +170,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentPatronymic}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentPatronymic}
                     />
                 </div>
                 <div className={styles.profileInputWrap}>
@@ -115,7 +182,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentPhone}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentPhone}
                     />
                     <InputField
                         placeholder={"mail@mail.ru"}
@@ -126,7 +192,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentEmail}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentEmail}
                     />
 
                 </div>
@@ -140,7 +205,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentCity}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentCity}
                     />
                     <InputField
                         placeholder={"Детский сад “Ромашка”"}
@@ -151,7 +215,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.kindergarten}
                         isPencil
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.kindergarten}
                     />
 
                 </div>
@@ -174,7 +237,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentPass}
                         isMarker
                         onChangeHandler={onChangeHandler}
-                    // inputValue={inputValue.parentPass}
                     />
                     <InputField
                         placeholder={generatePass}
@@ -185,7 +247,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         isPencil
                         onChangeHandler={onChangeHandler}
                         value={inputValue.parentNewPass}
-                    // inputValue={inputValue.parentNewPass}
                     />
                     {resetPassActive ? <InputField
                         placeholder={'mail@mail.ru'}
@@ -196,9 +257,9 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         isPencil
                         onChangeHandler={onChangeHandler}
                         value={inputValue.resetEmail}
-                    // inputValue={inputValue.resetEmail}
                     /> :
                         <ResetPassButton
+                            setCodeWindow={setCodeWindow}
                             setResetActive={setResetActive}
                             value={'Восстановить пароль'}
                         />

@@ -18,7 +18,7 @@ const Verification = () => {
 
     const email = useSelector(action=>action.user.email);
     const navigation = useNavigate();
-    console.log(email);
+    
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
