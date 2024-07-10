@@ -19,9 +19,9 @@ export const Login = () => {
   const [isActiveAuth, setIsActiveAuth] = useState(true);
   const [isActiveReset, setIsActiveReset] = useState(false);
   const [error, setError] = useState(null);
-
   const dispatch = useDispatch();
   const navigation = useNavigate();
+  console.log(error)
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -55,7 +55,7 @@ export const Login = () => {
         setError(data);
       }
     } catch (error) {
-
+      
     }
     setInputValue(initialState);
 
