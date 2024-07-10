@@ -190,7 +190,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "check_photo_theme_deadlines": {
         "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
-        "schedule": crontab(), # проверка каждую минуту для демонстрации - потом изменить периодичность
+        "schedule": crontab(hour='*/2'), # проверка каждые два часа
     },
 }
 

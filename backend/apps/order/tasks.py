@@ -11,6 +11,7 @@ from config.celery import BaseTask, app
 from config.settings import EMAIL_HOST_USER
 
 from apps.photo.models import PhotoTheme
+from apps.user.models.email_error_log import EmailErrorLog
 from apps.user.models.user import UserRole
 
 User = get_user_model()
@@ -28,7 +29,7 @@ class DigitalPhotosNotificationTask(BaseTask):
         if user:
             subject = f"Ваши электронные фото готовы."
             message = (f"Ваши электронные фото готовы.\n"
-                       f"Вы можете скачать электронные фото личном кабинете.\n\n"
+                       f"Вы можете скачать электронные фото в личном кабинете.\n\n"
                        f"C уважением,\n"
                        f"Администрация Фото-портала")
             try:
@@ -44,9 +45,17 @@ class DigitalPhotosNotificationTask(BaseTask):
                     exc=e,
                     task_id=self.request.id,
                     args=(),
-                    kwargs={},
+                    kwargs={'user': user},
                     einfo=traceback.format_exc(),
                 )
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        EmailErrorLog.objects.create(
+            message=str(exc),
+            is_sent=False,
+            user=kwargs['user'],
+        )
+        super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
 class CheckPhotoThemeDeadlinesTask(BaseTask):
@@ -57,7 +66,13 @@ class CheckPhotoThemeDeadlinesTask(BaseTask):
     def process(self, *args, **kwargs):
         notification_period = timedelta(hours=24)
         time_now = datetime.now(tz=ZoneInfo('Europe/Moscow'))
-        photo_themes = PhotoTheme.objects.filter(is_active=True, date_end__lt=(time_now + notification_period))
+        time_left_to_deadline = time_now + notification_period
+        time_border_to_send_notification = time_left_to_deadline - timedelta(hours=2)
+        photo_themes = PhotoTheme.objects.filter(
+            is_active=True,
+            date_end__lt=time_left_to_deadline,
+            date_end_gt=time_border_to_send_notification
+        )
         kindergartens = photo_themes.values_list('photo_lines__kindergarten', flat=True)
         users = User.objects.filter(kindergarten__in=kindergartens, role=UserRole.parent)
         recipients = list(users.values_list('email', flat=True))
@@ -87,13 +102,25 @@ class SendDeadLineNotificationTask(BaseTask):
                 fail_silently=False,
             )
         except Exception as e:
+            users = User.objects.filter(email__in=recipients)
             self.on_failure(
                 exc=e,
                 task_id=self.request.id,
                 args=(),
-                kwargs={},
+                kwargs={'users': users},
                 einfo=traceback.format_exc(),
             )
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        email_error_logs = [
+            EmailErrorLog(
+                message=str(exc),
+                is_sent=False,
+                user=user,
+            ) for user in kwargs['users']
+        ]
+        EmailErrorLog.objects.bulk_create(email_error_logs)
+        super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
