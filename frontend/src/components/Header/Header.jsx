@@ -8,42 +8,50 @@ import { getUserData } from "../../http/getUserData";
 import { tokenRefreshCreate } from "../../http/tokenRefreshCreate";
 import { setCookie } from "../../utils/setCookie";
 import { useDispatch, useSelector } from "react-redux";
-import { setAccessToken } from "../../store/authSlice";
+import { fetchRefreshToken, setAccessToken, fetchGetUserData } from "../../store/authSlice";
 import { addUserData } from "../../store/authSlice";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../../utils/useAuth";
+import { throttle } from "../../utils/throttle";
 export const Header = () => {
+
   const [navBarState, setNavBarState] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
+  const accessToken = useSelector(state => state.user.accessToken);
   const dispatch = useDispatch();
-  const userData = useSelector(state=>state.user.userData);
+  const userData = useSelector(state => state.user.userData);
 
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
+  // console.log(userData)
+  const throttledTokenRefreshCreate = throttle(tokenRefreshCreate, 1000);
 
-  useEffect(()=>{
-    tokenRefreshCreate()
-      .then(res => res.json())
+  useEffect(() => {
+
+    throttledTokenRefreshCreate()
       .then(res => {
-        if (res.refresh) {
-          setCookie('refresh', res.refresh);
-          dispatch(
-            setAccessToken(res.access)
-          )
+        if (res) {
+          const { response, data } = res;
+          if (response.ok) {
+            setCookie('refresh', data.refresh);
+            dispatch(
+              setAccessToken(data.access)
+            )
+          }
+          return data.access
         }
-        return res.access
       })
       .then(access => {
         getUserData(access)
           .then(res => res.json())
           .then(res => {
-            if(res.email){
+            if (res.email) {
               dispatch(addUserData(res))
-              console.log(res)
-          }
-        })
+            }
+          })
       })
-  },[])
+  }, [])
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -51,14 +59,12 @@ export const Header = () => {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
   // Условие для смены состояния navbarState при изменении ширины экрана
   useEffect(() => {
     if (windowWidth > 768) {
       setNavBarState(false);
     }
   }, [windowWidth]);
-
   // Предотвращение прокрутки страницы при открытом навбаре
   useEffect(() => {
     if (navBarState) {

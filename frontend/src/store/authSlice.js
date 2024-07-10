@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { setCookie } from "../utils/setCookie";
+
+
 const authSlice = createSlice({
     name: 'user',
     initialState: {
@@ -16,14 +18,14 @@ const authSlice = createSlice({
             last_name: '',
             promocode: '',
             second_name: '',
-            kindergarten:'',
-            phone_number:'',
+            kindergarten: '',
+            phone_number: '',
         },
-        resetDataUser:{
-            emailForReset:'',
-            newPass:''
+        resetDataUser: {
+            emailForReset: '',
+            newPass: ''
         },
-
+        accessToken: ''
     },
     reducers: {
         setUser: (state, action) => {
@@ -52,22 +54,21 @@ const authSlice = createSlice({
         },
         addUserData(state, action) {
             state.userData = action.payload;
-            localStorage.setItem('first_name',action.payload.first_name);
+            localStorage.setItem('first_name', action.payload.first_name);
             localStorage.setItem('last_name', action.payload.last_name);
             localStorage.setItem('second_name', action.payload.second_name);
             localStorage.setItem('email', action.payload.email);
             localStorage.setItem('phone', action.payload.phone_number);
 
-            action.payload.kindergarten.forEach(elem=>{
+            action.payload.kindergarten.forEach(elem => {
                 localStorage.setItem('kindergarten', elem.name);
                 localStorage.setItem('country', elem.region.country)
                 localStorage.setItem('regionName', elem.region.name)
             })
         },
-        setResetData(state, action){
+        setResetData(state, action) {
             state.resetDataUser.emailForReset = action.payload.emailForReset;
             state.resetDataUser.newPass = action.payload.newPass;
-            console.log(action.payload)
         }
     }
 })

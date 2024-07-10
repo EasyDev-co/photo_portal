@@ -25,17 +25,14 @@ const NewPassword = () => {
             const response = await parentChangePass(code, email, inputValue.newPassword)
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
                 setInputValue(initialState);
                 navigation('/sign-in')
             } else {
                 const data = await response.json();
-                console.log(data)
             }
         } catch (error) {
 
         }
-        console.log(inputValue)
     }
 
     return (

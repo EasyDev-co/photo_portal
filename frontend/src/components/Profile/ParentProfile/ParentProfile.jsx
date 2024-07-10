@@ -13,9 +13,10 @@ import { useDispatch } from "react-redux";
 import { setAccessToken, setResetData } from "../../../store/authSlice";
 import { userPartialUpdate } from "../../../http/userPartialUpdate";
 import { parentResetPassCreate } from "../../../http/parentResetPassCreate";
-import { parentEmailVerification } from "../../../http/parentEmailVerification";
+// import { parentEmailVerification } from "../../../http/parentEmailVerification";
 import { useClickOutside } from "../../../utils/useClickOutside";
-
+import { parentVerifyResetCode } from "../../../http/parentVerifyResetCode";
+import { parentChangePass } from "../../../http/parentChangePass"
 const ParentProfile = ({ nurseryIsAuth }) => {
 
     const [codeWindowActive, setCodeWindow] = useState(false)
@@ -67,6 +68,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 userPartialUpdate(access, {
                     email: inputValue.parentEmail,
                     first_name: inputValue.parentName,
+                    second_name: inputValue.second_name,
                     last_name: inputValue.parentSurname,
                     phone_number: inputValue.parentPhone
                 })
@@ -100,19 +102,25 @@ const ParentProfile = ({ nurseryIsAuth }) => {
 
     const onResetSubmit = (e) => {
         e.preventDefault();
-        parentEmailVerification(inputValueReset.code, resetDataUser.emailForReset)
+        parentVerifyResetCode(resetDataUser.emailForReset, inputValueReset.code)
             .then(res => res.json())
             .then(res => {
-                if (res) {
-                    console.log(res)
-                    // dispatch(setResetData({
-                    //     emailForReset: inputValue.resetEmail,
-                    //     newPass: inputValue.parentNewPass
-                    // }))
+                if (res.message === 'Код верифицирован. Можете сменить пароль.') {
+                    parentChangePass(inputValueReset.code, resetDataUser.emailForReset, resetDataUser.newPass)
+                        .then(res => res.json())
+                        .then(res => {
+                            if (res) {
+                                setCodeWindow(false)
+                            }
+                        })
+                        .catch(res =>{
+                            console.log(res)
+                            setCodeWindow(false)
+                        })
                 }
             })
     }
-    
+
     const onChangeReset = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setResetValue(newInput);
