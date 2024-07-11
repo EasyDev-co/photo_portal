@@ -2,21 +2,18 @@ import MainButton from "../../Buttons/MainButton";
 import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
 import styles from "./ParentProfile.module.css";
-import { userInfoProfile } from "../../../constants/constants";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector } from "react-redux";
-import { tokenRefreshCreate } from "../../../http/tokenRefreshCreate";
-import { setCookie } from "../../../utils/setCookie";
 import { useDispatch } from "react-redux";
-import { setAccessToken, setResetData } from "../../../store/authSlice";
-import { userPartialUpdate } from "../../../http/userPartialUpdate";
+import { setResetData, addUserData } from "../../../store/authSlice";
 import { parentResetPassCreate } from "../../../http/parentResetPassCreate";
-// import { parentEmailVerification } from "../../../http/parentEmailVerification";
 import { useClickOutside } from "../../../utils/useClickOutside";
 import { parentVerifyResetCode } from "../../../http/parentVerifyResetCode";
-import { parentChangePass } from "../../../http/parentChangePass"
+import { parentChangePass } from "../../../http/parentChangePass";
+
+import {fetchUserPartialUpdateWithTokenInterceptor} from '../../../http/userPartialUpdate'
 const ParentProfile = ({ nurseryIsAuth }) => {
 
     const [codeWindowActive, setCodeWindow] = useState(false)
@@ -28,6 +25,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
 
+    const access = useSelector(state => state.user.access);
+    const accessStor = localStorage.getItem('access');
     const [inputValue, setInputValue] = useState({
         parentSurname: localStorage.getItem('last_name') || '',
         parentName: localStorage.getItem('first_name') || '',
@@ -53,39 +52,24 @@ const ParentProfile = ({ nurseryIsAuth }) => {
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
-        tokenRefreshCreate()
-            .then(res => res.json())
-            .then(res => {
-                if (res.refresh) {
-                    setCookie('refresh', res.refresh);
-                    dispatch(
-                        setAccessToken(res.access)
-                    )
-                }
-                return res.access
+        fetchUserPartialUpdateWithTokenInterceptor(accessStor,{
+                email: inputValue.parentEmail,
+                first_name: inputValue.parentName,
+                second_name: inputValue.second_name,
+                last_name: inputValue.parentSurname,
+                phone_number: inputValue.parentPhone
             })
-            .then(access => {
-                userPartialUpdate(access, {
-                    email: inputValue.parentEmail,
-                    first_name: inputValue.parentName,
-                    second_name: inputValue.second_name,
-                    last_name: inputValue.parentSurname,
-                    phone_number: inputValue.parentPhone
-                })
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res) {
-                            // dispatch(addUserData(res))
-                            console.log(res)
-                        }
-                    })
+            .then(res=>res.json())
+            .then(res=>{
+                console.log(res)
+                // dispatch(addUserData(res))
             })
+
         if (resetPassActive) {
             parentResetPassCreate(inputValue.resetEmail)
                 .then(res => res.json())
                 .then(res => {
                     if (res) {
-                        console.log(res)
                         if (resetPassActive) {
                             setCodeWindow(true)
                         }
@@ -98,6 +82,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         }
 
     }
+
     const resetDataUser = useSelector(state => state.user.resetDataUser);
 
     const onResetSubmit = (e) => {
@@ -113,7 +98,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 setCodeWindow(false)
                             }
                         })
-                        .catch(res =>{
+                        .catch(res => {
                             console.log(res)
                             setCodeWindow(false)
                         })
@@ -245,6 +230,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentPass}
                         isMarker
                         onChangeHandler={onChangeHandler}
+                        autocomplete
                     />
                     <InputField
                         placeholder={generatePass}

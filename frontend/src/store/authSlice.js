@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { setCookie } from "../utils/setCookie";
 
-
 const authSlice = createSlice({
     name: 'user',
     initialState: {
@@ -25,11 +24,14 @@ const authSlice = createSlice({
             emailForReset: '',
             newPass: ''
         },
-        accessToken: ''
+        accessToken: '',
+        photosLine: [],
+        photoLineId: ''
     },
     reducers: {
         setUser: (state, action) => {
             setCookie('refresh', action.payload.refresh);
+            localStorage.setItem('access', action.payload.access);
             state.access = action.payload.access;
             state.refresh = action.payload.refresh;
         },
@@ -69,10 +71,30 @@ const authSlice = createSlice({
         setResetData(state, action) {
             state.resetDataUser.emailForReset = action.payload.emailForReset;
             state.resetDataUser.newPass = action.payload.newPass;
+        },
+        addPhotoLine(state, action) {
+            state.photosLine = action.payload;
+        },
+        addQrIdPhoto(state, action) {
+            state.photoLineId = action.payload
+            sessionStorage.setItem('photoline', action.payload);
         }
-    }
-})
 
-export const { setUser, removeUser, addBlur, setEmail, setCode, setAccessToken, addPhotos, addUserData, setResetData } = authSlice.actions;
+    }
+});
+export const {
+    setUser,
+    removeUser,
+    addBlur,
+    setEmail,
+    setCode,
+    setAccessToken,
+    addPhotos,
+    addUserData,
+    setResetData,
+    addPhotoLine,
+    addQrIdPhoto
+} = authSlice.actions;
+
 
 export default authSlice.reducer;

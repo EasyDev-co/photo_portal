@@ -3,54 +3,34 @@ import React, { useState, useEffect } from "react";
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBar } from "../NavBar/NavBar";
 import { ButtonBurger } from "./ButtonBurger/ButtonBurger";
-import { logo, userInfo } from "../../constants/constants";
-import { getUserData } from "../../http/getUserData";
-import { tokenRefreshCreate } from "../../http/tokenRefreshCreate";
-import { setCookie } from "../../utils/setCookie";
+import { logo } from "../../constants/constants";
+import { fetchUserDataWithTokenInterceptor, getUserData } from "../../http/getUserData";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchRefreshToken, setAccessToken, fetchGetUserData } from "../../store/authSlice";
 import { addUserData } from "../../store/authSlice";
-import { useLocation } from "react-router-dom";
-import { useAuth } from "../../utils/useAuth";
-import { throttle } from "../../utils/throttle";
+
 export const Header = () => {
 
   const [navBarState, setNavBarState] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const accessToken = useSelector(state => state.user.accessToken);
   const dispatch = useDispatch();
   const userData = useSelector(state => state.user.userData);
-
+  const access = useSelector(state => state.user.access);
+  const accessStor = localStorage.getItem('access');
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
   // console.log(userData)
-  const throttledTokenRefreshCreate = throttle(tokenRefreshCreate, 1000);
+  // const throttledTokenRefreshCreate = throttle(tokenRefreshCreate, 1000);
 
   useEffect(() => {
-
-    throttledTokenRefreshCreate()
+    fetchUserDataWithTokenInterceptor(accessStor)
+      .then(res => res.json())
       .then(res => {
-        if (res) {
-          const { response, data } = res;
-          if (response.ok) {
-            setCookie('refresh', data.refresh);
-            dispatch(
-              setAccessToken(data.access)
-            )
-          }
-          return data.access
+        if (res.email) {
+          dispatch(addUserData(res))
         }
       })
-      .then(access => {
-        getUserData(access)
-          .then(res => res.json())
-          .then(res => {
-            if (res.email) {
-              dispatch(addUserData(res))
-            }
-          })
-      })
+
   }, [])
 
   useEffect(() => {
