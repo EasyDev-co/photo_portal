@@ -1,6 +1,6 @@
 import InputField from "../InputField/InputField";
 import styles from "./Registration.module.css";
-import { useState,useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import yandex from '../../assets/images/socials/Я.svg'
 import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
@@ -9,38 +9,70 @@ import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
-import { setEmail } from "../../store/authSlice";
+import { addQrIdPhoto, setEmail } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
+import { useLocation } from "react-router-dom";
+import Scaner from "../Scaner/Scaner";
+
 export const Registration = () => {
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+
+  // const [urlData, setUrlData] = useState({
+  //   kindergarten_code: '',
+  //   photo_line_id: '',
+  //   photo: []
+  // });
+
   const initialState = {
-    gardenCode: '',
+    gardenCode:  '',
     pictureNumbers: '',
     fullName: '',
     email: '',
     password: '',
     repeatPassword: ''
   }
+
   const [activeBlur, setActiveBlur] = useState(false)
   const [inputValue, setInputValue] = useState(initialState);
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const navigation = useNavigate();
-  const email = useSelector(action=>action.user.email);
+  const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
+  const [scanActive, setScanActive] = useState(false);
+
+  useEffect(() => {
+    let photos = [];
+    searchParams.forEach((value, key) => {
+      if (key === "photo") {
+        photos.push(value);
+      }
+    });
+    setInputValue({
+      gardenCode: searchParams.get('kindergarten_code') || '',
+      pictureNumbers: photos.join('-') || ''
+    })
+    dispatch(addQrIdPhoto(searchParams.get('photo_line_id')))
+  }, [location.search]);
+
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
-  }
+  };
+
   const blurRef = useRef(null);
 
   useClickOutside(blurRef, () => {
-     setActiveBlur(false)
+    setActiveBlur(false)
   })
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const words = inputValue.fullName.split(' ');
     const { gardenCode, pictureNumbers, fullName, email, password } = inputValue;
- 
+
     try {
       const response = await parentRegisterCreate(email, words[1], words[2], words[0], password, gardenCode)
       if (response.ok) {
@@ -55,16 +87,21 @@ export const Registration = () => {
         setError(data);
       }
     } catch (error) {
-     
+
     }
     setInputValue(initialState);
   }
 
   return <>
     <div className={styles.login}>
+      <Scaner
+        scanActive={scanActive}
+        setScanActive={setScanActive}
+      />
       <div className={styles.container}>
         <div className={activeBlur ? styles.blurContainer : ' '}></div>
         <div className={styles.regFormWrap}>
+          <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           <div className={styles.regFormContainer}>
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">

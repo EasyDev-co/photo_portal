@@ -7,14 +7,19 @@ import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import {tokenRefreshCreate} from '../../http/tokenRefreshCreate'
 import { setCookie } from "../../utils/setCookie";
-import {setAccessToken} from '../../store/authSlice'
+import {addPhotoLine, addPhotos, setAccessToken} from '../../store/authSlice'
 import {getPhotoLine} from '../../http/getPhotoLine'
+import Scaner from "../Scaner/Scaner";
+import { useLocation } from "react-router-dom";
 
 export const Orders = () => {
-
   const dispatch = useDispatch();
   const addPhoto = useSelector(state=>state.user.photos);
   const [photos, setPhotos] = useState([]);
+  const photoLineId = useSelector(state=>state.user.photoLineId)
+  const [scanActive, setScanActive] = useState(false);
+  const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
+  const location = useLocation();
 
   useEffect(() => {
     tokenRefreshCreate()
@@ -26,18 +31,19 @@ export const Orders = () => {
             setAccessToken(res.access)
           )
         }
-        return res.access
+        return res.access;
       })
       .then(access => {
-        getPhotoLine('0472faa8-1e9d-485c-973a-15664608ff31', access)
+        getPhotoLine(!photoLineId && sessionData, access)
           .then(res => res.json())
           .then(res => {
             if(res.photos){
               setPhotos(res);
+              dispatch(addPhotoLine(res.photos))
             }
           })
       })
-  }, []);
+  }, [sessionData, photoLineId, location.pathname, scanActive]);
 
   const [blocks, setBlocks] = useState([]);
   
@@ -60,27 +66,37 @@ export const Orders = () => {
     calendar: 1,
     photo_book: 1
   });
+
   const onChangeHandler = (name, count) => {
     const newInput = (data) => ({ ...data, [name]: count });
     setInputValue(newInput);
-  }
+  };
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-  }
+    console.log(inputValue)
+  };
 
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
-
+  
   useClickOutside(blurRef, () => {
     setIsBlur(false);
   })
+  
   const [isActiveForm, setIsActiveForm] = useState(false);
+
   return (
     <div className={styles.ordersWrap}>
+      <Scaner
+         isAuth
+         scanActive={scanActive}
+         setScanActive={setScanActive}
+      />
       <div className={styles.orderWidggetWrap}>
         <div className={styles.orderWidggetContainer}>
-          <h1 className={styles.profileTitle}>Выбор фотографии</h1>
-          <form onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
+          <h1 className={styles.profileTitle}>Выбор фотографии  <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button></h1>
+          <form key={photos.length} onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
               {photos.photos?.map((photo,i) => {
                 return (
@@ -98,10 +114,11 @@ export const Orders = () => {
             {blocks.map((block, i) => (
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
-                  {addPhoto?.map((elem,i)=>{
+                  {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem,i)=>{
                     return(
                       <PhotoCard
                       key={i}
+                      blurRef={blurRef}
                       setIsBlur={setIsBlur}
                       photo={elem.photo}
                       onChangeHandler={onChangeHandler}
@@ -135,7 +152,6 @@ export const Orders = () => {
               </div>
               <div className={styles.promoStringWrap}>
                 <div className={styles.dot}>
-
                 </div>
                 <span style={styles.promoString}>
                   При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде

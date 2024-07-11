@@ -57,3 +57,7 @@
     font-size: 15px;
     font-weight: 700;
 }
+.errorMessage{
+    font-size: 15px;
+    color: #F09595;
+}

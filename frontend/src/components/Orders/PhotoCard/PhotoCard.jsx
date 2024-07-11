@@ -33,7 +33,7 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
     return (
         <div className={styles.photoCardWrap}>
             <div ref={scaleRef} className={isScale ? styles.imgWrapScale : styles.imgWrap}>
-                <img style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo} alt="" />
+                <img style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo.replace(/(http:\/\/[^/]+)/, '$1:8080')} alt="" />
                 <div onClick={() => { onScaleHandler() }} className={styles.loupe}></div>
                 <div className={isScale ? styles.rotateWrap : styles.dNone}>
                     <div onClick={() => decrement()} className={styles.rotateLeft}></div>
