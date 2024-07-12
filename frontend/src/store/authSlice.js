@@ -17,7 +17,11 @@ const authSlice = createSlice({
             last_name: '',
             promocode: '',
             second_name: '',
-            kindergarten: '',
+            kindergarten: {
+                name:'',
+                country:'',
+                region:''
+            },
             phone_number: '',
         },
         resetDataUser: {
@@ -64,8 +68,11 @@ const authSlice = createSlice({
 
             action.payload.kindergarten.forEach(elem => {
                 localStorage.setItem('kindergarten', elem.name);
+                state.userData.kindergarten.name = elem.name;
                 localStorage.setItem('country', elem.region.country)
+                state.userData.kindergarten.country = elem.region.country;
                 localStorage.setItem('regionName', elem.region.name)
+                state.userData.kindergarten.region = elem.region.name;
             })
         },
         setResetData(state, action) {

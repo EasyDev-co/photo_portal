@@ -18,11 +18,12 @@ export const userPartialUpdate = async (acces, obj) => {
 export const fetchUserPartialUpdateWithTokenInterceptor = async (access, obj) => {
     try {
         let response = await userPartialUpdate(access, obj)
-        if (response.status === 401 || response.status === 403) {
+        console.log(response)
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
             await tokenRefreshCreate()
                 .then(res => res.json())
                 .then(res => {
-                    if (res.refresh != undefined) {
+                    if (res.refresh !== undefined) {
                         setCookie('refresh', res.refresh);
                         localStorage.setItem('access', res.access);
                         response = userPartialUpdate(access, obj);

@@ -25,7 +25,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
 
-    const access = useSelector(state => state.user.access);
+    // const userData = useSelector(state => state.user.userData);
     const accessStor = localStorage.getItem('access');
     const [inputValue, setInputValue] = useState({
         parentSurname: localStorage.getItem('last_name') || '',
@@ -39,7 +39,18 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         parentNewPass: generatePass,
         resetEmail: ''
     });
-
+    // const [inputValue, setInputValue] = useState({
+    //     parentSurname: '',
+    //     parentName: '',
+    //     parentPatronymic: '',
+    //     parentPhone: '',
+    //     parentEmail: '',
+    //     kindergarten: '',
+    //     parentCity: '',
+    //     parentPass: '',
+    //     parentNewPass: generatePass,
+    //     resetEmail: ''
+    // });
     const [inputValueReset, setResetValue] = useState({
         code: ''
     });
