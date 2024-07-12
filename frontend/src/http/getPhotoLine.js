@@ -2,7 +2,7 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 export const getPhotoLine = async (id, access) => {
-    const url = `http://127.0.0.1:8080/api/v1/photo/photo_line/${id}/`;
+    const url = `https://photodetstvo.easydev-program.com:8080/api/v1/photo/photo_line/${id}/`;
 
     const response = await fetch(url, {
         headers: {

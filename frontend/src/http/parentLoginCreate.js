@@ -1,5 +1,5 @@
 export const parentLoginCreate = async (email, password) => {
-    const url = 'http://127.0.0.1:8080/api/v1/parent/login/';
+    const url = 'https://photodetstvo.easydev-program.com:8080/api/v1/parent/login/';
 
     const sendData = {
         email: email,
