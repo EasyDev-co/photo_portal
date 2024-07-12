@@ -71,7 +71,7 @@ class CheckPhotoThemeDeadlinesTask(BaseTask):
         photo_themes = PhotoTheme.objects.filter(
             is_active=True,
             date_end__lt=time_left_to_deadline,
-            date_end_gt=time_border_to_send_notification
+            date_end__gt=time_border_to_send_notification
         )
         kindergartens = photo_themes.values_list('photo_lines__kindergarten', flat=True)
         users = User.objects.filter(kindergarten__in=kindergartens, role=UserRole.parent)
