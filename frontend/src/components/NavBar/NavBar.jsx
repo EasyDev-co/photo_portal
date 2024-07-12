@@ -15,8 +15,11 @@ import {
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBarItem } from "./NavBarItem/NavBarItem";
 import { SocialItem } from "../SocialItem/SocialItem";
+import { useSelector } from "react-redux";
 
 export const NavBar = ({ onClose }) => {
+  
+  const userData = useSelector(state => state.user.userData);
   useEffect(() => {
     //обработчик для клавиши "Esc"
     const handleEsc = (e) => {
@@ -37,14 +40,14 @@ export const NavBar = ({ onClose }) => {
     <div className={styles.navBar}>
       <div className={styles.container}>
         <ul className={styles.userInfoList}>
-          <HeaderUserInfoItem
-            top={`${userInfo.surname} ${userInfo.name} ${userInfo.patronymic}`}
-            bottom={userInfo.tel}
-          />
-          <HeaderUserInfoItem
-            top={`${userInfo.country} ${userInfo.city}`}
-            bottom={userInfo.kindergarten}
-          />
+        <HeaderUserInfoItem
+                top={`${userData.last_name} ${userData.first_name} ${userData.second_name}`}
+                bottom={userData.phone_number || ''}
+              />
+              <HeaderUserInfoItem
+                top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
+                bottom={localStorage.getItem('kindergarten')}
+              />
         </ul>
         <ul className={styles.navList}>
           <NavBarItem
