@@ -2,10 +2,10 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 export const userPartialUpdate = async (acces, obj) => {
-    const url = `https://photodetstvo.easydev-program.com/api/v1/user/`;
-   
+    const url = `http://127.0.0.1:8080/api/v1/user/`;
+
     const response = await fetch(url, {
-        method:'PATCH',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${acces}`
@@ -18,17 +18,17 @@ export const userPartialUpdate = async (acces, obj) => {
 export const fetchUserPartialUpdateWithTokenInterceptor = async (access, obj) => {
     try {
         let response = await userPartialUpdate(access, obj)
-        console.log(response)
-        if (response.status === 400 || response.status === 401 || response.status === 403) {
-            await tokenRefreshCreate()
-                .then(res => res.json())
-                .then(res => {
-                    if (res.refresh !== undefined) {
+        console.log(response.ok)
+        if (!response.ok) {
+            let createToken = await tokenRefreshCreate()
+            if (createToken.ok) {
+                createToken.json()
+                    .then(res => {
                         setCookie('refresh', res.refresh);
                         localStorage.setItem('access', res.access);
                         response = userPartialUpdate(access, obj);
-                    }
-                })
+                    })
+            }
         }
         return response;
     } catch (error) {
