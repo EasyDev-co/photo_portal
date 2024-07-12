@@ -1,5 +1,5 @@
 export const parentRegisterCreate = async (email, first_name, second_name, last_name, password, kindergarten_code) => {
-    const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/register/';
+    const url = 'https://photodetstvo.easydev-program.com:8080/api/v1/parent/register/';
 
     const sendData = {
         email: email,
