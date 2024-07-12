@@ -1,5 +1,5 @@
 export const parentEmailVerification = async (code,email) => {
-    const url = 'https://photodetstvo.easydev-program.com:8080/api/v1/parent/email_verification_code/';
+    const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/email_verification_code/';
 
     const sendData = {
         email: email,

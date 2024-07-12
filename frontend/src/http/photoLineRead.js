@@ -1,7 +1,7 @@
 import { addAccessTokenToHeaders } from "./addAccessToken";
 
 export const photoLineRead = async (id) => {
-    const url = `https://photodetstvo.easydev-program.com:8080/api/v1/photo/photo/${id}/`;
+    const url = `https://photodetstvo.easydev-program.com/api/v1/photo/photo/${id}/`;
 
     const sendData = {
         id:id

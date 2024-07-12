@@ -2,7 +2,7 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 export const userPartialUpdate = async (acces, obj) => {
-    const url = `https://photodetstvo.easydev-program.com:8080/api/v1/user/`;
+    const url = `https://photodetstvo.easydev-program.com/api/v1/user/`;
 
     const response = await fetch(url, {
         method: 'PATCH',
