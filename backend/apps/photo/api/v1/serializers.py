@@ -13,7 +13,7 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
         fields = ('id', 'number', 'photo')
 
 
-class PhotoLineRetrieveSerializer(serializers.ModelSerializer):
+class PhotoLineSerializer(serializers.ModelSerializer):
     """
     Сериализатор для получения линии фотографий.
     """
@@ -21,7 +21,11 @@ class PhotoLineRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PhotoLine
-        fields = ('id', 'photos')
+        fields = ('id', 'photos', 'parent')
+
+
+# class PhotoNumbersSerializer(serializers.Serializer):
+#     numbers = serializers.ListSerializer()
 
 
 class CurrentPhotoThemeRetrieveSerializer(serializers.ModelSerializer):
