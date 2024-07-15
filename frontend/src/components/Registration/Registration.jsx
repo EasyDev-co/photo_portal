@@ -18,13 +18,7 @@ export const Registration = () => {
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-
-  // const [urlData, setUrlData] = useState({
-  //   kindergarten_code: '',
-  //   photo_line_id: '',
-  //   photo: []
-  // });
-
+  const [isChecked, setIsChecked] = useState(false);
   const initialState = {
     gardenCode:  '',
     pictureNumbers: '',
@@ -70,6 +64,15 @@ export const Registration = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    if(inputValue.password !== inputValue.repeatPassword){
+      setError('Пароли не совпадают!')
+      return;
+    }
+    if(!isChecked){
+      setError('Пожалуйста, примите условия использования')
+      return;
+    }
+   
     const words = inputValue.fullName.split(' ');
     const { gardenCode, pictureNumbers, fullName, email, password } = inputValue;
 
@@ -160,14 +163,13 @@ export const Registration = () => {
                 value={inputValue.repeatPassword}
               />
 
-              <div className={styles.privacyCheckbox}>
-                <input type="checkbox" name="" id="privacy" />
+              <div className={isChecked?styles.privacyCheckbox:styles.privacyCheckboxUnCheck}>
+                <input className={styles.privacyInput} onChange={(e)=>setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
                 <label htmlFor="privacy">
                   <p>
                     Даю согласие на обработку своих персональных данных.
                     <span> С соглашением ознакомлен.</span>
                   </p>
-
                 </label>
               </div>
               <button className={styles.authButton}>Продолжить</button>

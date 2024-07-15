@@ -84,20 +84,56 @@
 .privacyCheckbox {
   display: flex;
   align-items: start;
-
   font-size: 15px;
+  gap: 5px;
+}
+.privacyCheckbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #E5E5E5; /* Цвет рамки */
+  border-radius: 5px; /* Скругленные углы */
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+  flex-shrink: 0;
+}
+.privacyCheckboxUnCheck input[type="checkbox"]{
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #F09595; /* Цвет рамки */
+  border-radius: 5px; /* Скругленные углы */
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+  flex-shrink: 0;
+}
+
+.privacyCheckboxUnCheck {
+  display: flex;
+  align-items: start;
+  font-size: 15px;
+  gap: 5px;
 }
 
 .privacyCheckbox>label>p {
   color: rgb(110, 110, 110);
   font-size: 15px;
 }
-
+.privacyCheckboxUnCheck>label>p{
+  color: rgb(110, 110, 110);
+  font-size: 15px;
+}
 .privacyCheckbox>label>p>span {
   color: rgb(17, 187, 209);
   line-height: 24px;
 }
-
+.privacyCheckboxUnCheck>label>p>span{
+  color: rgb(17, 187, 209);
+  line-height: 24px;
+}
 .loginEnter {
   color: rgb(17, 187, 209);
   line-height: 24px;
@@ -107,12 +143,20 @@
   .privacyCheckbox {
     gap: 16px;
   }
-
+  .privacyCheckboxUnCheck{
+    gap: 16px;
+  }
   .privacyCheckbox>label>p {
     font-size: 20px;
   }
-
+  .privacyCheckboxUnCheck>label>p{
+    font-size: 20px;
+  }
   .privacyCheckbox>input {
+    width: 24px;
+    height: 24px;
+  }
+  .privacyCheckboxUnCheck>input{
     width: 24px;
     height: 24px;
   }
@@ -207,4 +251,13 @@
   right: 50px;
   top: 50px;
   position: absolute;
+}
+#privacy{
+  
+}
+.privacyInput{
+
+}
+.privacyInputUnActive{
+  border: 1px solid #007bff; /* Цвет рамки */
 }
