@@ -8,6 +8,7 @@ import AddKidsForm from "./AddKids/AddKidsForm";
 import { fetchWithTokenInterceptor } from '../../http/getPhotoLine'
 import Scaner from "../Scaner/Scaner";
 import { addPhotoLine } from "../../store/authSlice";
+import { useAuth } from "../../utils/useAuth";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -17,14 +18,31 @@ export const Orders = () => {
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
+  const { isAuth } = useAuth();
 
   useEffect(() => {
-    fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor)
-      .then(res => res.json())
-      .then(res => {
-        setPhotos(res);
-        dispatch(addPhotoLine(res.photos))
-      })
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+      const fetchData = async () => {
+        try {
+          const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
+          const data = await response.json();
+          setPhotos(data);
+          dispatch(addPhotoLine(data.photos));
+        } catch (error) {
+          if (error.name === 'AbortError') {
+            console.log('Fetch запрос был отменен');
+          } else {
+            console.error('Произошла ошибка:', error);
+          }
+        }
+      };
+      if(isAuth){
+        fetchData();
+      }
+      return () => {
+        abortController.abort();
+      };
   }, []);
 
   const [blocks, setBlocks] = useState([]);
@@ -56,7 +74,6 @@ export const Orders = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(inputValue)
   };
 
   const [isBlur, setIsBlur] = useState(false);

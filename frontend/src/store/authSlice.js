@@ -5,7 +5,7 @@ const authSlice = createSlice({
     name: 'user',
     initialState: {
         email: null,
-        access: true,
+        access: localStorage.getItem('access'),
         refresh: null,
         blur: false,
         code: null,
@@ -17,11 +17,11 @@ const authSlice = createSlice({
             last_name: '',
             promocode: '',
             second_name: '',
-            kindergarten: {
+            kindergarten: [{
                 name:'',
                 country:'',
                 region:''
-            },
+            }],
             phone_number: '',
         },
         resetDataUser: {
@@ -42,7 +42,8 @@ const authSlice = createSlice({
         },
         removeUser: (state) => {
             state.email = null;
-            state.access = null;
+            localStorage.setItem('access', '')
+
         },
         addBlur: (state, action) => {
             state.blur = action.payload;

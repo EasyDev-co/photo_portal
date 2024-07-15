@@ -1,10 +1,10 @@
 import { getCookie } from "../utils/setCookie";
 
+
 export const tokenRefreshCreate = () => {
     const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/token_refresh/';
-
     const sendData = {
-       refresh: getCookie('refresh')
+       refresh: refresh || getCookie('refresh')
     };
     const response = fetch(url, {
         method: 'POST',
