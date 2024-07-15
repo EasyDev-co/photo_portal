@@ -15,7 +15,7 @@ export const userPartialUpdate = async (acces, obj) => {
     return response;
 }
 
-export const fetchUserPartialUpdateWithTokenInterceptor = async (access, obj) => {
+export const fetchUserPartialUpdateWithTokenInterceptor = async (access, obj, refresh) => {
     try {
         let response = await userPartialUpdate(access, obj)
         console.log(response.ok)
