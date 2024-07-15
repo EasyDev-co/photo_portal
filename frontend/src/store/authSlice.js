@@ -30,7 +30,8 @@ const authSlice = createSlice({
         },
         accessToken: '',
         photosLine: [],
-        photoLineId: ''
+        photoLineId: '',
+        photoPrice:[]
     },
     reducers: {
         setUser: (state, action) => {
@@ -86,6 +87,9 @@ const authSlice = createSlice({
         addQrIdPhoto(state, action) {
             state.photoLineId = action.payload
             sessionStorage.setItem('photoline', action.payload);
+        },
+        addPhotoPrice(state, action){
+            state.photoPrice = action.payload;
         }
 
     }
@@ -101,7 +105,8 @@ export const {
     addUserData,
     setResetData,
     addPhotoLine,
-    addQrIdPhoto
+    addQrIdPhoto,
+    addPhotoPrice
 } = authSlice.actions;
 
 
