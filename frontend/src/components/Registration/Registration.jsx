@@ -72,6 +72,7 @@ export const Registration = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
     if (inputValue.password !== inputValue.repeatPassword) {
       setError({ repeatPass: ['Пароли не совпадают!'] })
       return;
@@ -176,8 +177,9 @@ export const Registration = () => {
                 error={error.repeatPass}
               />
 
-              <div className={isChecked ? styles.privacyCheckbox : styles.privacyCheckboxUnCheck}>
-                <input className={styles.privacyInput} onChange={(e) => setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
+
+              <div className={isChecked?styles.privacyCheckbox:styles.privacyCheckboxUnCheck}>
+                <input className={styles.privacyInput} onChange={(e)=>setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
                 <label htmlFor="privacy">
                   <p>
                     Даю согласие на обработку своих персональных данных.
