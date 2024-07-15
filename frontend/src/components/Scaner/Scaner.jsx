@@ -46,7 +46,6 @@ const Scaner = ({ scanActive, setScanActive, isAuth }) => {
         })
     }, [scanActive])
 
-    console.log(qrMessage)
     return (
         <div onClick={() => setScanActive(false)} className={scanActive ? styles.scanerActive : styles.scaner}>
             <div id='qrCodeContainer' ></div>

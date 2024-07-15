@@ -188,10 +188,14 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.user.tasks.ResendConfirmCodeTask",
         "schedule": crontab(minute="*/1"),
     },
+    "check_photo_theme_deadlines": {
+        "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
+        "schedule": crontab(hour='*/2'), # проверка каждые два часа
+    },
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,

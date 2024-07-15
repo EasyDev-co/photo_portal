@@ -3,8 +3,24 @@ import PaymentButton from '../../Buttons/PaymentButton';
 import PaymentDiagram from '../PaymentDiagram/PaymentDiagram';
 import styles from './PaymentTimer.module.css'
 import Timer from './Timer';
+import { useEffect } from 'react';
+import { fetchPhotoPriceWithTokenInterceptor } from '../../../http/getPhotoPrice';
 
 const PaymentTimer = () => {
+    const accessStor = localStorage.getItem('access');
+    const country = localStorage.getItem('country');
+    useEffect(() => {
+        fetchPhotoPriceWithTokenInterceptor(accessStor, country)
+            .then(res => res.json())
+            .then(res => {
+                if (res) {
+                    console.log(res)
+                }
+            })
+            .catch(res=>{
+                console.log(res)
+            })
+    }, [])
     return (
         <div className={styles.paymentTimerWrap}>
             <Timer
@@ -18,8 +34,8 @@ const PaymentTimer = () => {
                
             </Link> */}
             <PaymentButton
-                    value={'Оплатить'}
-                />
+                value={'Оплатить'}
+            />
         </div>
     );
 }

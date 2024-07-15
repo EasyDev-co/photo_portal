@@ -69,7 +69,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
 
         for formset in formsets:
             for inline_form in formset.forms:
-                if inline_form.is_valid():
+                if 'DELETE' not in inline_form.changed_data and inline_form.is_valid():
                     photo_numbers.append(inline_form.instance.number)
 
         qr_code, buffer = generate_qr_code(

@@ -42,7 +42,6 @@ export const Login = () => {
       const response = await parentLoginCreate(inputValue.email, inputValue.password)
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
         dispatch(
           setUser({
             access: data.access,
