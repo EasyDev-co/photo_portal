@@ -3,17 +3,18 @@ import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 export const getPhotoPrice = async (acces,region) => {
     const url = `http://127.0.0.1:8080/api/v1/photo_price_by_region/`;
+
     const sendData = {
         region: region
     }
     const response = await fetch(url, {
+        method:"POST",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${acces}`
         },
-        body:{
-            region: JSON.stringify(sendData)
-        }
+        body: JSON.stringify(sendData)
+
     });
     return response;
 }
