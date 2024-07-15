@@ -18,7 +18,10 @@ export const Login = () => {
   const [wrongPassord, setWrongPassword] = useState(false);
   const [isActiveAuth, setIsActiveAuth] = useState(true);
   const [isActiveReset, setIsActiveReset] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState({
+    non_field_errors:'',
+    
+  });
   const dispatch = useDispatch();
   const navigation = useNavigate();
   console.log(error)

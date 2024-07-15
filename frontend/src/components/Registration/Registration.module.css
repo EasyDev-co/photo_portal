@@ -261,3 +261,9 @@
 .privacyInputUnActive{
   border: 1px solid #007bff; /* Цвет рамки */
 }
+.wrongPass{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgb(240, 149, 149);
+}

@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addQrIdPhoto, setEmail } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
 import { useLocation } from "react-router-dom";
+import danger from '../../assets/images/Auth/DangerCircle.svg'
 import Scaner from "../Scaner/Scaner";
 
 export const Registration = () => {
@@ -20,7 +21,7 @@ export const Registration = () => {
   const searchParams = new URLSearchParams(location.search);
   const [isChecked, setIsChecked] = useState(false);
   const initialState = {
-    gardenCode:  '',
+    gardenCode: '',
     pictureNumbers: '',
     fullName: '',
     email: '',
@@ -31,7 +32,14 @@ export const Registration = () => {
   const [activeBlur, setActiveBlur] = useState(false)
   const [inputValue, setInputValue] = useState(initialState);
   const [responseData, setResponseData] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState({
+    email: '',
+    detail: '',
+    first_name: '',
+    password: '',
+    isChecked: '',
+    repeatPass: ''
+  });
   const navigation = useNavigate();
   const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
@@ -64,15 +72,16 @@ export const Registration = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if(inputValue.password !== inputValue.repeatPassword){
-      setError('Пароли не совпадают!')
+
+    if (inputValue.password !== inputValue.repeatPassword) {
+      setError({ repeatPass: ['Пароли не совпадают!'] })
       return;
     }
-    if(!isChecked){
-      setError('Пожалуйста, примите условия использования')
+    if (!isChecked) {
+      setError({ isChecked: ['Пожалуйста, примите условия использования'] })
       return;
     }
-   
+
     const words = inputValue.fullName.split(' ');
     const { gardenCode, pictureNumbers, fullName, email, password } = inputValue;
 
@@ -94,7 +103,7 @@ export const Registration = () => {
     }
     setInputValue(initialState);
   }
-
+  console.log(error)
   return <>
     <div className={styles.login}>
       <Scaner
@@ -118,6 +127,7 @@ export const Registration = () => {
                 activeBlur={activeBlur}
                 setActiveBlur={setActiveBlur}
                 blurRef={blurRef}
+                error={error.detail ? [error.detail] : error.detail}
               />
               <InputField
                 name={'pictureNumbers'}
@@ -137,6 +147,7 @@ export const Registration = () => {
                 isNone
                 isAuthForm
                 value={inputValue.fullName}
+                error={error.first_name}
               />
               <InputField
                 name={'email'}
@@ -145,6 +156,7 @@ export const Registration = () => {
                 isNone
                 isAuthForm
                 value={inputValue.email}
+                error={error.email}
               />
               <InputField
                 name={'password'}
@@ -153,6 +165,7 @@ export const Registration = () => {
                 placeholder={'Пароль'}
                 isAuthForm
                 value={inputValue.password}
+                error={error.password}
               />
               <InputField
                 name={'repeatPassword'}
@@ -161,7 +174,9 @@ export const Registration = () => {
                 placeholder={'Повторить пароль'}
                 isAuthForm
                 value={inputValue.repeatPassword}
+                error={error.repeatPass}
               />
+
 
               <div className={isChecked?styles.privacyCheckbox:styles.privacyCheckboxUnCheck}>
                 <input className={styles.privacyInput} onChange={(e)=>setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
@@ -172,6 +187,16 @@ export const Registration = () => {
                   </p>
                 </label>
               </div>
+              {error.isChecked &&
+                error.isChecked?.map(elem => {
+                  return (
+                    <div className={styles.wrongPass}>
+                      <img src={danger} alt="" />
+                      <span>{elem}</span>
+                    </div>
+                  )
+                })
+              }
               <button className={styles.authButton}>Продолжить</button>
             </form>
             <div className={styles.loginLinkWrap}>
