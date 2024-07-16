@@ -92,20 +92,20 @@ const InputField = (
                             activeWidget={activeWidget}
                         />
                     </div>
-                    <div className={style.errBlockWrap}>
-                        {error &&
-                            error?.map((elem, i) => {
-                                return (
-                                    <div key={i} className={style.wrongPass}>
-                                        <img src={danger} alt="" />
-                                        <span>{elem}</span>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
+                    {error &&
+                        <div className={style.errBlockWrap}>
+                            {error &&
+                                error?.map((elem, i) => {
+                                    return (
+                                        <div key={i} className={style.wrongPass}>
+                                            <img src={danger} alt="" />
+                                            <span>{elem}</span>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>}
                 </div>
-
             </div>
 
         </>
