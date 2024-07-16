@@ -31,3 +31,7 @@
   border-top: 1px solid #e5e5e5;
   padding: 40px 16px;
 }
+.linkToAuth>a{
+  color: #11bbd1;
+  font-size: 15px;
+}

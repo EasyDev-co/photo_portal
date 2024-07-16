@@ -1,5 +1,7 @@
+import { localUrl } from "../constants/constants";
+
 export const parentChangePass = async (code,email,newPass) => {
-    const url = 'http://127.0.0.1:8080/api/v1/parent/change_password/';
+    const url = `${localUrl}/api/v1/parent/change_password/`;
 
     const sendData = {
         email: email,

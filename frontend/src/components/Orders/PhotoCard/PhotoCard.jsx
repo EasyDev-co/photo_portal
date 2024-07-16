@@ -13,7 +13,7 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
     useClickOutside(scaleRef, () => {
         setIsScale(false);
     })
-
+    
     const onScaleHandler = () => {
         setIsBlur(true);
         setIsScale(true);

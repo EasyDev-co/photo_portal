@@ -15,8 +15,14 @@ import {
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBarItem } from "./NavBarItem/NavBarItem";
 import { SocialItem } from "../SocialItem/SocialItem";
+import { useSelector } from "react-redux";
+import { useAuth } from "../../utils/useAuth";
+import { Link } from "react-router-dom";
 
 export const NavBar = ({ onClose }) => {
+
+  const { isAuth } = useAuth();
+  const userData = useSelector(state => state.user.userData);
   useEffect(() => {
     //обработчик для клавиши "Esc"
     const handleEsc = (e) => {
@@ -36,60 +42,68 @@ export const NavBar = ({ onClose }) => {
   return (
     <div className={styles.navBar}>
       <div className={styles.container}>
-        <ul className={styles.userInfoList}>
-          <HeaderUserInfoItem
-            top={`${userInfo.surname} ${userInfo.name} ${userInfo.patronymic}`}
-            bottom={userInfo.tel}
-          />
-          <HeaderUserInfoItem
-            top={`${userInfo.country} ${userInfo.city}`}
-            bottom={userInfo.kindergarten}
-          />
-        </ul>
-        <ul className={styles.navList}>
-          <NavBarItem
-            router="/orders"
-            icon={bagIcon}
-            alt="иконка корзины"
-            text="Заказы"
-            onClick={onClose}
-          />
-          <NavBarItem
-            router="/gallery"
-            icon={imageIcon}
-            alt="иконка картинки"
-            text="Галерея"
-            onClick={onClose}
-          />
-          <NavBarItem
-            router="/profile"
-            icon={profileIcon}
-            alt="иконка профиля"
-            text="Личный кабинет"
-            onClick={onClose}
-          />
-          <NavBarItem
-            router="/about-us"
-            icon={infoIcon}
-            alt="иконка инфо"
-            text="О нас"
-            onClick={onClose}
-          />
-          <NavBarItem
-            router="/rules"
-            icon={rulesIcon}
-            alt="иконка правил"
-            text="Правила"
-            onClick={onClose}
-          />
-          <NavBarItem
-            router="/sign-in"
-            icon={exitIcon}
-            alt="иконка выхода"
-            text="Выход"
-            onClick={onClose}
-          />
-        </ul>
+        {isAuth ?
+          <>
+            <ul className={styles.userInfoList}>
+              <HeaderUserInfoItem
+                top={`${userData.last_name} ${userData.first_name} ${userData.second_name}`}
+                bottom={userData.phone_number || ''}
+              />
+              <HeaderUserInfoItem
+                top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
+                bottom={localStorage.getItem('kindergarten')}
+              />
+            </ul>
+            <ul className={styles.navList}>
+              <NavBarItem
+                router="/orders"
+                icon={bagIcon}
+                alt="иконка корзины"
+                text="Заказы"
+                onClick={onClose}
+              />
+              <NavBarItem
+                router="/gallery"
+                icon={imageIcon}
+                alt="иконка картинки"
+                text="Галерея"
+                onClick={onClose}
+              />
+              <NavBarItem
+                router="/profile"
+                icon={profileIcon}
+                alt="иконка профиля"
+                text="Личный кабинет"
+                onClick={onClose}
+              />
+              <NavBarItem
+                router="/about-us"
+                icon={infoIcon}
+                alt="иконка инфо"
+                text="О нас"
+                onClick={onClose}
+              />
+              <NavBarItem
+                router="/rules"
+                icon={rulesIcon}
+                alt="иконка правил"
+                text="Правила"
+                onClick={onClose}
+              />
+              <NavBarItem
+                router="/sign-in"
+                icon={exitIcon}
+                alt="иконка выхода"
+                text="Выход"
+                onClick={onClose}
+              />
+            </ul>
+          </> :
+          <div className={styles.linkToAuth}>
+            <Link to={'/sign-in'}>Войти</Link>
+          </div>
+        }
+
         <ul className={styles.socialList}>
           <SocialItem
             href="https://vk.com"

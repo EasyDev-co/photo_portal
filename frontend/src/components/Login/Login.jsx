@@ -18,7 +18,10 @@ export const Login = () => {
   const [wrongPassord, setWrongPassword] = useState(false);
   const [isActiveAuth, setIsActiveAuth] = useState(true);
   const [isActiveReset, setIsActiveReset] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState({
+    non_field_errors:'',
+    
+  });
   const dispatch = useDispatch();
   const navigation = useNavigate();
   console.log(error)
@@ -42,7 +45,6 @@ export const Login = () => {
       const response = await parentLoginCreate(inputValue.email, inputValue.password)
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
         dispatch(
           setUser({
             access: data.access,

@@ -9,7 +9,7 @@ class PhotoPriceAPIView(APIView):
     """
     Представление для цен на фото.
     """
-    def get(self, request):
+    def post(self, request):
         serializer = PhotoPriceByRegionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         photo_prices = PhotoPrice.objects.filter(region__name=serializer.data['region'])

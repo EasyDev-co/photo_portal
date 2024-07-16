@@ -19,11 +19,17 @@ export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuth } = useAuth();
-  
+
   useEffect(() => {
     // Перенаправляем на "/orders" при входе на сайт
     if (location.pathname === "/") {
       navigate("/orders");
+    }
+    if (!isAuth) {
+      if (location.pathname === "/") {
+        navigate("/about-us");
+      }
+     
     }
   }, [location.pathname, navigate]);
 
@@ -46,14 +52,23 @@ export const App = () => {
           <Route path="/password-reset/new-password" element={<NewPassword />} />
           <Route path="/*" element={<NotFound />} />
         </Route>
-      </> : <Route element={<AuthRoutes />}>
-        <Route path="/sign-in" element={<Login />} />
-        <Route path="/sign-up" element={<Registration />} />
-        <Route path="/verification" element={<Verification />} />
-        <Route path="/password-reset" element={<ResetPassword />} />
-        <Route path="/password-reset/new-password" element={<NewPassword />} />
-        <Route path="/*" element={<NotFound />} />
-      </Route>}
+
+      </> :
+        <>
+          <Route element={<Layout />}>
+            <Route path={"/about-us"} element={<AboutUs />} />
+            <Route path={"/rules"} element={<Rules />} />
+          </Route>
+          <Route element={<AuthRoutes />}>
+            <Route path="/sign-in" element={<Login />} />
+            <Route path="/sign-up" element={<Registration />} />
+            <Route path="/verification" element={<Verification />} />
+            <Route path="/password-reset" element={<ResetPassword />} />
+            <Route path="/password-reset/new-password" element={<NewPassword />} />
+            <Route path="/*" element={<NotFound />} />
+          </Route>
+        </>
+      }
 
     </Routes>
   );

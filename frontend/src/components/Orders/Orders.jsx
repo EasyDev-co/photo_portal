@@ -5,48 +5,55 @@ import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer'
 import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
-import {tokenRefreshCreate} from '../../http/tokenRefreshCreate'
-import { setCookie } from "../../utils/setCookie";
-import {addPhotoLine, addPhotos, setAccessToken} from '../../store/authSlice'
-import {getPhotoLine} from '../../http/getPhotoLine'
+import { fetchWithTokenInterceptor } from '../../http/getPhotoLine'
 import Scaner from "../Scaner/Scaner";
-import { useLocation } from "react-router-dom";
+import { addPhotoLine } from "../../store/authSlice";
+import { useAuth } from "../../utils/useAuth";
 
 export const Orders = () => {
   const dispatch = useDispatch();
-  const addPhoto = useSelector(state=>state.user.photos);
-  const [photos, setPhotos] = useState([]);
-  const photoLineId = useSelector(state=>state.user.photoLineId)
+  const addPhoto = useSelector(state => state.user.photos);
+  const [photos, setPhotos] = useState({photos:
+    [{number: 3, photo: 'http://127.0.0.1/media/photo/mDdYZD0X1jM.jpg'},
+      {number: 1, photo: 'http://127.0.0.1/media/photo/dC_z3tfsKjM.jpg'},
+      {number: 5, photo: 'http://127.0.0.1/media/photo/t5Yl1EfyFTM.jpg'},
+      {number: 4, photo: 'http://127.0.0.1/media/photo/R68dnExfmHA.jpg'},
+      {number: 6, photo: 'http://127.0.0.1/media/photo/thtWvQLxung.jpg'},
+      {number: 2, photo: 'http://127.0.0.1/media/photo/DU1r0HB2i-E.jpg'}]
+  });
+  const photoLineId = useSelector(state => state.user.photoLineId)
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
-  const location = useLocation();
+  const accessStor = localStorage.getItem('access');
+  const { isAuth } = useAuth();
 
   useEffect(() => {
-    tokenRefreshCreate()
-      .then(res => res.json())
-      .then(res => {
-        if (res.refresh) {
-          setCookie('refresh', res.refresh);
-          dispatch(
-            setAccessToken(res.access)
-          )
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+      const fetchData = async () => {
+        try {
+          const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
+          const data = await response.json();
+          setPhotos(data);
+          dispatch(addPhotoLine(data.photos));
+        } catch (error) {
+          if (error.name === 'AbortError') {
+            console.log('Fetch запрос был отменен');
+          } else {
+            console.error('Произошла ошибка:', error);
+          }
         }
-        return res.access;
-      })
-      .then(access => {
-        getPhotoLine(!photoLineId && sessionData, access)
-          .then(res => res.json())
-          .then(res => {
-            if(res.photos){
-              setPhotos(res);
-              dispatch(addPhotoLine(res.photos))
-            }
-          })
-      })
-  }, [sessionData, photoLineId, location.pathname, scanActive]);
+      };
+      if(isAuth){
+        fetchData();
+      }
+      return () => {
+        abortController.abort();
+      };
+  }, []);
 
   const [blocks, setBlocks] = useState([]);
-  
+
   const addBlock = () => {
     if (blocks.length < 2) {
       setBlocks([...blocks, { id: blocks.length + 1 }]);
@@ -59,12 +66,12 @@ export const Orders = () => {
   };
 
   const [inputValue, setInputValue] = useState({
-    "10x15": 1,
-    "15x20": 1,
-    "20x30": 1,
-    magnet: 1,
-    calendar: 1,
-    photo_book: 1
+    "10x15": 0,
+    "15x20": 0,
+    "20x30": 0,
+    magnet: 0,
+    calendar: 0,
+    photo_book: 0
   });
 
   const onChangeHandler = (name, count) => {
@@ -77,36 +84,34 @@ export const Orders = () => {
   }
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index))
     console.log(inputValue)
-
   };
 
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
-  
+
   useClickOutside(blurRef, () => {
     setIsBlur(false);
   })
-  
+
   const [isActiveForm, setIsActiveForm] = useState(false);
 
   return (
     <div className={styles.ordersWrap}>
       <Scaner
-         isAuth
-         scanActive={scanActive}
-         setScanActive={setScanActive}
+        isAuth
+        scanActive={scanActive}
+        setScanActive={setScanActive}
       />
       <div className={styles.orderWidggetWrap}>
         <div className={styles.orderWidggetContainer}>
           <h1 className={styles.profileTitle}>Выбор фотографии  <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button></h1>
           <form key={photos.length} onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
-              {photos.photos?.map((photo,i) => {
-                // console.log(photo)
+              {photos.photos?.map((photo, i) => {
                 return (
                   <PhotoCard
+                    number={photo.number}
                     key={i}
                     blurRef={blurRef}
                     setIsBlur={setIsBlur}
@@ -121,17 +126,18 @@ export const Orders = () => {
             {blocks.map((block, i) => (
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
-                  {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem,i)=>{
-                    // console.log(elem)
-                    return(
+                  {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem, i) => {
+                    return (
                       <PhotoCard
-                      key={i}
-                      blurRef={blurRef}
-                      setIsBlur={setIsBlur}
-                      photo={elem.photo}
-                      onChangeHandler={onChangeHandler}
-                      inputValue={inputValue}
-                    />
+                        number={elem.number}
+                        key={i}
+                        blurRef={blurRef}
+                        setIsBlur={setIsBlur}
+                        photo={elem.photo}
+                        onChangeHandler={onChangeHandler}
+                        inputValue={inputValue}
+                        getChangeData={getChangeData}
+                      />
                     )
                   })}
                 </div>
@@ -185,7 +191,7 @@ export const Orders = () => {
             </div>
           </div>
           <div className={styles.promoButtonWrap}>
-            <button onClick={()=>setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
+            <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
             <span>{1 + blocks.length} из 3</span>
           </div>
         </div>
