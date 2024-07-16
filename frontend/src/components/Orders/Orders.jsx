@@ -72,9 +72,14 @@ export const Orders = () => {
     setInputValue(newInput);
   };
 
+  const getChangeData = (e) =>{
+    console.log(e)
+  }
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    console.log(addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index))
     console.log(inputValue)
+
   };
 
   const [isBlur, setIsBlur] = useState(false);
@@ -99,6 +104,7 @@ export const Orders = () => {
           <form key={photos.length} onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
               {photos.photos?.map((photo,i) => {
+                // console.log(photo)
                 return (
                   <PhotoCard
                     key={i}
@@ -107,6 +113,7 @@ export const Orders = () => {
                     photo={photo.photo}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
+                    getChangeData={getChangeData}
                   />
                 )
               })}
@@ -115,6 +122,7 @@ export const Orders = () => {
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
                   {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem,i)=>{
+                    // console.log(elem)
                     return(
                       <PhotoCard
                       key={i}

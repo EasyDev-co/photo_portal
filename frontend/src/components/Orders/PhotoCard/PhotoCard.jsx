@@ -4,12 +4,12 @@ import Counter from './Counter/Counter';
 import { useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '../../../utils/useClickOutside';
 
-const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef }) => {
+const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData }) => {
     const [isScale, setIsScale] = useState(false);
     const [count, setCount] = useState(0);
 
     const scaleRef = useRef(null);
-    
+
     useClickOutside(scaleRef, () => {
         setIsScale(false);
     })
@@ -42,36 +42,42 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
             </div>
             <div className={styles.photoCountersCardsWrapper}>
                 <Counter
+                    getChangeData={getChangeData}
                     name={'10x15'}
                     id={'10x15'}
                     inputValue={inputValue["10x15"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                    getChangeData={getChangeData}
                     name={'15x20'}
                     id={'15x20'}
                     inputValue={inputValue["15x20"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                    getChangeData={getChangeData}
                     name={'20x30'}
                     id={'20x30'}
                     inputValue={inputValue["20x30"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                    getChangeData={getChangeData}
                     name={'magnet'}
                     id={'Магнит'}
                     inputValue={inputValue.magnet}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                    getChangeData={getChangeData}
                     name={'calendar'}
                     id={'Календарь'}
                     inputValue={inputValue.calendar}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                    getChangeData={getChangeData}
                     name={'photo_book'}
                     id={'Фотокнига'}
                     inputValue={inputValue.photo_book}

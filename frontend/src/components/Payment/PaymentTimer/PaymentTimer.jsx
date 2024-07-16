@@ -4,7 +4,7 @@ import PaymentDiagram from '../PaymentDiagram/PaymentDiagram';
 import styles from './PaymentTimer.module.css'
 import Timer from './Timer';
 
-const PaymentTimer = () => {
+const PaymentTimer = ({ onSubmitHandler }) => {
     return (
         <div className={styles.paymentTimerWrap}>
             <Timer
@@ -18,8 +18,9 @@ const PaymentTimer = () => {
                
             </Link> */}
             <PaymentButton
-                    value={'Оплатить'}
-                />
+                onSubmitHandler={onSubmitHandler}
+                value={'Оплатить'}
+            />
         </div>
     );
 }
