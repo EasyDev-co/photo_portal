@@ -21,7 +21,7 @@
     border: 1px solid rgb(229, 229, 229);
     height: 40px;
     outline: none;
-    width: 100%;
+    width: -webkit-fill-available;
     transition: .3s;
 }
 @media screen and (max-width: 768px) {
