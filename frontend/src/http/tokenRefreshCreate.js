@@ -1,7 +1,7 @@
 import { getCookie } from "../utils/setCookie";
 
 
-export const tokenRefreshCreate = () => {
+export const tokenRefreshCreate = (refresh) => {
     const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/token_refresh/';
 
     const sendData = {

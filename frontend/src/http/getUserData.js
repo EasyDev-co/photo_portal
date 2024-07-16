@@ -2,7 +2,7 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 
-export const getUserData = async (acces) => {
+export const getUserData = async (access, signal) => {
     const url = `https://photodetstvo.easydev-program.com/api/v1/user/`;
 
     const response = await fetch(url, {
