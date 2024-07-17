@@ -26,11 +26,12 @@ class OrderAdmin(admin.ModelAdmin):
         'photo_line',
         'status',
         'is_digital',
+        'is_photobook',
         'created',
         'modified',
     )
-    list_filter = ('status', 'photo_line')
-    search_fields = ('user__email',)
+    list_filter = ('status', 'photo_line', 'is_digital')
+    search_fields = ('user__email', 'photo_line__kindergarten__name')
     raw_id_fields = ('user', 'photo_line')
     ordering = ('created', 'modified')
     readonly_fields = (

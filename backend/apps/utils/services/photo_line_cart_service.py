@@ -74,6 +74,9 @@ class PhotoLineCartService:
                 price = self.apply_promocode(photo)
                 total_price += price
 
+            if photo_line['is_photobook']:
+                total_price = self.add_photobook_cost(photo_line, total_price)
+
             is_more_ransom_amount = self.check_ransom(photo_line, total_price)
 
             if is_more_ransom_amount:
@@ -81,9 +84,6 @@ class PhotoLineCartService:
 
             if not is_more_ransom_amount and photo_line['is_digital']:
                 total_price = self.add_digital_photos_cost(photo_line, total_price)
-
-            if photo_line['is_photobook']:
-                total_price = self.add_photobook_cost(photo_line, total_price)
 
             total_price = self.apply_bonus_coupon(total_price)
             photo_line.update(

@@ -63,7 +63,8 @@ class OrderAPIView(APIView):
                 ) for photo in photo_line['photos']
             ]
             OrderItem.objects.bulk_create(order_items)
-        return Response(cart)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
         #
         # photos, bonus_coupon, promocode = order_service.prepare_the_order_data()
         #

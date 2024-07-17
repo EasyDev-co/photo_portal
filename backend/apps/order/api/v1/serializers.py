@@ -60,7 +60,7 @@ class OrderSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_is_more_ransom_amount(obj):
         """Метод для проверки превышения суммы выкупа."""
-        ransom_amount = obj.kindergarten.region.ransom_amount
+        ransom_amount = obj.photo_line.kindergarten.region.ransom_amount
         if obj.order_price >= ransom_amount:
             return True
         return False
