@@ -21,9 +21,9 @@ class PhotoCartSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
     price_per_piece = serializers.SerializerMethodField()
     discount_price = serializers.CharField(required=False)
-    # discount_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
-    def get_price_per_piece(self, obj):
+    @staticmethod
+    def get_price_per_piece(obj):
         photo = get_object_or_404(Photo, id=obj['id'])
         region = photo.photo_line.kindergarten.region
         photo_price = get_object_or_404(PhotoPrice, region=region, photo_type=obj['photo_type'])

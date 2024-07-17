@@ -18,6 +18,7 @@ from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
 from apps.utils.services import CartService
+from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
 
 
@@ -81,66 +82,15 @@ class CartAPIView(APIView):
         serializer = PhotoLineCartSerializer(request.data, many=True)
         response = serializer.data
 
-        # инициируем корзину в сессии
+        # инициируем корзину в сессии и сервис для подготовки фотолиний
         cart = CartService(request)
         user = request.user
 
-        # есть ли промокоды
-        promocode = user.promocode
+        photo_line_cart_service = PhotoLineCartService(user, serializer, cart)
+        photo_line_cart_service.calculate_the_cost()
 
-        # есть ли купоны
-        bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
-
-        for photo_line in serializer.data:
-            # достаем фото из request считаем стоимоcть фотолинии без скидок
-            photos = photo_line['photos']
-            total_price = Decimal(0)
-
-            # если промокоды есть - применить к цене
-            for photo in photos:
-                photo_type = photo['photo_type']
-
-                # применить промокод и посчитать discount_price
-                if promocode:
-                    photo['discount_price'] = promocode.use_promocode_to_price(Decimal(photo['price_per_piece']).quantize(Decimal("0.0"), rounding=ROUND_HALF_UP), photo_type)
-                    loguru.logger.info(photo['discount_price'])
-                else:
-                    photo['discount_price'] = Decimal(photo['price_per_piece']).quantize(Decimal("0.0"), rounding=ROUND_HALF_UP)
-                    loguru.logger.info(photo['discount_price'])
-                price = Decimal(photo['discount_price']).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP) * photo['quantity']
-                loguru.logger.info(price)
-                total_price += price
-
-            # превышается ли сумма выкупа
-            photo_line_obj = get_object_or_404(PhotoLine, id=photo_line['id'])
-            ransom_amount = photo_line_obj.kindergarten.region.ransom_amount
-            is_more_ransom_amount = total_price >= ransom_amount
-
-            # будут ли электронные фото
-            if is_more_ransom_amount:
-                photo_line.update({'is_digital': True})
-
-
-            # при необходимости прибавить стоимость электронных фото
-            if not is_more_ransom_amount and photo_line['is_digital']:
-                region = get_object_or_404(PhotoLine, id=photo_line['id']).kindergarten.region
-                digital_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.digital).price
-                if promocode:
-                    digital_price = promocode.use_promocode_to_price(Decimal(digital_price), photo_type=PhotoType.digital)
-                total_price += Decimal(digital_price)
-
-            # если есть купон - применить к цене
-            if bonus_coupon:
-                total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
-
-            photo_line.update(
-                {
-                    'is_more_ransom_amount': is_more_ransom_amount,
-                    'total_price': str(total_price),
-                }
-            )
         serializer = PhotoLineCartSerializer(response, many=True)
-        cart.add_photolines_to_cart(user, serializer.data)
+        cart.add_products_to_cart(user, serializer.data)
         return Response(serializer.data)
 
     @staticmethod

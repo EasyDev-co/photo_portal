@@ -127,3 +127,9 @@ class CartService:
                 if product['photo_id'] == product_id and product['photo_type'] == photo_type:
                     return index
                 index += 1
+
+
+    # Методы для конкретных видов товаров
+
+    # Методы для фотолиний
+
