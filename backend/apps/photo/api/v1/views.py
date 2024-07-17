@@ -1,7 +1,6 @@
-import loguru
 from django.shortcuts import get_object_or_404
 
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -53,24 +52,22 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         return Response({'message': 'Фотолиния с указанными фотографиями не найдена'})
 
 
-class PhotoLineGetUpdateParentAPIView(APIView):
+class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
+    """Представление для получения одной фотолинии или указания родителя в фотолинии."""
+    serializer_class = PhotoLineSerializer
+    queryset = PhotoLine.objects.all()
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
-    """Представление для полочения одной фотолинии или указания родителя в фотолинии."""
-    @staticmethod
-    def get(request, pk):
-        """Получение фотолинии по id"""
-        photo_line = get_object_or_404(PhotoLine, id=pk)
-        serializer = PhotoLineSerializer(photo_line)
-        return Response(serializer.data)
 
-    @staticmethod
-    def patch(request, pk):
-        """Обновление родителя фотолинии (обновляется на request.user'a)."""
-        photo_line = get_object_or_404(PhotoLine, id=pk)
-        photo_line.parent = request.user
-        photo_line.save()
-        serializer = PhotoLineSerializer(photo_line)
-        return Response(serializer.data)
+
+class PhotoLinesGetByParent(ListAPIView):
+    """Представление для получения всех фотолиний родителя"""
+    serializer_class = PhotoLineSerializer
+    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
+    lookup_field = 'parent'
+
+    def get_queryset(self):
+        parent = self.request.user
+        return PhotoLine.objects.filter(parent=parent, photo_theme__is_active=True)
 
 
 class PhotoLineRetrieveAPIView(RetrieveAPIView):
