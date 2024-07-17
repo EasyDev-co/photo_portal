@@ -1,33 +1,37 @@
 import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
+export const getPhotoPrice = async (access,region) => {
+    const url = `https://photodetstvo.easydev-program.com/api/v1/photo_price_by_region/`;
 
-export const getUserData = async (access, signal) => {
-    const url = `https://photodetstvo.easydev-program.com/api/v1/user/`;
-
+    const sendData = {
+        region: region
+    }
     const response = await fetch(url, {
+        method:"POST",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        signal
+        body: JSON.stringify(sendData)
+
     });
     return response;
 }
 
-export const fetchUserDataWithTokenInterceptor = async (access, refresh) => {
+export const fetchPhotoPriceWithTokenInterceptor = async (access, region) => {
     try {
-        let response = await getUserData(access)
+        let response = await getPhotoPrice(access, region)
         if (!response.ok) {
-            localStorage.setItem('access','');
-            let createToken = await tokenRefreshCreate(refresh)
+            let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
+                        console.log(res)
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getUserData(res.access);
+                            response = getPhotoPrice(res.access, region);
                         }
                     })
             }

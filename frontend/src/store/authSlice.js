@@ -5,7 +5,7 @@ const authSlice = createSlice({
     name: 'user',
     initialState: {
         email: null,
-        access: true,
+        access: localStorage.getItem('access'),
         refresh: null,
         blur: false,
         code: null,
@@ -17,11 +17,11 @@ const authSlice = createSlice({
             last_name: '',
             promocode: '',
             second_name: '',
-            kindergarten: {
+            kindergarten: [{
                 name:'',
                 country:'',
                 region:''
-            },
+            }],
             phone_number: '',
         },
         resetDataUser: {
@@ -30,7 +30,8 @@ const authSlice = createSlice({
         },
         accessToken: '',
         photosLine: [],
-        photoLineId: ''
+        photoLineId: '',
+        photoPrice:[]
     },
     reducers: {
         setUser: (state, action) => {
@@ -41,7 +42,8 @@ const authSlice = createSlice({
         },
         removeUser: (state) => {
             state.email = null;
-            state.access = null;
+            localStorage.setItem('access', '')
+
         },
         addBlur: (state, action) => {
             state.blur = action.payload;
@@ -85,6 +87,9 @@ const authSlice = createSlice({
         addQrIdPhoto(state, action) {
             state.photoLineId = action.payload
             sessionStorage.setItem('photoline', action.payload);
+        },
+        addPhotoPrice(state, action){
+            state.photoPrice = action.payload;
         }
 
     }
@@ -100,7 +105,8 @@ export const {
     addUserData,
     setResetData,
     addPhotoLine,
-    addQrIdPhoto
+    addQrIdPhoto,
+    addPhotoPrice
 } = authSlice.actions;
 
 
