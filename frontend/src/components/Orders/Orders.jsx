@@ -7,19 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import { fetchWithTokenInterceptor } from '../../http/getPhotoLine'
 import Scaner from "../Scaner/Scaner";
-import { addPhotoLine } from "../../store/authSlice";
+import { addCartList, addPhotoLine } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 
 export const Orders = () => {
   const dispatch = useDispatch();
   const addPhoto = useSelector(state => state.user.photos);
-  const [photos, setPhotos] = useState({photos:
-    [{number: 3, photo: 'http://127.0.0.1/media/photo/mDdYZD0X1jM.jpg'},
-      {number: 1, photo: 'http://127.0.0.1/media/photo/dC_z3tfsKjM.jpg'},
-      {number: 5, photo: 'http://127.0.0.1/media/photo/t5Yl1EfyFTM.jpg'},
-      {number: 4, photo: 'http://127.0.0.1/media/photo/R68dnExfmHA.jpg'},
-      {number: 6, photo: 'http://127.0.0.1/media/photo/thtWvQLxung.jpg'},
-      {number: 2, photo: 'http://127.0.0.1/media/photo/DU1r0HB2i-E.jpg'}]
+  const [photos, setPhotos] = useState({
+    photos:
+      []
   });
   const photoLineId = useSelector(state => state.user.photoLineId)
   const [scanActive, setScanActive] = useState(false);
@@ -28,28 +24,29 @@ export const Orders = () => {
   const { isAuth } = useAuth();
 
   useEffect(() => {
-      const abortController = new AbortController();
-      const signal = abortController.signal;
-      const fetchData = async () => {
-        try {
-          const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
-          const data = await response.json();
-          setPhotos(data);
-          dispatch(addPhotoLine(data.photos));
-        } catch (error) {
-          if (error.name === 'AbortError') {
-            console.log('Fetch запрос был отменен');
-          } else {
-            console.error('Произошла ошибка:', error);
-          }
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+    const fetchData = async () => {
+      try {
+        const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
+        const data = await response.json();
+        setPhotos(data);
+        dispatch(addPhotoLine(data.photos));
+      } catch (error) {
+        console.log(error)
+        if (error.name === 'AbortError') {
+          console.log('Fetch запрос был отменен');
+        } else {
+          console.error('Произошла ошибка:', error);
         }
-      };
-      if(isAuth){
-        fetchData();
       }
-      return () => {
-        abortController.abort();
-      };
+    };
+    if (isAuth) {
+      fetchData();
+    }
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const [blocks, setBlocks] = useState([]);
@@ -74,17 +71,29 @@ export const Orders = () => {
     photo_book: 0
   });
 
-  const onChangeHandler = (name, count) => {
-    const newInput = (data) => ({ ...data, [name]: count });
+  const onChangeHandler = (name, count, number, photoId) => {
+
+    dispatch(addCartList(
+      {
+        ['quantity']: count,
+        ['id']: photoId,
+        ['photo_type']: Number(name)
+      }
+    ))
+    const newInput = (data) => ({ ...data, [name]: count, });
+
     setInputValue(newInput);
   };
 
-  const getChangeData = (e) =>{
+  const getChangeData = (e) => {
     console.log(e)
   }
+  const cartList = useSelector(state => state.user.cartList)
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(inputValue)
+    const uniqueByPhotoType = arr => Object.values(arr.reduce((acc, obj) => (!acc[obj.id] || !acc[obj.id][obj.photo_type] || acc[obj.id][obj.photo_type].quantity < obj.quantity) ? { ...acc, [obj.id]: { ...acc[obj.id], [obj.photo_type]: obj } } : acc, {})).reduce((res, subObj) => [...res, ...Object.values(subObj)], []);
+
+    console.log(uniqueByPhotoType(cartList))
   };
 
   const [isBlur, setIsBlur] = useState(false);
@@ -106,12 +115,14 @@ export const Orders = () => {
       <div className={styles.orderWidggetWrap}>
         <div className={styles.orderWidggetContainer}>
           <h1 className={styles.profileTitle}>Выбор фотографии  <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button></h1>
-          <form key={photos.length} onSubmit={(e) => onSubmitHandler(e)} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
+          <div key={photos.length} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
               {photos.photos?.map((photo, i) => {
                 return (
                   <PhotoCard
+                    onSubmitHandler={onSubmitHandler}
                     number={photo.number}
+                    photoId={photo.id}
                     key={i}
                     blurRef={blurRef}
                     setIsBlur={setIsBlur}
@@ -146,7 +157,7 @@ export const Orders = () => {
                 </div>
               </div>
             ))}
-          </form>
+          </div>
           <AddKidsForm
             setIsActiveForm={setIsActiveForm}
             isActiveForm={isActiveForm}

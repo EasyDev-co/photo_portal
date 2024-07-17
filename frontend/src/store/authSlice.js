@@ -31,7 +31,8 @@ const authSlice = createSlice({
         accessToken: '',
         photosLine: [],
         photoLineId: '',
-        photoPrice:[]
+        photoPrice:[],
+        cartList:[]
     },
     reducers: {
         setUser: (state, action) => {
@@ -66,7 +67,7 @@ const authSlice = createSlice({
             localStorage.setItem('last_name', action.payload.last_name);
             localStorage.setItem('second_name', action.payload.second_name);
             localStorage.setItem('email', action.payload.email);
-            localStorage.setItem('phone', action.payload.phone_number);
+            localStorage.setItem('phone', action.payload.phone_number === null ? '+7' : action.payload.phone_number);
 
             action.payload.kindergarten.forEach(elem => {
                 localStorage.setItem('kindergarten', elem.name);
@@ -91,7 +92,11 @@ const authSlice = createSlice({
         addPhotoPrice(state, action){
             state.photoPrice = action.payload;
         }
-
+        ,
+        addCartList(state, action){
+            state.cartList.push(action.payload)
+            // console.log(state.cartList)
+        }
     }
 });
 export const {
@@ -106,7 +111,8 @@ export const {
     setResetData,
     addPhotoLine,
     addQrIdPhoto,
-    addPhotoPrice
+    addPhotoPrice,
+    addCartList
 } = authSlice.actions;
 
 

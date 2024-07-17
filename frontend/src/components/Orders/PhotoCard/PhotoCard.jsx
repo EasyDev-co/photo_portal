@@ -4,7 +4,7 @@ import Counter from './Counter/Counter';
 import { useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '../../../utils/useClickOutside';
 
-const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData }) => {
+const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData,photoId}) => {
     const [isScale, setIsScale] = useState(false);
     const [count, setCount] = useState(0);
 
@@ -13,7 +13,7 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
     useClickOutside(scaleRef, () => {
         setIsScale(false);
     })
-    
+
     const onScaleHandler = () => {
         setIsBlur(true);
         setIsScale(true);
@@ -33,57 +33,69 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
     return (
         <div className={styles.photoCardWrap}>
             <div ref={scaleRef} className={isScale ? styles.imgWrapScale : styles.imgWrap}>
-                <img style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo.replace(/(http:\/\/[^/]+)/, '$1:8080')} alt="" />
+                <img style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo} alt="" />
                 <div onClick={() => { onScaleHandler() }} className={styles.loupe}></div>
                 <div className={isScale ? styles.rotateWrap : styles.dNone}>
                     <div onClick={() => decrement()} className={styles.rotateLeft}></div>
                     <div onClick={() => increment()} className={styles.rotateRight}></div>
                 </div>
             </div>
-            <div className={styles.photoCountersCardsWrapper}>
+            <form id={number} className={styles.photoCountersCardsWrapper}>
                 <Counter
+                    photoId={photoId}
+                    number={number}
                     getChangeData={getChangeData}
-                    name={'10x15'}
+                    name={1}
                     id={'10x15'}
                     inputValue={inputValue["10x15"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                photoId={photoId}
+                    number={number}
                     getChangeData={getChangeData}
-                    name={'15x20'}
+                    name={2}
                     id={'15x20'}
                     inputValue={inputValue["15x20"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                photoId={photoId}
+                    number={number}
                     getChangeData={getChangeData}
-                    name={'20x30'}
+                    name={3}
                     id={'20x30'}
                     inputValue={inputValue["20x30"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                photoId={photoId}
+                    number={number}
                     getChangeData={getChangeData}
-                    name={'magnet'}
+                    name={4}
                     id={'Магнит'}
                     inputValue={inputValue.magnet}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                photoId={photoId}
+                    number={number}
                     getChangeData={getChangeData}
-                    name={'calendar'}
+                    name={5}
                     id={'Календарь'}
                     inputValue={inputValue.calendar}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                photoId={photoId}
+                    number={number}
                     getChangeData={getChangeData}
-                    name={'photo_book'}
+                    name={0}
                     id={'Фотокнига'}
                     inputValue={inputValue.photo_book}
                     onChangeHandler={onChangeHandler}
                 />
-            </div>
+            </form>
         </div>
     );
 }
