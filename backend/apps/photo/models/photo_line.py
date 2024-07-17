@@ -1,8 +1,11 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
 from apps.kindergarten.models import Kindergarten
 from .photo_theme import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin
+
+User = get_user_model()
 
 
 class PhotoLine(UUIDMixin):
@@ -24,6 +27,14 @@ class PhotoLine(UUIDMixin):
         unique=True,
         null=True,
         blank=True
+    )
+    parent = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Родитель',
+        related_name='photo_lines',
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
