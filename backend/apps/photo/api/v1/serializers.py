@@ -24,10 +24,6 @@ class PhotoLineSerializer(serializers.ModelSerializer):
         fields = ('id', 'photos', 'parent')
 
 
-# class PhotoNumbersSerializer(serializers.Serializer):
-#     numbers = serializers.ListSerializer()
-
-
 class CurrentPhotoThemeRetrieveSerializer(serializers.ModelSerializer):
     """
     Сериализатор для получения темы фотосессии.

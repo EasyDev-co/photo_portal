@@ -101,13 +101,13 @@ class CartService:
 
     # Методы для позиций корзины
 
-    def add_product_to_cart(self, user, product_data):
-        """Добавить товар в корзину."""
-        if not self.check_cart_exists(user):
-            self.create_cart(user=user)
-
+    def add_photoline_to_cart(self, user, product_list):
+        """Добавить в корзину фотолинию."""
+        if self.check_cart_exists(user):
+            self.remove_cart(user=user)
+        self.create_cart(user)
         user_id = str(user.id)
-        self.cart[user_id].append(product_data)
+        self.cart[user_id] = product_list
         self.save()
 
     def add_product_list_to_cart(self, user, product_list):
@@ -127,12 +127,3 @@ class CartService:
                 if product['photo_id'] == product_id and product['photo_type'] == photo_type:
                     return index
                 index += 1
-
-    def remove_product_from_cart(self, user, product_id, photo_type):
-        """Удалить товар из корзины."""
-        if self.check_cart_exists(user):
-            index = self.get_photo_index_in_cart(user, product_id, photo_type)
-            if index is not None:
-                user_id = str(user.id)
-                self.cart[user_id].pop(index)
-                self.save()

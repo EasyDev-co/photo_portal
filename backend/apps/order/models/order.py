@@ -39,6 +39,10 @@ class Order(TimeStampedMixin):
         default=False,
         verbose_name="Электронные фотографии",
     )
+    is_photobook = models.BooleanField(
+        default=False,
+        verbose_name="Фотокнига",
+    )
     status = models.PositiveSmallIntegerField(
         choices=OrderStatus.choices,
         default=OrderStatus.created,

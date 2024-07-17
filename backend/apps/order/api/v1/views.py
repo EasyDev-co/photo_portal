@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+import loguru
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -5,9 +8,14 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.order.api.v1.serializers import OrderSerializer, PhotoCartSerializer, PhotoCartRemoveSerializer
+from apps.photo.api.v1.serializers import PhotoLineSerializer, PhotoRetrieveSerializer
+
+from apps.order.api.v1.serializers import OrderSerializer, PhotoCartSerializer, PhotoCartRemoveSerializer, PhotoLineCartSerializer
 from apps.order.models import Order
-from apps.photo.models import Photo
+from apps.photo.models import Photo, PhotoLine
+from apps.kindergarten.models import PhotoPrice, PhotoType
+from apps.promocode.models.bonus_coupon import BonusCoupon
+
 
 from apps.utils.services import CartService
 from apps.utils.services.order_service import OrderService
@@ -56,11 +64,81 @@ class OrderOneAPIView(APIView):
 
 
 class PhotoCartAPIView(APIView):
+    """Представление для одного фото из корзины (тестовый)"""
+    @staticmethod
+    def get(request):
+        photo = get_object_or_404(Photo, id=request.data['id'])
+        serializer = PhotoCartSerializer(photo)
+        serializer.update(Photo, {'photo_type': request.data['photo_type']})
+        return Response(serializer.data)
+
+
+class CartAPIView(APIView):
+    """Представление для корзины"""
+    def post(self, request):
+        """Добавление в корзину списка фотолиний"""
+        serializer = PhotoLineCartSerializer(request.data)
+        response = serializer.data
+
+        # достаем фото из request считаем стоимоcть фотолинии без скидок
+        photos = serializer.data['photos']
+        total_price = Decimal(0)
+
+        # есть ли промокоды
+        promocode = request.user.promocode
+
+        # если есть - применить к цене
+
+        for photo in photos:
+            photo_type = photo['photo_type']
+
+            # применить промокод
+
+            if promocode:
+                photo['discount_price'] = promocode.use_promocode_to_price(photo['price_per_piece'], photo_type)
+            else:
+                photo['discount_price'] = photo['price_per_piece']
+            price = photo['discount_price'] * photo['quantity']
+            total_price += price
+
+        # превышается ли сумма выкупа
+        photo_line = get_object_or_404(PhotoLine, id=serializer.data['id'])
+        ransom_amount = photo_line.kindergarten.region.ransom_amount
+        is_more_ransom_amount = total_price >= ransom_amount
+
+        # будут ли электронные фото
+        if is_more_ransom_amount:
+            response.update({'is_digital': True})
+
+        if not is_more_ransom_amount and response['is_digital']:
+            region = get_object_or_404(PhotoLine, id=response['id']).kindergarten.region
+            digital_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.digital).price
+            if promocode:
+                digital_price = promocode.use_promocode_to_price(digital_price, photo_type=PhotoType.digital)
+            total_price += digital_price
+
+        # есть ли купоны
+        bonus_coupon = BonusCoupon.objects.filter(user=request.user, is_active=True, balance__gt=0).first()
+
+        # если есть - применить к цене
+        if bonus_coupon:
+            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+
+        response.update(
+            {
+                'total_price': total_price,
+                'is_more_ransom_amount': is_more_ransom_amount,
+            }
+        )
+
+        return Response(response)
+
+
+class OldCartAPIView(APIView):
     """Представление для отображения корзины."""
 
-    @swagger_auto_schema(responses={"201": openapi.Response(description="Принимает список (list) с данными фото")}, request_body=PhotoCartSerializer)
     def post(self, request):
-        """Добавление фото в корзину."""
+        """Добавление фотолиний в корзину."""
         cart = CartService(request)
         user = request.user
         serializer = PhotoCartSerializer(data=request.data, many=True)
