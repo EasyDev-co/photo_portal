@@ -39,18 +39,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         parentNewPass: generatePass,
         resetEmail: ''
     });
-    // const [inputValue, setInputValue] = useState({
-    //     parentSurname: '',
-    //     parentName: '',
-    //     parentPatronymic: '',
-    //     parentPhone: '',
-    //     parentEmail: '',
-    //     kindergarten: '',
-    //     parentCity: '',
-    //     parentPass: '',
-    //     parentNewPass: generatePass,
-    //     resetEmail: ''
-    // });
+
     const [inputValueReset, setResetValue] = useState({
         code: ''
     });

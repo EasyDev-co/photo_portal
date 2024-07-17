@@ -1,0 +1,36 @@
+.dropdown{
+    width: 436px;
+    position: relative;
+    margin-bottom: 100px;
+}
+/* .dropdown .dropdownBtn{
+    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    height: 40px;
+} */
+.inputField{
+    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    height: 40px;
+    outline: none;
+    width: 436px;
+    transition: .3s;
+}
+.dropdownContent{
+    position: absolute;
+    top: 100%;
+    /* padding: 5px; */
+    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    height: 40px;
+    width: 100%;
+    color: rgb(110, 110, 110);
+    transition: .3s;
+}
+
+.dropdownItem:hover{
+    background: rgb(248, 249, 251);
+}

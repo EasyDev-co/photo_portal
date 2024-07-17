@@ -1,0 +1,54 @@
+.itemWrap{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+    width: 31%;
+    position: relative;
+}
+@media (min-width: 1080px) and (max-width: 1440px) {
+    .itemWrap{
+        width: 46%;
+    }
+ }
+ @media (min-width: 640px) and (max-width: 1079px) {
+    .itemWrap{
+        width: 95%;
+    }
+ }
+ @media (min-width: 360px) and (max-width: 639px) {
+    .itemWrap{
+        width: 95%;
+        padding: 0 15px;
+    }
+ }
+.itemWrapTimer{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+    width: 85%;
+    position: relative;
+}
+.itemLabel{
+    font-weight: 400;
+    font-size: 18px;
+}
+.itemData{
+    padding: 16px 0;
+    font-weight: 600;
+    font-size: 18px;
+    background-color: rgb(248, 249, 251);
+    text-align: center;
+}
+.itemCopy{
+    position: absolute;
+    background-image: url(../../../assets/images/Profile/copyBtn.svg);
+    background-size: 20px;
+    background-repeat: no-repeat;
+    width: 22px;
+    height: 22px;
+    right: 32px;
+    top: 63%;
+    cursor: pointer;
+}
