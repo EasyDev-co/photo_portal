@@ -1,6 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
 
-import loguru
 from django.shortcuts import get_object_or_404
 
 from apps.kindergarten.models import PhotoPrice, PhotoType

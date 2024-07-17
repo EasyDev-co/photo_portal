@@ -1,5 +1,3 @@
-import loguru
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -9,14 +7,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
-from apps.order.models import Order, OrderItem
-from apps.photo.models import PhotoLine, Photo
+from apps.order.models import Order
 
 from apps.utils.services import CartService
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
 
 User = get_user_model()
+
 
 class OrderAPIView(APIView):
     """Представление для заказа."""
