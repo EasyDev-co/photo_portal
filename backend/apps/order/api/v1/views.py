@@ -30,50 +30,15 @@ class OrderAPIView(APIView):
         """Создание заказа из товаров корзины."""
 
         cart_service = CartService(request)
-        # order_service = OrderService(request=request, cart=cart_service)
         user = request.user
-        cart = cart_service.gef_cart_by_user_id(user)
+        order_service = OrderService(user, cart_service)
 
-        # предварительно создаем заказы
-        orders = [
-            Order(
-                user=request.user,
-                photo_line=get_object_or_404(PhotoLine, id=photo_line['id']),
-                is_digital=photo_line['is_digital'],
-                is_photobook=photo_line['is_photobook'],
-                order_price=photo_line['total_price'],
-            ) for photo_line in cart
-        ]
-        orders = Order.objects.bulk_create(orders)
-        cart_service.remove_cart(user)
+        orders = order_service.create_orders()
+        order_service.create_order_items(orders)
 
-        order_ids = []
-        for order in orders:
-            order_ids.append(order.id)
-        orders = Order.objects.filter(id__in=order_ids)
-
-        for photo_line in cart:
-            order = orders.get(photo_line__id=photo_line['id'])
-            order_items = [
-                OrderItem(
-                    photo_type=photo['photo_type'],
-                    amount=photo['quantity'],
-                    order=order,
-                    photo=get_object_or_404(Photo, id=photo['id']),
-                ) for photo in photo_line['photos']
-            ]
-            OrderItem.objects.bulk_create(order_items)
         serializer = OrderSerializer(orders, many=True)
+        cart_service.remove_cart(user)
         return Response(serializer.data)
-        #
-        # photos, bonus_coupon, promocode = order_service.prepare_the_order_data()
-        #
-        # orders = order_service.create_orders()
-        # order_service.create_order_items(orders, photos, bonus_coupon, promocode)
-        # cart_service.remove_cart(user)
-        #
-        # serializer = OrderSerializer(orders, many=True)
-        # return Response(serializer.data)
 
     @staticmethod
     def get(request):

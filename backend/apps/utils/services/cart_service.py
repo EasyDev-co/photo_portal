@@ -70,7 +70,7 @@ class CartService:
             return self.cart[user_id]
         return []
 
-    def gef_cart_by_user_id(self, user):
+    def get_cart_by_user(self, user):
         if self.check_cart_exists(user):
             user_id = str(user.id)
             return self.cart[user_id]
