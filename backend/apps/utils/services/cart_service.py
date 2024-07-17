@@ -76,13 +76,6 @@ class CartService:
                 kindergarten_ids.append(position['kindergarten_id'])
             return kindergarten_ids
 
-    def get_cart_list(self, user):
-        """Получить все позиции корзины в list."""
-        if self.check_cart_exists(user):
-            user_id = str(user.id)
-            return self.cart[user_id]
-        return []
-
     def get_total_price(self, user):
         """Получить итоговую стоимость всех позиций корзины"""
         if self.check_cart_exists(user):
@@ -99,9 +92,7 @@ class CartService:
                     total_prices[kindergarten_id] += total_price
             return total_prices
 
-    # Методы для позиций корзины
-
-    def add_photoline_to_cart(self, user, product_list):
+    def add_products_to_cart(self, user, product_list):
         """Добавить в корзину фотолинию."""
         if self.check_cart_exists(user):
             self.remove_cart(user=user)
@@ -109,6 +100,15 @@ class CartService:
         user_id = str(user.id)
         self.cart[user_id] = product_list
         self.save()
+
+    def get_cart_list(self, user):
+        """Получить все позиции корзины в list."""
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            return self.cart[user_id]
+        return []
+
+    # Методы для позиций корзины
 
     def add_product_list_to_cart(self, user, product_list):
         if self.check_cart_exists(user):

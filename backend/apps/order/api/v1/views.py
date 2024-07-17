@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 import loguru
 from django.shortcuts import get_object_or_404
@@ -77,14 +77,19 @@ class CartAPIView(APIView):
     """Представление для корзины"""
     def post(self, request):
         """Добавление в корзину списка фотолиний"""
+        # принимаем данные
         serializer = PhotoLineCartSerializer(request.data, many=True)
         response = serializer.data
 
+        # инициируем корзину в сессии
+        cart = CartService(request)
+        user = request.user
+
         # есть ли промокоды
-        promocode = request.user.promocode
+        promocode = user.promocode
 
         # есть ли купоны
-        bonus_coupon = BonusCoupon.objects.filter(user=request.user, is_active=True, balance__gt=0).first()
+        bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
 
         for photo_line in serializer.data:
             # достаем фото из request считаем стоимоcть фотолинии без скидок
@@ -93,15 +98,17 @@ class CartAPIView(APIView):
 
             # если промокоды есть - применить к цене
             for photo in photos:
-                loguru.logger.info(photo)
                 photo_type = photo['photo_type']
 
                 # применить промокод и посчитать discount_price
                 if promocode:
-                    photo['discount_price'] = promocode.use_promocode_to_price(photo['price_per_piece'], photo_type)
+                    photo['discount_price'] = promocode.use_promocode_to_price(Decimal(photo['price_per_piece']).quantize(Decimal("0.0"), rounding=ROUND_HALF_UP), photo_type)
+                    loguru.logger.info(photo['discount_price'])
                 else:
-                    photo['discount_price'] = photo['price_per_piece']
-                price = photo['discount_price'] * photo['quantity']
+                    photo['discount_price'] = Decimal(photo['price_per_piece']).quantize(Decimal("0.0"), rounding=ROUND_HALF_UP)
+                    loguru.logger.info(photo['discount_price'])
+                price = Decimal(photo['discount_price']).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP) * photo['quantity']
+                loguru.logger.info(price)
                 total_price += price
 
             # превышается ли сумма выкупа
@@ -119,8 +126,8 @@ class CartAPIView(APIView):
                 region = get_object_or_404(PhotoLine, id=photo_line['id']).kindergarten.region
                 digital_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.digital).price
                 if promocode:
-                    digital_price = promocode.use_promocode_to_price(digital_price, photo_type=PhotoType.digital)
-                total_price += digital_price
+                    digital_price = promocode.use_promocode_to_price(Decimal(digital_price), photo_type=PhotoType.digital)
+                total_price += Decimal(digital_price)
 
             # если есть купон - применить к цене
             if bonus_coupon:
@@ -129,10 +136,20 @@ class CartAPIView(APIView):
             photo_line.update(
                 {
                     'is_more_ransom_amount': is_more_ransom_amount,
-                    'total_price': total_price,
+                    'total_price': str(total_price),
                 }
             )
-        return Response(response)
+        serializer = PhotoLineCartSerializer(response, many=True)
+        cart.add_photolines_to_cart(user, serializer.data)
+        return Response(serializer.data)
+
+    @staticmethod
+    def get(request):
+        """Показать корзину."""
+        cart = CartService(request)
+        cart_list = cart.get_cart_list(request.user)
+        serializer = PhotoLineCartSerializer(cart_list, many=True)
+        return Response(serializer.data)
 
 
 class OldCartAPIView(APIView):
