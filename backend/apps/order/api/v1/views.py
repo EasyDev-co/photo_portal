@@ -77,60 +77,61 @@ class CartAPIView(APIView):
     """Представление для корзины"""
     def post(self, request):
         """Добавление в корзину списка фотолиний"""
-        serializer = PhotoLineCartSerializer(request.data)
+        serializer = PhotoLineCartSerializer(request.data, many=True)
         response = serializer.data
-
-        # достаем фото из request считаем стоимоcть фотолинии без скидок
-        photos = serializer.data['photos']
-        total_price = Decimal(0)
 
         # есть ли промокоды
         promocode = request.user.promocode
 
-        # если есть - применить к цене
-
-        for photo in photos:
-            photo_type = photo['photo_type']
-
-            # применить промокод
-
-            if promocode:
-                photo['discount_price'] = promocode.use_promocode_to_price(photo['price_per_piece'], photo_type)
-            else:
-                photo['discount_price'] = photo['price_per_piece']
-            price = photo['discount_price'] * photo['quantity']
-            total_price += price
-
-        # превышается ли сумма выкупа
-        photo_line = get_object_or_404(PhotoLine, id=serializer.data['id'])
-        ransom_amount = photo_line.kindergarten.region.ransom_amount
-        is_more_ransom_amount = total_price >= ransom_amount
-
-        # будут ли электронные фото
-        if is_more_ransom_amount:
-            response.update({'is_digital': True})
-
-        if not is_more_ransom_amount and response['is_digital']:
-            region = get_object_or_404(PhotoLine, id=response['id']).kindergarten.region
-            digital_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.digital).price
-            if promocode:
-                digital_price = promocode.use_promocode_to_price(digital_price, photo_type=PhotoType.digital)
-            total_price += digital_price
-
         # есть ли купоны
         bonus_coupon = BonusCoupon.objects.filter(user=request.user, is_active=True, balance__gt=0).first()
 
-        # если есть - применить к цене
-        if bonus_coupon:
-            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+        for photo_line in serializer.data:
+            # достаем фото из request считаем стоимоcть фотолинии без скидок
+            photos = photo_line['photos']
+            total_price = Decimal(0)
 
-        response.update(
-            {
-                'total_price': total_price,
-                'is_more_ransom_amount': is_more_ransom_amount,
-            }
-        )
+            # если промокоды есть - применить к цене
+            for photo in photos:
+                loguru.logger.info(photo)
+                photo_type = photo['photo_type']
 
+                # применить промокод и посчитать discount_price
+                if promocode:
+                    photo['discount_price'] = promocode.use_promocode_to_price(photo['price_per_piece'], photo_type)
+                else:
+                    photo['discount_price'] = photo['price_per_piece']
+                price = photo['discount_price'] * photo['quantity']
+                total_price += price
+
+            # превышается ли сумма выкупа
+            photo_line_obj = get_object_or_404(PhotoLine, id=photo_line['id'])
+            ransom_amount = photo_line_obj.kindergarten.region.ransom_amount
+            is_more_ransom_amount = total_price >= ransom_amount
+
+            # будут ли электронные фото
+            if is_more_ransom_amount:
+                photo_line.update({'is_digital': True})
+
+
+            # при необходимости прибавить стоимость электронных фото
+            if not is_more_ransom_amount and photo_line['is_digital']:
+                region = get_object_or_404(PhotoLine, id=photo_line['id']).kindergarten.region
+                digital_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.digital).price
+                if promocode:
+                    digital_price = promocode.use_promocode_to_price(digital_price, photo_type=PhotoType.digital)
+                total_price += digital_price
+
+            # если есть купон - применить к цене
+            if bonus_coupon:
+                total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+
+            photo_line.update(
+                {
+                    'is_more_ransom_amount': is_more_ransom_amount,
+                    'total_price': total_price,
+                }
+            )
         return Response(response)
 
 
