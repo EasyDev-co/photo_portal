@@ -21,7 +21,7 @@
     border: 1px solid rgb(229, 229, 229);
     height: 40px;
     outline: none;
-    width: 100%;
+    width: -webkit-fill-available;
     transition: .3s;
 }
 @media screen and (max-width: 768px) {
@@ -69,6 +69,7 @@
     width:380px;
     display: flex;
     position: relative;
+    flex-direction: column;
 }
 @media screen and (max-width: 768px) {
     .inputQuestionField{
@@ -155,4 +156,22 @@
         transform:translatex(-50%);
         top: 60px;
     }
+  }
+
+  .wrongPass{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgb(240, 149, 149);
+  }
+
+  .errBlockWrap{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    /* position: absolute; */
+    background-color: #fff;
+    z-index: 1;
+    /* background-color: aliceblue; */
+    width: 300px;
   }

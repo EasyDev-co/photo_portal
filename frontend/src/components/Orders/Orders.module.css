@@ -207,6 +207,7 @@
     display: flex;
     align-items: center;
     gap: 24px;
+    margin-bottom: 37px;
 }
 
 .promoButtonWrap>span {

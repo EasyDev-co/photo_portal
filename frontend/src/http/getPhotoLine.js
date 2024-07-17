@@ -16,17 +16,17 @@ export const getPhotoLine = async (id, access) => {
 export const fetchWithTokenInterceptor = async (id, access) => {
     try {
         let response = await getPhotoLine(id, access)
-        if (!response.ok) {
+        if (response.status === 401 || response.status === 403)  {
+            localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
                         console.log(res)
-                        if (res.refresh !== undefined) {
-                            setCookie('refresh', res.refresh);
-                            localStorage.setItem('access', res.access);
-                            response = getPhotoLine(id, res.access);
-                        }
+                        setCookie('refresh', res.refresh);
+
+                        localStorage.setItem('access', res.access);
+                        response = getPhotoLine(id, res.access);
                     })
             }
 
