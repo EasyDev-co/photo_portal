@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
-from apps.order.models import Order
-from apps.photo.models import PhotoLine
+from apps.order.models import Order, OrderItem
+from apps.photo.models import PhotoLine, Photo
 
 from apps.utils.services import CartService
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
@@ -51,8 +51,18 @@ class OrderAPIView(APIView):
         for order in orders:
             order_ids.append(order.id)
         orders = Order.objects.filter(id__in=order_ids)
-        loguru.logger.info(orders)
 
+        for photo_line in cart:
+            order = orders.get(photo_line__id=photo_line['id'])
+            order_items = [
+                OrderItem(
+                    photo_type=photo['photo_type'],
+                    amount=photo['quantity'],
+                    order=order,
+                    photo=get_object_or_404(Photo, id=photo['id']),
+                ) for photo in photo_line['photos']
+            ]
+            OrderItem.objects.bulk_create(order_items)
         return Response(cart)
         #
         # photos, bonus_coupon, promocode = order_service.prepare_the_order_data()
