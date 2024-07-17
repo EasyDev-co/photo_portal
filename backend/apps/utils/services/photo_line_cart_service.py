@@ -1,21 +1,19 @@
 from decimal import Decimal, ROUND_HALF_UP
 
+import loguru
 from django.shortcuts import get_object_or_404
 
 from apps.kindergarten.models import PhotoPrice, PhotoType
 from apps.photo.models import PhotoLine
 from apps.promocode.models.bonus_coupon import BonusCoupon
 
-from apps.utils.services import CartService
-
 
 class PhotoLineCartService:
     """Сервис для подготовки фотолиний к добавлению в корзину."""
 
-    def __init__(self, user, serializer, cart: CartService):
+    def __init__(self, user, serializer):
         self.user = user
         self.serializer = serializer
-        self.cart = cart
         self.promocode = None
         self.bonus_coupon = None
 
@@ -48,14 +46,21 @@ class PhotoLineCartService:
         ransom_amount = photo_line_obj.kindergarten.region.ransom_amount
         return total_price >= ransom_amount
 
-    @staticmethod
-    def add_digital_photos_cost(photo_line, total_price, promocode):
+    def add_digital_photos_cost(self, photo_line, total_price):
         """Добавить к стоимости заказа стоимость электронных фото."""
         region = get_object_or_404(PhotoLine, id=photo_line['id']).kindergarten.region
         digital_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.digital).price
-        if promocode:
-            digital_price = promocode.use_promocode_to_price(Decimal(digital_price), photo_type=PhotoType.digital)
+        if self.promocode:
+            digital_price = self.promocode.use_promocode_to_price(Decimal(digital_price), photo_type=PhotoType.digital)
         total_price += Decimal(digital_price)
+        return total_price
+
+    def add_photobook_cost(self, photo_line, total_price):
+        region = get_object_or_404(PhotoLine, id=photo_line['id']).kindergarten.region
+        photobook_price = get_object_or_404(PhotoPrice, region=region, photo_type=PhotoType.photobook).price
+        if self.promocode:
+            photobook_price = self.promocode.use_promocode_to_price(Decimal(photobook_price), photo_type=PhotoType.photobook)
+        total_price += Decimal(photobook_price)
         return total_price
 
     def calculate_the_cost(self):
@@ -75,7 +80,10 @@ class PhotoLineCartService:
                 photo_line.update({'is_digital': True})
 
             if not is_more_ransom_amount and photo_line['is_digital']:
-                total_price = self.add_digital_photos_cost(photo_line, total_price, self.promocode)
+                total_price = self.add_digital_photos_cost(photo_line, total_price)
+
+            if photo_line['is_photobook']:
+                total_price = self.add_photobook_cost(photo_line, total_price)
 
             total_price = self.apply_bonus_coupon(total_price)
             photo_line.update(

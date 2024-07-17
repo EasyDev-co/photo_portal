@@ -69,3 +69,9 @@ class CartService:
             user_id = str(user.id)
             return self.cart[user_id]
         return []
+
+    def gef_cart_by_user_id(self, user):
+        if self.check_cart_exists(user):
+            user_id = str(user.id)
+            return self.cart[user_id]
+        return {}

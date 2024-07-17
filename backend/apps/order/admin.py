@@ -23,14 +23,15 @@ class OrderAdmin(admin.ModelAdmin):
         'order_price',
         'user',
         'kindergarten',
+        'photo_line',
         'status',
         'is_digital',
         'created',
         'modified',
     )
-    list_filter = ('status', 'kindergarten')
+    list_filter = ('status', 'photo_line')
     search_fields = ('user__email',)
-    raw_id_fields = ('user', 'kindergarten')
+    raw_id_fields = ('user', 'photo_line')
     ordering = ('created', 'modified')
     readonly_fields = (
         'order_price',
@@ -40,6 +41,9 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderItemInline
     ]
+
+    def kindergarten(self, instance):
+        return instance.photo_line.kindergarten
 
 
 @admin.register(OrderItem)
