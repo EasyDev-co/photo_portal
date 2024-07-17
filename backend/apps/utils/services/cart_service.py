@@ -1,8 +1,4 @@
-import loguru
-from decimal import Decimal
 from django.conf import settings
-
-# from apps.photo.models.photo import Photo
 
 
 class CartService:
@@ -58,40 +54,6 @@ class CartService:
             user_id = str(user.id)
             return len(self.cart[user_id])
 
-    def get_photo_ids(self, user):
-        """Получить все id фотографий"""
-        if self.check_cart_exists(user):
-            user_id = str(user.id)
-            photo_ids = []
-            for position in self.cart[user_id]:
-                photo_ids.append(position['photo_id'])
-            return photo_ids
-
-    def get_kindergarten_ids(self, user):
-        """Получить все id детских садов, имеющихся в корзине."""
-        if self.check_cart_exists(user):
-            user_id = str(user.id)
-            kindergarten_ids = []
-            for position in self.cart[user_id]:
-                kindergarten_ids.append(position['kindergarten_id'])
-            return kindergarten_ids
-
-    def get_total_price(self, user):
-        """Получить итоговую стоимость всех позиций корзины"""
-        if self.check_cart_exists(user):
-            user_id = str(user.id)
-            total_prices = {}
-
-            for position in self.cart[user_id]:
-                total_price = Decimal(0)
-                total_price += (Decimal(position['quantity']) * Decimal(position['price_per_piece']))
-                kindergarten_id = position['kindergarten_id']
-                if kindergarten_id not in total_prices.keys():
-                    total_prices[kindergarten_id] = total_price
-                else:
-                    total_prices[kindergarten_id] += total_price
-            return total_prices
-
     def add_products_to_cart(self, user, product_list):
         """Добавить в корзину фотолинию."""
         if self.check_cart_exists(user):
@@ -107,29 +69,3 @@ class CartService:
             user_id = str(user.id)
             return self.cart[user_id]
         return []
-
-    # Методы для позиций корзины
-
-    def add_product_list_to_cart(self, user, product_list):
-        if self.check_cart_exists(user):
-            self.remove_cart(user=user)
-        self.create_cart(user=user)
-        user_id = str(user.id)
-        self.cart[user_id] = product_list
-        self.save()
-
-    def get_photo_index_in_cart(self, user, product_id, photo_type):
-        """Получить индекс товара в корзине."""
-        if self.check_cart_exists(user):
-            user_id = str(user.id)
-            index = 0
-            for product in self.cart[user_id]:
-                if product['photo_id'] == product_id and product['photo_type'] == photo_type:
-                    return index
-                index += 1
-
-
-    # Методы для конкретных видов товаров
-
-    # Методы для фотолиний
-

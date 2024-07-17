@@ -38,10 +38,6 @@ class PhotoLineCartSerializer(serializers.Serializer):
     is_photobook = serializers.BooleanField()
 
 
-class PhotoCartRemoveSerializer(serializers.Serializer):
-    photo_id = serializers.CharField()
-    photo_type = serializers.IntegerField()
-
 class OrderItemSerializer(serializers.ModelSerializer):
     """Сериализатор для получения позиций (частей) заказа."""
 
