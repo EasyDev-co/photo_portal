@@ -19,11 +19,10 @@ User = get_user_model()
 class OrderAPIView(APIView):
     """Представление для заказа."""
 
-    @swagger_auto_schema(responses={
-        "201": openapi.Response(
-            description=""
-            )
-        })
+    @swagger_auto_schema(
+        responses={"201": OrderSerializer(many=True)},
+        operation_description="Передается с пустым телом запроса. Все данные берет сам из корзины.",
+    )
     def post(self, request):
         """Создание заказа из товаров корзины."""
 
@@ -38,8 +37,8 @@ class OrderAPIView(APIView):
         cart_service.remove_cart(user)
         return Response(serializer.data)
 
-    @staticmethod
-    def get(request):
+    @swagger_auto_schema(responses={"200": OrderSerializer(many=True)},)
+    def get(self, request):
         """Получение списка заказов пользователя."""
         orders = Order.objects.filter(user=request.user)
         serializer = OrderSerializer(orders, many=True)
@@ -48,8 +47,8 @@ class OrderAPIView(APIView):
 
 class OrderOneAPIView(APIView):
     """Представление для одного заказа."""
-    @staticmethod
-    def get(request, pk):
+    @swagger_auto_schema(responses={"200": OrderSerializer()},)
+    def get(self, request, pk):
         """Получение заказа."""
         order = get_object_or_404(Order, id=pk)
         serializer = OrderSerializer(order)
@@ -58,6 +57,14 @@ class OrderOneAPIView(APIView):
 
 class CartAPIView(APIView):
     """Представление для корзины"""
+    @swagger_auto_schema(
+        responses={
+            "201": openapi.Response(
+                description="Отправить в корзину список фотолиний с указаний внутри каждой фото, типа фото, количества"
+            )
+        },
+        request_body=PhotoLineCartSerializer
+    )
     def post(self, request):
         """Добавление в корзину списка фотолиний"""
         serializer = PhotoLineCartSerializer(request.data, many=True)
@@ -74,8 +81,8 @@ class CartAPIView(APIView):
 
         return Response(serializer.data)
 
-    @staticmethod
-    def get(request):
+    @swagger_auto_schema(responses={"200": PhotoLineCartSerializer(many=True)},)
+    def get(self, request):
         """Показать корзину."""
         cart = CartService(request)
         cart_list = cart.get_cart_list(request.user)
