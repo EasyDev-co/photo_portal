@@ -119,7 +119,7 @@ export const Login = () => {
                 <button className={styles.authButton}>Продолжить</button>
               </form>
               <div className={styles.loginLinkWrap}>
-                <p>Еще не усели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}>Зарегистрируйтесь</span> </Link></p>
+                <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}>Зарегистрируйтесь</span> </Link></p>
                 <div className={styles.socialList}>
                   <span>Войти через</span>
                   <div className={styles.socialWrap}>
