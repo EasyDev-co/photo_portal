@@ -11,6 +11,15 @@ class OrderItemInline(admin.TabularInline):
     verbose_name_plural = 'Части заказа'
     readonly_fields = ('photo_img',)
 
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     @admin.display(description='Фото')
     def photo_img(self, obj):
         return mark_safe(f'<img src="{obj.photo.photo.url}" width="200" height="200" />')
@@ -23,23 +32,32 @@ class OrderAdmin(admin.ModelAdmin):
         'order_price',
         'user',
         'kindergarten',
+        'photo_line',
         'status',
         'is_digital',
+        'is_photobook',
         'created',
         'modified',
     )
-    list_filter = ('status', 'kindergarten')
-    search_fields = ('user__email',)
-    raw_id_fields = ('user', 'kindergarten')
+    list_filter = ('status', 'photo_line', 'is_digital')
+    search_fields = ('user__email', 'photo_line__kindergarten__name')
     ordering = ('created', 'modified')
     readonly_fields = (
+        'id',
         'order_price',
+        'user',
+        'photo_line',
+        'is_digital',
+        'is_photobook',
         'created',
         'modified',
     )
     inlines = [
         OrderItemInline
     ]
+
+    def kindergarten(self, instance):
+        return instance.photo_line.kindergarten
 
 
 @admin.register(OrderItem)
@@ -58,6 +76,12 @@ class OrderItemAdmin(admin.ModelAdmin):
     ordering = ('created', 'modified')
     search_fields = ('order__id', 'order__user__email')
     readonly_fields = (
+        'id',
+        'photo_type',
+        'amount',
+        'price',
+        'order',
+        'photo',
         'created',
         'modified',
     )
