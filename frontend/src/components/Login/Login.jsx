@@ -102,6 +102,7 @@ export const Login = () => {
                   isNone
                   isAuthForm
                   value={inputValue.email}
+                  error={error.non_field_errors}
                 />
                 <InputField
                   name={'password'}
