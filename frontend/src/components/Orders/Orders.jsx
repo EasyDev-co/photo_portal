@@ -15,13 +15,21 @@ export const Orders = () => {
   const addPhoto = useSelector(state => state.user.photos);
   const [photos, setPhotos] = useState({
     photos:
-      []
+      [
+        // { number: 3, photo: 'http://127.0.0.1/media/photo/mDdYZD0X1jM.jpg' },
+        // { number: 1, photo: 'http://127.0.0.1/media/photo/dC_z3tfsKjM.jpg' },
+        // { number: 5, photo: 'http://127.0.0.1/media/photo/t5Yl1EfyFTM.jpg' },
+        // { number: 4, photo: 'http://127.0.0.1/media/photo/R68dnExfmHA.jpg' },
+        // { number: 6, photo: 'http://127.0.0.1/media/photo/thtWvQLxung.jpg' },
+        // { number: 2, photo: 'http://127.0.0.1/media/photo/DU1r0HB2i-E.jpg' }
+      ]
   });
   const photoLineId = useSelector(state => state.user.photoLineId)
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
   const { isAuth } = useAuth();
+  const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -31,6 +39,7 @@ export const Orders = () => {
         const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
         const data = await response.json();
         setPhotos(data);
+        console.log(data)
         dispatch(addPhotoLine(data.photos));
       } catch (error) {
         console.log(error)
@@ -80,20 +89,19 @@ export const Orders = () => {
         ['photo_type']: Number(name)
       }
     ))
-    const newInput = (data) => ({ ...data, [name]: count, });
 
+    const newInput = (data) => ({ ...data, [name]: count, });
     setInputValue(newInput);
   };
 
-  const getChangeData = (e) => {
-    console.log(e)
-  }
   const cartList = useSelector(state => state.user.cartList)
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const uniqueByPhotoType = arr => Object.values(arr.reduce((acc, obj) => (!acc[obj.id] || !acc[obj.id][obj.photo_type] || acc[obj.id][obj.photo_type].quantity < obj.quantity) ? { ...acc, [obj.id]: { ...acc[obj.id], [obj.photo_type]: obj } } : acc, {})).reduce((res, subObj) => [...res, ...Object.values(subObj)], []);
+    const data = uniqueByPhotoType(cartList)
+    console.log(e)
 
-    console.log(uniqueByPhotoType(cartList))
   };
 
   const [isBlur, setIsBlur] = useState(false);
@@ -129,10 +137,15 @@ export const Orders = () => {
                     photo={photo.photo}
                     onChangeHandler={onChangeHandler}
                     inputValue={inputValue}
-                    getChangeData={getChangeData}
                   />
                 )
               })}
+              <div className={styles.bookCheckbox}>
+                <div className={styles.bookDescr}>
+                  Фотокнига
+                </div>
+                <input id="bookCheckbox" name="checkbox" onChange={(e) => onChangeHandler(e.target.checked)} type="checkbox" />
+              </div>
             </div>
             {blocks.map((block, i) => (
               <div key={i}>
@@ -147,13 +160,18 @@ export const Orders = () => {
                         photo={elem.photo}
                         onChangeHandler={onChangeHandler}
                         inputValue={inputValue}
-                        getChangeData={getChangeData}
                       />
                     )
                   })}
                 </div>
                 <div className={styles.addBtnWrap}>
                   <button className={styles.deleteBlockBtn} onClick={() => deleteBlock(block.id)}>Удалить блок</button>
+                </div>
+                <div className={styles.bookCheckbox}>
+                  <div className={styles.bookDescr}>
+                    Фотокнига
+                  </div>
+                  <input id="bookCheckbox" name="checkbox" onChange={(e) => onChangeHandler(e)} type="checkbox" />
                 </div>
               </div>
             ))}

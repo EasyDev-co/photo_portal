@@ -1,12 +1,13 @@
 import { useState, useRef } from "react";
 import styles from './Counter.module.css'
 
-const Counter = ({ onChangeHandler, inputValue, name, id, number, photoId}) => {
+const  Counter = ({ onChangeHandler, inputValue, name, id, number, photoId}) => {
     const [count, setCount] = useState(0);
     const inputRef = useRef(null);
     const [showBtn, setShowBtn] = useState(false);
     
     const increment = () => {
+        
         setCount(prevCount => prevCount + 1);
         const siblingInput = inputRef.current.name;
         if (siblingInput) {

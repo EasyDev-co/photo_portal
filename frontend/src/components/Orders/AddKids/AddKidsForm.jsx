@@ -10,7 +10,7 @@ import { useClickOutside } from '../../../utils/useClickOutside';
 const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
 
     const addPhoto = useSelector(state => state.user.photos);
-    const [error,setError] = useState(false);
+    const [error, setError] = useState(false);
     const photosLine = useSelector(state => state.user.photosLine);
     const activeRef = useRef(null);
 
@@ -41,7 +41,7 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
     const onSubmitHandler = async (e) => {
 
         e.preventDefault();
-        console.log([...addPhoto, ...photosLine])
+        // console.log([...addPhoto, ...photosLine])
         if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
             setInputValue({
                 addKids: ''
@@ -50,32 +50,29 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
             return;
         }
 
-        inputValue.addKids.split(',').forEach(num => {
-            tokenRefreshCreate()
-                .then(res => res.json())
-                .then(res => {
-                    if (res.refresh) {
-                        setCookie('refresh', res.refresh);
-                        dispatch(
-                            setAccessToken(res.access)
-                        )
-                    }
-                    return res.access
-                })
-                .then(access => {
-                    getOnePhoto(num, access)
-                        .then(res => res.json())
-                        .then(res => {
-                            dispatch(addPhotos(res))
-                        })
-                })
-        });
+        tokenRefreshCreate()
+            .then(res => res.json())
+            .then(res => {
+                if (res.refresh) {
+                    setCookie('refresh', res.refresh);
+                    dispatch(
+                        setAccessToken(res.access)
+                    )
+                }
+                return res.access
+            })
+            .then(access => {
+                getOnePhoto(inputValue.addKids.split(','), access)
+                    .then(res => res.json())
+                    .then(res => {
+                        dispatch(addPhotos(res))
+                    })
+            })
         setError(false);
         addBlock();
         setInputValue({
             addKids: ''
         });
-
 
     }
 
@@ -86,9 +83,9 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 <div>
                     <input onChange={(e) => onChangeHandler(e)} name='addKids' value={inputValue.addKids} className={styles.addKidsInput} type="text" />
                 </div>
-                {error && 
+                {error &&
                     <div className={styles.errorMessage}>
-                        Номера фотографий которые вы ввели уже добавлены, введите другие номер! 
+                        Номера фотографий которые вы ввели уже добавлены, введите другие номер!
                     </div>}
             </div>
             <button className={styles.addKidsBtn}>Добавить</button>

@@ -2,14 +2,14 @@ import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
-export const userPartialUpdate = async (acces, obj) => {
+export const userPartialUpdate = async (access, obj) => {
     const url = `${localUrl}/api/v1/user/`;
 
     const response = await fetch(url, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${acces}`
+            'Authorization': `Bearer ${access}`
         },
         body: JSON.stringify(obj)
     });

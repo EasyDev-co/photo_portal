@@ -2,7 +2,7 @@ import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
-export const getPhotoPrice = async (acces,region) => {
+export const getPhotoPrice = async (access,region) => {
     const url = `${localUrl}/api/v1/photo_price_by_region/`;
 
     const sendData = {
@@ -12,7 +12,7 @@ export const getPhotoPrice = async (acces,region) => {
         method:"POST",
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${acces}`
+            'Authorization': `Bearer ${access}`
         },
         body: JSON.stringify(sendData)
 

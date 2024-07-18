@@ -44,7 +44,6 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                 <Counter
                     photoId={photoId}
                     number={number}
-                    getChangeData={getChangeData}
                     name={1}
                     id={'10x15'}
                     inputValue={inputValue["10x15"]}
@@ -53,7 +52,6 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                 <Counter
                 photoId={photoId}
                     number={number}
-                    getChangeData={getChangeData}
                     name={2}
                     id={'15x20'}
                     inputValue={inputValue["15x20"]}
@@ -62,7 +60,6 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                 <Counter
                 photoId={photoId}
                     number={number}
-                    getChangeData={getChangeData}
                     name={3}
                     id={'20x30'}
                     inputValue={inputValue["20x30"]}
@@ -71,28 +68,17 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                 <Counter
                 photoId={photoId}
                     number={number}
-                    getChangeData={getChangeData}
                     name={4}
                     id={'Магнит'}
                     inputValue={inputValue.magnet}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                photoId={photoId}
+                    photoId={photoId}
                     number={number}
-                    getChangeData={getChangeData}
                     name={5}
                     id={'Календарь'}
                     inputValue={inputValue.calendar}
-                    onChangeHandler={onChangeHandler}
-                />
-                <Counter
-                photoId={photoId}
-                    number={number}
-                    getChangeData={getChangeData}
-                    name={0}
-                    id={'Фотокнига'}
-                    inputValue={inputValue.photo_book}
                     onChangeHandler={onChangeHandler}
                 />
             </form>
