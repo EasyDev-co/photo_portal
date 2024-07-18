@@ -150,6 +150,7 @@ export const Orders = () => {
             {blocks.map((block, i) => (
               <div key={i}>
                 <div className={styles.photoCardsWrap}>
+                  {console.log(addPhoto)}
                   {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem, i) => {
                     return (
                       <PhotoCard

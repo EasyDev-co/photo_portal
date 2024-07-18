@@ -59,7 +59,10 @@ const authSlice = createSlice({
             state.access = action.payload;
         },
         addPhotos(state, action) {
-            state.photos.push(action.payload);
+            console.log(action.payload.photos)
+            console.log(action.payload)
+            // state.photos = [...state.photos, ...action.payload.photos]
+            // state.photos.push(action.payload);
         },
         addUserData(state, action) {
             state.userData = action.payload;

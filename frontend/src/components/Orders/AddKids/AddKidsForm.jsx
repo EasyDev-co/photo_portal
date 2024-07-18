@@ -39,7 +39,7 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
     }
 
     const onSubmitHandler = async (e) => {
-
+        const arr = inputValue.addKids.split(',').map(elem=>Number(elem))
         e.preventDefault();
         // console.log([...addPhoto, ...photosLine])
         if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
@@ -62,14 +62,18 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 return res.access
             })
             .then(access => {
-                getOnePhoto(inputValue.addKids.split(','), access)
-                    .then(res => res.json())
+                getOnePhoto(arr, access)
                     .then(res => {
-                        dispatch(addPhotos(res))
+                        if(res.ok){
+                            dispatch(addPhotos(res))
+                            addBlock();
+                        } else{
+                            setError(true);
+                        }
                     })
+                    setError(false);
+                    dispatch(addPhotos([]))
             })
-        setError(false);
-        addBlock();
         setInputValue({
             addKids: ''
         });
