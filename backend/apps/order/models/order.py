@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ValidationError
 
+from apps.photo.models import PhotoLine
 from apps.utils.models_mixins.models_mixins import TimeStampedMixin
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -29,15 +30,19 @@ class Order(TimeStampedMixin):
         related_name="orders",
         verbose_name="Пользователь",
     )
-    kindergarten = models.ForeignKey(
-        Kindergarten,
+    photo_line = models.OneToOneField(
+        PhotoLine,
         on_delete=models.PROTECT,
         related_name="orders",
-        verbose_name="Детский сад",
+        verbose_name="Фотолиния",
     )
     is_digital = models.BooleanField(
         default=False,
         verbose_name="Электронные фотографии",
+    )
+    is_photobook = models.BooleanField(
+        default=False,
+        verbose_name="Фотокнига",
     )
     status = models.PositiveSmallIntegerField(
         choices=OrderStatus.choices,

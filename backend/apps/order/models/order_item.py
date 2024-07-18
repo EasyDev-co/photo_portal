@@ -43,7 +43,7 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
     @property
     @admin.display(description='Цена')
     def price(self):
-        region = self.order.kindergarten.region
+        region = self.order.photo_line.kindergarten.region
         try:
             photo_price = region.photo_prices.get(photo_type=self.photo_type).price
             price = self.amount * photo_price

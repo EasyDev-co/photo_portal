@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -35,11 +36,11 @@ class PhotoRetrieveAPIView(RetrieveAPIView):
 
 
 class PhotoLineGetByPhotoNumberAPIView(APIView):
-    """Представление для получения фотолинии по номерам фото."""
+    """Получение фотолинии по номерам фото."""
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
 
-    @staticmethod
-    def get(request):
+    @swagger_auto_schema(responses={"200": PhotoLineSerializer()}, )
+    def post(self, request):
         """Получение фотолинии по id"""
         photo_numbers = request.data['numbers']
         first_photo = get_object_or_404(Photo, number=photo_numbers[0])
@@ -53,14 +54,15 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
 
 
 class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
-    """Представление для получения одной фотолинии или указания родителя в фотолинии."""
+    """Получение одной фотолинии или обновления родителя фотолинии."""
+    http_method_names = ('get', 'patch')
     serializer_class = PhotoLineSerializer
     queryset = PhotoLine.objects.all()
-    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
+    permission_classes = [IsAuthenticated]
 
 
 class PhotoLinesGetByParent(ListAPIView):
-    """Представление для получения всех фотолиний родителя"""
+    """Получение всех фотолиний родителя"""
     serializer_class = PhotoLineSerializer
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
     lookup_field = 'parent'
@@ -68,15 +70,6 @@ class PhotoLinesGetByParent(ListAPIView):
     def get_queryset(self):
         parent = self.request.user
         return PhotoLine.objects.filter(parent=parent, photo_theme__is_active=True)
-
-
-class PhotoLineRetrieveAPIView(RetrieveAPIView):
-    """
-    Получение линии фотографий.
-    """
-    serializer_class = PhotoLineSerializer
-    queryset = PhotoLine.objects.prefetch_related('photos').all()
-    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
 
 
 class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):

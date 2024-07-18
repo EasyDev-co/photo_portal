@@ -1,21 +1,42 @@
+from decimal import Decimal
+
+import loguru
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
 
+from apps.kindergarten.models import PhotoPrice, PhotoType
 from apps.order.models import Order, OrderItem
 from apps.order.models.const import OrderStatus
+from apps.photo.models import Photo, PhotoLine
 from apps.user.models.user import UserRole
+
+User = get_user_model()
 
 
 class PhotoCartSerializer(serializers.Serializer):
-    photo_id = serializers.CharField()
+    id = serializers.CharField()
     photo_type = serializers.IntegerField()
     quantity = serializers.IntegerField()
-    price_per_piece = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
-    kindergarten_id = serializers.CharField(required=False)
+    price_per_piece = serializers.SerializerMethodField()
+    discount_price = serializers.CharField(required=False)
+
+    @staticmethod
+    def get_price_per_piece(obj):
+        photo = get_object_or_404(Photo, id=obj['id'])
+        region = photo.photo_line.kindergarten.region
+        photo_price = get_object_or_404(PhotoPrice, region=region, photo_type=obj['photo_type'])
+        return str(photo_price.price)
 
 
-class PhotoCartRemoveSerializer(serializers.Serializer):
-    photo_id = serializers.CharField()
-    photo_type = serializers.IntegerField()
+class PhotoLineCartSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    photos = PhotoCartSerializer(many=True)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    is_digital = serializers.BooleanField(default=False)
+    is_photobook = serializers.BooleanField()
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
     """Сериализатор для получения позиций (частей) заказа."""
@@ -39,7 +60,7 @@ class OrderSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_is_more_ransom_amount(obj):
         """Метод для проверки превышения суммы выкупа."""
-        ransom_amount = obj.kindergarten.region.ransom_amount
+        ransom_amount = obj.photo_line.kindergarten.region.ransom_amount
         if obj.order_price >= ransom_amount:
             return True
         return False
