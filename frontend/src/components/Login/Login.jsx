@@ -116,7 +116,7 @@ export const Login = () => {
                   <img src={danger} alt="" />
                   <span>Пароль введен неверно</span>
                 </div>}
-                <Link to={'/password-reset'}><span onClick={() => setIsActiveReset(!isActiveReset)} className={styles.resetPass}>Восстановить пароль</span></Link>
+                <Link to={'/password-reset'}> <span onClick={() => setIsActiveReset(!isActiveReset)} className={styles.resetPass}>Восстановить пароль</span></Link>
                 <button className={styles.authButton}>Продолжить</button>
               </form>
               <div className={styles.loginLinkWrap}>
