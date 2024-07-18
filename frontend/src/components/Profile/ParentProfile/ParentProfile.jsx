@@ -21,7 +21,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     useClickOutside(codeRef, () => {
         setCodeWindow(false)
     })
-
+    const [error, setError] = useState();
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
 
@@ -74,6 +74,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
             .then(res=>{
                 console.log(res)
                 // dispatch(addUserData(res))
+            })
+            .catch(res=>{
+                console.log(res)
+                setError(res)
             })
 
         if (resetPassActive) {
