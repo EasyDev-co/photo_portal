@@ -3,7 +3,7 @@ import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 
 export const getUserData = async (access, signal) => {
-    const url = `http://127.0.0.1:8080/api/v1/user/`;
+    const url = `https://photodetstvo.easydev-program.com/api/v1/user/`;
 
     const response = await fetch(url, {
         headers: {
