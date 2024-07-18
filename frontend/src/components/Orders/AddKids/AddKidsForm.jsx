@@ -64,14 +64,19 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 })
                 .then(access => {
                     getOnePhoto(num, access)
-                        .then(res => res.json())
                         .then(res => {
-                            dispatch(addPhotos(res))
+                            if(res.ok){
+                                res.json()
+                                .then(res=>dispatch(addPhotos(res)))
+                                addBlock();
+                            } else{
+                                setError(true);
+                            }
                         })
+                        
                 })
         });
         setError(false);
-        addBlock();
         setInputValue({
             addKids: ''
         });
@@ -88,7 +93,7 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 </div>
                 {error && 
                     <div className={styles.errorMessage}>
-                        Номера фотографий которые вы ввели уже добавлены, введите другие номер! 
+                        Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер! 
                     </div>}
             </div>
             <button className={styles.addKidsBtn}>Добавить</button>
