@@ -58,6 +58,7 @@
     width:436px;
     display: flex;
     position: relative;
+    flex-direction: column;
 }
 @media screen and (max-width: 460px) {
     .inputFieldWrap{

@@ -13,7 +13,7 @@ import { useClickOutside } from "../../../utils/useClickOutside";
 import { parentVerifyResetCode } from "../../../http/parentVerifyResetCode";
 import { parentChangePass } from "../../../http/parentChangePass";
 
-import {fetchUserPartialUpdateWithTokenInterceptor} from '../../../http/userPartialUpdate'
+import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/userPartialUpdate'
 const ParentProfile = ({ nurseryIsAuth }) => {
 
     const [codeWindowActive, setCodeWindow] = useState(false)
@@ -21,7 +21,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     useClickOutside(codeRef, () => {
         setCodeWindow(false)
     })
-    const [error, setError] = useState();
+    const [error, setError] = useState({
+        phone_number:'',
+        message:''
+    });
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
 
@@ -63,22 +66,36 @@ const ParentProfile = ({ nurseryIsAuth }) => {
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
-        fetchUserPartialUpdateWithTokenInterceptor(accessStor,{
-                email: inputValue.parentEmail,
-                first_name: inputValue.parentName,
-                second_name: inputValue.second_name,
-                last_name: inputValue.parentSurname,
-                phone_number: inputValue.parentPhone
+        fetchUserPartialUpdateWithTokenInterceptor(accessStor, {
+            email: inputValue.parentEmail,
+            first_name: inputValue.parentName,
+            second_name: inputValue.second_name,
+            last_name: inputValue.parentSurname,
+            phone_number: inputValue.parentPhone
+        })
+            .then(res => {
+                if (!res.ok) {
+                    res.json()
+                    .then(res=>{
+                        console.log(res)
+                        setError(res)
+                    })
+                   
+                } else {
+                    res.json()
+                    .then(res=>{
+                        console.log(res)
+                    })
+                }
             })
-            .then(res=>res.json())
-            .then(res=>{
-                console.log(res)
-                // dispatch(addUserData(res))
-            })
-            .catch(res=>{
-                console.log(res)
-                setError(res)
-            })
+            // .then(res => {
+            //     console.log(res)
+            //     // dispatch(addUserData(res))
+            // })
+            // .catch(res => {
+            //     console.log(res)
+            //     setError(res)
+            // })
 
         if (resetPassActive) {
             parentResetPassCreate(inputValue.resetEmail)
@@ -190,6 +207,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentPhone}
                         isPencil
                         onChangeHandler={onChangeHandler}
+                        error={error.phone_number}
                     />
                     <InputField
                         placeholder={"mail@mail.ru"}
@@ -200,6 +218,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         value={inputValue.parentEmail}
                         isPencil
                         onChangeHandler={onChangeHandler}
+                        error={error.message ? [error.message] : error.message}
                     />
 
                 </div>
