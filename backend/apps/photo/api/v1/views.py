@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.decorators import action
 
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -41,7 +40,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
 
     @swagger_auto_schema(responses={"200": PhotoLineSerializer()}, )
-    def get(self, request):
+    def post(self, request):
         """Получение фотолинии по id"""
         photo_numbers = request.data['numbers']
         first_photo = get_object_or_404(Photo, number=photo_numbers[0])
@@ -59,7 +58,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
     http_method_names = ('get', 'patch')
     serializer_class = PhotoLineSerializer
     queryset = PhotoLine.objects.all()
-    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
+    permission_classes = [IsAuthenticated]
 
 
 class PhotoLinesGetByParent(ListAPIView):
