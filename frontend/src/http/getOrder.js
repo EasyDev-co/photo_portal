@@ -1,10 +1,9 @@
 import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
-import { patchPhotoLine } from "./patchPhotoLine";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
-export const getPhotoLine = async (id, access) => {
-    const url = `${localUrl}/api/v1/photo/photo_line/${id}/`;
+export const getOrder = async (access) => {
+    const url = `${localUrl}/api/v1/order/`;
 
     const response = await fetch(url, {
         headers: {
@@ -15,20 +14,18 @@ export const getPhotoLine = async (id, access) => {
     return response;
 }
 
-export const fetchWithTokenInterceptor = async (id, access) => {
+export const fetchGetOrderWithTokenInterceptor = async (access) => {
     try {
-        let response = await getPhotoLine(id, access)
+        let response = await getOrder(access)
         if (response.status === 401 || response.status === 403)  {
             localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
-                        console.log(res)
                         setCookie('refresh', res.refresh);
-
                         localStorage.setItem('access', res.access);
-                        response = getPhotoLine(id, res.access);
+                        response = getOrder(res.access);
                     })
             }
 

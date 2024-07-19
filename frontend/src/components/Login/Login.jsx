@@ -101,6 +101,7 @@ export const Login = () => {
                   isNone
                   isAuthForm
                   value={inputValue.email}
+                  error={error.non_field_errors}
                 />
                 <InputField
                   name={'password'}
@@ -114,11 +115,11 @@ export const Login = () => {
                   <img src={danger} alt="" />
                   <span>Пароль введен неверно</span>
                 </div>}
-                <Link to={'/password-reset'}><span onClick={() => setIsActiveReset(!isActiveReset)} className={styles.resetPass}>Восстановить пароль</span></Link>
+                <Link to={'/password-reset'}> <span onClick={() => setIsActiveReset(!isActiveReset)} className={styles.resetPass}>Восстановить пароль</span></Link>
                 <button className={styles.authButton}>Продолжить</button>
               </form>
               <div className={styles.loginLinkWrap}>
-                <p>Еще не усели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}>Зарегистрируйтесь</span> </Link></p>
+                <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}>Зарегистрируйтесь</span> </Link></p>
                 <div className={styles.socialList}>
                   <span>Войти через</span>
                   <div className={styles.socialWrap}>

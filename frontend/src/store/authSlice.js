@@ -59,13 +59,21 @@ const authSlice = createSlice({
             state.access = action.payload;
         },
         addPhotos(state, action) {
-            console.log(action.payload.photos)
-            console.log(action.payload)
-            // state.photos = [...state.photos, ...action.payload.photos]
-            // state.photos.push(action.payload);
+            const data = {  
+                photos: action.payload.photos.flat()
+            }
+            const updateData = {
+                ...data,
+                photos: data.photos.map(photo=> ({
+                    ...photo,
+                    photoLineId: action.payload.id
+                }))
+            }
+            state.photos.push(...updateData.photos);
         },
         addUserData(state, action) {
             state.userData = action.payload;
+            localStorage.setItem('idP', action.payload.id);
             localStorage.setItem('first_name', action.payload.first_name);
             localStorage.setItem('last_name', action.payload.last_name);
             localStorage.setItem('second_name', action.payload.second_name);
@@ -86,7 +94,17 @@ const authSlice = createSlice({
             state.resetDataUser.newPass = action.payload.newPass;
         },
         addPhotoLine(state, action) {
-            state.photosLine = action.payload;
+            const data = {  
+                photos: action.payload.photos.flat()
+            }
+            const updateData = {
+                ...data,
+                photos: data.photos.map(photo=> ({
+                    ...photo,
+                    photoLineId: action.payload.id
+                }))
+            }
+            state.photosLine = updateData.photos;
         },
         addQrIdPhoto(state, action) {
             state.photoLineId = action.payload
@@ -97,8 +115,7 @@ const authSlice = createSlice({
         }
         ,
         addCartList(state, action){
-            state.cartList.push(action.payload)
-            // console.log(state.cartList)
+            state.cartList.push(action.payload);
         }
     }
 });

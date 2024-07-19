@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { memo, useRef, useState} from 'react';
 import styles from './AddKids.module.css'
 import { tokenRefreshCreate } from '../../../http/tokenRefreshCreate';
 import { setCookie } from '../../../utils/setCookie';
@@ -6,13 +6,14 @@ import { addPhotos, setAccessToken } from '../../../store/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOnePhoto } from '../../../http/getOnePhoto';
 import { useClickOutside } from '../../../utils/useClickOutside';
-
-const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
+import { patchPhotoLine } from '../../../http/patchPhotoLine';
+const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
 
     const addPhoto = useSelector(state => state.user.photos);
     const [error, setError] = useState(false);
     const photosLine = useSelector(state => state.user.photosLine);
     const activeRef = useRef(null);
+    const idP = localStorage.getItem('idP');
 
     useClickOutside(activeRef, () => {
         setIsActiveForm(false)
@@ -65,14 +66,19 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 getOnePhoto(arr, access)
                     .then(res => {
                         if(res.ok){
-                            dispatch(addPhotos(res))
-                            addBlock();
+                            res.json()
+                            .then(res=>{
+                                dispatch(addPhotos(res))
+                                addBlock();
+                                patchPhotoLine(access,{
+                                    "parent": idP
+                                  },res.id)
+                            })
                         } else{
                             setError(true);
                         }
                     })
                     setError(false);
-                    dispatch(addPhotos([]))
             })
         setInputValue({
             addKids: ''
@@ -89,12 +95,12 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 </div>
                 {error &&
                     <div className={styles.errorMessage}>
-                        Номера фотографий которые вы ввели уже добавлены, введите другие номер!
+                        Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер! 
                     </div>}
             </div>
             <button className={styles.addKidsBtn}>Добавить</button>
         </form>
     );
-}
+})
 
 export default AddKidsForm;

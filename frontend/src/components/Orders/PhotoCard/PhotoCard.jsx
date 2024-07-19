@@ -4,7 +4,7 @@ import Counter from './Counter/Counter';
 import { useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '../../../utils/useClickOutside';
 
-const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData,photoId}) => {
+const PhotoCard = ({ isChecked, photoLineId, onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData, photoId }) => {
     const [isScale, setIsScale] = useState(false);
     const [count, setCount] = useState(0);
 
@@ -42,6 +42,8 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
             </div>
             <form id={number} className={styles.photoCountersCardsWrapper}>
                 <Counter
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
                     photoId={photoId}
                     number={number}
                     name={1}
@@ -50,7 +52,9 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                photoId={photoId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
                     number={number}
                     name={2}
                     id={'15x20'}
@@ -58,7 +62,9 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                photoId={photoId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
                     number={number}
                     name={3}
                     id={'20x30'}
@@ -66,7 +72,9 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                photoId={photoId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
                     number={number}
                     name={4}
                     id={'Магнит'}
@@ -74,6 +82,8 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
                     photoId={photoId}
                     number={number}
                     name={5}

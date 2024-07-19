@@ -22,8 +22,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         setCodeWindow(false)
     })
     const [error, setError] = useState({
-        phone_number:'',
-        message:''
+        phone_number: '',
+        message: ''
     });
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
@@ -76,26 +76,29 @@ const ParentProfile = ({ nurseryIsAuth }) => {
             .then(res => {
                 if (!res.ok) {
                     res.json()
-                    .then(res=>{
-                        console.log(res)
-                        setError(res)
-                    })
-                   
+                        .then(res => {
+                            console.log(res)
+                            setError(res)
+                        })
+
                 } else {
                     res.json()
-                    .then(res=>{
-                        console.log(res)
-                    })
+                        .then(res => {
+                            setError({
+                                phone_number: '',
+                                message: ''
+                            })
+                        })
                 }
             })
-            // .then(res => {
-            //     console.log(res)
-            //     // dispatch(addUserData(res))
-            // })
-            // .catch(res => {
-            //     console.log(res)
-            //     setError(res)
-            // })
+        // .then(res => {
+        //     console.log(res)
+        //     // dispatch(addUserData(res))
+        // })
+        // .catch(res => {
+        //     console.log(res)
+        //     setError(res)
+        // })
 
         if (resetPassActive) {
             parentResetPassCreate(inputValue.resetEmail)

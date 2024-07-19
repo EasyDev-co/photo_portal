@@ -1,75 +1,36 @@
 import styles from "./Orders.module.css";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PhotoCard from "./PhotoCard/PhotoCard";
-import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer'
+import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
 import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
-import { fetchWithTokenInterceptor } from '../../http/getPhotoLine'
+import { fetchWithTokenInterceptor } from '../../http/getPhotoLine';
 import Scaner from "../Scaner/Scaner";
 import { addCartList, addPhotoLine } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
+import Block from "./PhotoCard/PhotoBlock/Block";
+import { transformData } from "./PhotoCard/utils/utils";
+import { patchPhotoLine } from "../../http/patchPhotoLine";
+import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
+import { orderCreate } from "../../http/orderCreate";
 
 export const Orders = () => {
   const dispatch = useDispatch();
   const addPhoto = useSelector(state => state.user.photos);
-  const [photos, setPhotos] = useState({
-    photos:
-      [
-        // { number: 3, photo: 'http://127.0.0.1/media/photo/mDdYZD0X1jM.jpg' },
-        // { number: 1, photo: 'http://127.0.0.1/media/photo/dC_z3tfsKjM.jpg' },
-        // { number: 5, photo: 'http://127.0.0.1/media/photo/t5Yl1EfyFTM.jpg' },
-        // { number: 4, photo: 'http://127.0.0.1/media/photo/R68dnExfmHA.jpg' },
-        // { number: 6, photo: 'http://127.0.0.1/media/photo/thtWvQLxung.jpg' },
-        // { number: 2, photo: 'http://127.0.0.1/media/photo/DU1r0HB2i-E.jpg' }
-      ]
-  });
-  const photoLineId = useSelector(state => state.user.photoLineId)
+  const photoLineId = useSelector(state => state.user.photoLineId);
+  const photoLine = useSelector(state => state.user.photosLine);
+  const cartList = useSelector(state => state.user.cartList);
+
+  const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
+  const idP = localStorage.getItem('idP');
   const { isAuth } = useAuth();
-  const [isChecked, setIsChecked] = useState(false);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-    const fetchData = async () => {
-      try {
-        const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
-        const data = await response.json();
-        setPhotos(data);
-        console.log(data)
-        dispatch(addPhotoLine(data.photos));
-      } catch (error) {
-        console.log(error)
-        if (error.name === 'AbortError') {
-          console.log('Fetch запрос был отменен');
-        } else {
-          console.error('Произошла ошибка:', error);
-        }
-      }
-    };
-    if (isAuth) {
-      fetchData();
-    }
-    return () => {
-      abortController.abort();
-    };
-  }, []);
-
   const [blocks, setBlocks] = useState([]);
-
-  const addBlock = () => {
-    if (blocks.length < 2) {
-      setBlocks([...blocks, { id: blocks.length + 1 }]);
-    }
-  };
-
-  const deleteBlock = (id) => {
-    const filteredBlocks = blocks.filter((block) => block.id !== id);
-    setBlocks(filteredBlocks);
-  };
+  const [isChecked, setIsChecked] = useState(false);
+  const [orderValue, setOrderValue] = useState([]);
 
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
@@ -79,141 +40,184 @@ export const Orders = () => {
     calendar: 0,
     photo_book: 0
   });
-
-  const onChangeHandler = (name, count, number, photoId) => {
-
-    dispatch(addCartList(
-      {
-        ['quantity']: count,
-        ['id']: photoId,
-        ['photo_type']: Number(name)
-      }
-    ))
-
-    const newInput = (data) => ({ ...data, [name]: count, });
-    setInputValue(newInput);
-  };
-
-  const cartList = useSelector(state => state.user.cartList)
-
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    const uniqueByPhotoType = arr => Object.values(arr.reduce((acc, obj) => (!acc[obj.id] || !acc[obj.id][obj.photo_type] || acc[obj.id][obj.photo_type].quantity < obj.quantity) ? { ...acc, [obj.id]: { ...acc[obj.id], [obj.photo_type]: obj } } : acc, {})).reduce((res, subObj) => [...res, ...Object.values(subObj)], []);
-    const data = uniqueByPhotoType(cartList)
-    console.log(e)
-
-  };
-
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
 
   useClickOutside(blurRef, () => {
     setIsBlur(false);
-  })
+  });
 
   const [isActiveForm, setIsActiveForm] = useState(false);
 
+  useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
+        if (response.ok) {
+          const data = await response.json();
+          setPhotos(data.photos);
+          dispatch(addPhotoLine(data));
+          patchPhotoLine(accessStor, {
+            "parent": idP
+          }, data.id)
+        }
+
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('Fetch запрос был отменен');
+        } else {
+          console.error('Произошла ошибка:', error);
+        }
+      }
+    };
+
+    if (isAuth) {
+      fetchData();
+    }
+    return () => {
+      abortController.abort();
+    };
+  }, [isAuth, photoLineId, sessionData, accessStor, dispatch]);
+
+  const addBlock = useCallback(() => {
+    if (blocks.length < 2) {
+      setBlocks(prevBlocks => [...prevBlocks, { id: blocks.length + 1 }]);
+    }
+  }, [blocks.length]);
+
+  const onChangeHandler = (name, count, photoId, isChecked, photoLineId) => {
+
+    const newValue = {
+      quantity: count,
+      id: photoId,
+      photo_type: Number(name),
+      is_photobook: isChecked,
+      photoLineId: photoLineId
+    };
+
+    setOrderValue(prev => {
+      const updatedState = [...prev];
+      // Ищем совпадающий объект по id и photo_type
+      const existingIndex = updatedState.findIndex(
+        item => item.id === photoId && item.photo_type === newValue.photo_type
+      );
+
+      if (existingIndex !== -1) {
+        // Если объект существует, обновляем его
+        updatedState[existingIndex] = newValue;
+      } else {
+        // Если объект не существует, добавляем его
+        updatedState.push(newValue);
+      }
+
+      return updatedState;
+    });
+
+    setInputValue(prevInput => ({ ...prevInput, [name]: count }));
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    const transformedData = transformData(orderValue, false);
+    console.log(transformedData)
+
+    const response = await fetchCartCreateWithTokenInterceptor(accessStor, transformedData);
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data)
+      const order = await orderCreate(accessStor)
+      if(order.ok){
+        const data = await order.json();
+        console.log(data)
+      } else {
+        const data = await order.json();
+        console.log(data)
+      }
+    } else {
+      const data = await response.json();
+      console.log(data)
+    }
+  };
+
   return (
     <div className={styles.ordersWrap}>
-      <Scaner
-        isAuth
-        scanActive={scanActive}
-        setScanActive={setScanActive}
-      />
+      <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
       <div className={styles.orderWidggetWrap}>
         <div className={styles.orderWidggetContainer}>
-          <h1 className={styles.profileTitle}>Выбор фотографии  <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button></h1>
-          <div key={photos.length} id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
+          <h1 className={styles.profileTitle}>Выбор фотографии
+            <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
+          </h1>
+          <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <div ref={blurRef} className={styles.photoCardsWrap}>
-              {photos.photos?.map((photo, i) => {
-                return (
-                  <PhotoCard
-                    onSubmitHandler={onSubmitHandler}
-                    number={photo.number}
-                    photoId={photo.id}
-                    key={i}
-                    blurRef={blurRef}
-                    setIsBlur={setIsBlur}
-                    photo={photo.photo}
-                    onChangeHandler={onChangeHandler}
-                    inputValue={inputValue}
-                  />
-                )
-              })}
+              {photoLine.map((photo, i) => (
+                <PhotoCard
+                  key={i}
+                  onSubmitHandler={onSubmitHandler}
+                  number={photo.number}
+                  photoId={photo.id}
+                  blurRef={blurRef}
+                  setIsBlur={setIsBlur}
+                  photo={photo.photo}
+                  onChangeHandler={onChangeHandler}
+                  inputValue={inputValue}
+                  photoLineId={photo.photoLineId}
+                  isChecked={isChecked}
+                />
+              ))}
               <div className={styles.bookCheckbox}>
-                <div className={styles.bookDescr}>
-                  Фотокнига
-                </div>
-                <input id="bookCheckbox" name="checkbox" onChange={(e) => onChangeHandler(e.target.checked)} type="checkbox" />
+                <div className={styles.bookDescr}>Фотокнига</div>
+                <input
+                  id="bookCheckbox"
+                  name="checkbox"
+                  type="checkbox"
+                  onChange={(e) => setIsChecked(e.target.checked)}
+                />
               </div>
             </div>
-            {blocks.map((block, i) => (
-              <div key={i}>
-                <div className={styles.photoCardsWrap}>
-                  {console.log(addPhoto)}
-                  {addPhoto?.filter((obj, index, self) => self.map(item => item.number).indexOf(obj.number) === index).map((elem, i) => {
-                    return (
-                      <PhotoCard
-                        number={elem.number}
-                        key={i}
-                        blurRef={blurRef}
-                        setIsBlur={setIsBlur}
-                        photo={elem.photo}
-                        onChangeHandler={onChangeHandler}
-                        inputValue={inputValue}
-                      />
-                    )
-                  })}
-                </div>
-                <div className={styles.addBtnWrap}>
-                  <button className={styles.deleteBlockBtn} onClick={() => deleteBlock(block.id)}>Удалить блок</button>
-                </div>
-                <div className={styles.bookCheckbox}>
-                  <div className={styles.bookDescr}>
-                    Фотокнига
-                  </div>
-                  <input id="bookCheckbox" name="checkbox" onChange={(e) => onChangeHandler(e)} type="checkbox" />
-                </div>
-              </div>
-            ))}
+            <Block
+              photos={addPhoto}
+              onChangeHandler={onChangeHandler}
+              inputValue={inputValue}
+              blurRef={blurRef}
+              setIsBlur={setIsBlur}
+            />
           </div>
-          <AddKidsForm
-            setIsActiveForm={setIsActiveForm}
-            isActiveForm={isActiveForm}
-            addBlock={addBlock}
-          />
+          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromo}>
-              <div className={styles.promoStringWrap}>
-                <div className={styles.dot}>
+              { /* Промо сообщения можно вынести в отдельный компонент, чтобы сделать код чище */}
+              {[{
+                text: "Отправить электронную версию на электронную почту",
+                input: true,
+              }, {
+                text: "При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде",
+                input: false,
+              }, {
+                text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
+                input: false,
+              }].map((promo, index) => (
+                <div key={index} className={styles.promoStringWrap}>
+                  <div className={styles.dot}></div>
+                  {promo.input ? (
+                    <div className={styles.promoInputWrapp}>
+                      <span className={styles.promoString}>{promo.text}</span>
+                      <input
+                        className={styles.promoInput}
+                        placeholder="Электронный адрес*"
+                        type="text"
+                      />
+                    </div>
+                  ) : (
+                    <span className={styles.promoString}>{promo.text}</span>
+                  )}
                 </div>
-                <div className={styles.promoInputWrapp}>
-                  <span style={styles.promoString}>
-                    Отправить электронную версию на электронную почту
-                  </span>
-                  <input className={styles.promoInput} placeholder="Электронный адрес*" type="text" />
-                </div>
-              </div>
-              <div className={styles.promoStringWrap}>
-                <div className={styles.dot}>
-                </div>
-                <span style={styles.promoString}>
-                  При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде
-                </span>
-              </div>
-              <div className={styles.promoStringWrap}>
-                <div className={styles.dot}>
-
-                </div>
-                <span style={styles.promoString}>
-                  При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок
-                </span>
-              </div>
+              ))}
             </div>
             <div className={styles.orderPromo}>
-              <span style={styles.promoString}>
-                Введите промо-код для получения скидки
-              </span>
+              <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
                 <input className={styles.promoInput} placeholder="Введите промокод" type="text" />
                 <span>Промо-код активирован</span>
@@ -226,15 +230,9 @@ export const Orders = () => {
           </div>
         </div>
         <div className={styles.paymentTimerWrap}>
-          <PaymentTimer
-            formId={'orderForm'}
-            onSubmitHandler={onSubmitHandler}
-            count={'3 500'}
-          />
+          <PaymentTimer formId={'orderForm'} onSubmitHandler={onSubmitHandler} count={'3 500'} />
         </div>
       </div>
-
     </div>
   );
-
 };

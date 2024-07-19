@@ -1,22 +1,25 @@
-const collectFormData = () => {
-    const forms = document.querySelectorAll('form'); // Получаем все формы на странице
-    const formDataArray = [];
+export function transformData(data,digital) {
+    const result = [];
 
-    forms.forEach(form => {
-        const formData = {
-            id: form.id,
-            data: {},
-        };
-        
-        // Проходим по всем элементам формы
-        Array.from(form.elements).forEach(element => {
-            if (element.name) {
-                formData.data[element.name] = element.value;
-            }
-        });
-        
-        formDataArray.push(formData);
-    });
-    
-    return formDataArray;
-};
+    const groupedByPhotoLineId = data.reduce((acc, item) => {
+        const { photoLineId, is_photobook, ...photo } = item;
+        if (!acc[photoLineId]) {
+            acc[photoLineId] = {
+                id: photoLineId,
+                photos: [],
+                is_photobook: is_photobook,
+                is_digital: digital
+            };
+        }
+        acc[photoLineId].photos.push(photo);
+        return acc;
+    }, {});
+
+    for (const key in groupedByPhotoLineId) {
+        if (groupedByPhotoLineId.hasOwnProperty(key)) {
+            result.push(groupedByPhotoLineId[key]);
+        }
+    }
+
+    return result;
+}

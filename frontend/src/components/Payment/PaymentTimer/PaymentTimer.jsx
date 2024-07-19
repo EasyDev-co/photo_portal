@@ -18,7 +18,7 @@ const PaymentTimer = ({onSubmitHandler}) => {
             .then(res => {
                 if (!res.detail) {
                     dispatch(addPhotoPrice(res))
-                    console.log(res)
+                    // console.log(res)
                 }
             })
             .catch(res=>{
