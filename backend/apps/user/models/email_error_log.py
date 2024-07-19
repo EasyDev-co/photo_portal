@@ -9,7 +9,7 @@ User = get_user_model()
 class EmailErrorLog(models.Model):
     confirm_code = models.ForeignKey(
         ConfirmCode,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         verbose_name='Код',
     )
@@ -26,8 +26,9 @@ class EmailErrorLog(models.Model):
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name='Пользователь',
+        null=True
     )
 
     def __str__(self):
