@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
-const PhotoBlock = ({ index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur }) => {
-    const[isChecked, setIsChecked] = useState(false)
+const PhotoBlock = ({blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur,handleCheckboxChange,setIsChecked, isChecked }) => {
+
     return (
         <div className={styles.photoCardsWrap}>
             {photos.map((photo, index) => (
                 <PhotoCard
+                    blocksId={blocksId}
                     photoId={photo.id}
                     photo={photo.photo}
                     key={index}
@@ -23,10 +24,10 @@ const PhotoBlock = ({ index, photos, handleRemoveBlock, onChangeHandler, inputVa
                 <div className={styles.bookCheckbox}>
                     <div className={styles.bookDescr}>Фотокнига</div>
                     <input
-                        id="bookCheckbox"
+                        id={blocksId}
                         name="checkbox"
                         type="checkbox"
-                        onChange={(e) => setIsChecked(e.target.checked)}
+                        onChange={(e) => handleCheckboxChange(e)}
                     />
                 </div>
                 <button className={styles.mainButton} onClick={() => handleRemoveBlock(index)}>Удалить блок</button>

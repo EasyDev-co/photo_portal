@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import styles from './Counter.module.css'
 
-const Counter = ({ isChecked, photoLineId, onChangeHandler, inputValue, name, id, number, photoId }) => {
+const Counter = ({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, name, id, number, photoId }) => {
     const [count, setCount] = useState(0);
     const inputRef = useRef(null);
     const [showBtn, setShowBtn] = useState(false);
@@ -12,7 +12,7 @@ const Counter = ({ isChecked, photoLineId, onChangeHandler, inputValue, name, id
         const siblingInput = inputRef.current.name;
         if (siblingInput) {
             const siblingValue = siblingInput;
-            onChangeHandler(siblingValue, count + 1, photoId, isChecked, photoLineId);
+            onChangeHandler(siblingValue, count + 1, photoId, isChecked, photoLineId, blocksId);
         }
     };
 
@@ -22,7 +22,7 @@ const Counter = ({ isChecked, photoLineId, onChangeHandler, inputValue, name, id
             const siblingInput = inputRef.current.name;
             if (siblingInput) {
                 const siblingValue = siblingInput;
-                onChangeHandler(siblingValue, count - 1,  photoId, isChecked, photoLineId);
+                onChangeHandler(siblingValue, count - 1,  photoId, isChecked, photoLineId, blocksId);
             }
         }
     };

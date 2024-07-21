@@ -40,9 +40,8 @@ const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
     }
 
     const onSubmitHandler = async (e) => {
-        const arr = inputValue.addKids.split(',').map(elem=>Number(elem))
+        const arr = inputValue.addKids.split(',').map(elem=>Number(elem));
         e.preventDefault();
-        // console.log([...addPhoto, ...photosLine])
         if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
             setInputValue({
                 addKids: ''
@@ -73,6 +72,7 @@ const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
                                 patchPhotoLine(access,{
                                     "parent": idP
                                   },res.id)
+                              
                             })
                         } else{
                             setError(true);
@@ -83,7 +83,7 @@ const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
         setInputValue({
             addKids: ''
         });
-
+        setIsActiveForm(false)
     }
 
     return (

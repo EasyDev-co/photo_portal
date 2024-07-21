@@ -66,7 +66,7 @@ const authSlice = createSlice({
                 ...data,
                 photos: data.photos.map(photo=> ({
                     ...photo,
-                    photoLineId: action.payload.id
+                    photoLineId: action.payload.id,
                 }))
             }
             state.photos.push(...updateData.photos);
@@ -101,7 +101,7 @@ const authSlice = createSlice({
                 ...data,
                 photos: data.photos.map(photo=> ({
                     ...photo,
-                    photoLineId: action.payload.id
+                    photoLineId: action.payload.id,
                 }))
             }
             state.photosLine = updateData.photos;

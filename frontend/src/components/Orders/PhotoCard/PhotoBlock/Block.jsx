@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PhotoBlock from './PhotoBlock';
 import styles from "../../Orders.module.css";
-const Block = ({ photos,onChangeHandler,inputValue,blurRef,setIsBlur }) => {
+const Block = ({blocksId, photos,onChangeHandler,inputValue,blurRef,setIsBlur,handleCheckboxChange, setIsChecked,isChecked }) => {
 
 
   const [photoBlocks, setPhotoBlocks] = useState([])
@@ -25,6 +25,10 @@ const Block = ({ photos,onChangeHandler,inputValue,blurRef,setIsBlur }) => {
     <div className="block">
       {photoBlocks.map((block, index) => (
         <PhotoBlock
+        blocksId={blocksId}
+          isChecked={isChecked}
+          setIsChecked={setIsChecked}
+          handleCheckboxChange={handleCheckboxChange}
           index={index}
           key={index}
           photos={block}

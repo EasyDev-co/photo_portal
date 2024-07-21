@@ -31,14 +31,17 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-
+  const [digitalData, setDigitalData] = useState({
+    digital: false
+  })
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
     "20x30": 0,
     magnet: 0,
     calendar: 0,
-    photo_book: 0
+    photo_book: 0,
+    digital: false
   });
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
@@ -46,7 +49,6 @@ export const Orders = () => {
   useClickOutside(blurRef, () => {
     setIsBlur(false);
   });
-
   const [isActiveForm, setIsActiveForm] = useState(false);
 
   useEffect(() => {
@@ -88,13 +90,14 @@ export const Orders = () => {
     }
   }, [blocks.length]);
 
-  const onChangeHandler = (name, count, photoId, isChecked, photoLineId) => {
-
+  const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
     const newValue = {
+      blockId: blockId,
       quantity: count,
       id: photoId,
       photo_type: Number(name),
       is_photobook: isChecked,
+      is_digital: false,
       photoLineId: photoLineId
     };
 
@@ -112,24 +115,21 @@ export const Orders = () => {
         // Если объект не существует, добавляем его
         updatedState.push(newValue);
       }
-
       return updatedState;
     });
-
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const transformedData = transformData(orderValue, false);
+    const transformedData = transformData(orderValue, false, isChecked);
     console.log(transformedData)
-
     const response = await fetchCartCreateWithTokenInterceptor(accessStor, transformedData);
     if (response.ok) {
       const data = await response.json();
       console.log(data)
       const order = await orderCreate(accessStor)
-      if(order.ok){
+      if (order.ok) {
         const data = await order.json();
         console.log(data)
       } else {
@@ -141,7 +141,27 @@ export const Orders = () => {
       console.log(data)
     }
   };
+  const handleCheckboxChange = (event) => {
+    const { checked, id } = event.target;
+    const updatedItems = orderValue.map(item => {
 
+      if (item.blockId == id) {
+        // Возвращаем новый объект с добавленным свойством
+        return { ...item, ['is_photobook']: checked };
+      }
+      return item; // Возвращаем исходный объект, если id не совпадает
+    });
+    setOrderValue(updatedItems);
+  };
+  const handleInputEmailChange = (event) => {
+    const updatedItems = orderValue.map(item => {
+      // Возвращаем новый объект с добавленным свойством
+      return { ...item, ['is_digital']: !!event.target.value };
+      // Возвращаем исходный объект, если id не совпадает
+    });
+    setOrderValue(updatedItems);
+  };
+  console.log(orderValue)
   return (
     <div className={styles.ordersWrap}>
       <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
@@ -154,6 +174,7 @@ export const Orders = () => {
             <div ref={blurRef} className={styles.photoCardsWrap}>
               {photoLine.map((photo, i) => (
                 <PhotoCard
+                  blocksId={0}
                   key={i}
                   onSubmitHandler={onSubmitHandler}
                   number={photo.number}
@@ -170,25 +191,28 @@ export const Orders = () => {
               <div className={styles.bookCheckbox}>
                 <div className={styles.bookDescr}>Фотокнига</div>
                 <input
-                  id="bookCheckbox"
+                  id={0}
                   name="checkbox"
                   type="checkbox"
-                  onChange={(e) => setIsChecked(e.target.checked)}
+                  onChange={(e) => handleCheckboxChange(e)}
                 />
               </div>
             </div>
             <Block
+              blocksId={blocks.length}
               photos={addPhoto}
               onChangeHandler={onChangeHandler}
               inputValue={inputValue}
               blurRef={blurRef}
               setIsBlur={setIsBlur}
+              setIsChecked={setIsChecked}
+              isChecked={isChecked}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromo}>
-              { /* Промо сообщения можно вынести в отдельный компонент, чтобы сделать код чище */}
               {[{
                 text: "Отправить электронную версию на электронную почту",
                 input: true,
@@ -208,6 +232,8 @@ export const Orders = () => {
                         className={styles.promoInput}
                         placeholder="Электронный адрес*"
                         type="text"
+                        name="digital"
+                        onChange={(e) => handleInputEmailChange(e)}
                       />
                     </div>
                   ) : (
@@ -219,7 +245,12 @@ export const Orders = () => {
             <div className={styles.orderPromo}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
-                <input className={styles.promoInput} placeholder="Введите промокод" type="text" />
+                <input className={styles.promoInput}
+                  placeholder="Введите промокод"
+                  type="text"
+                  name="digital"
+                // onChange={(e) => handleInputEmailChange(e)} 
+                />
                 <span>Промо-код активирован</span>
               </div>
             </div>

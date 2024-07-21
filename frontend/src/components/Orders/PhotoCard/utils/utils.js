@@ -1,14 +1,14 @@
-export function transformData(data,digital) {
+export function transformData(data) {
     const result = [];
 
     const groupedByPhotoLineId = data.reduce((acc, item) => {
-        const { photoLineId, is_photobook, ...photo } = item;
+        const { photoLineId, is_photobook, is_digital, ...photo } = item;
         if (!acc[photoLineId]) {
             acc[photoLineId] = {
                 id: photoLineId,
                 photos: [],
                 is_photobook: is_photobook,
-                is_digital: digital
+                is_digital: is_digital
             };
         }
         acc[photoLineId].photos.push(photo);
@@ -20,6 +20,6 @@ export function transformData(data,digital) {
             result.push(groupedByPhotoLineId[key]);
         }
     }
-
+    
     return result;
 }
