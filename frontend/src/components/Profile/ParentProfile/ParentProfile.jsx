@@ -292,7 +292,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         <ResetPassButton
                             setCodeWindow={setCodeWindow}
                             setResetActive={setResetActive}
-                            value={'Восстановить пароль'}
+                            value={'Изменить пароль'}
                         />
                     }
                 </div>
