@@ -7,13 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import { fetchWithTokenInterceptor } from '../../http/getPhotoLine';
 import Scaner from "../Scaner/Scaner";
-import { addCartList, addPhotoLine } from "../../store/authSlice";
+import { addCartList, addPhotoLine, addPhotos, setCart } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
 import { patchPhotoLine } from "../../http/patchPhotoLine";
 import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
 import { orderCreate } from "../../http/orderCreate";
+import { fetchPhotoLineListWithTokenInterceptor, photoLineList } from "../../http/photoLineList";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ export const Orders = () => {
   const photoLineId = useSelector(state => state.user.photoLineId);
   const photoLine = useSelector(state => state.user.photosLine);
   const cartList = useSelector(state => state.user.cartList);
-
+  const [lineLenght, setlineLenght] = useState(0)
   const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
@@ -31,7 +32,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-  const [cart, setCart] = useState([])
+  // const [cart, setCart] = useState([])
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -50,37 +51,79 @@ export const Orders = () => {
   const [isActiveForm, setIsActiveForm] = useState(false);
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
+    let isMounted = true; // добавляем переменную для отслеживания монтирования
 
-    const fetchData = async () => {
-      try {
-        const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
-        if (response.ok) {
-          const data = await response.json();
-          setPhotos(data.photos);
-          dispatch(addPhotoLine(data));
-          patchPhotoLine(accessStor, {
-            "parent": idP
-          }, data.id)
+    fetchPhotoLineListWithTokenInterceptor(accessStor, '')
+      .then(res => {
+        if (isMounted && res.ok) {
+          res.json()
+            .then(data => {
+              console.log(data);
+              setlineLenght(data.length)
+              data.forEach(elem => {
+                dispatch(addPhotos(elem)); 
+                patchPhotoLine(accessStor, { "parent": idP }, elem.id)
+                  .then(() => {
+                    if (isMounted) {
+                      console.log('Patched photo line:', elem);
+                    }
+                  })
+                  .catch(error => {
+                    if (isMounted) {
+                      console.error('Error patching photo line:', error);
+                    }
+                  });
+              });
+            })
+            .catch(error => {
+              if (isMounted) {
+                console.error('Error parsing response:', error);
+              }
+            });
         }
-
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Fetch запрос был отменен');
-        } else {
-          console.error('Произошла ошибка:', error);
+      })
+      .catch(error => {
+        if (isMounted) {
+          console.error('Error fetching photo line list:', error);
         }
-      }
-    };
+      });
 
-    if (isAuth) {
-      fetchData();
-    }
     return () => {
-      abortController.abort();
+      isMounted = false; // обновляем переменную при размонтировании
     };
-  }, [isAuth, photoLineId, sessionData, accessStor, dispatch]);
+  }, [accessStor, idP, dispatch]);
+  // useEffect(() => {
+  //   const abortController = new AbortController();
+  //   const signal = abortController.signal;
+
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetchWithTokenInterceptor(!photoLineId && sessionData, accessStor, { signal });
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setPhotos(data.photos);
+  //         dispatch(addPhotoLine(data));
+  //         patchPhotoLine(accessStor, {
+  //           "parent": idP
+  //         }, data.id)
+  //       }
+
+  //     } catch (error) {
+  //       if (error.name === 'AbortError') {
+  //         console.log('Fetch запрос был отменен');
+  //       } else {
+  //         console.error('Произошла ошибка:', error);
+  //       }
+  //     }
+  //   };
+
+  //   if (isAuth) {
+  //     fetchData();
+  //   }
+  //   return () => {
+  //     abortController.abort();
+  //   };
+  // }, [isAuth, photoLineId, sessionData, accessStor, dispatch]);
 
   const addBlock = useCallback(() => {
     if (blocks.length < 2) {
@@ -113,8 +156,6 @@ export const Orders = () => {
         // Если объект не существует, добавляем его
         updatedState.push(newValue);
       }
-
-
       return updatedState;
     });
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
@@ -122,10 +163,11 @@ export const Orders = () => {
   useEffect(() => {
     const transformedData = transformData(orderValue);
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-    .then(res=>res.json())
-    .then(res=>{
-        setCart(res)
-    })
+      .then(res => res.json())
+      .then(res => {
+        dispatch(setCart(res))
+        // setCart(res)
+      })
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
@@ -173,7 +215,7 @@ export const Orders = () => {
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
           <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
-            <div ref={blurRef} className={styles.photoCardsWrap}>
+            {/* <div ref={blurRef} className={styles.photoCardsWrap}>
               {photoLine.map((photo, i) => (
                 <PhotoCard
                   blocksId={0}
@@ -199,7 +241,7 @@ export const Orders = () => {
                   onChange={(e) => handleCheckboxChange(e)}
                 />
               </div>
-            </div>
+            </div> */}
             <Block
               blocksId={blocks.length}
               photos={addPhoto}
@@ -259,7 +301,7 @@ export const Orders = () => {
           </div>
           <div className={styles.promoButtonWrap}>
             <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
-            <span>{1 + blocks.length} из 3</span>
+            <span>{lineLenght} из 3</span>
           </div>
         </div>
         <div className={styles.paymentTimerWrap}>
@@ -267,7 +309,7 @@ export const Orders = () => {
             formId={'orderForm'}
             onSubmitHandler={onSubmitHandler}
             count={'3 500'}
-            cart={cart} />
+          />
         </div>
       </div>
     </div>
