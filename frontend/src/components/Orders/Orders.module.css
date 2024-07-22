@@ -302,12 +302,12 @@
         -ms-flex-align: center;
             align-items: center;
     gap: 24px;
-    margin-bottom: 37px;
 }
 
 .promoButtonWrap>span {
     color: rgb(110, 110, 110);
     font-size: 15px;
+    flex-shrink: 0;
 }
 
 .orderWidggetContainer {
@@ -353,3 +353,30 @@
         -ms-transform: scale(1.5);
             transform: scale(1.5);
 }
+.mailLink{
+    color: #11BBD1;
+    margin: 0 5px;
+}
+.errMessage{
+    background-color: #F8F9FB;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.buttonAddKidsWrap{
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+@media (min-width: 360px) and (max-width: 767px) {
+    .buttonAddKidsWrap{
+        display: flex;
+        gap: 25px;
+        align-items: start;
+        margin-bottom: 50px;
+        flex-direction: column;
+    }
+  }

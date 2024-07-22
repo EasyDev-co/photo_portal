@@ -25,7 +25,7 @@ const Block = ({blocksId, photos,onChangeHandler,inputValue,blurRef,setIsBlur,ha
     <div className="block">
       {photoBlocks.map((block, index) => (
         <PhotoBlock
-        blocksId={blocksId}
+          blocksId={index}
           isChecked={isChecked}
           setIsChecked={setIsChecked}
           handleCheckboxChange={handleCheckboxChange}
