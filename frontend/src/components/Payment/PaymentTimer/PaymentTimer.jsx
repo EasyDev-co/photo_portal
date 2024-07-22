@@ -32,7 +32,6 @@ const PaymentTimer = ({cart, onSubmitHandler}) => {
             />
             <PaymentDiagram
                 cart={cart}
-                count={'3 500'}
             />
             {/* <Link to={'/payment'}>
                

@@ -121,16 +121,11 @@ export const Orders = () => {
   };
   useEffect(() => {
     const transformedData = transformData(orderValue);
-    const response = fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData);
-    if (response.ok) {
-      const data = response.json();
-      console.log(data)
-      setCart(data)
-    } else {
-      // const data = response.json();
-      // console.log(data)
-    }
-    // console.log(orderValue)
+    fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
+    .then(res=>res.json())
+    .then(res=>{
+        setCart(res)
+    })
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
