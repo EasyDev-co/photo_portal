@@ -5,7 +5,7 @@ const PaymentDiagram = ({cart}) => {
     const [count, setCount] = useState(0)
     useEffect(() => {
         const sumTotalPrice = cart.reduce((sum, item) => {
-            console.log(parseFloat(item.total_price))
+            // console.log(parseFloat(item.total_price))
             return sum + parseFloat(item.total_price);
         }, 0);
         setCount(sumTotalPrice);
