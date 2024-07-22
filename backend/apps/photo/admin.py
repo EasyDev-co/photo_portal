@@ -9,7 +9,8 @@ from django.contrib import messages
 from apps.kindergarten.models import Region
 from apps.photo.models import (Photo,
                                PhotoTheme,
-                               PhotoLine, Coefficient)
+                               PhotoLine,
+                               Coefficient)
 from apps.photo.models.photo_theme import PhotoPopularityStat
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
