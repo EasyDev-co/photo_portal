@@ -15,6 +15,7 @@ import { patchPhotoLine } from "../../http/patchPhotoLine";
 import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
 import { orderCreate } from "../../http/orderCreate";
 import { fetchPhotoLineListWithTokenInterceptor, photoLineList } from "../../http/photoLineList";
+import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -32,7 +33,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-  // const [cart, setCart] = useState([])
+
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -61,7 +62,7 @@ export const Orders = () => {
               console.log(data);
               setlineLenght(data.length)
               data.forEach(elem => {
-                dispatch(addPhotos(elem)); 
+                dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)
                   .then(() => {
                     if (isMounted) {
@@ -166,7 +167,6 @@ export const Orders = () => {
       .then(res => res.json())
       .then(res => {
         dispatch(setCart(res))
-        // setCart(res)
       })
   }, [orderValue])
 
@@ -205,7 +205,7 @@ export const Orders = () => {
     });
     setOrderValue(updatedItems);
   };
-  // console.log(orderValue)
+
   return (
     <div className={styles.ordersWrap}>
       <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
@@ -299,10 +299,30 @@ export const Orders = () => {
               </div>
             </div>
           </div>
-          <div className={styles.promoButtonWrap}>
-            <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
-            <span>{lineLenght} из 3</span>
-          </div>
+          {lineLenght >= 3 ?
+            <div className={styles.buttonAddKidsWrap}>
+              <div className={styles.promoButtonWrap}>
+                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button>
+                <span>{lineLenght} из 3</span>
+              </div>
+              <div className={styles.errMessage}>
+                <img src={danger} alt="" />
+                <span>
+                  Вы превысили лимит добавления детей. Если у вас четверо детей, то напишите нам на
+                  <a className={styles.mailLink} href="">
+                    fotodetstvo1@yandex.ru
+                  </a>
+                  и мы проверим информацию
+                </span>
+              </div>
+            </div> :
+            <div>
+              <div className={styles.promoButtonWrap}>
+                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
+                <span>{lineLenght} из 3</span>
+              </div>
+            </div>
+          }
         </div>
         <div className={styles.paymentTimerWrap}>
           <PaymentTimer
