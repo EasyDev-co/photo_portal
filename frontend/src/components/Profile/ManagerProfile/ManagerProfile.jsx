@@ -8,7 +8,7 @@ import MainButton from "../../Buttons/MainButton";
 import Dropdown from "./Dropdown/Dropdown";
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
-    console.log(copy)
+
     return (
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
