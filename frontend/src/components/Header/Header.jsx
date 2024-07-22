@@ -10,6 +10,7 @@ import { addUserData } from "../../store/authSlice";
 import { getCookie } from "../../utils/setCookie";
 import { useAuth } from "../../utils/useAuth";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const [cookieData, setCookieData] = useState(getCookie('refresh'));
@@ -20,6 +21,7 @@ export const Header = () => {
   const refresh = useSelector(state => state.user.refresh);
   const accessStor = localStorage.getItem('access');
   const { isAuth } = useAuth();
+  const navigate = useNavigate();
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
@@ -82,7 +84,7 @@ export const Header = () => {
         id="header"
       >
         <div className={styles.container}>
-          <div className={styles.leftBlock}>
+          <div onClick={()=> navigate("/about-us")} className={styles.leftBlock}>
             <img className={styles.logo} src={logo} alt="логотип" />
           </div>
           {isAuth ?
