@@ -26,6 +26,7 @@ const PaymentTimer = ({onSubmitHandler}) => {
     }, [])
     return (
         <div className={styles.paymentTimerWrap}>
+            
             <Timer
                 date={'Sat Jun 30 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}
                 desc={':'}
