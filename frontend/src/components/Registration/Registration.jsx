@@ -20,6 +20,13 @@ export const Registration = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const [isChecked, setIsChecked] = useState(false);
+  const accessStor = localStorage.getItem('access');
+  const navigate = useNavigate();
+  useEffect(()=>{
+    if(accessStor){
+      navigate('/orders')
+    }
+  },[])
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -44,6 +51,7 @@ export const Registration = () => {
   const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
   const [scanActive, setScanActive] = useState(false);
+
 
   useEffect(() => {
     let photos = [];
