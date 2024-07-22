@@ -20,7 +20,6 @@ export const Login = () => {
   const [isActiveReset, setIsActiveReset] = useState(false);
   const [error, setError] = useState({
     non_field_errors:'',
-    
   });
   const dispatch = useDispatch();
   const navigation = useNavigate();

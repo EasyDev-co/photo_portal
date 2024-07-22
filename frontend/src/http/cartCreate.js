@@ -3,22 +3,22 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 
-export const getUserData = async (access, signal) => {
-    const url = `${localUrl}/api/v1/user/`;
-
-    const response = await fetch(url, {
+export const cartCreate = async (access, cart) => {
+    const url = `${localUrl}/api/v1/cart/`;
+    const response = await fetch(url,{
+        method:'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        signal
+        body: JSON.stringify(cart),
     });
     return response;
 }
 
-export const fetchUserDataWithTokenInterceptor = async (access, refresh) => {
+export const fetchCartCreateWithTokenInterceptor = async (access, refresh ,cart) => {
     try {
-        let response = await getUserData(access)
+        let response = await cartCreate(access, cart)
         if (!response.ok) {
             localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate(refresh)
@@ -28,11 +28,10 @@ export const fetchUserDataWithTokenInterceptor = async (access, refresh) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getUserData(res.access);
+                            response = cartCreate(res.access, cart);
                         }
                     })
             }
-
         }
         return response;
     } catch (error) {

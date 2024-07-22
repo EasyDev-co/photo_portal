@@ -1,5 +1,7 @@
+import { localUrl } from "../constants/constants";
+
 export const parentLoginCreate = async (email, password) => {
-    const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/login/';
+    const url = `${localUrl}/api/v1/parent/login/`;
 
     const sendData = {
         email: email,

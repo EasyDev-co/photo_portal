@@ -104,7 +104,9 @@ const InputField = (
                                     )
                                 })
                             }
-                        </div>}
+                        </div>
+                    }
+
                 </div>
             </div>
 
