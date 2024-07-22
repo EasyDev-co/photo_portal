@@ -18,7 +18,6 @@ const PaymentTimer = ({onSubmitHandler}) => {
             .then(res => {
                 if (!res.detail) {
                     dispatch(addPhotoPrice(res))
-                    // console.log(res)
                 }
             })
             .catch(res=>{
@@ -32,7 +31,6 @@ const PaymentTimer = ({onSubmitHandler}) => {
                 desc={':'}
             />
             <PaymentDiagram
-                count={'3 500'}
             />
             {/* <Link to={'/payment'}>
                

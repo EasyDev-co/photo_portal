@@ -14,7 +14,7 @@ export const Gallery = () => {
         console.log(data)
       }
     } catch (error) {
-      
+        
     }
    
       
