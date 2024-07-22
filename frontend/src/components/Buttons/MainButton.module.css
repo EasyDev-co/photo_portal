@@ -1,3 +1,10 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 .mainButton{
     background-color: rgb(17, 187, 209);
     padding: 12px 24px;
@@ -30,6 +37,8 @@
     height: 40px;
     outline: none;
     /* width: 100%; */
+    -webkit-transition: .3s;
+    -o-transition: .3s;
     transition: .3s;
 }
 

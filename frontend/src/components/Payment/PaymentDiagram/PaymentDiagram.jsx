@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import styles from './PaymentDiagram.module.css'
+import { useSelector } from 'react-redux';
 
-const PaymentDiagram = ({cart}) => {
+const PaymentDiagram = () => {
     const [count, setCount] = useState(0)
+    const cart = useSelector(state=>state.user.cart)
     useEffect(() => {
         const sumTotalPrice = cart.reduce((sum, item) => {
             console.log(parseFloat(item.total_price))
