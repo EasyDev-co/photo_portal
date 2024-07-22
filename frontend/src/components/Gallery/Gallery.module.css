@@ -1,0 +1,41 @@
+.ordersWrap {
+    margin: 0 0 0 140px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media screen and (max-width: 1000px) {
+    .ordersWrap {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .ordersWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .ordersWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+
+.profileTitle {
+    color: #090909;
+    font-family: "Nunito";
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 20px;
+    padding: 60px 40px 40px 0;
+    position: relative;
+}
+
+@media screen and (max-width: 768px) {
+    .profileTitle {
+        margin-left: 0;
+        padding: 40px 20px 40px 0;
+    }
+}

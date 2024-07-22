@@ -1,5 +1,7 @@
+import { localUrl } from "../constants/constants";
+
 export const parentVerifyResetCode = async (email, code) => {
-    const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/verify_reset_code/';
+    const url = `${localUrl}/api/v1/parent/verify_reset_code/`;
 
     const sendData = {
         email: email,

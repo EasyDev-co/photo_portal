@@ -4,12 +4,12 @@ import Counter from './Counter/Counter';
 import { useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '../../../utils/useClickOutside';
 
-const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef }) => {
+const PhotoCard = ({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData, photoId }) => {
     const [isScale, setIsScale] = useState(false);
     const [count, setCount] = useState(0);
 
     const scaleRef = useRef(null);
-    
+
     useClickOutside(scaleRef, () => {
         setIsScale(false);
     })
@@ -40,44 +40,63 @@ const PhotoCard = ({ onChangeHandler, inputValue, onSubmitHandler, number, photo
                     <div onClick={() => increment()} className={styles.rotateRight}></div>
                 </div>
             </div>
-            <div className={styles.photoCountersCardsWrapper}>
+            <form id={number} className={styles.photoCountersCardsWrapper}>
                 <Counter
-                    name={'10x15'}
+                    blocksId={blocksId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
+                    number={number}
+                    name={1}
                     id={'10x15'}
                     inputValue={inputValue["10x15"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                    name={'15x20'}
+                blocksId={blocksId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
+                    number={number}
+                    name={2}
                     id={'15x20'}
                     inputValue={inputValue["15x20"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                    name={'20x30'}
+                blocksId={blocksId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
+                    number={number}
+                    name={3}
                     id={'20x30'}
                     inputValue={inputValue["20x30"]}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                    name={'magnet'}
+                blocksId={blocksId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
+                    number={number}
+                    name={4}
                     id={'Магнит'}
                     inputValue={inputValue.magnet}
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                    name={'calendar'}
+                blocksId={blocksId}
+                    photoLineId={photoLineId}
+                    isChecked={isChecked}
+                    photoId={photoId}
+                    number={number}
+                    name={5}
                     id={'Календарь'}
                     inputValue={inputValue.calendar}
                     onChangeHandler={onChangeHandler}
                 />
-                <Counter
-                    name={'photo_book'}
-                    id={'Фотокнига'}
-                    inputValue={inputValue.photo_book}
-                    onChangeHandler={onChangeHandler}
-                />
-            </div>
+            </form>
         </div>
     );
 }

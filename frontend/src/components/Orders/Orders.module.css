@@ -234,3 +234,16 @@
     top: 40%;
     left: 260px;
 }
+.bookCheckbox{
+    display: flex;
+    border: 1px solid rgb(229, 229, 229);
+    border-radius: 8px;
+    width: 216px;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+}
+#bookCheckbox{
+    accent-color: #11BBD1;
+    transform: scale(1.5);
+}

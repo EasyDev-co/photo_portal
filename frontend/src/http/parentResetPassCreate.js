@@ -1,5 +1,7 @@
+import { localUrl } from "../constants/constants";
+
 export const parentResetPassCreate = async (email) => {
-    const url = 'https://photodetstvo.easydev-program.com/api/v1/parent/reset_password/';
+    const url = `${localUrl}/api/v1/parent/reset_password/`;
 
     const sendData = {
         email: email,

@@ -1,18 +1,16 @@
 import { localUrl } from "../constants/constants";
 
-export const getOnePhoto = async (num,access) => {
-    const url = `${localUrl}/api/v1/photo/photo_line_by_numbers/`;
-    
-    const sendData = {
-        numbers: num
-    }
+
+export const patchPhotoLine = async (access, obj, id) => {
+    const url = `${localUrl}/api/v1/photo/photo_line/${id}/`;
+
     const response = await fetch(url, {
-        method:"POST",
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        body: JSON.stringify(sendData)
+        body: JSON.stringify(obj)
     });
     return response;
 }
