@@ -1,8 +1,9 @@
+import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 export const getPhotoPrice = async (access,region) => {
-    const url = `https://photodetstvo.easydev-program.com/api/v1/photo_price_by_region/`;
+    const url = `${localUrl}/api/v1/photo_price_by_region/`;
 
     const sendData = {
         region: region

@@ -31,7 +31,9 @@ const authSlice = createSlice({
         accessToken: '',
         photosLine: [],
         photoLineId: '',
-        photoPrice:[]
+        photoPrice:[],
+        cartList:[],
+        cart:[]
     },
     reducers: {
         setUser: (state, action) => {
@@ -58,15 +60,26 @@ const authSlice = createSlice({
             state.access = action.payload;
         },
         addPhotos(state, action) {
-            state.photos.push(action.payload);
+            const data = {  
+                photos: action.payload.photos.flat()
+            }
+            const updateData = {
+                ...data,
+                photos: data.photos.map(photo=> ({
+                    ...photo,
+                    photoLineId: action.payload.id,
+                }))
+            }
+            state.photos.push(...updateData.photos);
         },
         addUserData(state, action) {
             state.userData = action.payload;
+            localStorage.setItem('idP', action.payload.id);
             localStorage.setItem('first_name', action.payload.first_name);
             localStorage.setItem('last_name', action.payload.last_name);
             localStorage.setItem('second_name', action.payload.second_name);
             localStorage.setItem('email', action.payload.email);
-            localStorage.setItem('phone', action.payload.phone_number);
+            localStorage.setItem('phone', action.payload.phone_number === null ? '+7' : action.payload.phone_number);
 
             action.payload.kindergarten.forEach(elem => {
                 localStorage.setItem('kindergarten', elem.name);
@@ -82,7 +95,17 @@ const authSlice = createSlice({
             state.resetDataUser.newPass = action.payload.newPass;
         },
         addPhotoLine(state, action) {
-            state.photosLine = action.payload;
+            const data = {  
+                photos: action.payload.photos.flat()
+            }
+            const updateData = {
+                ...data,
+                photos: data.photos.map(photo=> ({
+                    ...photo,
+                    photoLineId: action.payload.id,
+                }))
+            }
+            state.photosLine = updateData.photos;
         },
         addQrIdPhoto(state, action) {
             state.photoLineId = action.payload
@@ -91,7 +114,13 @@ const authSlice = createSlice({
         addPhotoPrice(state, action){
             state.photoPrice = action.payload;
         }
-
+        ,
+        addCartList(state, action){
+            state.cartList.push(action.payload);
+        },
+        setCart(state, action){
+            state.cart = action.payload
+        }
     }
 });
 export const {
@@ -106,7 +135,9 @@ export const {
     setResetData,
     addPhotoLine,
     addQrIdPhoto,
-    addPhotoPrice
+    addPhotoPrice,
+    addCartList,
+    setCart
 } = authSlice.actions;
 
 

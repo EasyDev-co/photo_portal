@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { memo, useRef, useState} from 'react';
 import styles from './AddKids.module.css'
 import { tokenRefreshCreate } from '../../../http/tokenRefreshCreate';
 import { setCookie } from '../../../utils/setCookie';
@@ -6,13 +6,14 @@ import { addPhotos, setAccessToken } from '../../../store/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOnePhoto } from '../../../http/getOnePhoto';
 import { useClickOutside } from '../../../utils/useClickOutside';
-
-const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
+import { patchPhotoLine } from '../../../http/patchPhotoLine';
+const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
 
     const addPhoto = useSelector(state => state.user.photos);
-    const [error,setError] = useState(false);
+    const [error, setError] = useState(false);
     const photosLine = useSelector(state => state.user.photosLine);
     const activeRef = useRef(null);
+    const idP = localStorage.getItem('idP');
 
     useClickOutside(activeRef, () => {
         setIsActiveForm(false)
@@ -39,9 +40,8 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
     }
 
     const onSubmitHandler = async (e) => {
-
+        const arr = inputValue.addKids.split(',').map(elem=>Number(elem));
         e.preventDefault();
-        console.log([...addPhoto, ...photosLine])
         if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
             setInputValue({
                 addKids: ''
@@ -50,33 +50,40 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
             return;
         }
 
-        inputValue.addKids.split(',').forEach(num => {
-            tokenRefreshCreate()
-                .then(res => res.json())
-                .then(res => {
-                    if (res.refresh) {
-                        setCookie('refresh', res.refresh);
-                        dispatch(
-                            setAccessToken(res.access)
-                        )
-                    }
-                    return res.access
-                })
-                .then(access => {
-                    getOnePhoto(num, access)
-                        .then(res => res.json())
-                        .then(res => {
-                            dispatch(addPhotos(res))
-                        })
-                })
-        });
-        setError(false);
-        addBlock();
+        tokenRefreshCreate()
+            .then(res => res.json())
+            .then(res => {
+                if (res.refresh) {
+                    setCookie('refresh', res.refresh);
+                    dispatch(
+                        setAccessToken(res.access)
+                    )
+                }
+                return res.access
+            })
+            .then(access => {
+                getOnePhoto(arr, access)
+                    .then(res => {
+                        if(res.ok){
+                            res.json()
+                            .then(res=>{
+                                dispatch(addPhotos(res))
+                                addBlock();
+                                patchPhotoLine(access,{
+                                    "parent": idP
+                                  },res.id)
+                              
+                            })
+                        } else{
+                            setError(true);
+                        }
+                    })
+                    setError(false);
+            })
         setInputValue({
             addKids: ''
         });
-
-
+        setIsActiveForm(false)
     }
 
     return (
@@ -86,14 +93,14 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 <div>
                     <input onChange={(e) => onChangeHandler(e)} name='addKids' value={inputValue.addKids} className={styles.addKidsInput} type="text" />
                 </div>
-                {error && 
+                {error &&
                     <div className={styles.errorMessage}>
-                        Номера фотографий которые вы ввели уже добавлены, введите другие номер! 
+                        Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер! 
                     </div>}
             </div>
             <button className={styles.addKidsBtn}>Добавить</button>
         </form>
     );
-}
+})
 
 export default AddKidsForm;

@@ -31,7 +31,7 @@ const userInfoProfile = {
   city: "Ростов-на-Дону",
   kindergarten: "Детский сад “Ромашка”",
   email: "bobik228@mail.ru",
-  password:"12asd345!678910"
+  password: "12asd345!678910"
 };
 const rulesItems = [
   {
@@ -72,7 +72,8 @@ const aboutUsItems = [
     infoAltPhoto: "фото ребёнка",
   },
 ];
-
+const localUrl = `http://127.0.0.1:8080`;
+const prodUrl = `https://photodetstvo.easydev-program.com`;
 export {
   logo,
   bagIcon,
@@ -87,5 +88,7 @@ export {
   userInfo,
   rulesItems,
   aboutUsItems,
-  userInfoProfile
+  userInfoProfile,
+  localUrl,
+  prodUrl
 };

@@ -1,17 +1,18 @@
 import { useState, useRef } from "react";
 import styles from './Counter.module.css'
 
-const Counter = ({ onChangeHandler, inputValue, name, id }) => {
+const Counter = ({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, name, id, number, photoId }) => {
     const [count, setCount] = useState(0);
     const inputRef = useRef(null);
     const [showBtn, setShowBtn] = useState(false);
-    
+    // console.log(isChecked)
     const increment = () => {
+
         setCount(prevCount => prevCount + 1);
         const siblingInput = inputRef.current.name;
         if (siblingInput) {
             const siblingValue = siblingInput;
-            onChangeHandler(siblingValue, count + 1);
+            onChangeHandler(siblingValue, count + 1, photoId, isChecked, photoLineId, blocksId);
         }
     };
 
@@ -21,20 +22,19 @@ const Counter = ({ onChangeHandler, inputValue, name, id }) => {
             const siblingInput = inputRef.current.name;
             if (siblingInput) {
                 const siblingValue = siblingInput;
-                onChangeHandler(siblingValue, count - 1);
+                onChangeHandler(siblingValue, count - 1,  photoId, isChecked, photoLineId, blocksId);
             }
         }
     };
-    
+
     return (
         <div className={styles.counterBlock}>
             <div className={styles.counterName}>{id}</div>
-            <div onMouseEnter={()=>setShowBtn(true)} onMouseLeave={()=>setShowBtn(false)} className={styles.counterButtonWrap}>
-                <button className={showBtn?styles.counterButtonDecShow:styles.counterButtonDec} type="button" onClick={decrement} disabled={count === 0}>-</button>
-                <input  className={styles.counterInput} ref={inputRef} type="text" name={name} value={count} disabled />
-                <button className={showBtn?styles.counterButtonShow:styles.counterButton} type="button" onClick={increment}>+</button>
+            <div onMouseEnter={() => setShowBtn(true)} onMouseLeave={() => setShowBtn(false)} className={styles.counterButtonWrap}>
+                <button className={showBtn ? styles.counterButtonDecShow : styles.counterButtonDec} type="button" onClick={decrement} disabled={count === 0}>-</button>
+                <input className={styles.counterInput} ref={inputRef} type="text" name={name} value={count} disabled />
+                <button className={showBtn ? styles.counterButtonShow : styles.counterButton} type="button" onClick={increment}>+</button>
             </div>
-
         </div>
     );
 }

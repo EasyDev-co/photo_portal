@@ -1,6 +1,18 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 .inputWrap{
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
 
 
 }
@@ -21,13 +33,27 @@
     border: 1px solid rgb(229, 229, 229);
     height: 40px;
     outline: none;
-    width: -webkit-fill-available;
+    width:  -webkit-fill-available;
+    -webkit-transition: .3s;
+    -o-transition: .3s;
     transition: .3s;
 }
 @media screen and (max-width: 768px) {
     .inputField{
       font-size: 20px;
         
+    }
+    .inputField::-webkit-input-placeholder{
+        font-size: 20px;
+    }
+    .inputField::-moz-placeholder{
+        font-size: 20px;
+    }
+    .inputField:-ms-input-placeholder{
+        font-size: 20px;
+    }
+    .inputField::-ms-input-placeholder{
+        font-size: 20px;
     }
     .inputField::placeholder{
         font-size: 20px;
@@ -37,6 +63,18 @@
     .inputField{
         font-size: 15px;
           
+      }
+      .inputField::-webkit-input-placeholder{
+          font-size: 15px;
+      }
+      .inputField::-moz-placeholder{
+          font-size: 15px;
+      }
+      .inputField:-ms-input-placeholder{
+          font-size: 15px;
+      }
+      .inputField::-ms-input-placeholder{
+          font-size: 15px;
       }
       .inputField::placeholder{
           font-size: 15px;
@@ -52,12 +90,20 @@
     height: 40px;
     outline: none;
     width: 100%;
+    -webkit-transition: .3s;
+    -o-transition: .3s;
     transition: .3s;
 }
 .inputFieldWrap{
     width:436px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     position: relative;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
 }
 @media screen and (max-width: 460px) {
     .inputFieldWrap{
@@ -67,9 +113,14 @@
 
 .inputFieldWrapAuth{
     width:380px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     position: relative;
-    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
 }
 @media screen and (max-width: 768px) {
     .inputQuestionField{
@@ -151,23 +202,36 @@
 
 @media screen and (max-width: 768px) {
     .showWidget {
+        width: -webkit-fit-content;
+        width: -moz-fit-content;
         width: fit-content;    
         left:50%;
-        transform:translatex(-50%);
+        -webkit-transform:translatex(-50%);
+            -ms-transform:translatex(-50%);
+                transform:translatex(-50%);
         top: 60px;
     }
   }
 
   .wrongPass{
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    align-items: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
     gap: 8px;
     color: rgb(240, 149, 149);
   }
 
   .errBlockWrap{
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
     gap: 5px;
     /* position: absolute; */
     background-color: #fff;
