@@ -8,7 +8,7 @@ import { fetchPhotoPriceWithTokenInterceptor } from '../../../http/getPhotoPrice
 import { useDispatch } from 'react-redux';
 import { addPhotoPrice } from '../../../store/authSlice';
 
-const PaymentTimer = ({onSubmitHandler}) => {
+const PaymentTimer = ({cart, onSubmitHandler}) => {
     const accessStor = localStorage.getItem('access');
     const country = localStorage.getItem('regionName');
     const dispatch = useDispatch()
@@ -18,7 +18,6 @@ const PaymentTimer = ({onSubmitHandler}) => {
             .then(res => {
                 if (!res.detail) {
                     dispatch(addPhotoPrice(res))
-                    // console.log(res)
                 }
             })
             .catch(res=>{
@@ -32,6 +31,7 @@ const PaymentTimer = ({onSubmitHandler}) => {
                 desc={':'}
             />
             <PaymentDiagram
+                cart={cart}
                 count={'3 500'}
             />
             {/* <Link to={'/payment'}>

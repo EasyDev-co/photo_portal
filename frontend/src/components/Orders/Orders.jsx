@@ -31,9 +31,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-  const [digitalData, setDigitalData] = useState({
-    digital: false
-  })
+  const [cart, setCart] = useState([])
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -115,53 +113,62 @@ export const Orders = () => {
         // Если объект не существует, добавляем его
         updatedState.push(newValue);
       }
+
+
       return updatedState;
     });
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
+  useEffect(() => {
+    const transformedData = transformData(orderValue);
+    const response = fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData);
+    if (response.ok) {
+      const data = response.json();
+      console.log(data)
+      setCart(data)
+    } else {
+      // const data = response.json();
+      // console.log(data)
+    }
+    // console.log(orderValue)
+  }, [orderValue])
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const transformedData = transformData(orderValue, false, isChecked);
-    console.log(transformedData)
-    const response = await fetchCartCreateWithTokenInterceptor(accessStor, transformedData);
-    if (response.ok) {
-      const data = await response.json();
+    const order = await orderCreate(accessStor)
+    if (order.ok) {
+      const data = await order.json();
       console.log(data)
-      const order = await orderCreate(accessStor)
-      if (order.ok) {
-        const data = await order.json();
-        console.log(data)
-      } else {
-        const data = await order.json();
-        console.log(data)
-      }
     } else {
-      const data = await response.json();
+      const data = await order.json();
       console.log(data)
     }
   };
+
   const handleCheckboxChange = (event) => {
     const { checked, id } = event.target;
     const updatedItems = orderValue.map(item => {
-
       if (item.blockId == id) {
-        // Возвращаем новый объект с добавленным свойством
-        return { ...item, ['is_photobook']: checked };
+        return {
+          ...item,
+          ['is_photobook']: checked
+        };
       }
-      return item; // Возвращаем исходный объект, если id не совпадает
+      return item;
     });
     setOrderValue(updatedItems);
   };
+
   const handleInputEmailChange = (event) => {
     const updatedItems = orderValue.map(item => {
-      // Возвращаем новый объект с добавленным свойством
-      return { ...item, ['is_digital']: !!event.target.value };
-      // Возвращаем исходный объект, если id не совпадает
+      return {
+        ...item,
+        ['is_digital']: !!event.target.value
+      };
     });
     setOrderValue(updatedItems);
   };
-  console.log(orderValue)
+  // console.log(orderValue)
   return (
     <div className={styles.ordersWrap}>
       <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
@@ -261,7 +268,11 @@ export const Orders = () => {
           </div>
         </div>
         <div className={styles.paymentTimerWrap}>
-          <PaymentTimer formId={'orderForm'} onSubmitHandler={onSubmitHandler} count={'3 500'} />
+          <PaymentTimer
+            formId={'orderForm'}
+            onSubmitHandler={onSubmitHandler}
+            count={'3 500'}
+            cart={cart} />
         </div>
       </div>
     </div>

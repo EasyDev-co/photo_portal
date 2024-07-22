@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import styles from './PaymentDiagram.module.css'
 
-const PaymentDiagram = ({count}) => {
+const PaymentDiagram = ({cart, count}) => {
+    useEffect()
     return ( 
         <div className={styles.diagramWrap}>
             <span>Итого:</span>
