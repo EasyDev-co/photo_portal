@@ -30,7 +30,7 @@ class PhotoLine(UUIDMixin):
     )
     parent = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Родитель',
         related_name='photo_lines',
         blank=True,
