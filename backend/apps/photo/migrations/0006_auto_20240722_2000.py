@@ -18,11 +18,16 @@ def insert_coefficient(apps, schema_editor):
     Coefficient.objects.bulk_create(objects)
 
 
+def remove_coefficients(apps, schema_editor):
+    Coefficient = apps.get_model("photo", "Coefficient")
+    Coefficient.objects.all().delete()
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('photo', '0005_coefficient_photopopularitystat'),
     ]
 
     operations = [
-        migrations.RunPython(insert_coefficient),
+        migrations.RunPython(insert_coefficient, remove_coefficients),
     ]
