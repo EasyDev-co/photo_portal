@@ -62,6 +62,7 @@ class User(UUIDMixin, AbstractUser):
         unique=True,
         verbose_name='Номер телефона',
         null=True,
+        blank=True
     )
 
     objects = UserManager()
