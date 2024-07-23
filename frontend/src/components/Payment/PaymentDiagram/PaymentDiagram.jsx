@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './PaymentDiagram.module.css'
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const PaymentDiagram = () => {
     const [count, setCount] = useState(0)
