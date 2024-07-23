@@ -4,13 +4,18 @@ import { useSelector } from 'react-redux';
 
 const PaymentDiagram = () => {
     const [count, setCount] = useState(0)
+    const navigate = useNavigate()
     const cart = useSelector(state=>state.user.cart)
     useEffect(() => {
-        const sumTotalPrice = cart.reduce((sum, item) => {
-            // console.log(parseFloat(item.total_price))
-            return sum + parseFloat(item.total_price);
-        }, 0);
-        setCount(sumTotalPrice);
+        try {
+            const sumTotalPrice = cart?.reduce((sum, item) => {
+                return sum + parseFloat(item.total_price);
+            }, 0);
+            setCount(sumTotalPrice);
+        } catch (error) {
+            navigate('/sign-in')
+        }
+        
     }, [cart]);
     return ( 
         <div className={styles.diagramWrap}>
