@@ -1,5 +1,5 @@
 import styles from "./ManagerProfile.module.css";
-import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
+// import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import StatisticItem from "./StatisticItem";
 import { useState } from "react";
 import PaymentDiagram from "../../Payment/PaymentDiagram/PaymentDiagram";
@@ -15,7 +15,6 @@ const ManagerProfile = () => {
                 <h1 className={styles.profileTitle}>Статистика</h1>
                 <div className={styles.profileWidget}>
                     <StatisticItem
-
                         label={'Количество заказов'}
                         data={'43 из 79'}
                     />
