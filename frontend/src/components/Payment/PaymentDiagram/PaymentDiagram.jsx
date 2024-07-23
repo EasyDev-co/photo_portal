@@ -10,10 +10,12 @@ const PaymentDiagram = () => {
     useEffect(() => {
         try {
             const sumTotalPrice = cart?.reduce((sum, item) => {
+                // console.log(parseFloat(item.total_price))
                 return sum + parseFloat(item.total_price);
             }, 0);
             setCount(sumTotalPrice);
         } catch (error) {
+            console.log(error)
             navigate('/sign-in')
         }
         

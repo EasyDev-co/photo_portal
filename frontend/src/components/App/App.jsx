@@ -15,6 +15,7 @@ import ResetPassword from "../Registration/ResetPassword/ResetPassword";
 import NewPassword from "../Registration/NewPassword/NewPassword";
 import Verification from "../Registration/Verificattion.jsx/Verification";
 import { useAuth } from "../../utils/useAuth";
+import Account from "../Account/Account";
 export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,9 +38,9 @@ export const App = () => {
     <Routes>
       {isAuth ? <>
         <Route element={<Layout />}>
-          <Route path={"/orders"} element={<Orders />} />
+          <Route path={"/orders"} role={'manager'} element={<Account role={'parent'} />} />
+          <Route path={"/profile"} element={<Profile role={'parent'} />} />
           <Route path={"/gallery"} element={<Gallery />} />
-          <Route path={"/profile"} element={<Profile role={'manager'} />} />
           <Route path={"/about-us"} element={<AboutUs />} />
           <Route path={"/rules"} element={<Rules />} />
           <Route path={"orders/payment"} element={<Payment />} />
@@ -52,7 +53,6 @@ export const App = () => {
           <Route path="/password-reset/new-password" element={<NewPassword />} />
           <Route path="/*" element={<NotFound />} />
         </Route>
-
       </> :
         <>
           <Route element={<Layout />}>

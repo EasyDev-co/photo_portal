@@ -21,7 +21,6 @@
             align-items: center;
     padding: 69px 40px 160px 40px;
     gap: 80px;
-    border-left: 1px solid rgb(229, 229, 229);
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
             flex-grow: 1;
