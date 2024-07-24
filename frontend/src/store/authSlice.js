@@ -32,7 +32,8 @@ const authSlice = createSlice({
         photosLine: [],
         photoLineId: '',
         photoPrice:[],
-        cartList:[]
+        cartList:[],
+        cart:[]
     },
     reducers: {
         setUser: (state, action) => {
@@ -59,16 +60,26 @@ const authSlice = createSlice({
             state.access = action.payload;
         },
         addPhotos(state, action) {
+            // Плоский массив фотографий
             const data = {  
                 photos: action.payload.photos.flat()
-            }
+            };
+        
+            // Создаем множество для хранения уникальных id
+            const existingIds = new Set(state.photos.map(photo => photo.id));
+        
+            // Фильтруем фотографии по уникальному id
             const updateData = {
                 ...data,
-                photos: data.photos.map(photo=> ({
-                    ...photo,
-                    photoLineId: action.payload.id,
-                }))
-            }
+                photos: data.photos
+                    .filter(photo => !existingIds.has(photo.id)) // Оставляем только уникальные фото
+                    .map(photo => ({
+                        ...photo,
+                        photoLineId: action.payload.id,
+                    }))
+            };
+        
+            // Добавляем уникальные фотографии в состояние
             state.photos.push(...updateData.photos);
         },
         addUserData(state, action) {
@@ -116,6 +127,9 @@ const authSlice = createSlice({
         ,
         addCartList(state, action){
             state.cartList.push(action.payload);
+        },
+        setCart(state, action){
+            state.cart = action.payload
         }
     }
 });
@@ -132,7 +146,8 @@ export const {
     addPhotoLine,
     addQrIdPhoto,
     addPhotoPrice,
-    addCartList
+    addCartList,
+    setCart
 } = authSlice.actions;
 
 

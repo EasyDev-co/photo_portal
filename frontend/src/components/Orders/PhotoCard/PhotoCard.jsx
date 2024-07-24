@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import styles from './PhotoCard.module.css'
 import Counter from './Counter/Counter';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { useClickOutside } from '../../../utils/useClickOutside';
 
-const PhotoCard = ({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData, photoId }) => {
+const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData, photoId }) => {
     const [isScale, setIsScale] = useState(false);
     const [count, setCount] = useState(0);
 
@@ -99,6 +99,6 @@ const PhotoCard = ({blocksId, isChecked, photoLineId, onChangeHandler, inputValu
             </form>
         </div>
     );
-}
+})
 
 export default PhotoCard;

@@ -1,3 +1,92 @@
-.profileWrap{
-    margin-left: 100px;
+.profileWrap {
+    margin: 0 0 0 140px;
+    display: flex;
+}
+
+@media screen and (max-width: 1000px) {
+    .profileWrap {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .profileWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .profileWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+.profileTitle {
+    color: #090909;
+    font-family: "Nunito";
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 20px;
+    padding: 60px 40px 40px 0;
+}
+
+@media screen and (max-width: 768px) {
+    .profileTitle {
+        margin-left: 0;
+        padding: 40px 20px 40px 0;
+    }
+}
+.profileWidget{
+    display: flex;
+    flex-wrap: wrap;
+    /* gap: 24px; */
+    row-gap: 40px;
+    column-gap: 24px;
+    margin-bottom: 40px;
+    /* justify-content: center; */
+}
+.paymentTimerWrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 69px 40px 160px 40px;
+    gap: 80px;
+    border-left: 1px solid rgb(229, 229, 229);
+    flex-grow: 1;
+}
+@media (max-width: 968px) {
+    .paymentTimerWrap{
+        padding: 60px 20px 60px 20px;
+        border: none;
+    }
+}
+@media (max-width: 380px) {
+    .paymentTimerWrap{
+        padding: 60px 20px 60px 20px;
+    }
+}
+.checkWrap{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+.checkForm{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+.checkForm>label{
+    font-size: 18px;
+    font-weight: 600;
+}
+.inputField{
+    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    height: 40px;
+    outline: none;
+    width: 436px;
+    transition: .3s;
 }

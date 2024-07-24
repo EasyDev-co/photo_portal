@@ -1,11 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import styles from './Counter.module.css'
 
 const Counter = ({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, name, id, number, photoId }) => {
     const [count, setCount] = useState(0);
     const inputRef = useRef(null);
     const [showBtn, setShowBtn] = useState(false);
-    // console.log(isChecked)
     const increment = () => {
 
         setCount(prevCount => prevCount + 1);

@@ -1,11 +1,26 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 .ordersWrap {
     margin: 0 0 0 140px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
 }
 
 @media screen and (max-width: 1000px) {
     .ordersWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
         flex-direction: column;
     }
 }
@@ -23,12 +38,19 @@
 }
 
 .orderWidggetWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
     justify-content: space-between;
 }
 
 @media screen and (max-width: 968px) {
     .orderWidggetWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
         flex-direction: column;
     }
 }
@@ -39,6 +61,7 @@
     border-radius: 8px;
     font-size: 15px;
     font-weight: 700;
+
 }
 
 .profileTitle {
@@ -59,10 +82,14 @@
 }
 
 .photoCardsWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 24px;
+    position: relative;
 }
 
 /* .photoCardsWrapBlur{
@@ -72,23 +99,38 @@
     margin-bottom: 24px;
    position: relative;
 } */
-.photoCardsForm{
+.photoCardsForm {
+    position: relative;
+    margin-bottom: 68px;
+}
+@media screen and (max-width: 460px) {
+    .photoCardsForm {
+
+        margin-bottom: 124px;
+    }
+}
+.photoCardsFormBlur {
     position: relative;
 }
-.photoCardsFormBlur{
-    position: relative;
-}
-.photoCardsFormBlur::after{
+
+.photoCardsFormBlur::after {
     content: "";
     position: absolute;
     inset: 0;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
+
 @media (max-width: 1440px) {
     .photoCardsWrap {
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
         justify-content: center;
     }
-    .photoCardsWrapBlur{
+
+    .photoCardsWrapBlur {
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
         justify-content: center;
     }
 }
@@ -96,6 +138,8 @@
 .orderPromoWrap {
     margin-bottom: 24px;
     /* margin-right: 40px; */
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     gap: 24px;
 }
@@ -104,27 +148,47 @@
 
 @media (max-width: 1440px) {
     .orderPromoWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
         flex-direction: column;
     }
 }
 
 .orderPromo {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
     gap: 20px;
     border: 1px solid rgb(229, 229, 229);
     border-radius: 8px;
     padding: 24px;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
     flex-grow: 1;
 }
+
 @media (max-width: 380px) {
-    .orderPromo{
+    .orderPromo {
+        -webkit-box-align: start;
+        -ms-flex-align: start;
         align-items: start;
     }
 }
+
 .promoStringWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -138,6 +202,7 @@
     border-radius: 50%;
     background-color: rgb(17, 187, 209);
     margin-right: 8px;
+    -ms-flex-negative: 0;
     flex-shrink: 0;
 }
 
@@ -148,21 +213,50 @@
     border-radius: 8px;
 }
 
+.promoInput::-webkit-input-placeholder {
+    color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+
+.promoInput::-moz-placeholder {
+    color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+
+.promoInput:-ms-input-placeholder {
+    color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+
+.promoInput::-ms-input-placeholder {
+    color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+
 .promoInput::placeholder {
     color: rgb(110, 110, 110);
     font-size: 15px;
 }
 
 .promoInputWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     gap: 16px;
 }
+
 @media (max-width: 380px) {
-    .promoInputWrap{
+    .promoInputWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
         flex-direction: column;
     }
 }
+
 .promoInputWrap>span {
     color: rgb(17, 187, 209);
     font-size: 15px;
@@ -178,15 +272,28 @@
 }
 
 .addBtnWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
     justify-content: end;
     margin-bottom: 24px;
 }
 
 .paymentTimerWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
     justify-content: flex-start;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     /* padding: 0px 40px 0px 40px; */
     gap: 80px;
@@ -204,28 +311,39 @@
 }
 
 .promoButtonWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     gap: 24px;
-    margin-bottom: 37px;
 }
 
 .promoButtonWrap>span {
     color: rgb(110, 110, 110);
     font-size: 15px;
+    flex-shrink: 0;
 }
 
 .orderWidggetContainer {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
     margin-right: 40px;
 }
+
 @media (max-width: 520px) {
     .orderWidggetContainer {
         margin: 0;
     }
 }
-.qrCodeBtn{
+
+.qrCodeBtn {
     background-image: url(../../assets/images/Auth/6e45a5a3e5fadc8600c67a0aaaa5f737.png);
     background-size: 40px;
     width: 40px;
@@ -234,16 +352,68 @@
     top: 40%;
     left: 260px;
 }
-.bookCheckbox{
+
+.bookCheckbox {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     border: 1px solid rgb(229, 229, 229);
     border-radius: 8px;
-    width: 216px;
+    width: 179px;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
     justify-content: space-between;
     padding: 12px 16px;
-    margin-bottom: 24px;
 }
-#bookCheckbox{
+
+#bookCheckbox {
     accent-color: #11BBD1;
+    -webkit-transform: scale(1.5);
+    -ms-transform: scale(1.5);
     transform: scale(1.5);
+}
+
+.mailLink {
+    color: #11BBD1;
+    margin: 0 5px;
+}
+
+.errMessage {
+    background-color: #F8F9FB;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.buttonAddKidsWrap {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+@media (min-width: 360px) and (max-width: 767px) {
+    .buttonAddKidsWrap {
+        display: flex;
+        gap: 25px;
+        align-items: start;
+        margin-bottom: 50px;
+        flex-direction: column;
+    }
+}
+
+.widgetDelete {
+    position: absolute;
+    width: 100%;
+    right: 0;
+    display: flex;
+    margin-top: 24px;
+    justify-content: space-between;
+}
+@media screen and (max-width: 460px) {
+    .widgetDelete {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
