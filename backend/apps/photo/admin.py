@@ -142,7 +142,7 @@ class PhotoPopularityStatAdmin(admin.ModelAdmin):
         try:
             query_params = dict(parse_qsl(request.GET['_changelist_filters']))
             region_id = query_params.get('region')
-        except MultiValueDictKeyError:
+        except (MultiValueDictKeyError, ValueError):
             region_id = None
 
         extra_context = extra_context or {}

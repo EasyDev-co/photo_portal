@@ -6,12 +6,12 @@
 
 {% block content %}
     <div class="results">
-        <table>
+        <table style="width: 100%;">
 
             <thead>
             <tr>
                 <th>
-                    <div class="text">
+                    <div class="text" style="text-align: center;">
                         <a href="#"> Порядковый номер фотографии </a>
                     </div>
                 </th>
@@ -28,7 +28,7 @@
             <tbody>
             {% for row in popularity %}
                 <tr class="{% cycle 'row1' 'row2' %}">
-                    <td> {{ row.serial_number }} </td>
+                    <td style="text-align: center;"> {{ row.serial_number }} </td>
                     <td> {{ row.popularity | default:0 }} </td>
                 </tr>
             {% endfor %}
