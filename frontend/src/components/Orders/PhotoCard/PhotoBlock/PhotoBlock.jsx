@@ -1,10 +1,10 @@
 import React, { memo, useState } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
-const PhotoBlock = ({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
+const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
 
     return (
-        <div className={styles.photoCardsWrap}>
+        <div key={index} className={styles.photoCardsWrap}>
             {photos.map((photo, index) => (
                 <div key={index} className={styles.photoCardWrapper}>
                     <PhotoCard
@@ -20,9 +20,9 @@ const PhotoBlock = ({ blocksId, index, photos, handleRemoveBlock, onChangeHandle
                         photoLineId={photo.photoLineId}
                         isChecked={isChecked}
                     />
-                    
+                    {index === 5 &&
                         <div className={styles.widgetDelete}>
-                            {index === 0 &&  <div className={styles.bookCheckbox}>
+                            <div className={styles.bookCheckbox}>
                                 <div className={styles.bookDescr}>Фотокнига</div>
                                 <input
                                     id={blocksId}
@@ -30,17 +30,14 @@ const PhotoBlock = ({ blocksId, index, photos, handleRemoveBlock, onChangeHandle
                                     type="checkbox"
                                     onChange={(e) => handleCheckboxChange(e)}
                                 />
-                            </div>}
-                            {index === 5 &&
-                             <button className={styles.mainButton} onClick={() => handleRemoveBlock(index, photo.photoLineId)}>Удалить блок</button>
-                            }
+                            </div>
+                            <button className={styles.mainButton} onClick={() => handleRemoveBlock(blocksId, photo.photoLineId)}>Удалить блок</button>
                         </div>
-                    
+                    }
                 </div>
             ))}
-
         </div>
     );
-}
+})
 
 export default PhotoBlock;

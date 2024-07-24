@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getOnePhoto } from '../../../http/getOnePhoto';
 import { useClickOutside } from '../../../utils/useClickOutside';
 import { patchPhotoLine } from '../../../http/patchPhotoLine';
-const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
+
+const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
 
     const addPhoto = useSelector(state => state.user.photos);
     const [error, setError] = useState(false);
@@ -68,7 +69,7 @@ const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
                             res.json()
                             .then(res=>{
                                 dispatch(addPhotos(res))
-                                addBlock();
+                                // addBlock();
                                 patchPhotoLine(access,{
                                     "parent": idP
                                   },res.id)
@@ -101,6 +102,6 @@ const AddKidsForm = memo(({ addBlock, isActiveForm, setIsActiveForm }) => {
             <button className={styles.addKidsBtn}>Добавить</button>
         </form>
     );
-})
+}
 
 export default AddKidsForm;

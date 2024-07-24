@@ -60,16 +60,26 @@ const authSlice = createSlice({
             state.access = action.payload;
         },
         addPhotos(state, action) {
+            // Плоский массив фотографий
             const data = {  
                 photos: action.payload.photos.flat()
-            }
+            };
+        
+            // Создаем множество для хранения уникальных id
+            const existingIds = new Set(state.photos.map(photo => photo.id));
+        
+            // Фильтруем фотографии по уникальному id
             const updateData = {
                 ...data,
-                photos: data.photos.map(photo=> ({
-                    ...photo,
-                    photoLineId: action.payload.id,
-                }))
-            }
+                photos: data.photos
+                    .filter(photo => !existingIds.has(photo.id)) // Оставляем только уникальные фото
+                    .map(photo => ({
+                        ...photo,
+                        photoLineId: action.payload.id,
+                    }))
+            };
+        
+            // Добавляем уникальные фотографии в состояние
             state.photos.push(...updateData.photos);
         },
         addUserData(state, action) {
