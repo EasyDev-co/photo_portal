@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 const PaymentDiagram = () => {
     const [count, setCount] = useState(0)
-    const navigate = useNavigate()
-    const cart = useSelector(state=>state.user.cart)
+    const navigate = useNavigate();
+    const cart = useSelector(state=>state.user.cart);
+
     useEffect(() => {
         try {
             const sumTotalPrice = cart?.reduce((sum, item) => {
@@ -15,8 +16,6 @@ const PaymentDiagram = () => {
             }, 0);
             setCount(sumTotalPrice);
         } catch (error) {
-            console.log(error)
-            navigate('/sign-in')
         }
         
     }, [cart]);

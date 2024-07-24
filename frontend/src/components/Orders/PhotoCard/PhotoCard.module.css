@@ -91,4 +91,10 @@
 
 .cardImg {
     width: -webkit-fill-available;
+    height: 190px;
+}
+.block{
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
 }

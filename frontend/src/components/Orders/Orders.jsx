@@ -5,22 +5,21 @@ import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
-import { addCartList, addPhotoLine, addPhotos, setCart } from "../../store/authSlice";
+import { addPhotos, setCart } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
 import { patchPhotoLine } from "../../http/patchPhotoLine";
 import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
 import { orderCreate } from "../../http/orderCreate";
-import { fetchPhotoLineListWithTokenInterceptor, photoLineList } from "../../http/photoLineList";
+import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 
 export const Orders = () => {
   const dispatch = useDispatch();
-  // const photoLineId = useSelector(state => state.user.photoLineId);
-  // const photoLine = useSelector(state => state.user.photosLine);
-  // const cartList = useSelector(state => state.user.cartList);
+
   const [lineLenght, setlineLenght] = useState(0)
+  const addPhoto = useSelector(state => state.user.photos);
   const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
@@ -86,7 +85,7 @@ export const Orders = () => {
     return () => {
       isMounted = false; 
     };
-  }, [accessStor, idP, dispatch]);
+  }, [accessStor, dispatch, idP]);
 
   const addBlock = useCallback(() => {
     if (blocks.length < 2) {
@@ -124,9 +123,14 @@ export const Orders = () => {
   useEffect(() => {
     const transformedData = transformData(orderValue);
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-      .then(res => res.json())
       .then(res => {
-        dispatch(setCart(res))
+        if(res.ok){
+          res.json()
+          .then(res=>{
+            dispatch(setCart(res))
+          })
+          
+        }
       })
   }, [orderValue])
 
@@ -176,6 +180,7 @@ export const Orders = () => {
           </h1>
           <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             <Block
+              addPhoto={addPhoto}
               orderValue={orderValue}
               setOrderValue={setOrderValue}
               onChangeHandler={onChangeHandler}
