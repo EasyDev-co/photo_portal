@@ -36,7 +36,7 @@ services:
       - media_dir:/opt/backend/media/
       - ./backend:/opt/backend:rw
     ports:
-      - "8001:8000"
+      - "8000:8000"
 
   celery:
     <<: *base_web
