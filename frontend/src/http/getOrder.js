@@ -10,7 +10,6 @@ export const getOrder = async (access) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        credentials: 'include'
     });
     return response;
 }
