@@ -208,5 +208,6 @@ CORS_ALLOW_CREDENTIALS = True
 CART_SESSION_ID = 'cart'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
