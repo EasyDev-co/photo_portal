@@ -102,6 +102,7 @@
 .photoCardsForm {
     position: relative;
     margin-bottom: 68px;
+    transition: 3s;
 }
 @media screen and (max-width: 460px) {
     .photoCardsForm {
