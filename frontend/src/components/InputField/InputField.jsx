@@ -36,7 +36,7 @@ const InputField = (
         setIsActiveInput(!activeInput);
 
         const siblingInput = inputRef.current;
-
+        setActiveBlur(false)
         if (isQuestions) {
             setActiveWidget(!activeWidget)
             setActiveBlur(true);

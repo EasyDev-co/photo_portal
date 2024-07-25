@@ -18,12 +18,13 @@ export const Login = () => {
   const [wrongPassord, setWrongPassword] = useState(false);
   const [isActiveAuth, setIsActiveAuth] = useState(true);
   const [isActiveReset, setIsActiveReset] = useState(false);
+
   const [error, setError] = useState({
     non_field_errors:'',
   });
   const dispatch = useDispatch();
   const navigation = useNavigate();
-  console.log(error)
+
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -102,6 +103,7 @@ export const Login = () => {
                   isAuthForm
                   value={inputValue.email}
                   error={error.non_field_errors}
+                  setActiveBlur={setActiveBlur}
                 />
                 <InputField
                   name={'password'}
@@ -110,6 +112,7 @@ export const Login = () => {
                   placeholder={'Пароль'}
                   isAuthForm
                   value={inputValue.password}
+                  setActiveBlur={setActiveBlur}
                 />
                 {wrongPassord && <div className={styles.wrongPass}>
                   <img src={danger} alt="" />
