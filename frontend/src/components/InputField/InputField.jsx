@@ -36,7 +36,7 @@ const InputField = (
         setIsActiveInput(!activeInput);
 
         const siblingInput = inputRef.current;
-
+        setActiveBlur(false)
         if (isQuestions) {
             setActiveWidget(!activeWidget)
             setActiveBlur(true);
@@ -65,6 +65,7 @@ const InputField = (
                 </label>
                 <div className={isAuthForm ? style.inputFieldWrapAuth : style.inputFieldWrap}>
                     <input
+                        onClick={()=>setActiveBlur(false)}
                         ref={inputRef}
                         onChange={(e) => onChangeHandler(e)}
                         className={activeWidget ? style.inputQuestionField : style.inputField}
