@@ -24,14 +24,11 @@ export const fetchWithTokenInterceptor = async (id, access) => {
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
-                        console.log(res)
                         setCookie('refresh', res.refresh);
-
                         localStorage.setItem('access', res.access);
                         response = getPhotoLine(id, res.access);
                     })
             }
-
         }
         return response;
     } catch (error) {

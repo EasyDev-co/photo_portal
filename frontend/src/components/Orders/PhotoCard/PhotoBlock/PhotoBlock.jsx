@@ -3,7 +3,7 @@ import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
 const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
 
-    return (
+    return (    
         <div key={index} className={styles.photoCardsWrap}>
             {photos.map((photo, index) => (
                 <div key={index} className={styles.photoCardWrapper}>

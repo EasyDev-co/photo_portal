@@ -11,16 +11,17 @@ import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
 import { patchPhotoLine } from "../../http/patchPhotoLine";
 import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
-import { fetchOrderCreateWithTokenInterceptor, orderCreate } from "../../http/orderCreate";
+import { orderCreate } from "../../http/orderCreate";
 import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
+import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
 
 export const Orders = () => {
   const dispatch = useDispatch();
 
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
-  const [photos, setPhotos] = useState([]);
+  // const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
@@ -45,8 +46,46 @@ export const Orders = () => {
   useClickOutside(blurRef, () => {
     setIsBlur(false);
   });
-  console.log(isBlur)
   const [isActiveForm, setIsActiveForm] = useState(false);
+  useEffect(() => {
+    let isMounted = true;
+    if (sessionData) {
+      fetchWithTokenInterceptor(sessionData, accessStor)
+        .then(res => {
+          if (isMounted && res.ok) {
+            res.json()
+              .then(data => {
+                dispatch(addPhotos(data));
+                patchPhotoLine(accessStor, { "parent": idP }, data.id)
+                  .then(() => {
+                    if (isMounted) {
+                      // console.log('Patched photo line:', elem);
+                    }
+                  })
+                  .catch(error => {
+                    if (isMounted) {
+                      console.error('Error patching photo line:', error);
+                    }
+                  });
+              })
+              .catch(error => {
+                if (isMounted) {
+                  console.error('Error parsing response:', error);
+                }
+              });
+          }
+        })
+        .catch(error => {
+          if (isMounted) {
+            console.error('Error fetching photo line list:', error);
+          }
+        });
+      return () => {
+        isMounted = false;
+      };
+    }
+
+  }, [accessStor, sessionData])
 
   useEffect(() => {
     let isMounted = true; // добавляем переменную для отслеживания монтирования
@@ -84,9 +123,9 @@ export const Orders = () => {
         }
       });
     return () => {
-      isMounted = false; 
+      isMounted = false;
     };
-  }, [accessStor, dispatch, idP]);
+  }, [accessStor, dispatch, idP, lineLenght]);
 
   const addBlock = useCallback(() => {
     if (blocks.length < 2) {
@@ -125,20 +164,19 @@ export const Orders = () => {
     const transformedData = transformData(orderValue);
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
-        
-        if(res.ok){
+        if (res.ok) {
           res.json()
-          .then(res=>{
-            dispatch(setCart(res))
-          })
-          
+            .then(res => {
+              dispatch(setCart(res))
+            })
+
         }
       })
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const order = await fetchOrderCreateWithTokenInterceptor(accessStor, '')
+    const order = await orderCreate(accessStor)
     if (order.ok) {
       const data = await order.json();
       console.log(data)
@@ -154,7 +192,8 @@ export const Orders = () => {
       if (item.blockId == id) {
         return {
           ...item,
-          ['is_photobook']: checked
+          is_photobook: checked
+
         };
       }
       return item;
@@ -176,7 +215,7 @@ export const Orders = () => {
     <div className={styles.ordersWrap}>
       <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
       <div className={styles.orderWidggetWrap}>
-        <div  className={styles.orderWidggetContainer}>
+        <div className={styles.orderWidggetContainer}>
           <h1 className={styles.profileTitle}>Выбор фотографии
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
@@ -193,6 +232,7 @@ export const Orders = () => {
               isChecked={isChecked}
               handleCheckboxChange={handleCheckboxChange}
               lineLenght={lineLenght}
+              setlineLenght={setlineLenght}
             />
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
