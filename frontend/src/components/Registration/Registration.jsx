@@ -126,6 +126,7 @@ export const Registration = () => {
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
+                //  setActiveBlur={ setActiveBlur}
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}
@@ -154,6 +155,7 @@ export const Registration = () => {
                 placeholder={'ФИО'}
                 isNone
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.fullName}
                 error={error.first_name}
               />
@@ -163,6 +165,7 @@ export const Registration = () => {
                 placeholder={'Электронный адрес'}
                 isNone
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.email}
                 error={error.email}
               />
@@ -172,6 +175,7 @@ export const Registration = () => {
                 type={'password'}
                 placeholder={'Пароль'}
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.password}
                 error={error.password}
               />
@@ -181,6 +185,7 @@ export const Registration = () => {
                 type={'password'}
                 placeholder={'Повторить пароль'}
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.repeatPassword}
                 error={error.repeatPass}
               />

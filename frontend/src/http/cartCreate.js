@@ -7,6 +7,7 @@ export const cartCreate = async (access, cart) => {
     const url = `${localUrl}/api/v1/cart/`;
     const response = await fetch(url,{
         method:'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`

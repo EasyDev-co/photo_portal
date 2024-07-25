@@ -11,30 +11,35 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
     const scaleRef = useRef(null);
 
     useClickOutside(scaleRef, () => {
-        setIsScale(false);
+        if(isScale){
+            setIsScale(false);
+            setIsBlur(false)
+        }
     })
 
     const onScaleHandler = () => {
-        setIsBlur(true);
+        setIsBlur(true)
         setIsScale(true);
     }
-
+    // console.log(isScale)
     const increment = () => {
+        setIsBlur(true)
         if (count < 360) {
             setCount(prevCount => prevCount + 90);
         }
     };
     const decrement = () => {
+        setIsBlur(true)
         if (count > 0) {
             setCount(prevCount => prevCount - 90);
         }
     };
 
     return (
-        <div className={styles.photoCardWrap}>
-            <div ref={scaleRef} className={isScale ? styles.imgWrapScale : styles.imgWrap}>
-                <img style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo} alt="" />
-                <div onClick={() => { onScaleHandler() }} className={styles.loupe}></div>
+        <div ref={blurRef}  className={styles.photoCardWrap}>
+            <div ref={scaleRef} onClick={()=>{isScale && setIsBlur(true)}} className={isScale ? styles.imgWrapScale : styles.imgWrap}>
+                <img  style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo} alt="" />
+                <div onClick={() =>onScaleHandler()} className={styles.loupe}></div>
                 <div className={isScale ? styles.rotateWrap : styles.dNone}>
                     <div onClick={() => decrement()} className={styles.rotateLeft}></div>
                     <div onClick={() => increment()} className={styles.rotateRight}></div>
