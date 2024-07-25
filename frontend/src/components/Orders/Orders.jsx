@@ -11,7 +11,7 @@ import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
 import { patchPhotoLine } from "../../http/patchPhotoLine";
 import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
-import { orderCreate } from "../../http/orderCreate";
+import { fetchOrderCreateWithTokenInterceptor, orderCreate } from "../../http/orderCreate";
 import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 
@@ -45,6 +45,7 @@ export const Orders = () => {
   useClickOutside(blurRef, () => {
     setIsBlur(false);
   });
+  console.log(isBlur)
   const [isActiveForm, setIsActiveForm] = useState(false);
 
   useEffect(() => {
@@ -124,6 +125,7 @@ export const Orders = () => {
     const transformedData = transformData(orderValue);
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
+        
         if(res.ok){
           res.json()
           .then(res=>{
@@ -136,7 +138,7 @@ export const Orders = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const order = await orderCreate(accessStor)
+    const order = await fetchOrderCreateWithTokenInterceptor(accessStor, '')
     if (order.ok) {
       const data = await order.json();
       console.log(data)
@@ -174,7 +176,7 @@ export const Orders = () => {
     <div className={styles.ordersWrap}>
       <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
       <div className={styles.orderWidggetWrap}>
-        <div className={styles.orderWidggetContainer}>
+        <div  className={styles.orderWidggetContainer}>
           <h1 className={styles.profileTitle}>Выбор фотографии
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
