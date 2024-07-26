@@ -5,5 +5,5 @@ from apps.order.api.v1.views import CartAPIView, OrderAPIView, OrderOneAPIView
 urlpatterns = [
     path('order/', OrderAPIView.as_view(), name='order'),
     path('order/<uuid:pk>', OrderOneAPIView.as_view(), name='one_order'),
-    path('cart/', CartAPIView.as_view(), name='cart'),
+    # path('cart/', CartAPIView.as_view(), name='cart'),
 ]
