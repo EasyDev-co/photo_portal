@@ -149,7 +149,7 @@ export const Orders = () => {
       const existingIndex = updatedState.findIndex(
         item => item.id === photoId && item.photo_type === newValue.photo_type
       );
-
+      console.log(existingIndex)
       if (existingIndex !== -1) {
         updatedState[existingIndex] = newValue;
       } else {
@@ -159,9 +159,10 @@ export const Orders = () => {
     });
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
-
+  // console.log(orderValue)
   useEffect(() => {
     const transformedData = transformData(orderValue);
+    // console.log(transformedData)
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
@@ -186,8 +187,9 @@ export const Orders = () => {
     }
   };
 
-  const handleCheckboxChange = (event) => {
+  const handleCheckboxChange = (event, photoLineId) => {
     const { checked, id } = event.target;
+    
     const updatedItems = orderValue.map(item => {
       if (item.blockId == id) {
         return {
@@ -199,6 +201,8 @@ export const Orders = () => {
       return item;
     });
     setOrderValue(updatedItems);
+
+
   };
 
   const handleInputEmailChange = (event) => {

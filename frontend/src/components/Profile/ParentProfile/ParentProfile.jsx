@@ -28,7 +28,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     });
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
-
+    const [activeBlur, setActiveBlur] = useState(true)
     // const userData = useSelector(state => state.user.userData);
     const accessStor = localStorage.getItem('access');
     const [inputValue, setInputValue] = useState({
@@ -153,6 +153,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 value={inputValueReset.code}
                                 onChangeHandler={onChangeReset}
                                 isNone
+                                setActiveBlur={setActiveBlur}
                             />
                             <MainButton
                                 value={"Отправить код"}
@@ -171,6 +172,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentSurname}
                             isPencil
                             onChangeHandler={onChangeHandler}
+                            setActiveBlur={setActiveBlur}
                         />
                         <InputField
                             placeholder={"Имя"}
@@ -181,6 +183,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentName}
                             isPencil
                             onChangeHandler={onChangeHandler}
+                            setActiveBlur={setActiveBlur}
                         />
                         <InputField
                             placeholder={"Отчество"}
@@ -191,6 +194,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentPatronymic}
                             isPencil
                             onChangeHandler={onChangeHandler}
+                            setActiveBlur={setActiveBlur}
                         />
                     </div>
                     <div className={styles.profileInputWrap}>
@@ -204,6 +208,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             isPencil
                             onChangeHandler={onChangeHandler}
                             error={error.phone_number}
+                            setActiveBlur={setActiveBlur}
                         />
                         <InputField
                             placeholder={"mail@mail.ru"}
@@ -215,6 +220,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             isPencil
                             onChangeHandler={onChangeHandler}
                             error={error.message ? [error.message] : error.message}
+                            setActiveBlur={setActiveBlur}
                         />
 
                     </div>
@@ -228,6 +234,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentCity}
                             isPencil
                             onChangeHandler={onChangeHandler}
+                            setActiveBlur={setActiveBlur}
                         />
                         <InputField
                             placeholder={"Детский сад “Ромашка”"}
@@ -238,6 +245,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.kindergarten}
                             isPencil
                             onChangeHandler={onChangeHandler}
+                            setActiveBlur={setActiveBlur}
                         />
 
                     </div>
@@ -266,6 +274,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             isMarker
                             onChangeHandler={onChangeHandler}
                             autocomplete
+                            setActiveBlur={setActiveBlur}
                         />
                         <InputField
                             placeholder={generatePass}
@@ -276,6 +285,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             isPencil
                             onChangeHandler={onChangeHandler}
                             value={inputValue.parentNewPass}
+                            setActiveBlur={setActiveBlur}
                         />
                         {resetPassActive ? <InputField
                             placeholder={'mail@mail.ru'}
@@ -287,6 +297,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             onChangeHandler={onChangeHandler}
                             value={inputValue.resetEmail}
                             error={error.email}
+                            setActiveBlur={setActiveBlur}
                         /> :
                             <ResetPassButton
                                 setCodeWindow={setCodeWindow}
@@ -302,7 +313,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     </div>
                 </form>
             </div>
-
             <PaymentTimer
                 count={'3 500'} />
         </div>
