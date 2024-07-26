@@ -23,7 +23,8 @@ const InputField = (
         isAuthForm,
         urlData,
         autocomplete,
-        error
+        error,
+        isBlur
     }) => {
 
     const [activeInput, setIsActiveInput] = useState(false);
@@ -65,7 +66,7 @@ const InputField = (
                 </label>
                 <div className={isAuthForm ? style.inputFieldWrapAuth : style.inputFieldWrap}>
                     <input
-                        onClick={()=>setActiveBlur(false)}
+                        onClick={()=>isBlur && setActiveBlur(false)}
                         ref={inputRef}
                         onChange={(e) => onChangeHandler(e)}
                         className={activeWidget ? style.inputQuestionField : style.inputField}

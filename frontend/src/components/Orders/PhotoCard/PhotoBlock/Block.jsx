@@ -9,7 +9,7 @@ const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHan
   const [photoBlocks, setPhotoBlocks] = useState([]);
   const dispatch = useDispatch();
   const accessStor = localStorage.getItem('access');
-  console.log(addPhoto)
+
   useEffect(()=>{
     setlineLenght(photoBlocks.length)
   },[photoBlocks])
