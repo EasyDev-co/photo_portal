@@ -29,3 +29,9 @@ class PhotoPriceDoesNotExist(APIException):
     status_code = 400
     default_detail = 'Цена на фото этого типа не найдена.'
     default_code = 'photo_price_not_found'
+
+
+class PhotoThemeDoesNotExist(APIException):
+    status_code = 400
+    default_detail = 'Такая фототема не найдена.'
+    default_code = 'photo_theme_not_found'
