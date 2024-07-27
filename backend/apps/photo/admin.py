@@ -58,12 +58,15 @@ class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
 
 @admin.register(PhotoLine)
 class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
-    list_display = ('photo_theme', 'kindergarten')
+    list_display = ('photo_theme', 'kindergarten', 'photos')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
     inlines = [
         PhotoInline
     ]
+
+    def photos(self, obj):
+        return ",".join([str(p.number) for p in obj.photos.all()])
 
     @admin.display(description='QR код')
     def qr_image(self, obj):
