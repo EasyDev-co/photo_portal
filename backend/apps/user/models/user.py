@@ -1,10 +1,11 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 from apps.kindergarten.models import Kindergarten
 from apps.promocode.models import Promocode
 from apps.user.managers import UserManager
-from apps.user.validators import validate_phone_number
+from apps.user.validators import validate_phone_number, validate_cyrillic
 from apps.utils.services.normalize_phone_number import normalize_phone_number
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 
@@ -21,16 +22,19 @@ class User(UUIDMixin, AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     first_name = models.CharField(
-        max_length=255,
+        max_length=56,
+        validators=[MinLengthValidator(2), validate_cyrillic],
         verbose_name='Имя'
     )
     second_name = models.CharField(
-        max_length=255,
+        max_length=56,
+        validators=[MinLengthValidator(2), validate_cyrillic],
         verbose_name='Отчество',
         blank=True
     )
     last_name = models.CharField(
-        max_length=255,
+        max_length=56,
+        validators=[MinLengthValidator(2), validate_cyrillic],
         verbose_name='Фамилия'
     )
 
