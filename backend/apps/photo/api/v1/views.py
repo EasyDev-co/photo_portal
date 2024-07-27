@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -50,7 +51,10 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if photo_numbers == numbers_in_photo_line:
             serializer = PhotoLineSerializer(photo_line)
             return Response(serializer.data)
-        return Response({'message': 'Фотолиния с указанными фотографиями не найдена'})
+        return Response(
+            {'message': 'Фотолиния с указанными фотографиями не найдена'},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 
 class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
