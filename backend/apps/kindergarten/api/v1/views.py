@@ -72,12 +72,11 @@ class PhotoThemeRansomAPIView(APIView):
         # Если сумма выкупа больше 0 и фототема завершена,
         # записываем информацию о сумме выкупа в БД.
         if ransom_amount > 0 and current_time > photo_theme.date_end:
-            with transaction.atomic():
-                Ransom.objects.create(
-                    kindergarten_id=pk,
-                    photo_theme=photo_theme,
-                    ransom_amount=ransom_amount
-                )
+            Ransom.objects.create(
+                kindergarten_id=pk,
+                photo_theme=photo_theme,
+                ransom_amount=ransom_amount
+            )
         return Response(
             {'ransom': ransom_amount},
             status=status.HTTP_200_OK
