@@ -1,6 +1,8 @@
 from django.core.files.base import ContentFile
+from django.core.validators import MinLengthValidator
 from django.db import models
 
+from apps.kindergarten.validators import validate_cyrillic_space_dash_quotes
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 from apps.kindergarten.models.region import Region
 from apps.utils.services import generate_qr_code
@@ -15,7 +17,8 @@ class Kindergarten(UUIDMixin):
         verbose_name='Регион'
     )
     name = models.CharField(
-        max_length=255,
+        max_length=56,
+        validators=[validate_cyrillic_space_dash_quotes, MinLengthValidator(2)],
         verbose_name='Название'
     )
     code = models.CharField(
