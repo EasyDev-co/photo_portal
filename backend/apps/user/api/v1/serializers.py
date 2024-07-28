@@ -23,6 +23,8 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         if user is None or not user.is_active:
             raise ValidationError('Нет такого пользователя.')
+        if not user.is_verified:
+            raise ValidationError('Email не подтвержден.')
 
         refresh = RefreshToken.for_user(user)
         refresh['email'] = user.email

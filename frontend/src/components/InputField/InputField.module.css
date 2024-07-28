@@ -89,7 +89,7 @@
     border: 1px solid rgb(17, 187, 209);
     height: 40px;
     outline: none;
-    width: 100%;
+    /* width: 100%; */
     -webkit-transition: .3s;
     -o-transition: .3s;
     transition: .3s;

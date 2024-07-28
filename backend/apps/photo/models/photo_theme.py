@@ -24,3 +24,10 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     class Meta:
         verbose_name = 'Тема фотосессии'
         verbose_name_plural = 'Темы фотосессий'
+
+
+class PhotoPopularityStat(PhotoTheme):
+    class Meta:
+        proxy = True
+        verbose_name = 'Статистика популярности фотографий'
+        verbose_name_plural = 'Статистики популярности фотографий'

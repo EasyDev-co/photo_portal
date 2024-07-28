@@ -5,7 +5,7 @@ const authSlice = createSlice({
     name: 'user',
     initialState: {
         email: null,
-        access: true,//localStorage.getItem('access'),
+        access: localStorage.getItem('access'),
         refresh: null,
         blur: false,
         code: null,
@@ -82,6 +82,9 @@ const authSlice = createSlice({
             // Добавляем уникальные фотографии в состояние
             state.photos.push(...updateData.photos);
         },
+        removePhotos(state, action){
+            state.photos = state.photos.filter(photo => photo.photoLineId !== action.payload);
+        },
         addUserData(state, action) {
             state.userData = action.payload;
             localStorage.setItem('idP', action.payload.id);
@@ -147,7 +150,8 @@ export const {
     addQrIdPhoto,
     addPhotoPrice,
     addCartList,
-    setCart
+    setCart,
+    removePhotos
 } = authSlice.actions;
 
 
