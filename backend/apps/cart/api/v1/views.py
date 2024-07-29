@@ -6,6 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from apps.cart.api.v1.serializer import PhotoInCartSerializer, CartPhotoLineSerializer, CartSerializer, CartPhotoLineCreateUpdateSerializer
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
+from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
 class PhotoInCartAPIView(APIView):
@@ -46,9 +47,17 @@ class CartAPIView(APIView):
     def post(self, request):
         cart = Cart.objects.get_or_create(user=request.user)[0].id
         validated_data = request.data
+
+
+        # считаем скидки
+        promocode = request.user.promocode
+        bonus_coupon = BonusCoupon.objects.filter(user=request.user, is_active=True, balance__gt=0).first()
+
         for data in validated_data:
             data['cart'] = cart
-        serializer = CartPhotoLineCreateUpdateSerializer(data=validated_data, many=True)
+
+
+        serializer = CartPhotoLineCreateUpdateSerializer(data=validated_data, context={'request': request}, many=True)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         return Response(CartPhotoLineSerializer(instance, many=True).data)

@@ -1,19 +1,20 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
-import loguru
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
-from apps.kindergarten.models import PhotoPrice, PhotoType
+from apps.kindergarten.models import PhotoPrice
 from apps.photo.models import Photo, PhotoLine
+from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
 class PhotoInCartSerializer(serializers.ModelSerializer):
     """Сериализатор для Фото в корзине."""
     id = serializers.PrimaryKeyRelatedField(source='photo', queryset=Photo.objects.all())
     price_per_piece = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    discount_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
     class Meta:
         model = PhotoInCart
@@ -34,7 +35,8 @@ class CartPhotoLineSerializer(serializers.Serializer):
     is_photobook = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
-    def get_photos(self, obj):
+    @staticmethod
+    def get_photos(obj):
         photos_in_cart = PhotoInCart.objects.filter(cart_photo_line=obj)
         serializer = PhotoInCartSerializer(photos_in_cart, many=True)
         return serializer.data
@@ -50,27 +52,48 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     photos = PhotoInCartSerializer(many=True)
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
-    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    # total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def create(self, validated_data):
         photos_in_cart = validated_data.pop('photos')
-        # cart_id = validated_data.pop('cart')
-        # photo_line_id = validated_data.pop('photo_line')
-        # cart = get_object_or_404(Cart, id=cart_id)
-        # photo_line = get_object_or_404(PhotoLine, id=photo_line_id)
-        loguru.logger.info(validated_data)
-
         instance = CartPhotoLine.objects.create(**validated_data)
-        photo_list = [
-            PhotoInCart(
+        user = self.context.get('request').user
+
+        promocode = user.promocode
+        # bonus_coupon = bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
+
+        total_price = Decimal(0)
+
+        photo_list = []
+
+        for photo in photos_in_cart:
+            price_per_piece = get_object_or_404(
+                PhotoPrice,
                 photo_type=photo['photo_type'],
-                quantity=photo['quantity'],
-                discount_price=photo['discount_price'],
-                photo=photo['photo'],
-                price_per_piece=get_object_or_404(PhotoPrice, photo_type=photo['photo_type'], region=validated_data['photo_line'].kindergarten.region).price,
-                cart_photo_line=instance,
-            ) for photo in photos_in_cart]
+                region=validated_data['photo_line'].kindergarten.region
+            ).price
+
+            discount_price = price_per_piece
+
+            if promocode:
+                discount_price = promocode.use_promocode_to_price(
+                    Decimal(price_per_piece.quantize(Decimal("0.0"), rounding=ROUND_HALF_UP)), photo['photo_type']
+                )
+
+            photo_list.append(
+                PhotoInCart(
+                    photo_type=photo['photo_type'],
+                    quantity=photo['quantity'],
+                    discount_price=discount_price,
+                    photo=photo['photo'],
+                    price_per_piece=price_per_piece,
+                    cart_photo_line=instance,
+                )
+            )
+            total_price += discount_price * photo['quantity']
         PhotoInCart.objects.bulk_create(photo_list)
+        instance.total_price = total_price
+        instance.save()
         return instance
 
 
