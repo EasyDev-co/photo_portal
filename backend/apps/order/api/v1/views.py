@@ -23,6 +23,7 @@ class OrderAPIView(APIView):
     def post(self, request):
         cart = get_object_or_404(Cart, user=request.user)
         cart_photo_lines = cart.cart_photo_lines.select_related('cart')
+
         orders = [
             Order(
                 user=request.user,
@@ -54,6 +55,7 @@ class OrderAPIView(APIView):
             OrderItem.objects.bulk_create(order_items)
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
+
 
 class OldOrderAPIView(APIView):
     """Представление для заказа. (Старое - не актуально)."""

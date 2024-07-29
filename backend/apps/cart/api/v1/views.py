@@ -45,11 +45,14 @@ class CartAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        cart = Cart.objects.get_or_create(user=request.user)[0].id
-        validated_data = request.data
+        cart = Cart.objects.get_or_create(user=request.user)[0]
 
+        cart_photo_lines = cart.cart_photo_lines.select_related('cart')
+        cart_photo_lines.delete()
+
+        validated_data = request.data
         for data in validated_data:
-            data['cart'] = cart
+            data['cart'] = cart.id
 
         serializer = CartPhotoLineCreateUpdateSerializer(data=validated_data, context={'request': request}, many=True)
         serializer.is_valid(raise_exception=True)
