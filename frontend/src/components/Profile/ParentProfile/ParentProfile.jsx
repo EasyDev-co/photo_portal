@@ -142,10 +142,11 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         <div className={styles.profileWrap}>
             <div className={styles.profileFormsWrap}>
                 {codeWindowActive &&
-                    <form ref={codeRef} onSubmit={(e) => onResetSubmit(e)} className={styles.codeResetForm} action="">
+                    <form onSubmit={(e) => onResetSubmit(e)} className={styles.codeResetForm} action="">
+                        <div onClick={()=>setCodeWindow(false)} className={styles.closeBtn}></div>
                         <div className={styles.codeResetWrap}>
                             <InputField
-                                label={"Введите код отпрвленный на Email"}
+                                label={"Введите код отправленный на Email"}
                                 placeholder={"Код"}
                                 type={"text"}
                                 name={"code"}
@@ -271,7 +272,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             name={"parentPass"}
                             id={"parentPass"}
                             value={inputValue.parentPass}
-                            isMarker
                             onChangeHandler={onChangeHandler}
                             autocomplete
                             setActiveBlur={setActiveBlur}
@@ -302,13 +302,13 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             <ResetPassButton
                                 setCodeWindow={setCodeWindow}
                                 setResetActive={setResetActive}
-                                value={'Изменить пароль'}
+                                value={'Укажите Email'}
                             />
                         }
                     </div>
                     <div>
                         <MainButton
-                            value={"Изменить"}
+                            value={"Отправить код для смены пароля"}
                         />
                     </div>
                 </form>
