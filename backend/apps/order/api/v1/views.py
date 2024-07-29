@@ -54,6 +54,7 @@ class OrderAPIView(APIView):
             ]
             OrderItem.objects.bulk_create(order_items)
         serializer = OrderSerializer(orders, many=True)
+        cart.delete()
         return Response(serializer.data)
 
 
