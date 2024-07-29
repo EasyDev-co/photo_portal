@@ -15,6 +15,11 @@ class PhotoInCartAPIView(APIView):
         serializer.save()
         return Response(serializer.data)
 
+    def get(self, request):
+        photos_in_cart = PhotoInCart.objects.all()
+        serializer = PhotoInCartSerializer(photos_in_cart, many=True)
+        return Response(serializer.data)
+
 
 class CartPhotoLineAPIView(APIView):
     def get(self, request):
