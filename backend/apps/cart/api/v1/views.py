@@ -48,14 +48,8 @@ class CartAPIView(APIView):
         cart = Cart.objects.get_or_create(user=request.user)[0].id
         validated_data = request.data
 
-
-        # считаем скидки
-        promocode = request.user.promocode
-        bonus_coupon = BonusCoupon.objects.filter(user=request.user, is_active=True, balance__gt=0).first()
-
         for data in validated_data:
             data['cart'] = cart
-
 
         serializer = CartPhotoLineCreateUpdateSerializer(data=validated_data, context={'request': request}, many=True)
         serializer.is_valid(raise_exception=True)
