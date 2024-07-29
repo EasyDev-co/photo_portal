@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from apps.cart.api.v1.serializer import PhotoInCartSerializer, CartPhotoLineSerializer, CartSerializer, CartPhotoLineCreateUpdateSerializer
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
 
+
 class PhotoInCartAPIView(APIView):
     def post(self, request):
         serializer = PhotoInCartSerializer(data=request.data)
@@ -29,21 +30,20 @@ class CartPhotoLineAPIView(APIView):
         return Response(CartPhotoLineSerializer(instance).data)
 
 
-
 class CartAPIView(APIView):
     """Представление для корзины."""
     def get(self, request):
-        user = request.user
-        cart = get_object_or_404(Cart, user=user)
-        response = []
-        for photo_line in cart.photo_lines:
-            response.append(
-                {
-                    "id": photo_line.id,
-                    "photos": photo_line.photos,
-                    "total_price": photo_line.total_price,
-                    "is_digital": photo_line.is_digital,
-                    "is_photobook": photo_line.is_photobook,
-                }
-            )
-        return Response(response)
+        cart = get_object_or_404(Cart, user=request.user)
+        cart_photo_lines = CartPhotoLine.objects.filter(cart=cart)
+        serializer = CartPhotoLineSerializer(cart_photo_lines, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        cart = Cart.objects.get_or_create(user=request.user)[0].id
+        validated_data = request.data
+        for data in validated_data:
+            data['cart'] = cart
+        serializer = CartPhotoLineCreateUpdateSerializer(data=validated_data, many=True)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response(CartPhotoLineSerializer(instance, many=True).data)

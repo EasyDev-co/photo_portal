@@ -8,7 +8,7 @@ from apps.photo.models import Photo, PhotoLine
 
 
 class PhotoInCartSerializer(serializers.ModelSerializer):
-
+    """Сериализатор для Фото в корзине."""
     class Meta:
         model = PhotoInCart
         fields = (
@@ -20,21 +20,8 @@ class PhotoInCartSerializer(serializers.ModelSerializer):
         )
 
 
-
-# class CartPhotoLineSerializer(serializers.ModelSerializer):
-#     photos = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = CartPhotoLine
-#         fields = '__all__'
-#
-#     def get_photos(self, obj):
-#         photos_in_cart = PhotoInCart.objects.filter(cart_photo_line=obj)
-#         serializer = PhotoInCartSerializer(photos_in_cart, many=True)
-#         return serializer.data
-
-
 class CartPhotoLineSerializer(serializers.Serializer):
+    """Сериализатор для отображения Фотолиний в корзине."""
     id = serializers.UUIDField()
     photos = serializers.SerializerMethodField()
     is_digital = serializers.BooleanField(default=False)
@@ -48,6 +35,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
 
 
 class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
+    """Сериализатор для создания Фотолиний в корзине."""
     cart = serializers.UUIDField()
     id = serializers.UUIDField()
     photos = PhotoInCartSerializer(many=True)
@@ -77,9 +65,6 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
             ) for photo in photos_in_cart]
         PhotoInCart.objects.bulk_create(photo_list)
         return instance
-
-
-
 
 
 class CartSerializer(serializers.Serializer):
