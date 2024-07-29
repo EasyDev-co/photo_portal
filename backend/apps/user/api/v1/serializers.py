@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
+from apps.kindergarten.models import Kindergarten
 from apps.user.models import User
 from apps.user.validators import validate_phone_number
 
@@ -96,6 +97,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         required=False,
         validators=[validate_phone_number]
     )
+    kindergarten = serializers.PrimaryKeyRelatedField(
+        queryset=Kindergarten.objects.all(),
+        many=True,
+        required=False
+    )
 
     class Meta:
         model = User
@@ -103,5 +109,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
-            'phone_number'
+            'phone_number',
+            'kindergarten'
         )

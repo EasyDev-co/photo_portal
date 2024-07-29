@@ -1,20 +1,23 @@
 from datetime import datetime
 
-from django.db import transaction
-from pytz import timezone
-
 from django.core.exceptions import ValidationError
+from django.db.models import Sum
+from django_filters.rest_framework import DjangoFilterBackend
+from pytz import timezone
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-
-from django.db.models import Sum
 
 from apps.exceptions.api_exceptions import PhotoThemeDoesNotExist
+from apps.kindergarten.api.v1.filters import KindergartenFilter
+from apps.kindergarten.api.v1.serializers import (
+    PhotoPriceSerializer,
+    PhotoPriceByRegionSerializer,
+    KindergartenSerializer
+)
+from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten
 from apps.order.models import Order
 from apps.photo.models import PhotoTheme
-from apps.kindergarten.models import PhotoPrice, Ransom
-from apps.kindergarten.api.v1.serializers import PhotoPriceSerializer, PhotoPriceByRegionSerializer
 from config.settings import TIME_ZONE
 
 
@@ -81,3 +84,12 @@ class PhotoThemeRansomAPIView(APIView):
             {'ransom': ransom_amount},
             status=status.HTTP_200_OK
         )
+
+
+class KindergartenListView(generics.ListAPIView):
+    """Вью для получения списка детских садов."""
+
+    queryset = Kindergarten.objects.all()
+    serializer_class = KindergartenSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = KindergartenFilter
