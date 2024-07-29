@@ -1,6 +1,8 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 
 from apps.cart.api.v1.views import CartAPIView, PhotoInCartAPIView, CartPhotoLineAPIView
+
 
 urlpatterns = [
     path('cart/', CartAPIView.as_view(), name='cart'),
