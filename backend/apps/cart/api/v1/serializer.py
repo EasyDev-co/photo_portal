@@ -1,11 +1,12 @@
 from decimal import ROUND_HALF_UP, Decimal
 
+import loguru
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
-from apps.kindergarten.models import PhotoPrice
+from apps.kindergarten.models import PhotoPrice, PhotoType
 from apps.photo.models import Photo, PhotoLine
 from apps.promocode.models.bonus_coupon import BonusCoupon
 
@@ -52,26 +53,22 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     photos = PhotoInCartSerializer(many=True)
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
-    # total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def create(self, validated_data):
         photos_in_cart = validated_data.pop('photos')
         instance = CartPhotoLine.objects.create(**validated_data)
         user = self.context.get('request').user
+        region_prices = PhotoPrice.objects.filter(region=validated_data['photo_line'].kindergarten.region)
 
         promocode = user.promocode
-        # bonus_coupon = bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
+        bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
 
         total_price = Decimal(0)
 
         photo_list = []
 
         for photo in photos_in_cart:
-            price_per_piece = get_object_or_404(
-                PhotoPrice,
-                photo_type=photo['photo_type'],
-                region=validated_data['photo_line'].kindergarten.region
-            ).price
+            price_per_piece = region_prices.get(photo_type=photo['photo_type']).price
 
             discount_price = price_per_piece
 
@@ -92,6 +89,16 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
             )
             total_price += discount_price * photo['quantity']
         PhotoInCart.objects.bulk_create(photo_list)
+
+        if bonus_coupon:
+            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+
+        if validated_data['is_digital']:
+            total_price += region_prices.get(photo_type=PhotoType.digital).price
+
+        if validated_data['is_photobook']:
+            total_price += region_prices.get(photo_type=PhotoType.photobook).price
+
         instance.total_price = total_price
         instance.save()
         return instance
