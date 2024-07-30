@@ -33,6 +33,7 @@ const InputField = (
     const [inputChange, setInputChange] = useState(true);
 
     const inputRef = useRef(null);
+    
     const clickMarker = (e) => {
         setIsActiveInput(!activeInput);
 
