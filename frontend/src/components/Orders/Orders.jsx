@@ -21,7 +21,6 @@ export const Orders = () => {
 
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
-  // const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
@@ -189,23 +188,37 @@ export const Orders = () => {
 
   const handleCheckboxChange = (event, photoLineId) => {
     const { checked, id } = event.target;
-    
-    const updatedItems = orderValue.map(item => {
-      if (item.blockId == id) {
-        return {
-          ...item,
-          is_photobook: checked
+    fetchCartCreateWithTokenInterceptor(accessStor, '', 
+      [{
+       id: photoLineId,
+       photos: [],
+       is_photobook: checked,
+       is_digital: false
+     }]
+   )
+     .then(res => {
+       if (res.ok) {
+         res.json()
+           .then(res => {
+             dispatch(setCart(res))
+           })
+       }
+     })
+    // const updatedItems = orderValue.map(item => {
+    //   if (item.blockId == id) {
+    //     return {
+    //       ...item,
+    //       is_photobook: checked
 
-        };
-      }
-      return item;
-    });
-    setOrderValue(updatedItems);
-
-
+    //     };
+    //   }
+    //   return item;
+    // });
+    // setOrderValue(updatedItems);
   };
 
   const handleInputEmailChange = (event) => {
+   
     const updatedItems = orderValue.map(item => {
       return {
         ...item,

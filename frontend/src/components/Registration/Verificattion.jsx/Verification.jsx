@@ -3,9 +3,11 @@ import InputField from '../../InputField/InputField';
 import { useState } from 'react';
 import { parentEmailVerification } from '../../../http/parentEmailVerification';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser} from '../../../store/authSlice';
+import { addPhotos, setUser } from '../../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../utils/useAuth';
+import { getOnePhoto } from '../../../http/getOnePhoto';
+import { patchPhotoLine } from '../../../http/patchPhotoLine';
 const Verification = () => {
     const initialState = {
         code: '',
@@ -14,11 +16,11 @@ const Verification = () => {
     const dispatch = useDispatch();
     const [inputValue, setInputValue] = useState(initialState);
     const [error, setError] = useState(null);
-    const {isAuth} = useAuth();
-
-    const email = useSelector(action=>action.user.email);
+    const { isAuth } = useAuth();
+    const idP = localStorage.getItem('idP');
+    const email = useSelector(action => action.user.email);
     const navigation = useNavigate();
-    
+    const photoNumbers = useSelector(action => action.user.photoNumbers);
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
@@ -26,7 +28,7 @@ const Verification = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         try {
-            const response = await parentEmailVerification(inputValue.code,email)
+            const response = await parentEmailVerification(inputValue.code, email)
             if (response.ok) {
                 const data = await response.json();
                 dispatch(
@@ -35,6 +37,18 @@ const Verification = () => {
                         refresh: data.refresh
                     })
                 )
+                getOnePhoto(photoNumbers, data.access)
+                    .then(res => {
+                        if (res.ok) {
+                            res.json()
+                                .then(res => {
+                                    dispatch(addPhotos(res))
+                                    patchPhotoLine(data.access,{
+                                        "parent": data.user
+                                      },res.id)
+                                })
+                        }
+                    })
                 navigation('/')
             } else {
                 const data = await response.json();
