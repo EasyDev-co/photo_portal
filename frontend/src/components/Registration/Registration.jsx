@@ -9,7 +9,7 @@ import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
-import { addQrIdPhoto, setEmail } from "../../store/authSlice";
+import { addQrIdPhoto, setEmail, setPhotoNumbers } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
 import { useLocation } from "react-router-dom";
 import danger from '../../assets/images/Auth/DangerCircle.svg'
@@ -22,11 +22,11 @@ export const Registration = () => {
   const [isChecked, setIsChecked] = useState(false);
   const accessStor = localStorage.getItem('access');
   const navigate = useNavigate();
-  useEffect(()=>{
-    if(accessStor){
+  useEffect(() => {
+    if (accessStor) {
       navigate('/orders')
     }
-  },[])
+  }, [])
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -101,6 +101,11 @@ export const Registration = () => {
           setEmail(inputValue.email)
         )
         setResponseData(data);
+        dispatch(setPhotoNumbers(
+          inputValue.pictureNumbers.split('-').map(elem => {
+            return Number(elem)
+          })
+        ))
         navigation('/verification');
       } else {
         const data = await response.json();
@@ -111,7 +116,7 @@ export const Registration = () => {
     }
     setInputValue(initialState);
   }
-  console.log(error)
+
   return <>
     <div className={styles.login}>
       <Scaner
@@ -126,6 +131,7 @@ export const Registration = () => {
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
+                //  setActiveBlur={ setActiveBlur}
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}
@@ -154,6 +160,7 @@ export const Registration = () => {
                 placeholder={'ФИО'}
                 isNone
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.fullName}
                 error={error.first_name}
               />
@@ -163,6 +170,7 @@ export const Registration = () => {
                 placeholder={'Электронный адрес'}
                 isNone
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.email}
                 error={error.email}
               />
@@ -172,6 +180,7 @@ export const Registration = () => {
                 type={'password'}
                 placeholder={'Пароль'}
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.password}
                 error={error.password}
               />
@@ -181,13 +190,14 @@ export const Registration = () => {
                 type={'password'}
                 placeholder={'Повторить пароль'}
                 isAuthForm
+                setActiveBlur={setActiveBlur}
                 value={inputValue.repeatPassword}
                 error={error.repeatPass}
               />
 
 
-              <div className={isChecked?styles.privacyCheckbox:styles.privacyCheckboxUnCheck}>
-                <input className={styles.privacyInput} onChange={(e)=>setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
+              <div className={isChecked ? styles.privacyCheckbox : styles.privacyCheckboxUnCheck}>
+                <input className={styles.privacyInput} onChange={(e) => setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
                 <label htmlFor="privacy">
                   <p>
                     Даю согласие на обработку своих персональных данных.

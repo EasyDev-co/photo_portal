@@ -50,7 +50,6 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
             setError(true);
             return;
         }
-
         tokenRefreshCreate()
             .then(res => res.json())
             .then(res => {

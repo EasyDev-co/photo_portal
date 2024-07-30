@@ -1,11 +1,21 @@
+from urllib.parse import parse_qsl
+
 from django.contrib import admin
+from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.safestring import mark_safe
 from rest_framework.exceptions import ValidationError
 from django.contrib import messages
 
+from apps.kindergarten.models import Region
 from apps.photo.models import (Photo,
                                PhotoTheme,
-                               PhotoLine)
+                               PhotoLine,
+                               Coefficient)
+from apps.photo.models.photo_theme import PhotoPopularityStat
+from apps.utils.services.calculate_photo_popularity import (
+    get_prepared_data,
+    calculate_popularity
+)
 
 from config.settings import PHOTO_LINE_URL
 from apps.utils.services import generate_qr_code
@@ -48,12 +58,15 @@ class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
 
 @admin.register(PhotoLine)
 class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
-    list_display = ('photo_theme', 'kindergarten')
+    list_display = ('photo_theme', 'kindergarten', 'photos')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
     inlines = [
         PhotoInline
     ]
+
+    def photos(self, obj):
+        return ",".join([str(p.number) for p in obj.photos.all()])
 
     @admin.display(description='QR код')
     def qr_image(self, obj):
@@ -95,3 +108,70 @@ class PhotoAdmin(admin.ModelAdmin):
     def photo_img(self, obj):
         if obj:
             return mark_safe(f'<img src="{obj.photo.url}" width="200" height="200" />')
+
+
+class RegionFilter(admin.SimpleListFilter):
+    title = 'Регион'
+    parameter_name = 'region'
+
+    def lookups(self, request, model_admin):
+        regions = Region.objects.all()
+        return [(region.id, region.name) for region in regions]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(photo_lines__kindergarten__region__id=self.value()).distinct()
+        return queryset
+
+
+@admin.register(PhotoPopularityStat)
+class PhotoPopularityStatAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    list_filter = (RegionFilter,)
+    ordering = ('name',)
+    change_form_template = 'admin/photo/photopopularitystat/change_form.html'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        """Кастомное представление для отображения статистики."""
+        try:
+            query_params = dict(parse_qsl(request.GET['_changelist_filters']))
+            region_id = query_params.get('region')
+        except (MultiValueDictKeyError, ValueError):
+            region_id = None
+
+        extra_context = extra_context or {}
+
+        prepared_data = get_prepared_data(
+            photo_theme_id=object_id,
+            region_id=region_id,
+        )
+        popularity = calculate_popularity(prepared_data)
+
+        extra_context['popularity'] = popularity
+        return super().change_view(request, object_id, form_url, extra_context)
+
+
+@admin.register(Coefficient)
+class CoefficientAdmin(admin.ModelAdmin):
+    list_display = (
+        'photo_type',
+        'coefficient'
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

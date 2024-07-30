@@ -4,6 +4,7 @@ export function transformData(data) {
     const result = [];
 
     const groupedByPhotoLineId = data.reduce((acc, item) => {
+        
         const { photoLineId, is_photobook, is_digital, ...photo } = item;
         if (!acc[photoLineId]) {
             acc[photoLineId] = {
@@ -13,7 +14,12 @@ export function transformData(data) {
                 is_digital: is_digital
             };
         }
-        acc[photoLineId].photos.push(photo);
+        console.log(photo.photo_type)
+        if(photo.photo_type != 6){
+            acc[photoLineId].photos.push(photo);
+        } else {
+            acc[photoLineId].photos.push();
+        }  
         return acc;
     }, {});
 

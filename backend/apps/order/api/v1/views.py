@@ -1,3 +1,4 @@
+import loguru
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -6,8 +7,9 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.cart.models import Cart
 from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
-from apps.order.models import Order
+from apps.order.models import Order, OrderItem
 
 from apps.utils.services import CartService
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
@@ -17,7 +19,47 @@ User = get_user_model()
 
 
 class OrderAPIView(APIView):
-    """Представление для заказа."""
+
+    def post(self, request):
+        cart = get_object_or_404(Cart, user=request.user)
+        cart_photo_lines = cart.cart_photo_lines.select_related('cart')
+
+        orders = [
+            Order(
+                user=request.user,
+                photo_line=cart_photo_line.photo_line,
+                is_digital=cart_photo_line.is_digital,
+                is_photobook=cart_photo_line.is_photobook,
+                order_price=cart_photo_line.total_price,
+
+            ) for cart_photo_line in cart_photo_lines
+        ]
+        orders = Order.objects.bulk_create(orders)
+
+        order_ids = []
+        for order in orders:
+            order_ids.append(order.id)
+        orders = Order.objects.filter(id__in=order_ids)
+
+        for cart_photo_line in cart_photo_lines:
+            order = orders.get(photo_line__id=cart_photo_line.photo_line.id)
+            photos_in_cart = cart_photo_line.photos_in_cart.select_related('cart_photo_line')
+            order_items = [
+                OrderItem(
+                    photo_type=photo_in_cart.photo_type,
+                    amount=photo_in_cart.quantity,
+                    order=order,
+                    photo=photo_in_cart.photo,
+                ) for photo_in_cart in photos_in_cart
+            ]
+            OrderItem.objects.bulk_create(order_items)
+        serializer = OrderSerializer(orders, many=True)
+        cart_photo_lines.delete()
+        return Response(serializer.data)
+
+
+class OldOrderAPIView(APIView):
+    """Представление для заказа. (Старое - не актуально)."""
 
     @swagger_auto_schema(
         responses={"201": OrderSerializer(many=True)},
@@ -45,8 +87,8 @@ class OrderAPIView(APIView):
         return Response(serializer.data)
 
 
-class OrderOneAPIView(APIView):
-    """Представление для одного заказа."""
+class OldOrderOneAPIView(APIView):
+    """Представление для одного заказа. (Старое - не актуально)."""
     @swagger_auto_schema(responses={"200": OrderSerializer()},)
     def get(self, request, pk):
         """Получение заказа."""
@@ -55,8 +97,8 @@ class OrderOneAPIView(APIView):
         return Response(serializer.data)
 
 
-class CartAPIView(APIView):
-    """Представление для корзины"""
+class OldCartAPIView(APIView):
+    """Представление для корзины (старая корзина - не актуально)"""
     @swagger_auto_schema(
         responses={
             "201": openapi.Response(
