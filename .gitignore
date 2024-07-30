@@ -164,3 +164,4 @@ backend.dockerfile
 celery.dockerfile
 static
 media
+dumps
