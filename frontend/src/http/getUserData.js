@@ -3,7 +3,7 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
 
-export const getUserData = async (access, signal) => {
+export const getUserData = async (access) => {
     const url = `${localUrl}/api/v1/user/`;
 
     const response = await fetch(url, {
@@ -11,7 +11,6 @@ export const getUserData = async (access, signal) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        signal
     });
     return response;
 }

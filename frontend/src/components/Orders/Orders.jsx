@@ -158,10 +158,9 @@ export const Orders = () => {
     });
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
-  // console.log(orderValue)
+
   useEffect(() => {
     const transformedData = transformData(orderValue);
-    // console.log(transformedData)
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
