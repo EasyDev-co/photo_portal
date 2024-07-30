@@ -8,8 +8,8 @@ const PaymentDiagram = () => {
     const navigate = useNavigate();
     const cart = useSelector(state=>state.user.cart);
     const total_price = useSelector(state=>state.user.total_price);
-    console.log(total_price)
-    console.log(cart)
+    // console.log(total_price)
+    // console.log(cart)
     useEffect(() => {
         try {
             const sumTotalPrice = cart?.reduce((sum, item) => {

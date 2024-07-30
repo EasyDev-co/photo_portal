@@ -44,7 +44,7 @@ const Verification = () => {
                                 .then(res => {
                                     dispatch(addPhotos(res))
                                     patchPhotoLine(data.access,{
-                                        "parent": idP
+                                        "parent": data.user
                                       },res.id)
                                 })
                         }
