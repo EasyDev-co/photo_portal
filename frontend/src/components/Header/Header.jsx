@@ -20,41 +20,55 @@ export const Header = () => {
   const userData = useSelector(state => state.user.userData);
   const refresh = useSelector(state => state.user.refresh);
   const accessStor = localStorage.getItem('access');
+  const [localStorageValue, setLocalStorageValue] = useState({
+    last_name: localStorage.getItem('last_name'),
+    first_name: localStorage.getItem('first_name'),
+    second_name: localStorage.getItem('second_name'),
+    phone: localStorage.getItem('phone')
+  })
   const { isAuth } = useAuth();
   const navigate = useNavigate();
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
+  const updateLocalStorageValues = (key, value) => {
+    localStorage.setItem(key, value);
+    setLocalStorageValue(prevValues => ({
+      ...prevValues,
+      [key]: value
+    }));
+  };
 
   useEffect(() => {
-    // Создаем экземпляр AbortController
-    const abortController = new AbortController();
-    const signal = abortController.signal;
+    // Проверка и обновление значений каждую секунду
+    const intervalId = setInterval(() => {
+      const updatedValues = {
+        last_name: localStorage.getItem('last_name'),
+        first_name: localStorage.getItem('first_name'),
+        second_name: localStorage.getItem('second_name'),
+        phone: localStorage.getItem('phone')
+      };
 
-    // Определяем функцию для фетча данных
-    const fetchData = () => {
-      fetchUserDataWithTokenInterceptor(accessStor, refresh, { signal })
-        .then(res => res.json())
-        .then(res => {
-          if (res.email) {
-            dispatch(addUserData(res));
-          }
-        })
-        .catch(error => {
-          if (error.name === 'AbortError') {
-            console.log('Fetch запрос был отменен');
-          } else {
-            console.error('Произошла ошибка:', error);
-          }
-        });
-    };
-    if(isAuth){
-      fetchData();
-    }
-    return () => {
-      abortController.abort();
-    };
-  }, [cookieData])
+      // Обновление состояния только если значения изменились
+      if (JSON.stringify(updatedValues) !== JSON.stringify(localStorageValue)) {
+        setLocalStorageValue(updatedValues);
+      }
+    }, 1000); // Проверка каждую секунду
+
+    // Очистка интервала при размонтировании компонента
+    return () => clearInterval(intervalId);
+  }, [localStorageValue]);
+  useEffect(() => {
+    fetchUserDataWithTokenInterceptor(accessStor, refresh)
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(res => {
+              dispatch(addUserData(res))
+            })
+        }
+      })
+  }, [accessStor, cookieData, dispatch, refresh])
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -62,13 +76,13 @@ export const Header = () => {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  // Условие для смены состояния navbarState при изменении ширины экрана
+
   useEffect(() => {
     if (windowWidth > 768) {
       setNavBarState(false);
     }
   }, [windowWidth]);
-  // Предотвращение прокрутки страницы при открытом навбаре
+
   useEffect(() => {
     if (navBarState) {
       document.body.style.overflow = "hidden";
@@ -77,6 +91,23 @@ export const Header = () => {
     }
   }, [navBarState]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const updatedValues = {
+        last_name: localStorage.getItem('last_name') || '',
+        first_name: localStorage.getItem('first_name') || '',
+        second_name: localStorage.getItem('second_name') || '',
+        phone: localStorage.getItem('phone') || ''
+      };
+
+      if (JSON.stringify(updatedValues) !== JSON.stringify(localStorageValue)) {
+        setLocalStorageValue(updatedValues);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [localStorageValue]);
+
   return (
     <>
       <header
@@ -84,15 +115,15 @@ export const Header = () => {
         id="header"
       >
         <div className={styles.container}>
-          <div onClick={()=> navigate("/about-us")} className={styles.leftBlock}>
+          <div onClick={() => navigate("/about-us")} className={styles.leftBlock}>
             <img className={styles.logo} src={logo} alt="логотип" />
           </div>
           {isAuth ?
             <div className={styles.rightBlock}>
               <ul className={styles.userInfoList}>
                 <HeaderUserInfoItem
-                  top={`${userData.last_name} ${userData.first_name} ${userData.second_name}`}
-                  bottom={userData.phone_number || ''}
+                  top={`${localStorageValue.last_name} ${localStorageValue.first_name} ${localStorageValue.second_name}`}
+                  bottom={localStorageValue.phone}
                 />
                 <HeaderUserInfoItem
                   top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
@@ -119,7 +150,7 @@ export const Header = () => {
           )}
         </div>
         {windowWidth <= 768 && navBarState && (
-          <NavBar onClose={toggleNavBar} navBarState={navBarState} />
+          <NavBar localStorageValue={localStorageValue} onClose={toggleNavBar} navBarState={navBarState} />
         )}
       </header>
     </>

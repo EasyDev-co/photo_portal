@@ -2,7 +2,7 @@ import MainButton from "../../Buttons/MainButton";
 import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
 import styles from "./ParentProfile.module.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector } from "react-redux";
@@ -12,8 +12,8 @@ import { parentResetPassCreate } from "../../../http/parentResetPassCreate";
 import { useClickOutside } from "../../../utils/useClickOutside";
 import { parentVerifyResetCode } from "../../../http/parentVerifyResetCode";
 import { parentChangePass } from "../../../http/parentChangePass";
-
 import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/userPartialUpdate'
+
 const ParentProfile = ({ nurseryIsAuth }) => {
 
     const [codeWindowActive, setCodeWindow] = useState(false)
@@ -29,21 +29,22 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const [resetPassActive, setResetActive] = useState(false);
     const [generatePass, setPass] = useState(gen_password(12));
     const [activeBlur, setActiveBlur] = useState(true)
-    // const userData = useSelector(state => state.user.userData);
+    const userData = useSelector(state => state.user.userData);
     const accessStor = localStorage.getItem('access');
+
     const [inputValue, setInputValue] = useState({
-        parentSurname: localStorage.getItem('last_name') || '',
-        parentName: localStorage.getItem('first_name') || '',
-        parentPatronymic: localStorage.getItem('second_name') || '',
-        parentPhone: localStorage.getItem('phone') || '',
-        parentEmail: localStorage.getItem('email') || '',
-        kindergarten: localStorage.getItem('kindergarten') || '',
-        parentCity: localStorage.getItem('regionName') || '',
+        parentSurname: localStorage.getItem('last_name'),
+        parentName: localStorage.getItem('first_name'),
+        parentPatronymic: localStorage.getItem('second_name'),
+        parentPhone: localStorage.getItem('phone'),
+        parentEmail: localStorage.getItem('email'),
+        kindergarten: localStorage.getItem('kindergarten'),
+        parentCity: localStorage.getItem('regionName'),
         parentPass: '',
         parentNewPass: generatePass,
         resetEmail: ''
     });
-
+    
     const [inputValueReset, setResetValue] = useState({
         code: ''
     });
@@ -73,6 +74,19 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 } else {
                     res.json()
                         .then(res => {
+                            console.log(res)
+
+                            setInputValue(prev => ({
+                                ...prev,
+                                parentEmail: res.email,
+                                parentName: res.first_name,
+                                parentSurname: res.last_name,
+                                parentPhone: res.phone_number
+                            }))
+                            localStorage.setItem('last_name', res.last_name);
+                            localStorage.setItem('first_name', res.first_name);
+                            localStorage.setItem('phone', res.phone_number);
+                            localStorage.setItem('email', res.email);
                             setError({
                                 phone_number: '',
                                 message: '',
@@ -81,7 +95,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                         })
                 }
             })
-
     }
 
     const onSubmitToReset = (e) => {
@@ -126,7 +139,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             }
                         })
                         .catch(res => {
-                            console.log(res)
                             setCodeWindow(false)
                         })
                 }
@@ -142,10 +154,11 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         <div className={styles.profileWrap}>
             <div className={styles.profileFormsWrap}>
                 {codeWindowActive &&
-                    <form ref={codeRef} onSubmit={(e) => onResetSubmit(e)} className={styles.codeResetForm} action="">
+                    <form onSubmit={(e) => onResetSubmit(e)} className={styles.codeResetForm} action="">
+                        <div onClick={() => setCodeWindow(false)} className={styles.closeBtn}></div>
                         <div className={styles.codeResetWrap}>
                             <InputField
-                                label={"Введите код отпрвленный на Email"}
+                                label={"Введите код отправленный на Email"}
                                 placeholder={"Код"}
                                 type={"text"}
                                 name={"code"}
@@ -271,7 +284,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             name={"parentPass"}
                             id={"parentPass"}
                             value={inputValue.parentPass}
-                            isMarker
                             onChangeHandler={onChangeHandler}
                             autocomplete
                             setActiveBlur={setActiveBlur}
@@ -302,13 +314,13 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             <ResetPassButton
                                 setCodeWindow={setCodeWindow}
                                 setResetActive={setResetActive}
-                                value={'Изменить пароль'}
+                                value={'Укажите Email'}
                             />
                         }
                     </div>
                     <div>
                         <MainButton
-                            value={"Изменить"}
+                            value={"Отправить код для смены пароля"}
                         />
                     </div>
                 </form>

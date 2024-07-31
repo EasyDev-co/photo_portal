@@ -101,7 +101,10 @@
     }
 }
 .photoCardsFormBlur {
+
     position: relative;
+    margin-bottom: 68px;
+    transition: 3s;
 }
 
 .photoCardsFormBlur::after {
@@ -434,4 +437,12 @@
         flex-direction: column;
         gap: 15px;
     }
+}
+.checkboxInputWrap{
+    display: flex;
+    gap: 15px;
+}
+.bookDescr{
+    white-space: nowrap;
+    margin-right: 5px;
 }
