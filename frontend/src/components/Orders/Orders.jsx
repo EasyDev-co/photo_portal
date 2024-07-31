@@ -241,7 +241,7 @@ export const Orders = () => {
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
           <div className={styles.orderPromoWrap}>
-            <div className={styles.orderPromo}>
+            {/* <div className={styles.orderPromo}>
               {[{
                 text: "Отправить электронную версию на электронную почту",
                 input: true,
@@ -270,8 +270,8 @@ export const Orders = () => {
                   )}
                 </div>
               ))}
-            </div>
-            <div className={styles.orderPromo}>
+            </div> */}
+            <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
                 <input className={styles.promoInput}
