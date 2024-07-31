@@ -22,6 +22,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
                     />
                     {index === 5 &&
                         <div className={styles.widgetDelete}>
+                            <div className={styles.checkboxInputWrap}>
                             <div className={styles.bookCheckbox}>
                                 <div className={styles.bookDescr}>Фотокнига</div>
                                 <input
@@ -32,6 +33,18 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
                                     // onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
                                 />
                             </div>
+                            <div className={styles.bookCheckbox}>
+                                <div className={styles.bookDescr}>В электронном виде</div>
+                                <input
+                                    id={blocksId}
+                                    name={0}
+                                    type="checkbox"
+                                    onChange={(e)=>onChangeHandler(e.target.name, 0 ,  photo.photoLineId, e.target.checked , photo.photoLineId, blocksId)}
+                                    // onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
+                                />
+                            </div>
+                            </div>
+                            
                             <button className={styles.mainButton} onClick={() => handleRemoveBlock(blocksId, photo.photoLineId)}>Удалить блок</button>
                         </div>
                     }
