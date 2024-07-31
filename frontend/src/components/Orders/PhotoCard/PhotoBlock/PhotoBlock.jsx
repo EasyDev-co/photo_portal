@@ -50,6 +50,36 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
                     }
                 </div>
             ))}
+            <div className={styles.orderPromo}>
+              {[{
+                text: "Отправить электронную версию на электронную почту",
+                input: true,
+              }, {
+                text: "При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде",
+                input: false,
+              }, {
+                text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
+                input: false,
+              }].map((promo, index) => (
+                <div key={index} className={styles.promoStringWrap}>
+                  <div className={styles.dot}></div>
+                  {promo.input ? (
+                    <div className={styles.promoInputWrapp}>
+                      <span className={styles.promoString}>{promo.text}</span>
+                      <input
+                        className={styles.promoInput}
+                        placeholder="Электронный адрес*"
+                        type="text"
+                        name="digital"
+                        // onChange={(e) => handleInputEmailChange(e)}
+                      />
+                    </div>
+                  ) : (
+                    <span className={styles.promoString}>{promo.text}</span>
+                  )}
+                </div>
+              ))}
+            </div>
         </div>
     );
 })

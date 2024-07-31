@@ -21,6 +21,7 @@ export const Orders = () => {
 
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
+  // const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
@@ -158,7 +159,7 @@ export const Orders = () => {
     });
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
-
+  // console.log(orderValue)
   useEffect(() => {
     const transformedData = transformData(orderValue);
     // console.log(transformedData)
@@ -204,120 +205,119 @@ export const Orders = () => {
 
   };
 
-const handleInputEmailChange = (event) => {
+  const handleInputEmailChange = (event) => {
+    const updatedItems = orderValue.map(item => {
+      return {
+        ...item,
+        ['is_digital']: !!event.target.value
+      };
+    });
+    setOrderValue(updatedItems);
+  };
 
-  const updatedItems = orderValue.map(item => {
-    return {
-      ...item,
-      ['is_digital']: !!event.target.value
-    };
-  });
-  setOrderValue(updatedItems);
-};
-
-return (
-  <div className={styles.ordersWrap}>
-    <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
-    <div className={styles.orderWidggetWrap}>
-      <div className={styles.orderWidggetContainer}>
-        <h1 className={styles.profileTitle}>Выбор фотографии
-          <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
-        </h1>
-        <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
-          <Block
-            addPhoto={addPhoto}
-            orderValue={orderValue}
-            setOrderValue={setOrderValue}
-            onChangeHandler={onChangeHandler}
-            inputValue={inputValue}
-            blurRef={blurRef}
-            setIsBlur={setIsBlur}
-            setIsChecked={setIsChecked}
-            isChecked={isChecked}
-            handleCheckboxChange={handleCheckboxChange}
-            lineLenght={lineLenght}
-            setlineLenght={setlineLenght}
+  return (
+    <div className={styles.ordersWrap}>
+      <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
+      <div className={styles.orderWidggetWrap}>
+        <div className={styles.orderWidggetContainer}>
+          <h1 className={styles.profileTitle}>Выбор фотографии
+            <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
+          </h1>
+          <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
+            <Block
+              addPhoto={addPhoto}
+              orderValue={orderValue}
+              setOrderValue={setOrderValue}
+              onChangeHandler={onChangeHandler}
+              inputValue={inputValue}
+              blurRef={blurRef}
+              setIsBlur={setIsBlur}
+              setIsChecked={setIsChecked}
+              isChecked={isChecked}
+              handleCheckboxChange={handleCheckboxChange}
+              lineLenght={lineLenght}
+              setlineLenght={setlineLenght}
+            />
+          </div>
+          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
+          <div className={styles.orderPromoWrap}>
+            {/* <div className={styles.orderPromo}>
+              {[{
+                text: "Отправить электронную версию на электронную почту",
+                input: true,
+              }, {
+                text: "При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде",
+                input: false,
+              }, {
+                text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
+                input: false,
+              }].map((promo, index) => (
+                <div key={index} className={styles.promoStringWrap}>
+                  <div className={styles.dot}></div>
+                  {promo.input ? (
+                    <div className={styles.promoInputWrapp}>
+                      <span className={styles.promoString}>{promo.text}</span>
+                      <input
+                        className={styles.promoInput}
+                        placeholder="Электронный адрес*"
+                        type="text"
+                        name="digital"
+                        onChange={(e) => handleInputEmailChange(e)}
+                      />
+                    </div>
+                  ) : (
+                    <span className={styles.promoString}>{promo.text}</span>
+                  )}
+                </div>
+              ))}
+            </div> */}
+            <div className={styles.orderPromoPromocode}>
+              <span className={styles.promoString}>Введите промо-код для получения скидки</span>
+              <div className={styles.promoInputWrap}>
+                <input className={styles.promoInput}
+                  placeholder="Введите промокод"
+                  type="text"
+                  name="digital"
+                />
+                <span>Промо-код активирован</span>
+              </div>
+            </div>
+          </div>
+          {lineLenght >= 3 ?
+            <div className={styles.buttonAddKidsWrap}>
+              <div className={styles.promoButtonWrap}>
+                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button>
+                <span>{lineLenght} из 3</span>
+              </div>
+              <div className={styles.errMessage}>
+                <img src={danger} alt="" />
+                <span>
+                  Вы превысили лимит добавления детей. Если у вас четверо детей, то напишите нам на
+                  <a className={styles.mailLink} href="">
+                    fotodetstvo1@yandex.ru
+                  </a>
+                  и мы проверим информацию
+                </span>
+              </div>
+            </div> :
+            <div>
+              <div className={styles.promoButtonWrap}>
+                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
+                <span>{lineLenght} из 3</span>
+              </div>
+            </div>
+          }
+        </div>
+        <div className={styles.paymentTimerWrap}>
+          <PaymentTimer
+            formId={'orderForm'}
+            onSubmitHandler={onSubmitHandler}
+            count={'3 500'}
           />
         </div>
-        <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
-        <div className={styles.orderPromoWrap}>
-          <div className={styles.orderPromo}>
-            {[{
-              text: "Отправить электронную версию на электронную почту",
-              input: true,
-            }, {
-              text: "При заказе от 2 000 рублей к к такой-то дате, вы получите все электронные версии фотографий",
-              input: false,
-            }, {
-              text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
-              input: false,
-            }].map((promo, index) => (
-              <div key={index} className={styles.promoStringWrap}>
-                <div className={styles.dot}></div>
-                {promo.input ? (
-                  <div className={styles.promoInputWrapp}>
-                    <span className={styles.promoString}>{promo.text}</span>
-                    <input
-                      className={styles.promoInput}
-                      placeholder="Электронный адрес*"
-                      type="text"
-                      name="digital"
-                      onChange={(e) => handleInputEmailChange(e)}
-                    />
-                  </div>
-                ) : (
-                  <span className={styles.promoString}>{promo.text}</span>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className={styles.orderPromo}>
-            <span className={styles.promoString}>Введите промо-код для получения скидки</span>
-            <div className={styles.promoInputWrap}>
-              <input className={styles.promoInput}
-                placeholder="Введите промокод"
-                type="text"
-                name="digital"
-              />
-              <span>Промо-код активирован</span>
-            </div>
-          </div>
-        </div>
-        {lineLenght >= 3 ?
-          <div className={styles.buttonAddKidsWrap}>
-            <div className={styles.promoButtonWrap}>
-              <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button>
-              <span>{lineLenght} из 3</span>
-            </div>
-            <div className={styles.errMessage}>
-              <img src={danger} alt="" />
-              <span>
-                Вы превысили лимит добавления детей. Если у вас четверо детей, то напишите нам на
-                <a className={styles.mailLink} href="">
-                  fotodetstvo1@yandex.ru
-                </a>
-                и мы проверим информацию
-              </span>
-            </div>
-          </div> :
-          <div>
-            <div className={styles.promoButtonWrap}>
-              <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
-              <span>{lineLenght} из 3</span>
-            </div>
-          </div>
-        }
-      </div>
-      <div className={styles.paymentTimerWrap}>
-        <PaymentTimer
-          formId={'orderForm'}
-          onSubmitHandler={onSubmitHandler}
-          count={'3 500'}
-        />
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Orders;
