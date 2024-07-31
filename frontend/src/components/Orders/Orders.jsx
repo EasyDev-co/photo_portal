@@ -163,6 +163,7 @@ export const Orders = () => {
   useEffect(() => {
     const transformedData = transformData(orderValue);
     // console.log(transformedData)
+    console.log(transformedData)
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
@@ -189,20 +190,31 @@ export const Orders = () => {
 
   const handleCheckboxChange = (event, photoLineId) => {
     const { checked, id } = event.target;
-    
-    const updatedItems = orderValue.map(item => {
-      if (item.blockId == id) {
-        return {
-          ...item,
-          is_photobook: checked
+    const transformedData = transformData(orderValue);
+    if (transformedData.length === 0) {
+      // Если массив пустой, создаем новый объект и добавляем его в массив
+      transformedData.push({
+          "id": photoLineId,
+          "photos": [],
+          "is_photobook": checked,
+          "is_digital": true
+      });
+  }
 
-        };
-      }
-      return item;
-    });
-    setOrderValue(updatedItems);
-
-
+  const index = transformedData.findIndex(item => item.id === photoLineId);
+  if (index !== -1) {
+  
+      transformedData[index].is_photobook = checked;
+  } else {
+      
+      transformedData.push({
+          "id": photoLineId,
+          "photos": [],
+          "is_photobook": checked, 
+          "is_digital": true 
+      });
+    }
+    console.log(transformedData)
   };
 
   const handleInputEmailChange = (event) => {
