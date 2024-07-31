@@ -111,7 +111,10 @@
     }
 }
 .photoCardsFormBlur {
+
     position: relative;
+    margin-bottom: 68px;
+    transition: 3s;
 }
 
 .photoCardsFormBlur::after {
