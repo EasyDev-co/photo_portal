@@ -161,6 +161,7 @@ export const Orders = () => {
 
   useEffect(() => {
     const transformedData = transformData(orderValue);
+    // console.log(transformedData)
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
@@ -187,36 +188,20 @@ export const Orders = () => {
 
   const handleCheckboxChange = (event, photoLineId) => {
     const { checked, id } = event.target;
-    const transformedData = transformData(orderValue);
-    const photos = transformedData.map(item => {
-      if (item.id === photoLineId) {
-          return {
-              ...item,
-              is_photobook: checked 
-          };
+    
+    const updatedItems = orderValue.map(item => {
+      if (item.blockId == id) {
+        return {
+          ...item,
+          is_photobook: checked
+
+        };
       }
       return item;
-  });
-    fetchCartCreateWithTokenInterceptor(accessStor, '', photos)
-     .then(res => {
-        if (res.ok) {
-          res.json()
-            .then(res => {
-              dispatch(setCart(res))
-            })
-        }
-      })
-    // const updatedItems = orderValue.map(item => {
-    //   if (item.blockId == id) {
-    //     return {
-    //       ...item,
-    //       is_photobook: checked
+    });
+    setOrderValue(updatedItems);
 
-    //     };
-    //   }
-    //   return item;
-    // });
-    // setOrderValue(updatedItems);
+
   };
 
 const handleInputEmailChange = (event) => {
@@ -261,7 +246,7 @@ return (
               text: "Отправить электронную версию на электронную почту",
               input: true,
             }, {
-              text: "При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде",
+              text: "При заказе от 2 000 рублей к к такой-то дате, вы получите все электронные версии фотографий",
               input: false,
             }, {
               text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
