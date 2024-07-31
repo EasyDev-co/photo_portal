@@ -421,3 +421,11 @@
         gap: 15px;
     }
 }
+.checkboxInputWrap{
+    display: flex;
+    gap: 15px;
+}
+.bookDescr{
+    white-space: nowrap;
+    margin-right: 5px;
+}
