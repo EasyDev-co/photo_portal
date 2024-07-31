@@ -1,20 +1,24 @@
+import logging
 from datetime import datetime
 
-from django.db import transaction
-from pytz import timezone
-
 from django.core.exceptions import ValidationError
+from django.db.models import Sum, Count, Case, When, Avg
+from django.shortcuts import get_object_or_404
+from pytz import timezone
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-
-from django.db.models import Sum
 
 from apps.exceptions.api_exceptions import PhotoThemeDoesNotExist
+from apps.kindergarten.api.v1.permissions import IsKindergartenManager
+from apps.kindergarten.api.v1.serializers import (
+    PhotoPriceSerializer,
+    PhotoPriceByRegionSerializer
+)
+from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten
 from apps.order.models import Order
+from apps.order.models.const import OrderStatus
 from apps.photo.models import PhotoTheme
-from apps.kindergarten.models import PhotoPrice, Ransom
-from apps.kindergarten.api.v1.serializers import PhotoPriceSerializer, PhotoPriceByRegionSerializer
 from config.settings import TIME_ZONE
 
 
@@ -81,3 +85,31 @@ class PhotoThemeRansomAPIView(APIView):
             {'ransom': ransom_amount},
             status=status.HTTP_200_OK
         )
+
+
+class KindergartenStatsAPIView(APIView):
+    """Вью для получения статистики по детскому саду."""
+
+    permission_classes = (IsKindergartenManager,)
+
+    def get(self, request, pk):
+        kindergarten: Kindergarten = get_object_or_404(Kindergarten, id=pk)
+
+        stats = (
+            Order.objects.filter(photo_line__kindergarten=kindergarten)
+            .aggregate(
+                total_orders=Count('id'),
+                total_amount=Sum('order_price'),
+                completed_orders=Count(Case(When(status=OrderStatus.completed, then=1))),
+                average_order_value=Avg('order_price')
+            )
+        )
+
+        response_data = {
+            'total_orders': stats.get('total_orders', 0),
+            'completed_orders': stats.get('completed_orders', 0),
+            'average_order_value': stats.get('average_order_value') or 0,
+            'total_sum': stats.get('total_amount') or 0
+        }
+
+        return Response(response_data)
