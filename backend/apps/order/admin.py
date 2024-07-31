@@ -42,16 +42,16 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'photo_line', 'is_digital')
     search_fields = ('user__email', 'photo_line__kindergarten__name')
     ordering = ('created', 'modified')
-    # readonly_fields = (
-    #     'id',
-    #     'order_price',
-    #     'user',
-    #     'photo_line',
-    #     'is_digital',
-    #     'is_photobook',
-    #     'created',
-    #     'modified',
-    # )
+    readonly_fields = (
+        'id',
+        'order_price',
+        'user',
+        'photo_line',
+        'is_digital',
+        'is_photobook',
+        'created',
+        'modified',
+    )
     inlines = [
         OrderItemInline
     ]
