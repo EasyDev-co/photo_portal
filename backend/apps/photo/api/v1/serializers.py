@@ -19,9 +19,14 @@ class PhotoLineSerializer(serializers.ModelSerializer):
     """
     photos = PhotoRetrieveSerializer(many=True, read_only=True)
 
+    ransom_amount = serializers.SerializerMethodField()
+
     class Meta:
         model = PhotoLine
-        fields = ('id', 'photos', 'parent')
+        fields = ('id', 'photos', 'parent', 'ransom_amount')
+
+    def get_ransom_amount(self, obj):
+        return obj.kindergarten.region.ransom_amount
 
 
 class CurrentPhotoThemeRetrieveSerializer(serializers.ModelSerializer):
