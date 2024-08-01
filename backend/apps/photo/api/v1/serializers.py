@@ -17,11 +17,15 @@ class PhotoLineSerializer(serializers.ModelSerializer):
     """
     Сериализатор для получения линии фотографий.
     """
+    deadline = serializers.SerializerMethodField()
     photos = PhotoRetrieveSerializer(many=True, read_only=True)
 
     class Meta:
         model = PhotoLine
-        fields = ('id', 'photos', 'parent')
+        fields = ('id', 'photos', 'parent', 'deadline')
+
+    def get_deadline(self, obj):
+        return obj.photo_theme.date_end
 
 
 class CurrentPhotoThemeRetrieveSerializer(serializers.ModelSerializer):
