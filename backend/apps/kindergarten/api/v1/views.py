@@ -1,21 +1,21 @@
-import logging
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db.models import Sum, Count, Case, When, Avg
-from django.shortcuts import get_object_or_404
+from django.db.models.functions import Round
 from pytz import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.exceptions.api_exceptions import PhotoThemeDoesNotExist
-from apps.kindergarten.api.v1.permissions import IsKindergartenManager
+from apps.kindergarten.api.v1.permissions import IsManager
 from apps.kindergarten.api.v1.serializers import (
     PhotoPriceSerializer,
-    PhotoPriceByRegionSerializer
+    PhotoPriceByRegionSerializer,
+    KindergartenStatsSerializer
 )
-from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten
+from apps.kindergarten.models import PhotoPrice, Ransom
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus
 from apps.photo.models import PhotoTheme
@@ -90,26 +90,29 @@ class PhotoThemeRansomAPIView(APIView):
 class KindergartenStatsAPIView(APIView):
     """Вью для получения статистики по детскому саду."""
 
-    permission_classes = (IsKindergartenManager,)
+    permission_classes = (IsManager,)
 
     def get(self, request, pk):
-        kindergarten: Kindergarten = get_object_or_404(Kindergarten, id=pk)
+        kindergarten = request.user.kindergarten.filter(id=pk).first()
+
+        if kindergarten is None:
+            return Response(
+                {"detail": "У вас нет прав доступа к этому ресурсу."},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         stats = (
             Order.objects.filter(photo_line__kindergarten=kindergarten)
             .aggregate(
                 total_orders=Count('id'),
-                total_amount=Sum('order_price'),
-                completed_orders=Count(Case(When(status=OrderStatus.completed, then=1))),
-                average_order_value=Avg('order_price')
+                total_amount=Round(Sum('order_price'), 2),
+                completed_orders=Count(
+                    Case(When(status=OrderStatus.completed, then=1))
+                ),
+                average_order_value=Round(Avg('order_price'), 2)
             )
         )
 
-        response_data = {
-            'total_orders': stats.get('total_orders', 0),
-            'completed_orders': stats.get('completed_orders', 0),
-            'average_order_value': stats.get('average_order_value') or 0,
-            'total_sum': stats.get('total_amount') or 0
-        }
-
-        return Response(response_data)
+        serializer = KindergartenStatsSerializer(data=stats)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
