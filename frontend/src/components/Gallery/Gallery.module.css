@@ -6,7 +6,7 @@
 */
 
 .ordersWrap {
-    margin: 0 0 0 140px;
+    margin: 0 25px 0 140px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -37,8 +37,12 @@
     }
 }
 
-
-.profileTitle {
+.titleWrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.galleryTitle {
     color: #090909;
     font-family: "Nunito";
     font-weight: 700;
@@ -49,8 +53,36 @@
 }
 
 @media screen and (max-width: 768px) {
-    .profileTitle {
+    .galleryTitle {
         margin-left: 0;
         padding: 40px 20px 40px 0;
     }
+}
+.photosGallery{
+    gap: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.imgWrap{
+    padding: 10px;
+    border-radius: 8px;
+    border:1px solid rgb(229, 229, 229);
+}
+.btnWrap{
+    display: flex;
+    justify-content: end;
+}
+.galleryBtn{
+    background-color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    width: 200px;
+}
+.galleryItemWrap{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }

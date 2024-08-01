@@ -44,6 +44,7 @@ export const App = () => {
           <Route path={"/about-us"} element={<AboutUs />} />
           <Route path={"/rules"} element={<Rules />} />
           <Route path={"orders/payment"} element={<Payment />} />
+          <Route path="/*" element={<NotFound />} />
         </Route>
         <Route element={<AuthRoutes />}>
           <Route path="/sign-in" element={<Login />} />
@@ -51,13 +52,13 @@ export const App = () => {
           <Route path="/verification" element={<Verification />} />
           <Route path="/password-reset" element={<ResetPassword />} />
           <Route path="/password-reset/new-password" element={<NewPassword />} />
-          <Route path="/*" element={<NotFound />} />
         </Route>
       </> :
         <>
           <Route element={<Layout />}>
             <Route path={"/about-us"} element={<AboutUs />} />
             <Route path={"/rules"} element={<Rules />} />
+            <Route path="/*" element={<NotFound />} />
           </Route>
           <Route element={<AuthRoutes />}>
             <Route path="/sign-in" element={<Login />} />
@@ -65,7 +66,7 @@ export const App = () => {
             <Route path="/verification" element={<Verification />} />
             <Route path="/password-reset" element={<ResetPassword />} />
             <Route path="/password-reset/new-password" element={<NewPassword />} />
-            <Route path="/*" element={<NotFound />} />
+           
           </Route>
         </>
       }

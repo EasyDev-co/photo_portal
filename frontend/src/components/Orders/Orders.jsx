@@ -57,29 +57,9 @@ export const Orders = () => {
               .then(data => {
                 dispatch(addPhotos(data));
                 patchPhotoLine(accessStor, { "parent": idP }, data.id)
-                  .then(() => {
-                    if (isMounted) {
-                      // console.log('Patched photo line:', elem);
-                    }
-                  })
-                  .catch(error => {
-                    if (isMounted) {
-                      console.error('Error patching photo line:', error);
-                    }
-                  });
               })
-              .catch(error => {
-                if (isMounted) {
-                  console.error('Error parsing response:', error);
-                }
-              });
           }
         })
-        .catch(error => {
-          if (isMounted) {
-            console.error('Error fetching photo line list:', error);
-          }
-        });
       return () => {
         isMounted = false;
       };
@@ -98,30 +78,10 @@ export const Orders = () => {
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)
-                  .then(() => {
-                    if (isMounted) {
-                      // console.log('Patched photo line:', elem);
-                    }
-                  })
-                  .catch(error => {
-                    if (isMounted) {
-                      console.error('Error patching photo line:', error);
-                    }
-                  });
               });
             })
-            .catch(error => {
-              if (isMounted) {
-                console.error('Error parsing response:', error);
-              }
-            });
         }
       })
-      .catch(error => {
-        if (isMounted) {
-          console.error('Error fetching photo line list:', error);
-        }
-      });
     return () => {
       isMounted = false;
     };
@@ -201,8 +161,6 @@ export const Orders = () => {
       return item;
     });
     setOrderValue(updatedItems);
-
-
   };
 
   const handleInputEmailChange = (event) => {
@@ -241,36 +199,6 @@ export const Orders = () => {
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
           <div className={styles.orderPromoWrap}>
-            {/* <div className={styles.orderPromo}>
-              {[{
-                text: "Отправить электронную версию на электронную почту",
-                input: true,
-              }, {
-                text: "При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде",
-                input: false,
-              }, {
-                text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
-                input: false,
-              }].map((promo, index) => (
-                <div key={index} className={styles.promoStringWrap}>
-                  <div className={styles.dot}></div>
-                  {promo.input ? (
-                    <div className={styles.promoInputWrapp}>
-                      <span className={styles.promoString}>{promo.text}</span>
-                      <input
-                        className={styles.promoInput}
-                        placeholder="Электронный адрес*"
-                        type="text"
-                        name="digital"
-                        onChange={(e) => handleInputEmailChange(e)}
-                      />
-                    </div>
-                  ) : (
-                    <span className={styles.promoString}>{promo.text}</span>
-                  )}
-                </div>
-              ))}
-            </div> */}
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
