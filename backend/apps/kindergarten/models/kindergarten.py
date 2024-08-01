@@ -34,6 +34,10 @@ class Kindergarten(UUIDMixin):
         default=False,
         verbose_name='Наличие фотокниги'
     )
+    locality = models.CharField(
+        max_length=255,
+        verbose_name='Населенный пункт'
+    )
 
     def __str__(self):
         return f'{self.name} ({self.code})'
