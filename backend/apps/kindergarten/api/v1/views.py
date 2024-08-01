@@ -105,11 +105,11 @@ class KindergartenStatsAPIView(APIView):
             Order.objects.filter(photo_line__kindergarten=kindergarten)
             .aggregate(
                 total_orders=Count('id'),
-                total_amount=Round(Sum('order_price'), 2),
+                total_amount=Round(Sum('order_price', default=0), 2),
                 completed_orders=Count(
-                    Case(When(status=OrderStatus.completed, then=1))
+                    Case(When(status=OrderStatus.completed, then=1), default=0)
                 ),
-                average_order_value=Round(Avg('order_price'), 2)
+                average_order_value=Round(Avg('order_price', default=0), 2)
             )
         )
 
