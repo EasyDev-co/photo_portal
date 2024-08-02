@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import styles from "./Gallery.module.css";
 import { fetchGetOrderWithTokenInterceptor } from "../../http/getOrder";
+import GalleryItem from "./GalleryItem";
 export const Gallery = () => {
   const accessStor = localStorage.getItem('access');
   useEffect(()=>{
@@ -16,22 +17,10 @@ export const Gallery = () => {
     } catch (error) {
         
     }
-   
-      
   },[])
   return <>
     <div className={styles.ordersWrap}>
-      <div>
-        <h1 className={styles.profileTitle}>
-
-        </h1>
-        <div className={styles.Orders}> 
-
-        </div>
-      </div>
-      <div className={styles.photosGallery}>
-
-      </div>
+      <GalleryItem/>
     </div>
   </>;
 };
