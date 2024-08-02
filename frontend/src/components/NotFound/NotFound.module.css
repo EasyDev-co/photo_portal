@@ -1,0 +1,66 @@
+.notFoundWrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    height: calc(100vh - 70px);
+    font-size: 600px;
+    justify-content: center;
+    align-items: center;
+    color: #E5E5E5;
+    position: relative;
+}
+.notFoundText{
+    font-size: 50px;
+    color: #11BBD1;
+    position: absolute;
+}
+@media screen and (max-width: 1248px) {
+    .notFoundWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        font-size: 400px;
+    }
+    .notFoundText{
+        font-size: 35px;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .notFoundWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        font-size: 300px;
+    }
+    .notFoundText{
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .notFoundWrap {
+        height: calc(100vh - 93px);
+        font-size: 250px;
+    }
+    .notFoundText{
+        font-size: 25px;
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .notFoundWrap {
+        height: calc(100vh - 93px);
+        font-size: 150px;
+    }
+    .notFoundText{
+        font-size: 15px;
+    }
+}
+
+ /* Стили для контейнера чекбокса */
