@@ -16,12 +16,27 @@ export const Layout = ({ children }) => {
     // Очищаем обработчик событий при размонтировании компонента
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  const [scrollY, setScrollY] = useState(0);
 
+    const handleScroll = () => {
+        setScrollY(window.scrollY);
+    };
+
+    useEffect(() => {
+        // Добавление обработчика события прокрутки
+        window.addEventListener('scroll', handleScroll);
+
+        // Удаление обработчика события при размонтировании компонента
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+    console.log(scrollY)
   return (
-    <div className="body">
+    <div  className="body">
       <div className="page">
         <Header />
-        {isSidebarVisible > 768 && <SideBar />}
+        {isSidebarVisible > 768 && <SideBar scrollY={scrollY}/>}
         <Outlet />
       </div>
     </div>
