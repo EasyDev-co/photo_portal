@@ -45,14 +45,17 @@ export const NavBar = ({localStorageValue, onClose }) => {
         {isAuth ?
           <>
             <ul className={styles.userInfoList}>
-              <HeaderUserInfoItem
-                top={`${localStorageValue.last_name} ${localStorageValue.first_name} ${localStorageValue.second_name}`}
-                bottom={localStorageValue.phone}
-              />
-              <HeaderUserInfoItem
-                top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
-                bottom={localStorage.getItem('kindergarten')}
-              />
+            <HeaderUserInfoItem
+                  top={`${localStorageValue.last_name === null ? '' : localStorageValue.last_name} 
+                  ${localStorageValue.first_name === null ? '' : localStorageValue.first_name} 
+                  ${localStorageValue.second_name === null ? '' : localStorageValue.second_name}`}
+                  bottom={localStorageValue.phone}
+                />
+                <HeaderUserInfoItem
+                  top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
+                  ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
+                  bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
+                />
             </ul>
             <ul className={styles.navList}>
               <NavBarItem
