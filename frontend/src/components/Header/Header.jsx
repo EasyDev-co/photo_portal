@@ -31,13 +31,6 @@ export const Header = () => {
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
-  const updateLocalStorageValues = (key, value) => {
-    localStorage.setItem(key, value);
-    setLocalStorageValue(prevValues => ({
-      ...prevValues,
-      [key]: value
-    }));
-  };
 
   useEffect(() => {
     // Проверка и обновление значений каждую секунду

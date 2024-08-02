@@ -21,6 +21,7 @@ const Verification = () => {
     const email = useSelector(action => action.user.email);
     const navigation = useNavigate();
     const photoNumbers = useSelector(action => action.user.photoNumbers);
+    const photoLineId = useSelector(action => action.user.photoLineId);
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
@@ -43,12 +44,15 @@ const Verification = () => {
                             res.json()
                                 .then(res => {
                                     dispatch(addPhotos(res))
-                                    patchPhotoLine(data.access,{
+                                    patchPhotoLine(data.access, {
                                         "parent": data.user
-                                      },res.id)
+                                    }, res.id)
                                 })
                         }
                     })
+                patchPhotoLine(data.access, {
+                    "parent": data.user
+                }, photoLineId)
                 navigation('/')
             } else {
                 const data = await response.json();

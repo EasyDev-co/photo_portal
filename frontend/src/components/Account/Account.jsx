@@ -5,7 +5,7 @@ import { useState } from "react";
 const Account = ({role}) => {
 
     const [nurseryIsAuth, setNurseryIsAuth] = useState(false);
-    const [isPayment, setIsPayment] = useState(true);
+    const [isPayment, setIsPayment] = useState(false);
     return (
         <>
             <div className={''}>
