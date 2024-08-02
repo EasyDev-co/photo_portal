@@ -40,12 +40,14 @@ const ResetPassword = () => {
           dispatch(
             setEmail(inputValue.resetEmail)
           )
+          localStorage.setItem('onReset', 'true')
           setOnReset(true);
           console.log(data)
       
         } else {
           const data = await response.json();
           console.log(data)
+          localStorage.setItem('onReset', 'false')
         }
       } catch (error) {
 
@@ -57,6 +59,7 @@ const ResetPassword = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
+          localStorage.setItem('onReset', 'false')
           navigation('/password-reset/new-password');
           dispatch(
             setCode({
@@ -82,7 +85,7 @@ const ResetPassword = () => {
             <div className={styles.regFormContainer}>
               <h1 className={styles.formHeader}>Восстановление пароля</h1>
               <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
-                {onReset ?
+                {localStorage.getItem('onReset') === 'true'?
                   <InputField
                     name={'resetCode'}
                     onChangeHandler={onChangeHandler}
