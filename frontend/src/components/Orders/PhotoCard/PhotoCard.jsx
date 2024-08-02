@@ -13,15 +13,12 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
     useClickOutside(scaleRef, () => {
         if(isScale){
             setIsScale(false);
-            setIsBlur(false)
         }
     })
-
     const onScaleHandler = () => {
         setIsBlur(true)
         setIsScale(true);
     }
-    // console.log(isScale)
     const increment = () => {
         setIsBlur(true)
         if (count < 360) {
