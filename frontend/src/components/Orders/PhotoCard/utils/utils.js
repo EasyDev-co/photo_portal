@@ -14,7 +14,7 @@ export function transformData(data) {
                 is_digital: is_digital
             };
         }
-        console.log(photo.photo_type)
+        
         if(photo.photo_type != 6){
             acc[photoLineId].photos.push(photo);
         } else {
