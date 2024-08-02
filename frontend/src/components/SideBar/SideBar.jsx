@@ -5,12 +5,23 @@ import { SideBarItem } from "./SideBarItem/SideBarItem";
 import { useAuth } from "../../utils/useAuth";
 import { useRef, useEffect } from "react";
 
-export const SideBar = ({scrollY}) => {
+export const SideBar = ({ scrollY, innerHeight }) => {
   const { isAuth } = useAuth();
 
-  
+  console.log(innerHeight)
   return (
-    <div className={scrollY > 0 ? styles.sideBar : styles.sideBarScroll}>
+    <div style={innerHeight < 870 ?
+      {
+        height: `${innerHeight - 68}px`,
+        overflowX: 'hidden',
+        overflowY: 'scroll'
+      } :
+      {
+        height: `${innerHeight - 68}px`,
+        overflowX: 'hidden',
+        overflowY: 'hidden'
+      } 
+    } className={scrollY > 0 ? styles.sideBar : styles.sideBarScroll}>
       <div className={styles.firstBlock}>
         <nav className={styles.nav}>
 
