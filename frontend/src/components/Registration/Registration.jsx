@@ -9,7 +9,7 @@ import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
-import { addQrIdPhoto, setEmail } from "../../store/authSlice";
+import { addQrIdPhoto, setEmail, setPhotoNumbers } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
 import { useLocation } from "react-router-dom";
 import danger from '../../assets/images/Auth/DangerCircle.svg'
@@ -22,11 +22,11 @@ export const Registration = () => {
   const [isChecked, setIsChecked] = useState(false);
   const accessStor = localStorage.getItem('access');
   const navigate = useNavigate();
-  useEffect(()=>{
-    if(accessStor){
+  useEffect(() => {
+    if (accessStor) {
       navigate('/orders')
     }
-  },[])
+  }, [])
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -100,7 +100,13 @@ export const Registration = () => {
         dispatch(
           setEmail(inputValue.email)
         )
+   
         setResponseData(data);
+        dispatch(setPhotoNumbers(
+          inputValue.pictureNumbers.split('-').map(elem => {
+            return Number(elem)
+          })
+        ))
         navigation('/verification');
       } else {
         const data = await response.json();
@@ -111,7 +117,7 @@ export const Registration = () => {
     }
     setInputValue(initialState);
   }
-  console.log(error)
+
   return <>
     <div className={styles.login}>
       <Scaner
@@ -191,8 +197,8 @@ export const Registration = () => {
               />
 
 
-              <div className={isChecked?styles.privacyCheckbox:styles.privacyCheckboxUnCheck}>
-                <input className={styles.privacyInput} onChange={(e)=>setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
+              <div className={isChecked ? styles.privacyCheckbox : styles.privacyCheckboxUnCheck}>
+                <input className={styles.privacyInput} onChange={(e) => setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
                 <label htmlFor="privacy">
                   <p>
                     Даю согласие на обработку своих персональных данных.

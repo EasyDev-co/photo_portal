@@ -167,4 +167,11 @@
         align-items: center;
    }
 }
-
+.closeBtn{
+    background-image: url(../../../assets/images/Profile/close-icon-2048x2047-22z7exfk.png);
+    background-repeat: no-repeat;
+    height: 15px;
+    background-size: 15px;
+    background-position: right;
+    cursor: pointer;
+}

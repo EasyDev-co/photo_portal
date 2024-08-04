@@ -126,6 +126,7 @@ class EmailVerificationCodeAPIView(ConfirmCodeMixin, APIView):
         refresh_token = RefreshToken.for_user(user)
         return Response(
             {
+                'user': str(user.id),
                 'refresh': str(refresh_token),
                 'access': str(refresh_token.access_token)
             }, status=status.HTTP_201_CREATED
