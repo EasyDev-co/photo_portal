@@ -159,10 +159,10 @@ export const Orders = () => {
     });
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
-  // console.log(orderValue)
+
   useEffect(() => {
     const transformedData = transformData(orderValue);
-    // console.log(transformedData)
+
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
@@ -189,7 +189,7 @@ export const Orders = () => {
 
   const handleCheckboxChange = (event, photoLineId) => {
     const { checked, id } = event.target;
-    
+
     const updatedItems = orderValue.map(item => {
       if (item.blockId == id) {
         return {
@@ -224,20 +224,26 @@ export const Orders = () => {
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
           <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
-            <Block
-              addPhoto={addPhoto}
-              orderValue={orderValue}
-              setOrderValue={setOrderValue}
-              onChangeHandler={onChangeHandler}
-              inputValue={inputValue}
-              blurRef={blurRef}
-              setIsBlur={setIsBlur}
-              setIsChecked={setIsChecked}
-              isChecked={isChecked}
-              handleCheckboxChange={handleCheckboxChange}
-              lineLenght={lineLenght}
-              setlineLenght={setlineLenght}
-            />
+            {console.log(addPhoto)}
+            {addPhoto.length === 0 ? <div>
+              У Вас пока нет заказов
+            </div> :
+              <Block
+                addPhoto={addPhoto}
+                orderValue={orderValue}
+                setOrderValue={setOrderValue}
+                onChangeHandler={onChangeHandler}
+                inputValue={inputValue}
+                blurRef={blurRef}
+                setIsBlur={setIsBlur}
+                setIsChecked={setIsChecked}
+                isChecked={isChecked}
+                handleCheckboxChange={handleCheckboxChange}
+                lineLenght={lineLenght}
+                setlineLenght={setlineLenght}
+              />
+            }
+
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
           <div className={styles.orderPromoWrap}>
