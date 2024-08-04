@@ -100,6 +100,7 @@ export const Registration = () => {
         dispatch(
           setEmail(inputValue.email)
         )
+   
         setResponseData(data);
         dispatch(setPhotoNumbers(
           inputValue.pictureNumbers.split('-').map(elem => {

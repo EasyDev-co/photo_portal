@@ -29,7 +29,7 @@ const Verification = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         try {
-            const response = await parentEmailVerification(inputValue.code, email)
+            const response = await parentEmailVerification(inputValue.code, email ? email : localStorage.getItem('email'))
             if (response.ok) {
                 const data = await response.json();
                 dispatch(

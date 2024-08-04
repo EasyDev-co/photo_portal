@@ -5,8 +5,8 @@ const authSlice = createSlice({
     name: 'user',
     initialState: {
         email: null,
-        // access: localStorage.getItem('access'),
-        access: true,
+        access: localStorage.getItem('access'),
+        // access: true,
         refresh: null,
         blur: false,
         code: null,
@@ -58,6 +58,7 @@ const authSlice = createSlice({
         },
         setEmail(state, action) {
             state.email = action.payload;
+            localStorage.setItem('email', action.payload)
         },
         setCode(state, action) {
             state.code = action.payload.code;
