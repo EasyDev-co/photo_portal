@@ -8,7 +8,6 @@ import { useRef, useEffect } from "react";
 export const SideBar = ({ scrollY, innerHeight }) => {
   const { isAuth } = useAuth();
 
-  console.log(innerHeight)
   return (
     <div style={innerHeight < 870 ?
       {
