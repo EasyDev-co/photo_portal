@@ -99,6 +99,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
             </form>
+            <div style={styles.photoNumber}>Фото № {number}</div>
         </div>
     );
 })
