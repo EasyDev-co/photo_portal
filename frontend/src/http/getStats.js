@@ -2,37 +2,31 @@ import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./tokenRefreshCreate";
 
-export const getPhotoPrice = async (access,region) => {
-    const url = `${localUrl}/api/v1/photo_price_by_region/`;
+export const getStats = async (access,id) => {
+    const url = `${localUrl}/api/v1/stats/${id}/`;
 
-    const sendData = {
-        region: region
-    }
     const response = await fetch(url, {
-        method:"POST",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        },
-        body: JSON.stringify(sendData)
+        }
 
     });
     return response;
 }
 
-export const fetchPhotoPriceWithTokenInterceptor = async (access, region) => {
+export const fetchGetStatsWithTokenInterceptor = async (access, id) => {
     try {
-        let response = await getPhotoPrice(access, region)
-        if (response.status === '401' || response.status === '403') {
+        let response = await getStats(access, id)
+        if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
-                        console.log(res)
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getPhotoPrice(res.access, region);
+                            response = getStats(res.access, id);
                         }
                     })
             }

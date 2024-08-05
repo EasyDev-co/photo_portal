@@ -33,7 +33,7 @@ export const App = () => {
 
     }
   }, [location.pathname, navigate]);
-  console.log(isAuth)
+
   return (
     <Routes>
       {isAuth ? <>
