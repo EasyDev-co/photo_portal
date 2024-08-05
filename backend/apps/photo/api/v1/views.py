@@ -57,9 +57,8 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if photo_numbers == numbers_in_photo_line:
             serializer = PhotoLineSerializer(photo_line)
 
-            user = request.user
             user_photo_count, created = UserPhotoCount.objects.get_or_create(
-                user=user,
+                user=request.user,
                 photo_theme=photo_line.photo_theme
             )
             if user_photo_count.count == 0:
