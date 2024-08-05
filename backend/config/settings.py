@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'django_celery_beat',
     'drf_yasg',
+    "phonenumber_field",
 
     # Приложения
     'apps.kindergarten',
@@ -212,3 +213,5 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+PHONENUMBER_DEFAULT_REGION = 'RU'

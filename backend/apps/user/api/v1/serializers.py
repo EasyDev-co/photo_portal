@@ -5,10 +5,11 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from phonenumber_field.serializerfields import PhoneNumberField
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
 from apps.user.models import User
-from apps.user.validators import validate_phone_number, validate_cyrillic
+from apps.user.validators import validate_cyrillic
 
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -104,10 +105,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         validators=[validate_cyrillic, MinLengthValidator(2)]
     )
     email = serializers.EmailField(required=False)
-    phone_number = serializers.CharField(
-        max_length=12,
+    phone_number = PhoneNumberField(
         required=False,
-        validators=[validate_phone_number]
+        max_length=12
     )
 
     class Meta:
