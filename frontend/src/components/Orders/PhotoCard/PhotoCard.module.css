@@ -10,7 +10,7 @@
 
 @media (max-width: 460px) {
     .photoCardWrap {
-        width: 280px;
+        width: 326px;
     }
 }
 
@@ -93,6 +93,12 @@
     width: -webkit-fill-available;
     height: 190px;
 }
+@media (max-width: 460px) {
+    .cardImg {
+       height: 453px;
+    }
+}
+
 .block{
     display: flex;
     flex-direction: column;
