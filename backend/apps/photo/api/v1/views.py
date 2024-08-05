@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -10,7 +12,7 @@ from rest_framework.views import APIView
 from apps.photo.api.v1.serializers import (CurrentPhotoThemeRetrieveSerializer,
                                            PhotoLineSerializer,
                                            PhotoRetrieveSerializer)
-from apps.photo.models import Photo, PhotoLine, PhotoTheme
+from apps.photo.models import Photo, PhotoLine, PhotoTheme, UserPhotoCount
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 
 
@@ -43,6 +45,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
     @swagger_auto_schema(responses={"200": PhotoLineSerializer()}, )
     def post(self, request):
         """Получение фотолинии по id"""
+
         photo_numbers = request.data['numbers']
         first_photo = get_object_or_404(Photo, number=photo_numbers[0])
         photo_line = first_photo.photo_line
@@ -50,11 +53,26 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         numbers_in_photo_line = list(photo_line_photos.values_list('number', flat=True))
         if photo_numbers == numbers_in_photo_line:
             serializer = PhotoLineSerializer(photo_line)
+
+            user = request.user
+            user_photo_count, created = UserPhotoCount.objects.get_or_create(
+                user=user,
+                photo_theme=photo_line.photo_theme
+            )
+            if user_photo_count.count == 0:
+                return Response(
+                    {'message': 'Вы достигли лимита'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            user_photo_count.count -= 1
+            user_photo_count.save()
             return Response(serializer.data)
         return Response(
             {'message': 'Фотолиния с указанными фотографиями не найдена'},
             status=status.HTTP_404_NOT_FOUND
         )
+
+
 
 
 class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
