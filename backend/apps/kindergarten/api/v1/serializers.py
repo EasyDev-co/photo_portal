@@ -17,7 +17,7 @@ class KindergartenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Kindergarten
-        fields = ('region', 'name')
+        fields = ('id', 'region', 'name')
 
 
 class PhotoPriceSerializer(serializers.ModelSerializer):
