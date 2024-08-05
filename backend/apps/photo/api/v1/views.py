@@ -1,17 +1,20 @@
-import logging
-
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-
-from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
+from rest_framework.generics import (
+    RetrieveAPIView,
+    RetrieveUpdateAPIView,
+    ListAPIView
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.photo.api.v1.serializers import (CurrentPhotoThemeRetrieveSerializer,
-                                           PhotoLineSerializer,
-                                           PhotoRetrieveSerializer)
+from apps.photo.api.v1.serializers import (
+    CurrentPhotoThemeRetrieveSerializer,
+    PhotoLineSerializer,
+    PhotoRetrieveSerializer
+)
 from apps.photo.models import Photo, PhotoLine, PhotoTheme, UserPhotoCount
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 
