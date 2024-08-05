@@ -35,7 +35,9 @@ const authSlice = createSlice({
         cartList:[],
         cart:[],
         total_price:0,
-        photoNumbers:[]
+        photoNumbers:[],
+        role: 1,
+        kindergarten_id:''
     },
     reducers: {
         setUser: (state, action) => {
@@ -93,6 +95,9 @@ const authSlice = createSlice({
         },
         addUserData(state, action) {
             state.userData = action.payload;
+            state.role = action.payload.role;
+
+            localStorage.setItem('role', action.payload.role);
             localStorage.setItem('idP', action.payload.id);
             localStorage.setItem('first_name', action.payload.first_name);
             localStorage.setItem('last_name', action.payload.last_name);
@@ -101,6 +106,8 @@ const authSlice = createSlice({
             localStorage.setItem('phone', action.payload.phone_number === null ? '+7' : action.payload.phone_number);
 
             action.payload.kindergarten.forEach(elem => {
+                localStorage.setItem('kindergarten_id', elem.id)
+                state.kindergarten_id = elem.id
                 localStorage.setItem('kindergarten', elem.name);
                 state.userData.kindergarten.name = elem.name;
                 localStorage.setItem('country', elem.region.country)
