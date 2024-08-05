@@ -30,10 +30,10 @@ export const App = () => {
       if (location.pathname === "/") {
         navigate("/about-us");
       }
-     
+
     }
   }, [location.pathname, navigate]);
-  
+  console.log(isAuth)
   return (
     <Routes>
       {isAuth ? <>
@@ -66,7 +66,6 @@ export const App = () => {
             <Route path="/verification" element={<Verification />} />
             <Route path="/password-reset" element={<ResetPassword />} />
             <Route path="/password-reset/new-password" element={<NewPassword />} />
-           
           </Route>
         </>
       }
