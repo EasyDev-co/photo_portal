@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('kindergarten', '0007_alter_kindergarten_name_alter_region_country_and_more'),
+        ('kindergarten', '0008_alter_kindergarten_name_alter_region_country_and_more'),
     ]
 
     operations = [
