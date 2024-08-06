@@ -1,14 +1,15 @@
+from django.core.validators import MinLengthValidator
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-
 from django.contrib.auth.password_validation import validate_password
+from phonenumber_field.serializerfields import PhoneNumberField
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
 from apps.user.models import User
-from apps.user.validators import validate_phone_number
+from apps.user.validators import validate_cyrillic
 
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -88,19 +89,32 @@ class UserGetSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=255, required=False)
-    last_name = serializers.CharField(max_length=255, required=False)
-    email = serializers.EmailField(required=False)
-    phone_number = serializers.CharField(
-        max_length=12,
+    first_name = serializers.CharField(
+        max_length=56,
         required=False,
-        validators=[validate_phone_number]
+        validators=[validate_cyrillic, MinLengthValidator(2)]
+    )
+    second_name = serializers.CharField(
+        max_length=56,
+        required=False,
+        validators=[validate_cyrillic, MinLengthValidator(2)]
+    )
+    last_name = serializers.CharField(
+        max_length=56,
+        required=False,
+        validators=[validate_cyrillic, MinLengthValidator(2)]
+    )
+    email = serializers.EmailField(required=False)
+    phone_number = PhoneNumberField(
+        required=False,
+        max_length=12
     )
 
     class Meta:
         model = User
         fields = (
             'first_name',
+            'second_name',
             'last_name',
             'email',
             'phone_number'
