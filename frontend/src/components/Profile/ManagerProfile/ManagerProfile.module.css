@@ -66,6 +66,9 @@
         padding: 60px 20px 60px 20px;
     }
 }
+.profileWidgetWrap{
+    width: 100%;
+}
 .checkWrap{
     display: flex;
     flex-direction: column;
