@@ -91,7 +91,8 @@
 
 .cardImg {
     width: -webkit-fill-available;
-    height: 190px;
+    height: 290px;
+    object-fit: cover;
 }
 @media (max-width: 460px) {
     .cardImg {
