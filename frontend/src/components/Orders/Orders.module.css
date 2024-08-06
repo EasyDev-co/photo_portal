@@ -232,6 +232,14 @@
     border: 1px solid rgb(229, 229, 229);
     outline: none;
     border-radius: 8px;
+    width: 100%;
+}
+.promoInputActive {
+    padding: 12px 16px;
+    border: 1px solid rgb(229, 229, 229);
+    outline: none;
+    border-radius: 8px;
+    width: 100%;
 }
 
 .promoInput::-webkit-input-placeholder {
@@ -256,6 +264,30 @@
 
 .promoInput::placeholder {
     color: rgb(110, 110, 110);
+    font-size: 15px;
+}
+.promoInputActive::-webkit-input-placeholder {
+    color:#11bbd1;
+    font-size: 15px;
+}
+
+.promoInputActive::-moz-placeholder {
+    color:#11bbd1;
+    font-size: 15px;
+}
+
+.promoInputActive:-ms-input-placeholder {
+    color: #11bbd1;
+    font-size: 15px;
+}
+
+.promoInputActive::-ms-input-placeholder {
+    color: #11bbd1;
+    font-size: 15px;
+}
+
+.promoInputActive::placeholder {
+    color: #11bbd1;
     font-size: 15px;
 }
 

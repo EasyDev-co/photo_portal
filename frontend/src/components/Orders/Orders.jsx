@@ -208,12 +208,11 @@ export const Orders = () => {
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
-                <input className={styles.promoInput}
-                  placeholder="Введите промокод"
+                <input className={true ? styles.promoInputActive : styles.promoInput}
+                  placeholder={true ? "Промо-код активирован" :"Введите промокод"}
                   type="text"
                   name="digital"
                 />
-                <span>Промо-код активирован</span>
               </div>
             </div>
           </div>
