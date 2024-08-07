@@ -94,6 +94,7 @@ export const NavBar = ({localStorageValue, onClose }) => {
                 onClick={onClose}
               />
               <NavBarItem
+                isLogOut
                 router="/sign-in"
                 icon={exitIcon}
                 alt="иконка выхода"
