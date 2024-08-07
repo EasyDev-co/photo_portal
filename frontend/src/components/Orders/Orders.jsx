@@ -182,7 +182,6 @@ export const Orders = () => {
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
           <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
-            {console.log(addPhoto)}
             {addPhoto.length === 0 ? <div>
               У Вас пока нет заказов
             </div> :
