@@ -3,10 +3,9 @@ import styles from './MainButton.module.css'
 const ResetPassButton = ({value,resetPassActive, setResetActive, setCodeWindow}) => {
     const onResetActive = () =>{
         setResetActive(true)
-
     }
     return ( 
-        <button onClick={()=>onResetActive()}className={styles.resetButton}>{value}</button>
+        <button onClick={()=>onResetActive()}className={styles.mainButton}>{value}</button>
     );
 }
  
