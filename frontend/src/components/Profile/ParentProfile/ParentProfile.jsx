@@ -26,7 +26,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         message: '',
         email: ''
     });
-    const [resetPassActive, setResetActive] = useState(false);
+    const [resetPassActive, setResetActive] = useState(true);
     const [generatePass, setPass] = useState(gen_password(12));
     const [activeBlur, setActiveBlur] = useState(true)
     const userData = useSelector(state => state.user.userData);
@@ -44,7 +44,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         parentNewPass: generatePass,
         resetEmail: ''
     });
-    
+
     const [inputValueReset, setResetValue] = useState({
         code: ''
     });
@@ -100,7 +100,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const onSubmitToReset = (e) => {
         e.preventDefault()
         if (resetPassActive) {
-            parentResetPassCreate(inputValue.resetEmail)
+            parentResetPassCreate(userData.email)
                 .then(res => {
                     if (res.ok) {
                         res.json()
@@ -110,7 +110,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                     setCodeWindow(true)
                                 }
                                 dispatch(setResetData({
-                                    emailForReset: inputValue.resetEmail,
+                                    emailForReset: userData.email,
                                     newPass: inputValue.parentNewPass
                                 }))
                             })
@@ -125,9 +125,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         }
     }
     const resetDataUser = useSelector(state => state.user.resetDataUser);
+
     const onResetSubmit = (e) => {
         e.preventDefault();
-        parentVerifyResetCode(resetDataUser.emailForReset, inputValueReset.code)
+        parentVerifyResetCode(userData.email, inputValueReset.code)
             .then(res => res.json())
             .then(res => {
                 if (res.message === 'Код верифицирован. Можете сменить пароль.') {
@@ -275,9 +276,9 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     </div>
                     }
                 </form>
-                <form className={styles.formReset} onSubmit={(e) => onSubmitToReset(e)} action="">
+                <form className={styles.formReset} onSubmit={(e)=> onSubmitToReset(e)} action="">
                     <div className={styles.profileInputWrap}>
-                        <InputField
+                        {/* <InputField
                             placeholder={"Старый пароль"}
                             label={"Старый пароль"}
                             type={"password"}
@@ -287,7 +288,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             onChangeHandler={onChangeHandler}
                             autocomplete
                             setActiveBlur={setActiveBlur}
-                        />
+                        /> */}
                         <InputField
                             placeholder={generatePass}
                             label={"Новый пароль"}
@@ -299,7 +300,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentNewPass}
                             setActiveBlur={setActiveBlur}
                         />
-                        {resetPassActive ? <InputField
+                        {/* {resetPassActive ? <InputField
                             placeholder={'mail@mail.ru'}
                             label={"Введите Email для изменения пароля"}
                             type={"text"}
@@ -316,12 +317,19 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 setResetActive={setResetActive}
                                 value={'Укажите Email'}
                             />
-                        }
+                        } */}
                     </div>
                     <div>
-                        <MainButton
-                            value={"Отправить код для смены пароля"}
+                        <ResetPassButton
+                            setCodeWindow={setCodeWindow}
+                            setResetActive={setResetActive}
+                            value={'Отправить код для смены пароля'}
                         />
+                        {/* <MainButton
+                            // isReset
+                            // setResetActive={setResetActive}
+                            value={"Отправить код для смены пароля"}
+                        /> */}
                     </div>
                 </form>
             </div>
