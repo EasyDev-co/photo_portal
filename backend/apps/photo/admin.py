@@ -51,6 +51,7 @@ class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
         'date_start',
         'date_end'
     )
+    readonly_fields = ('are_qrs_removed',)
     list_filter = ('is_active',)
     search_fields = ('name',)
     ordering = ('name', 'date_start', 'date_end')
@@ -72,6 +73,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
     def qr_image(self, obj):
         if obj.qr_code:
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
+        return 'Недоступно'
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
@@ -93,7 +95,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
         )
 
         obj.qr_code.save(
-            f'{str(obj.photo_theme.name)}_qr.png',
+            f'{str(obj.photo_theme.id)}/{str(obj.photo_theme.name)}_qr.png',
             ContentFile(buffer.read())
         )
 

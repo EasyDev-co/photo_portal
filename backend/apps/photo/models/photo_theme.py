@@ -17,6 +17,10 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     date_end = models.DateTimeField(
         verbose_name='Дата окончания'
     )
+    are_qrs_removed = models.BooleanField(
+        verbose_name='Удалены ли QR коды',
+        default=False
+    )
 
     def __str__(self):
         return f'{self.name}'
