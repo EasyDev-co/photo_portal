@@ -19,7 +19,7 @@ export const SideBar = ({ scrollY, innerHeight }) => {
         height: `${innerHeight - 68}px`,
         overflowX: 'hidden',
         overflowY: 'hidden'
-      } 
+      }
     } className={scrollY > 0 ? styles.sideBar : styles.sideBarScroll}>
       <div className={styles.firstBlock}>
         <nav className={styles.nav}>
