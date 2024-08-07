@@ -33,6 +33,7 @@ const ManagerProfile = () => {
                 }
             })
     }, [accessStor, kindergarten_id])
+
     return (
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
@@ -87,16 +88,6 @@ const ManagerProfile = () => {
                 </div>
                 <div className={styles.checkWrap}>
                     <form className={styles.checkForm}>
-                        {/* <label htmlFor="parentName">Выгрузка чеков</label>
-                        <input placeholder="ФИО родителя" className={styles.inputField} id={'parentName'} type="text" list="data" />
-                        <datalist id="data">
-                            <option value="Chrome" label="Google" />
-                            <option value="Firefox" label="Mozilla" />
-                            <option value="Opera" label="Opera" />
-                            {data.map((item, key) =>
-                        <option key={key} value={item.displayValue} />
-                    )}
-                        </datalist> */}
                         <Dropdown />
                         <div>
                             <MainButton
