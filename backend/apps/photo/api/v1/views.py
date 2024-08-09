@@ -1,5 +1,3 @@
-import logging
-
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -56,7 +54,6 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         first_photo = get_object_or_404(Photo, number=photo_numbers[0])
         photo_line = first_photo.photo_line
 
-        logging.error(photo_line.kindergarten not in user.kindergarten.all())
         if photo_line.kindergarten not in user.kindergarten.all():
             return Response(
                 {'message': 'Фотолиния не относится к вашему детскому саду'},
