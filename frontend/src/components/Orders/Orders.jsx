@@ -43,9 +43,9 @@ export const Orders = () => {
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
 
-  useClickOutside(blurRef, () => {
-    setIsBlur(false);
-  });
+  // useClickOutside(blurRef, () => {
+  //   setIsBlur(false);
+  // });
   const [isActiveForm, setIsActiveForm] = useState(false);
   useEffect(() => {
     let isMounted = true;
@@ -109,7 +109,6 @@ export const Orders = () => {
       const existingIndex = updatedState.findIndex(
         item => item.id === photoId && item.photo_type === newValue.photo_type
       );
-      console.log(existingIndex)
       if (existingIndex !== -1) {
         updatedState[existingIndex] = newValue;
       } else {
