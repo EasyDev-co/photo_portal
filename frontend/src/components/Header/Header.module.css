@@ -69,7 +69,10 @@
   background-repeat: no-repeat;
   background-position: center;
 }
-
+.linkToAuth>a{
+  color: #11bbd1;
+  font-size: 15px;
+}
 @media screen and (max-width: 768px) {
   .header {
     border-bottom: none;
@@ -101,8 +104,8 @@
   .container {
     padding: 8px 20px;
   }
+  .linkToAuth>a{
+    display: none;
+  }
 }
-.linkToAuth>a{
-  color: #11bbd1;
-  font-size: 15px;
-}
+
