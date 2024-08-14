@@ -145,49 +145,35 @@ export const Orders = () => {
     }
   };
 
-  const handleCheckboxChange = (event, photoLineId) => {
-    const { checked, id } = event.target;
-    if (orderValue.length !== 0) {
-      const updatedItems = orderValue.map(item => {
-        if (item.blockId == id) {
-          return {
-            ...item,
-            is_photobook: checked
-
-          };
-        }
-        return item;
-
-      });
-      setOrderValue(updatedItems);
-    } else {
-
-      setOrderValue((prev) => [
-        ...prev,
-        {
-          "id": photoLineId,
-          "photos": [
-
-          ],
-          "is_photobook": checked,
-          "is_digital": false
-        }
-      ])
-
-    }
-
-    console.log(photoLineId, id)
-
-  };
-
-  const handleInputEmailChange = (event) => {
-    const updatedItems = orderValue.map(item => {
-      return {
-        ...item,
-        ['is_digital']: !!event.target.value
-      };
-    });
-    setOrderValue(updatedItems);
+  const handleCheckboxChange = (event, photoLineId) => { 
+    const { checked, name } = event.target; 
+    console.log(checked, name); 
+   
+    setOrderValue((prev) => { 
+      const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
+   
+      if (existingItemIndex > -1) { 
+        const updatedItem = { ...prev[existingItemIndex] }; 
+        if (name == 6) { 
+          updatedItem.is_photobook = checked; 
+        } else if (name == 7) { 
+          updatedItem.is_digital = checked; 
+        } 
+        return [ 
+          ...prev.slice(0, existingItemIndex), 
+          updatedItem, 
+          ...prev.slice(existingItemIndex + 1), 
+        ]; 
+      } else { 
+        const newItem = { 
+          id: photoLineId, 
+          photos: [], 
+          is_photobook: name == 6 ? checked : false, 
+          is_digital: name == 7 ? checked : false 
+        }; 
+        return [...prev, newItem]; 
+      } 
+    }); 
   };
 
   return (
