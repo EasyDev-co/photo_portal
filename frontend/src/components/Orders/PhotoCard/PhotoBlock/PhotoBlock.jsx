@@ -38,12 +38,17 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
                       <div className={styles.checkmark}></div>
                     </div>
                   </label>
-
                 </div>
                 <div className={styles.bookCheckbox}>
                   <div className={styles.bookDescr}>В электронном виде</div>
                   <label className={styles.custom_checkbox}>
-                    <input type="checkbox" />
+                  <input  
+                      className='' 
+                      id={blocksId} 
+                      name={7} 
+                      type="checkbox" 
+                      onChange={(e) => handleCheckboxChange(e, photo.photoLineId)} 
+                    />
                     <div className={styles.checkbox}>
                       <div className={styles.checkmark}></div>
                     </div>
