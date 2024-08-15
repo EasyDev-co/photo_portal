@@ -1,4 +1,3 @@
-import loguru
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -11,7 +10,7 @@ from apps.cart.models import Cart
 from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
 from apps.order.models import Order, OrderItem
 
-from apps.utils.services import CartService
+from apps.utils.services import CartService, YaDiskApiService
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
 
@@ -22,18 +21,29 @@ class OrderAPIView(APIView):
 
     def post(self, request):
         cart = get_object_or_404(Cart, user=request.user)
+
+        ya_disk_api_service = YaDiskApiService()
+
         cart_photo_lines = cart.cart_photo_lines.select_related('cart')
 
-        orders = [
-            Order(
-                user=request.user,
-                photo_line=cart_photo_line.photo_line,
-                is_digital=cart_photo_line.is_digital,
-                is_photobook=cart_photo_line.is_photobook,
-                order_price=cart_photo_line.total_price,
+        orders = []
 
-            ) for cart_photo_line in cart_photo_lines
-        ]
+        for cart_photo_line in cart_photo_lines:
+
+            if cart_photo_line.is_digital:
+                ya_disk_api_service.upload_digital_photos(photo_line=cart_photo_line.photo_line, user=request.user)
+
+            orders.append(
+                Order(
+                    user=request.user,
+                    photo_line=cart_photo_line.photo_line,
+                    is_digital=cart_photo_line.is_digital,
+                    is_photobook=cart_photo_line.is_photobook,
+                    order_price=cart_photo_line.total_price,
+
+                )
+            )
+
         orders = Order.objects.bulk_create(orders)
 
         order_ids = []
