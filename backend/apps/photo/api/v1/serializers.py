@@ -17,13 +17,17 @@ class PhotoLineSerializer(serializers.ModelSerializer):
     """
     Сериализатор для получения линии фотографий.
     """
+    deadline = serializers.SerializerMethodField()
     photos = PhotoRetrieveSerializer(many=True, read_only=True)
 
     ransom_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = PhotoLine
-        fields = ('id', 'photos', 'parent', 'ransom_amount')
+        fields = ('id', 'photos', 'parent', 'deadline', 'ransom_amount')
+
+    def get_deadline(self, obj):
+        return obj.photo_theme.date_end
 
     def get_ransom_amount(self, obj):
         return obj.kindergarten.region.ransom_amount
