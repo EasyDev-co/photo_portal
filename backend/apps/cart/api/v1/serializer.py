@@ -93,14 +93,17 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         # стоимость электронных фото
         ransom_amount = validated_data['photo_line'].kindergarten.region.ransom_amount
-        if total_price >= ransom_amount:
-            if not validated_data['is_digital']:
-                instance.is_digital = True
-                instance.save()
-        else:
-            if validated_data['is_digital']:
-                digital_price = region_prices.get(photo_type=PhotoType.digital).price
-                total_price += digital_price
+        if ransom_amount:
+            if total_price >= ransom_amount:
+                if not validated_data['is_digital']:
+                    instance.is_digital = True
+                    instance.save()
+            else:
+                if validated_data['is_digital']:
+                    digital_price = region_prices.get(photo_type=PhotoType.digital).price
+                    if promocode:
+                        digital_price = promocode.use_promocode_to_price(digital_price, PhotoType.digital)
+                    total_price += digital_price
 
         # применение купона и промокода
         if bonus_coupon:
