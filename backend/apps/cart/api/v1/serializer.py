@@ -72,11 +72,6 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
             discount_price = price_per_piece
 
-            if promocode:
-                discount_price = promocode.use_promocode_to_price(
-                    Decimal(price_per_piece.quantize(Decimal("0.0"), rounding=ROUND_HALF_UP)), photo['photo_type']
-                )
-
             photo_list.append(
                 PhotoInCart(
                     photo_type=photo['photo_type'],
@@ -93,8 +88,6 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         # стоимость фотокниги
         if validated_data['is_photobook']:
             photobook_price = region_prices.get(photo_type=PhotoType.photobook).price
-            if promocode:
-                photobook_price = promocode.use_promocode_to_price(photobook_price, PhotoType.photobook)
             total_price += photobook_price
 
 
@@ -112,9 +105,13 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                         digital_price = promocode.use_promocode_to_price(digital_price, PhotoType.digital)
                     total_price += digital_price
 
-        # применение купона
+        # применение купона и промокода
         if bonus_coupon:
             total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+        if promocode:
+            total_price = promocode.use_promocode_to_price(
+                Decimal(total_price.quantize(Decimal("0.0"), rounding=ROUND_HALF_UP))
+            )
 
         instance.total_price = total_price
         instance.save()

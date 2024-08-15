@@ -1,13 +1,38 @@
 import styles from "./ManagerProfile.module.css";
 // import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import StatisticItem from "./StatisticItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PaymentDiagram from "../../Payment/PaymentDiagram/PaymentDiagram";
 import Timer from "../../Payment/PaymentTimer/Timer";
 import MainButton from "../../Buttons/MainButton";
 import Dropdown from "./Dropdown/Dropdown";
+import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/getStats";
+import { useSelector } from "react-redux";
+
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
+    const accessStor = localStorage.getItem('access');
+    const kindergarten_id = useSelector(state => state.user.kindergarten_id);
+    const [stats, setStats] = useState(
+        {
+            total_orders: 0,
+            completed_orders: 0,
+            average_order_value: "0.00",
+            total_amount: "0.00"
+        }
+    );
+    useEffect(() => {
+        getStats(accessStor, kindergarten_id)
+            .then(res => {
+                if (res.ok) {
+                    res.json()
+                        .then(res => {
+                            console.log(res)
+                            setStats(res)
+                        })
+                }
+            })
+    }, [accessStor, kindergarten_id])
 
     return (
         <div className={styles.profileWrap}>
@@ -16,7 +41,7 @@ const ManagerProfile = () => {
                 <div className={styles.profileWidget}>
                     <StatisticItem
                         label={'Количество заказов'}
-                        data={'43 из 79'}
+                        data={`${stats.completed_orders} из ${stats.total_orders}`}
                     />
                     <StatisticItem
                         setIsCopy={setIsCopy}
@@ -26,9 +51,9 @@ const ManagerProfile = () => {
                     />
                     <StatisticItem
                         label={'Средний чек, руб'}
-                        data={'12 250'}
+                        data={stats.average_order_value}
                     />
-                    <StatisticItem
+                    {/* <StatisticItem
                         label={'Сбор с заказа “Зимняя сказка”, руб'}
                         data={'48 348'}
                     />
@@ -59,21 +84,11 @@ const ManagerProfile = () => {
                     <StatisticItem
                         label={'Промо-код для сотрудников'}
                         data={'code20'}
-                    />
+                    /> */}
                 </div>
                 <div className={styles.checkWrap}>
                     <form className={styles.checkForm}>
-                        {/* <label htmlFor="parentName">Выгрузка чеков</label>
-                        <input placeholder="ФИО родителя" className={styles.inputField} id={'parentName'} type="text" list="data" />
-                        <datalist id="data">
-                            <option value="Chrome" label="Google" />
-                            <option value="Firefox" label="Mozilla" />
-                            <option value="Opera" label="Opera" />
-                            {data.map((item, key) =>
-                        <option key={key} value={item.displayValue} />
-                    )}
-                        </datalist> */}
-                        <Dropdown/>
+                        <Dropdown />
                         <div>
                             <MainButton
                                 value={'Скачать все чеки'}
@@ -99,7 +114,7 @@ const ManagerProfile = () => {
                 <StatisticItem
                     timer
                     label={'Итого'}
-                    data={'23 450'}
+                    data={stats.total_amount}
                 />
                 <Timer
                     date={'Sat Jun 30 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}

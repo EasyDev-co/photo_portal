@@ -23,7 +23,7 @@ export const getPhotoPrice = async (access,region) => {
 export const fetchPhotoPriceWithTokenInterceptor = async (access, region) => {
     try {
         let response = await getPhotoPrice(access, region)
-        if (!response.ok) {
+        if (response.status === '401' || response.status === '403') {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()

@@ -16,12 +16,10 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
             setIsBlur(false)
         }
     })
-
     const onScaleHandler = () => {
         setIsBlur(true)
         setIsScale(true);
     }
-    // console.log(isScale)
     const increment = () => {
         setIsBlur(true)
         if (count < 360) {
@@ -36,7 +34,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
     };
 
     return (
-        <div ref={blurRef}  className={styles.photoCardWrap}>
+        <div className={styles.photoCardWrap}>
             <div ref={scaleRef} onClick={()=>{isScale && setIsBlur(true)}} className={isScale ? styles.imgWrapScale : styles.imgWrap}>
                 <img  style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo} alt="" />
                 <div onClick={() =>onScaleHandler()} className={styles.loupe}></div>
@@ -102,6 +100,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
             </form>
+            <div className={styles.photoNumber}>Фото № {number}</div>
         </div>
     );
 })

@@ -21,7 +21,64 @@ class KindergartenInLine(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        (
+            _("Personal info"),
+            {
+                "fields": (
+                    "first_name",
+                    'second_name',
+                    "last_name",
+                    'phone_number',
+                    'role',
+                    'promocode',
+                    'is_verified',
+                )
+            }
+        ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "groups",
+                    "user_permissions",
+                    "is_superuser",
+                    "is_staff"
+                ),
+            },
+        ),
+        (
+            _("Important dates"),
+            {
+                "fields": (
+                    "last_login",
+                    "date_joined"
+                )
+            }
+        ),
+    )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "password1",
+                    "password2",
+                    "first_name",
+                    'second_name',
+                    "last_name",
+                    'phone_number',
+                    'role',
+                    'promocode',
+                    'is_verified',
+                ),
+            },
+        ),
+    )
     list_display = (
         'id',
         'email',
@@ -43,6 +100,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('role', 'is_verified')
     raw_id_fields = ('promocode',)
     ordering = ('email', 'last_name', 'first_name')
+    readonly_fields = ('last_login', 'date_joined')
 
     inlines = [KindergartenInLine]
 
@@ -106,6 +164,7 @@ class StaffAdmin(BaseUserAdmin):
         'last_name',
     )
     ordering = ('email',)
+    readonly_fields = ('last_login', 'date_joined')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

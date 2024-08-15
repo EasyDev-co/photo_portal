@@ -30,6 +30,7 @@
   height: 56px;
   border: 1px solid #11bbd1;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .num {

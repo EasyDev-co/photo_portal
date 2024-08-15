@@ -31,13 +31,6 @@ export const Header = () => {
   const toggleNavBar = () => {
     setNavBarState(!navBarState);
   };
-  const updateLocalStorageValues = (key, value) => {
-    localStorage.setItem(key, value);
-    setLocalStorageValue(prevValues => ({
-      ...prevValues,
-      [key]: value
-    }));
-  };
 
   useEffect(() => {
     // Проверка и обновление значений каждую секунду
@@ -121,13 +114,16 @@ export const Header = () => {
           {isAuth ?
             <div className={styles.rightBlock}>
               <ul className={styles.userInfoList}>
-                <HeaderUserInfoItem
-                  top={`${localStorageValue.last_name} ${localStorageValue.first_name} ${localStorageValue.second_name}`}
+              <HeaderUserInfoItem
+                  top={`${localStorageValue.last_name === null ? '' : localStorageValue.last_name} 
+                  ${localStorageValue.first_name === null ? '' : localStorageValue.first_name} 
+                  ${localStorageValue.second_name === null ? '' : localStorageValue.second_name}`}
                   bottom={localStorageValue.phone}
                 />
                 <HeaderUserInfoItem
-                  top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
-                  bottom={localStorage.getItem('kindergarten')}
+                  top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
+                  ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
+                  bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
                 />
               </ul>
             </div> :

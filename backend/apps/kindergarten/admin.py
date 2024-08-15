@@ -23,9 +23,10 @@ class KindergartenAdmin(admin.ModelAdmin):
         'name',
         'region',
         'code',
-        'has_photobook'
+        'has_photobook',
+        'locality'
     )
-    list_filter = ('region',)
+    list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('region',)

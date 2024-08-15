@@ -1,7 +1,13 @@
+from datetime import datetime
+
+from django.core.exceptions import ValidationError
+from pytz import timezone
+
 from django.db import models
 from django.contrib.auth import get_user_model
 
 from apps.kindergarten.models import Kindergarten
+from config.settings import TIME_ZONE
 from .photo_theme import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 
@@ -43,3 +49,9 @@ class PhotoLine(UUIDMixin):
     class Meta:
         verbose_name = 'Линия фотографий'
         verbose_name_plural = 'Линии фотографий'
+
+    def clean(self):
+        super().clean()
+        current_time = datetime.now().astimezone(tz=timezone(TIME_ZONE))
+        if self.photo_theme.date_end <= current_time:
+            raise ValidationError('Срок указанной фототемы вышел.')

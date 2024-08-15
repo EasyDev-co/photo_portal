@@ -24,7 +24,8 @@ const InputField = (
         urlData,
         autocomplete,
         error,
-        isBlur
+        isBlur,
+        isDisabled
     }) => {
 
     const [activeInput, setIsActiveInput] = useState(false);
@@ -76,7 +77,7 @@ const InputField = (
                         name={name}
                         id={id}
                         value={value}
-                        disabled={isPencil && inputChange}
+                        disabled={isPencil && inputChange || isDisabled}
                         required
                         autoComplete={autocomplete && 'off'}
                     />
