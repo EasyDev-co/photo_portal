@@ -28,6 +28,7 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     class Meta:
         verbose_name = 'Тема фотосессии'
         verbose_name_plural = 'Темы фотосессий'
+        ordering = ("-created",)
 
 
 class PhotoPopularityStat(PhotoTheme):
