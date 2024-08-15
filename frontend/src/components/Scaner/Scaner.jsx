@@ -23,7 +23,7 @@ const Scaner = ({ scanActive, setScanActive, isAuth }) => {
                 html5QrCode.stop();
             }
         }
-
+        
         const qrCodeSuccess = (decodeTxt) => {
             if(!isAuth){
                 window.location.href = decodeTxt;

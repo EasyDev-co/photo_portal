@@ -30,7 +30,7 @@ export const App = () => {
       if (location.pathname === "/") {
         navigate("/about-us");
       }
-     
+
     }
   }, [location.pathname, navigate]);
 
@@ -66,7 +66,6 @@ export const App = () => {
             <Route path="/verification" element={<Verification />} />
             <Route path="/password-reset" element={<ResetPassword />} />
             <Route path="/password-reset/new-password" element={<NewPassword />} />
-           
           </Route>
         </>
       }

@@ -46,6 +46,8 @@ services:
     container_name: ${PROJECT_SLUG}_celery
     volumes:
       - ./backend/:/opt/backend/:rw
+      - static_dir:/opt/backend/static/
+      - media_dir:/opt/backend/media/
 
   frontend:
     build:

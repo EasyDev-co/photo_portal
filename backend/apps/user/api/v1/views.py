@@ -37,11 +37,20 @@ class UserAPIView(APIView):
                     data=serializer.data,
                     status=status.HTTP_200_OK
                 )
-            except IntegrityError:
+            except IntegrityError as e:
+                error_message = str(e).lower()
+
+                if 'email' in error_message:
+                    error_data = {
+                        "email": ["Адрес электронной почты недоступен"]}
+                elif 'phone_number' in error_message:
+                    error_data = {
+                        "phone_number": ["Номер телефона недоступен"]}
+                else:
+                    error_data = {"message": "Произошла ошибка при сохранении"}
+
                 return Response(
-                    data={
-                        'message': 'Адрес электронной почты недоступен'
-                    },
+                    data=error_data,
                     status=status.HTTP_400_BAD_REQUEST
                 )
         return Response(

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'django_celery_beat',
     'drf_yasg',
+    "phonenumber_field",
 
     # Приложения
     'apps.kindergarten',
@@ -88,8 +89,8 @@ if SENTRY_IS_ON:
     sentry_sdk.init(
         dsn=os.environ.get('SENTRY_DSN'),
         integrations=[
-                DjangoIntegration(),
-            ],
+            DjangoIntegration(),
+        ],
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
     )
@@ -191,8 +192,12 @@ CELERY_BEAT_SCHEDULE = {
     },
     "check_photo_theme_deadlines": {
         "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
-        "schedule": crontab(minute='0', hour='*/2'), # проверка каждые два часа
+        "schedule": crontab(minute='0', hour='*/2'),  # проверка каждые два часа
     },
+    "remove_old_qr_codes": {
+        "task": "apps.photo.tasks.QRCodeRemoverTask",
+        "schedule": crontab(minute='0', hour='*/48'),
+    }
 }
 
 SIMPLE_JWT = {
@@ -212,3 +217,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+PHONENUMBER_DEFAULT_REGION = 'RU'
+
+PHOTO_LINE_MEDIA_PATH = os.path.join(MEDIA_ROOT, 'photo_line')

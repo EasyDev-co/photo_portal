@@ -3,10 +3,24 @@ import { vkIcon, whatsAppIcon, telegramIcon } from "../../constants/constants";
 import { SocialItem } from "../SocialItem/SocialItem";
 import { SideBarItem } from "./SideBarItem/SideBarItem";
 import { useAuth } from "../../utils/useAuth";
-export const SideBar = () => {
+import { useRef, useEffect } from "react";
+
+export const SideBar = ({ scrollY, innerHeight }) => {
   const { isAuth } = useAuth();
+
   return (
-    <div className={styles.sideBar}>
+    <div style={innerHeight < 870 ?
+      {
+        height: `${innerHeight - 68}px`,
+        overflowX: 'hidden',
+        overflowY: 'scroll'
+      } :
+      {
+        height: `${innerHeight - 68}px`,
+        overflowX: 'hidden',
+        overflowY: 'hidden'
+      }
+    } className={scrollY > 0 ? styles.sideBar : styles.sideBarScroll}>
       <div className={styles.firstBlock}>
         <nav className={styles.nav}>
 
@@ -54,7 +68,7 @@ export const SideBar = () => {
                   svgStrokeLinecap="round"
                   secondPathD=""
                 />
-                  <SideBarItem
+                <SideBarItem
                   router="/about-us"
                   svgWidth="25"
                   svgHeight="24"

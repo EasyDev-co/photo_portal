@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { useAuth } from "../../utils/useAuth";
 import { Link } from "react-router-dom";
 
-export const NavBar = ({localStorageValue, onClose }) => {
+export const NavBar = ({ localStorageValue, onClose }) => {
 
   const { isAuth } = useAuth();
   const userData = useSelector(state => state.user.userData);
@@ -46,12 +46,15 @@ export const NavBar = ({localStorageValue, onClose }) => {
           <>
             <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
-                top={`${localStorageValue.last_name} ${localStorageValue.first_name} ${localStorageValue.second_name}`}
+                top={`${localStorageValue.last_name === null ? '' : localStorageValue.last_name} 
+                  ${localStorageValue.first_name === null ? '' : localStorageValue.first_name} 
+                  ${localStorageValue.second_name === null ? '' : localStorageValue.second_name}`}
                 bottom={localStorageValue.phone}
               />
               <HeaderUserInfoItem
-                top={`${localStorage.getItem('country')}, ${localStorage.getItem('regionName')}`}
-                bottom={localStorage.getItem('kindergarten')}
+                top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
+                  ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
+                bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
               />
             </ul>
             <ul className={styles.navList}>
@@ -91,6 +94,7 @@ export const NavBar = ({localStorageValue, onClose }) => {
                 onClick={onClose}
               />
               <NavBarItem
+                isLogOut
                 router="/sign-in"
                 icon={exitIcon}
                 alt="иконка выхода"
@@ -98,10 +102,27 @@ export const NavBar = ({localStorageValue, onClose }) => {
                 onClick={onClose}
               />
             </ul>
-          </> :
-          <div className={styles.linkToAuth}>
-            <Link to={'/sign-in'}>Войти</Link>
-          </div>
+          </>
+          :
+          <ul className={styles.navList}>
+            <NavBarItem
+              router="/about-us"
+              icon={infoIcon}
+              alt="иконка инфо"
+              text="О нас"
+              onClick={onClose}
+            />
+            <NavBarItem
+              router="/rules"
+              icon={rulesIcon}
+              alt="иконка правил"
+              text="Правила"
+              onClick={onClose}
+            />
+            <div className={styles.linkToAuth}>
+              <Link to={'/sign-in'}>Войти</Link>
+            </div>
+          </ul>
         }
 
         <ul className={styles.socialList}>

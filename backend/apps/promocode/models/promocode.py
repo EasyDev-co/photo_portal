@@ -27,11 +27,11 @@ class Promocode(UUIDMixin, TimeStampedMixin):
     def __str__(self):
         return f"Промокод {self.code}"
 
-    def use_promocode_to_price(self, price, photo_type):
+    def use_promocode_to_price(self, price):
         """Применить промокод к цене."""
         price = Decimal(price)
-        discount_photo_type = get_object_or_404(PromocodePhotoTypes, promocode=self, photo_type=photo_type)
-        price = price - (price * (discount_photo_type.discount / Decimal(100)))
+        # discount_photo_type = get_object_or_404(PromocodePhotoTypes, promocode=self, photo_type=photo_type)
+        price = price - (price * Decimal(0.5))
         return price
 
 

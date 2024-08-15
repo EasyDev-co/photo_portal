@@ -43,10 +43,15 @@ export const Registration = () => {
     email: '',
     detail: '',
     first_name: '',
+    last_name:'',
+    second_name:'',
     password: '',
     isChecked: '',
     repeatPass: ''
   });
+  const [errorName, setErrorName] = useState({
+    text:''
+  })
   const navigation = useNavigate();
   const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
@@ -77,9 +82,38 @@ export const Registration = () => {
   useClickOutside(blurRef, () => {
     setActiveBlur(false)
   })
-
+  function validateFullName(input) {
+    // Регулярное выражение для проверки кириллических букв
+    const cyrillicPattern = /^[А-ЯЁа-яё]+$/;
+    
+    // Разделяем строку на слова
+    const words = input.trim().split(/\s+/);
+    
+    // Проверяем, что слов ровно три
+    if (words.length !== 2) {
+      setErrorName({
+        text: ['Длинна этого поля не может быть короче 1 слова.']
+      })
+      return
+    }
+    
+    // Проверяем каждое слово на соответствие регулярному выражению
+    for (let word of words) {
+      if (!cyrillicPattern.test(word)) {
+        setErrorName({
+          text: ['Можно вводить только кириллические символы.']
+        })
+        return
+      }     
+  }
+    
+  setErrorName({
+    text:['']
+  })
+}
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
 
     if (inputValue.password !== inputValue.repeatPassword) {
       setError({ repeatPass: ['Пароли не совпадают!'] })
@@ -100,6 +134,7 @@ export const Registration = () => {
         dispatch(
           setEmail(inputValue.email)
         )
+   
         setResponseData(data);
         dispatch(setPhotoNumbers(
           inputValue.pictureNumbers.split('-').map(elem => {
@@ -110,13 +145,14 @@ export const Registration = () => {
       } else {
         const data = await response.json();
         setError(data);
+        validateFullName(inputValue.fullName)
       }
     } catch (error) {
 
     }
     setInputValue(initialState);
   }
-
+  console.log(errorName)
   return <>
     <div className={styles.login}>
       <Scaner
@@ -162,7 +198,7 @@ export const Registration = () => {
                 isAuthForm
                 setActiveBlur={setActiveBlur}
                 value={inputValue.fullName}
-                error={error.first_name}
+                error={errorName.text}
               />
               <InputField
                 name={'email'}
