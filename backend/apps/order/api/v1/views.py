@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,7 +19,12 @@ from apps.utils.services import CartService
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
-from config.settings import TERMINAL_KEY, T_PASSWORD, PAYMENT_INIT_URL, PAYMENT_GET_STATE_URL
+from config.settings import (TERMINAL_KEY,
+                             T_PASSWORD,
+                             PAYMENT_INIT_URL,
+                             PAYMENT_GET_STATE_URL,
+                             TAXATION,
+                             VAT)
 
 User = get_user_model()
 
@@ -65,56 +71,50 @@ class OrderAPIView(APIView):
 
 class PaymentAPIView(APIView):
     description = 'Выкуп фотографий'
+    permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def get(self, request, pk):
         user = request.user
-        order = Order.objects.get(id=request.data.get('order_id'))
+        order = get_object_or_404(Order, id=pk)
         order_items = OrderItem.objects.filter(order_id=order.id)
 
-        values = {
+        payment_data = {
             'Amount': int(order.order_price * 100),
             'Description': self.description,
             'OrderId': order.id,
             'Password': T_PASSWORD,
-            'PayType': 'O',
-            "Recurrent": "N",
             'TerminalKey': TERMINAL_KEY,
         }
-        token = generate_token_for_t_bank(values)
 
-        data = {
-            'TerminalKey': TERMINAL_KEY,
-            'OrderId': str(order.id),
-            'Amount': str(int(order.order_price * 100)),
-            'Description': self.description,
-            "PayType": "O",
-            "Recurrent": "N",
-            'Token': token,
-            'DATA': {},
-            'Receipt': {
-                'Items': [
-                    {
-                        'Name': f'Фотография №{order_item.photo.number}, '
-                                f'{PhotoType(order_item.photo_type).label} - {order_item.amount}шт.',
-                        'Price': str(int(order_item.price * 100 / order_item.amount)),
-                        'Quantity': str(order_item.amount),
-                        'Amount': str(int(order_item.price * 100)),
-                        'Tax': 'none'
-                    } for order_item in order_items
-                ],
-                'Email': str(user.email),
-                'Taxation': 'osn',
-            }
+        token = generate_token_for_t_bank(payment_data)
+        payment_data.pop('Password')
+        payment_data['Receipt'] = {
+            'Items': [
+                {
+                    'Name': f'Фотография №{order_item.photo.number}, '
+                            f'{PhotoType(order_item.photo_type).label} - {order_item.amount}шт.',
+                    'Price': str(int(order_item.price * 100 / order_item.amount)),
+                    'Quantity': str(order_item.amount),
+                    'Amount': str(int(order_item.price * 100)),
+                    'Tax': VAT
+                } for order_item in order_items
+            ],
+            'Email': str(user.email),
+            'Taxation': TAXATION,
         }
+        payment_data['Token'] = token
 
         response = requests.post(
             url=PAYMENT_INIT_URL,
-            json=data
+            json=payment_data
         )
 
         if response.json()['Success']:
             payment_url = response.json()['PaymentURL']
-            Order.objects.filter(id=order.id).update(payment_id=response.json()['PaymentId'])
+            Order.objects.filter(id=order.id).update(
+                payment_id=response.json()['PaymentId'],
+                status=OrderStatus.payment_awaiting
+            )
             return Response(payment_url, status=status.HTTP_200_OK)
         return Response(
             f"{response.json()['Message']} {response.json()['Details']}",
@@ -123,8 +123,9 @@ class PaymentAPIView(APIView):
 
 
 class GetPaymentStateAPIView(APIView):
-    def post(self, request):
-        order = Order.objects.get(id=request.data.get('order_id'))
+
+    def get(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
         values = {
             'TerminalKey': TERMINAL_KEY,
             'PaymentId': order.payment_id,
@@ -139,9 +140,14 @@ class GetPaymentStateAPIView(APIView):
         )
         if response.json()['Success'] and response.json()['Status'] == 'CONFIRMED':
             Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
-            return Response(response.json()['Message'], status=status.HTTP_200_OK)
+            return Response(
+                response.json()['Message'],
+                status=status.HTTP_200_OK
+            )
+
+        Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
         return Response(
-            f"Заказ не оплачен. Статус оплаты {response.json()['Status']}",
+            f"Заказ не оплачен.",
             status=status.HTTP_400_BAD_REQUEST
         )
 

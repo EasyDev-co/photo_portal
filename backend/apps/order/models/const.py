@@ -7,5 +7,6 @@ class OrderStatus(models.IntegerChoices):
     paid_for = 2, 'Оплачен'
     digital_order_is_completed = 3, 'Электронные фото готовы'
     completed = 4, 'Выполнен'
-    refunded = 5, 'Платеж возвращен'
-    rejected = 6, 'Платеж отклонен'
+    payment_awaiting = 5, 'Ожидает оплаты'
+    failed = 6, 'Платеж отклонен'
+    refunded = 7, 'Платеж возвращен'
