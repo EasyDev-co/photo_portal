@@ -50,6 +50,12 @@ class Order(TimeStampedMixin):
         default=OrderStatus.created,
         verbose_name="Статус заказа",
     )
+    payment_id = models.CharField(
+        max_length=20,
+        verbose_name="Идентификатор транзакции",
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = "Заказ"
