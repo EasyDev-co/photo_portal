@@ -221,3 +221,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 PHONENUMBER_DEFAULT_REGION = 'RU'
 
 PHOTO_LINE_MEDIA_PATH = os.path.join(MEDIA_ROOT, 'photo_line')
+
+# для работы с облаком
+YAD_API_BASE_URL = os.getenv("YAD_API_BASE_URL")
+YAD_OAUTH_TOKEN = os.getenv("YAD_OAUTH_TOKEN")
+YAD_WORKDIR = os.getenv("YAD_WORKDIR")
