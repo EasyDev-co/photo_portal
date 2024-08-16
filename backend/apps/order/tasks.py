@@ -20,7 +20,7 @@ User = get_user_model()
 class DigitalPhotosNotificationTask(BaseTask):
     """
     Задача отправления уведомления о готовности электронных фото.
-    Срабатывает через signals.py при изменении статуса Order на digital_order_is_completed.
+    Срабатывает через signals.py при изменении статуса Order на paid_for.
     """
     name = 'digital_photos_notification'
 
