@@ -1,4 +1,4 @@
-import { memo, useRef, useState} from 'react';
+import { memo, useRef, useState } from 'react';
 import styles from './AddKids.module.css'
 import { tokenRefreshCreate } from '../../../http/tokenRefreshCreate';
 import { setCookie } from '../../../utils/setCookie';
@@ -26,7 +26,8 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
     const dispatch = useDispatch();
 
     const onChangeHandler = (event) => {
-        const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
+        const inputValue = event.target.value;
+        const newInput = (data) => ({ ...data, [event.target.name]: inputValue });
         setInputValue(newInput);
     }
 
@@ -41,49 +42,61 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
     }
 
     const onSubmitHandler = async (e) => {
-        const arr = inputValue.addKids.split(',').map(elem=>Number(elem));
+        const arr = inputValue.addKids.split('-').map(Number);
         e.preventDefault();
-        if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
+        const regex = /^\d+(-\d+){5}$/;
+        // Проверяем соответствие значения регулярному выражению
+        if (regex.test(inputValue.addKids)) {
+            setError("");
+            if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
+                setInputValue({
+                    addKids: ''
+                });
+                setError(true);
+                return;
+            }
+            tokenRefreshCreate()
+                .then(res => res.json())
+                .then(res => {
+                    if (res.refresh) {
+                        setCookie('refresh', res.refresh);
+                        dispatch(
+                            setAccessToken(res.access)
+                        )
+                    }
+                    return res.access
+                })
+                .then(access => {
+                    getOnePhoto(arr, access)
+                        .then(res => {
+                            if (res.ok) {
+                                res.json()
+                                    .then(res => {
+                                        dispatch(addPhotos(res))
+                                        // addBlock();
+                                        patchPhotoLine(access, {
+                                            "parent": idP
+                                        }, res.id)
+
+                                    })
+                            } else {
+                                setError('Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер!');
+                            }
+                        })
+                    setError('');
+                })
             setInputValue({
                 addKids: ''
             });
-            setError(true);
-            return;
+            setIsActiveForm(false)
+        } else {
+
+            setError("Неправильный формат ввода. Введите 6 номеров фото через дефис.")
         }
-        tokenRefreshCreate()
-            .then(res => res.json())
-            .then(res => {
-                if (res.refresh) {
-                    setCookie('refresh', res.refresh);
-                    dispatch(
-                        setAccessToken(res.access)
-                    )
-                }
-                return res.access
-            })
-            .then(access => {
-                getOnePhoto(arr, access)
-                    .then(res => {
-                        if(res.ok){
-                            res.json()
-                            .then(res=>{
-                                dispatch(addPhotos(res))
-                                // addBlock();
-                                patchPhotoLine(access,{
-                                    "parent": idP
-                                  },res.id)
-                              
-                            })
-                        } else{
-                            setError(true);
-                        }
-                    })
-                    setError(false);
-            })
-        setInputValue({
-            addKids: ''
-        });
-        setIsActiveForm(false)
+
+
+
+
     }
 
     return (
@@ -93,9 +106,9 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                 <div>
                     <input onChange={(e) => onChangeHandler(e)} name='addKids' value={inputValue.addKids} className={styles.addKidsInput} type="text" />
                 </div>
-                {error &&
+                {!!error &&
                     <div className={styles.errorMessage}>
-                        Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер! 
+                        {error}
                     </div>}
             </div>
             <button className={styles.addKidsBtn}>Добавить</button>
