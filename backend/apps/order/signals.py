@@ -26,7 +26,7 @@ def delete_order_price(sender, instance, **kwargs):
 def digital_order_is_completed(sender, instance, **kwargs):
     """
     Сигнал для отправки уведомления о готовности электронных фото.
-    Срабатывает, когда заказу устанавливается статус digital_order_is_completed.
+    Срабатывает, когда заказу устанавливается статус paid_for.
     """
     if instance.id:
         old_instance = Order.objects.get(id=instance.id)
