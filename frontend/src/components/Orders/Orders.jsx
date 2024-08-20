@@ -15,6 +15,7 @@ import { orderCreate } from "../../http/orderCreate";
 import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
+import { fetchPaymentCreateTokenInterceptor, paymentCreate } from "../../http/fetchPayment";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -135,45 +136,63 @@ export const Orders = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const order = await orderCreate(accessStor)
-    if (order.ok) {
-      const data = await order.json();
-      console.log(data)
-    } else {
-      const data = await order.json();
-      console.log(data)
+    if (orderValue.length !== 0) {
+      const order = await orderCreate(accessStor)
+      if (order.ok) {
+        const data = await order.json();
+        console.log(data)
+        paymentCreate(accessStor, data[0].id)
+          .then(res => {
+            if (res.ok) {
+              res.json()
+                .then(res => {
+                  console.log(res)
+                  window.location.href = res;
+                })
+            } else {
+              res.json()
+                .then(res => {
+                  console.log(res)
+                })
+            }
+          })
+
+      } else {
+        const data = await order.json();
+        console.log(data)
+      }
     }
+
   };
 
-  const handleCheckboxChange = (event, photoLineId) => { 
-    const { checked, name } = event.target; 
-    console.log(checked, name); 
-   
-    setOrderValue((prev) => { 
-      const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
-   
-      if (existingItemIndex > -1) { 
-        const updatedItem = { ...prev[existingItemIndex] }; 
-        if (name == 6) { 
-          updatedItem.is_photobook = checked; 
-        } else if (name == 7) { 
-          updatedItem.is_digital = checked; 
-        } 
-        return [ 
-          ...prev.slice(0, existingItemIndex), 
-          updatedItem, 
-          ...prev.slice(existingItemIndex + 1), 
-        ]; 
-      } else { 
-        const newItem = { 
-          id: photoLineId, 
-          photos: [], 
-          is_photobook: name == 6 ? checked : false, 
-          is_digital: name == 7 ? checked : false 
-        }; 
-        return [...prev, newItem]; 
-      } 
-    }); 
+  const handleCheckboxChange = (event, photoLineId) => {
+    const { checked, name } = event.target;
+
+    setOrderValue((prev) => {
+      const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
+
+      if (existingItemIndex > -1) {
+        const updatedItem = { ...prev[existingItemIndex] };
+        if (name == 6) {
+          updatedItem.is_photobook = checked;
+        } else if (name == 7) {
+          updatedItem.is_digital = checked;
+        }
+        return [
+          ...prev.slice(0, existingItemIndex),
+          updatedItem,
+          ...prev.slice(existingItemIndex + 1),
+        ];
+      } else {
+        const newItem = {
+          id: photoLineId,
+          photos: [],
+          is_photobook: name == 6 ? checked : false,
+          is_digital: name == 7 ? checked : false
+        };
+        return [...prev, newItem];
+      }
+    });
   };
 
   return (
