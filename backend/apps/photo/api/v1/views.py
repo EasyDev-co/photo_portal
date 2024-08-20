@@ -70,7 +70,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             user_photo_count.save()
             return Response(serializer.data)
         return Response(
-            {'message': 'Пробник с указанными фотографиями не найдена'},
+            {'message': 'Пробник с указанными фотографиями не найден.'},
             status=status.HTTP_404_NOT_FOUND
         )
 
