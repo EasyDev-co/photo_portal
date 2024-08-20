@@ -15,7 +15,7 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
 
 class PhotoLineSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для получения линии фотографий.
+    Сериализатор для получения пробников.
     """
     deadline = serializers.SerializerMethodField()
     photos = PhotoRetrieveSerializer(many=True, read_only=True)

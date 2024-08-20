@@ -29,7 +29,7 @@ class PhotoInCartSerializer(serializers.ModelSerializer):
 
 
 class CartPhotoLineSerializer(serializers.Serializer):
-    """Сериализатор для отображения Фотолиний в корзине."""
+    """Сериализатор для отображения пробника в корзине."""
     id = serializers.UUIDField()
     photos = serializers.SerializerMethodField()
     is_digital = serializers.BooleanField(default=False)
@@ -44,7 +44,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
 
 
 class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
-    """Сериализатор для создания Фотолиний в корзине."""
+    """Сериализатор для создания пробника в корзине."""
     cart = serializers.PrimaryKeyRelatedField(queryset=Cart.objects.all())
     id = serializers.PrimaryKeyRelatedField(
         source='photo_line',

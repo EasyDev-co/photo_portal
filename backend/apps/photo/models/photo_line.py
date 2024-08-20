@@ -47,8 +47,8 @@ class PhotoLine(UUIDMixin):
         return f'{self.photo_theme} ({self.kindergarten})'
 
     class Meta:
-        verbose_name = 'Линия фотографий'
-        verbose_name_plural = 'Линии фотографий'
+        verbose_name = 'Пробник'
+        verbose_name_plural = 'Пробники'
 
     def clean(self):
         super().clean()

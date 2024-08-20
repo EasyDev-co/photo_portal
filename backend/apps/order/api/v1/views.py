@@ -198,13 +198,13 @@ class OldCartAPIView(APIView):
     @swagger_auto_schema(
         responses={
             "201": openapi.Response(
-                description="Отправить в корзину список фотолиний с указаний внутри каждой фото, типа фото, количества"
+                description="Отправить в корзину список пробников с указаний внутри каждой фото, типа фото, количества"
             )
         },
         request_body=PhotoLineCartSerializer
     )
     def post(self, request):
-        """Добавление в корзину списка фотолиний"""
+        """Добавление в корзину списка пробников"""
         serializer = PhotoLineCartSerializer(request.data, many=True)
         response = serializer.data.copy()
 
