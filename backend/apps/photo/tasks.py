@@ -6,7 +6,7 @@ from config.celery import BaseTask, app
 
 class QRCodeRemoverTask(BaseTask):
     """
-    Поиск и удаление изображений QR кодов устаревших фотолиний.
+    Поиск и удаление изображений QR кодов устаревших пробников.
     """
 
     def process(self, *args, **kwargs):
