@@ -93,13 +93,21 @@ export const Registration = () => {
     const words = input.trim().split(/\s+/);
 
     // Проверяем, что слов ровно три
-    if (words.length !== 2) {
+    if (words.length <= 2) {
       setErrorName({
         text: ['Длинна этого поля не может быть короче 1 слова.']
       })
       return
     }
 
+    for (let word of words) {
+      if (word.length >= 57) {
+        setErrorName({
+          text: ['Слишком много символов.']
+        })
+        return
+      }
+    }
     // Проверяем каждое слово на соответствие регулярному выражению
     for (let word of words) {
       if (!cyrillicPattern.test(word)) {
@@ -156,8 +164,6 @@ export const Registration = () => {
     } else {
       setError({ pictureNumbers: ['Неправильный формат ввода. Введите 6 номеров фото через дефис.'] })
     }
-
-  
   }
 
   return <>
@@ -174,7 +180,6 @@ export const Registration = () => {
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
-                //  setActiveBlur={ setActiveBlur}
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}
