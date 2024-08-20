@@ -93,9 +93,22 @@ export const Registration = () => {
     const words = input.trim().split(/\s+/);
 
     // Проверяем, что слов ровно три
-    if (words.length <= 2) {
+    if (words.length < 2) {
       setErrorName({
         text: ['Длинна этого поля не может быть короче 1 слова.']
+      })
+      return
+    }
+
+    if (words[0].length <= 2) {
+      setErrorName({
+        text: ['Длинна фамилии не может быть короче 2 символов.']
+      })
+      return
+    }
+    if (words[1].length <= 2) {
+      setErrorName({
+        text: ['Длинна имени не может быть короче 2 символов.']
       })
       return
     }
@@ -119,7 +132,7 @@ export const Registration = () => {
     }
 
     setErrorName({
-      text: ['']
+      text: []
     })
   }
   const onSubmitHandler = async (e) => {
@@ -210,7 +223,7 @@ export const Registration = () => {
                 isNone
                 isAuthForm
                 setActiveBlur={setActiveBlur}
-                value={inputValue.fullName}
+                value={inputValue.fullName && inputValue.fullName}
                 error={errorName.text}
               />
               <InputField
