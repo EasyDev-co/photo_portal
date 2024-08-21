@@ -1,66 +1,81 @@
-from decimal import Decimal
+from random import choice
+import string
 
-import loguru
-from django.db import models
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator
+from django.db import models, IntegrityError
 
+from apps.photo.models import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
-from apps.kindergarten.models import PhotoType
+User = get_user_model()
+
+PROMO_CODE_CHARACTERS = string.ascii_uppercase + string.digits
+
+
+def generate_promo_code(length: int = 10) -> str:
+    """
+    Генерация случайного промокода из букв и цифр.
+    """
+    return ''.join(choice(PROMO_CODE_CHARACTERS) for _ in range(length))
 
 
 class Promocode(UUIDMixin, TimeStampedMixin):
-    """Модель промокода."""
+    """Модель промокода для заведующих."""
+
     code = models.CharField(
         max_length=200,
+        unique=True,
+        blank=True,
+        db_index=True,
         verbose_name="Промокод",
+    )
+    photo_theme = models.ForeignKey(
+        PhotoTheme,
+        on_delete=models.CASCADE,
+        related_name="promo_codes",
+        verbose_name="Фототема"
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="promo_codes",
+        verbose_name="Заведующий"
     )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Активен",
     )
+    discount_services = models.PositiveIntegerField(
+        default=50,
+        validators=(MaxValueValidator(100),),
+        verbose_name="Скидка на все услуги (%)"
+    )
+    discount_photobooks = models.PositiveIntegerField(
+        default=20,
+        validators=(MaxValueValidator(100),),
+        verbose_name="Скидка на фотокниги (%)"
+    )
 
     class Meta:
         verbose_name = "Промокод"
         verbose_name_plural = "Промокоды"
+        ordering = ("-created",)
 
     def __str__(self):
-        return f"Промокод {self.code}"
+        return f"Промокод: {self.code}, Фототема: {self.photo_theme}, Пользователь: {self.user}"
 
-    def use_promocode_to_price(self, price):
-        """Применить промокод к цене."""
-        price = Decimal(price)
-        # discount_photo_type = get_object_or_404(PromocodePhotoTypes, promocode=self, photo_type=photo_type)
-        price = price - (price * Decimal(0.5))
-        return price
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = self.generate_unique_code()
+        super().save(*args, **kwargs)
 
-
-class PromocodePhotoTypes(UUIDMixin):
-    """
-    Модель для указания размера скидки для каждого типа фото.
-    Если модели PromocodePhotoTypes для Promocode отсутствуют,
-    то скидка применяется ко всем типам.
-    """
-    promocode = models.ForeignKey(
-        Promocode,
-        on_delete=models.CASCADE,
-        related_name="promocode_phototype",
-        verbose_name="Промокод",
-    )
-    photo_type = models.PositiveSmallIntegerField(
-        choices=PhotoType.choices,
-        verbose_name="Тип фото, к которой применяется скидка",
-        blank=True
-    )
-    discount = models.DecimalField(
-        max_digits=3,
-        decimal_places=0,
-        verbose_name="Размер скидки (%)"
-    )
-
-    class Meta:
-        verbose_name = "Скидка к промокоду"
-        verbose_name_plural = "Скидки к промокодам"
-
-    def __str__(self):
-        return f"Скидка на {self.photo_type} к промокоду {self.promocode}"
+    @staticmethod
+    def generate_unique_code():
+        """
+        Генерация уникального промокода.
+        """
+        while True:
+            code = generate_promo_code()
+            if not Promocode.objects.filter(code=code).exists():
+                return code
