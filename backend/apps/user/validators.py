@@ -14,15 +14,14 @@ class CustomPasswordValidator:
     Кастомный валидатор пароля.
     """
 
+    message = (
+        "Пароль может содержать только латинские буквы, цифры "
+        "и спецсимволы ~!@#$%^&*()_-+=."
+    )
+
     def validate(self, password, user=None):
         if not re.match(r'^[a-zA-Z0-9~!@#$%^&*()_\-+=]+$', password):
-            raise ValidationError(
-                "Пароль может содержать только латинские буквы, цифры "
-                "и спецсимволы ~!@#$%^&*()_-+=."
-            )
+            raise ValidationError(self.message)
 
     def get_help_text(self):
-        return (
-            "Пароль должен содержать только латинские буквы, цифры и "
-            "спецсимволы ~!@#$%^&*()_-+=."
-        )
+        return self.message
