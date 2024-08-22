@@ -8,6 +8,7 @@ from rest_framework import serializers
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
 from apps.kindergarten.models import PhotoPrice, PhotoType
 from apps.photo.models import Photo, PhotoLine
+from apps.promocode.models import Promocode
 from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
@@ -53,14 +54,21 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     photos = PhotoInCartSerializer(many=True)
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
+    promo_code = serializers.CharField(required=False)
 
     def create(self, validated_data):
+        promo_code_data = validated_data.get('promo_code')
+        promo_code = None
+        if promo_code_data:
+            promo_code = Promocode.objects.filter(
+                code=promo_code_data, is_active=True
+            ).first()
+
         photos_in_cart = validated_data.pop('photos')
         instance = CartPhotoLine.objects.create(**validated_data)
         user = self.context.get('request').user
         region_prices = PhotoPrice.objects.filter(region=validated_data['photo_line'].kindergarten.region)
 
-        promocode = user.promocode
         bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
 
         total_price = Decimal(0)
@@ -88,6 +96,11 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         # стоимость фотокниги
         if validated_data['is_photobook']:
             photobook_price = region_prices.get(photo_type=PhotoType.photobook).price
+            if promo_code and promo_code.discount_photobooks:
+                photobook_price = promo_code.apply_discount(
+                    price=photobook_price,
+                    is_photobook=True
+                )
             total_price += photobook_price
 
 
@@ -101,17 +114,15 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
             else:
                 if validated_data['is_digital']:
                     digital_price = region_prices.get(photo_type=PhotoType.digital).price
-                    if promocode:
-                        digital_price = promocode.use_promocode_to_price(digital_price, PhotoType.digital)
+                    if promo_code and promo_code.discount_services:
+                        digital_price = promo_code.apply_discount(
+                            price=digital_price
+                        )
                     total_price += digital_price
 
         # применение купона и промокода
         if bonus_coupon:
             total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
-        if promocode:
-            total_price = promocode.use_promocode_to_price(
-                Decimal(total_price.quantize(Decimal("0.0"), rounding=ROUND_HALF_UP))
-            )
 
         instance.total_price = total_price
         instance.save()
