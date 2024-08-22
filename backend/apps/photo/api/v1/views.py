@@ -42,12 +42,12 @@ class PhotoRetrieveAPIView(RetrieveAPIView):
 
 
 class PhotoLineGetByPhotoNumberAPIView(APIView):
-    """Получение фотолинии по номерам фото."""
+    """Получение пробника по номерам фото."""
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
 
     @swagger_auto_schema(responses={"200": PhotoLineSerializer()}, )
     def post(self, request):
-        """Получение фотолинии по id"""
+        """Получение пробника по id"""
 
         user = request.user
         photo_numbers = request.data['numbers']
@@ -85,15 +85,13 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             return Response(serializer.data)
 
         return Response(
-            {'message': 'Фотолиния с указанными фотографиями не найдена'},
-            status=status.HTTP_404_NOT_FOUND,
+            {'message': 'Пробник с указанными фотографиями не найден.'},
+            status=status.HTTP_404_NOT_FOUND
         )
 
 
-
-
 class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
-    """Получение одной фотолинии или обновления родителя фотолинии."""
+    """Получение одного пробника или обновления родителя пробника."""
     http_method_names = ('get', 'patch')
     serializer_class = PhotoLineSerializer
     queryset = PhotoLine.objects.all()
@@ -101,7 +99,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
 
 
 class PhotoLinesGetByParent(ListAPIView):
-    """Получение всех фотолиний родителя"""
+    """Получение всех пробников родителя"""
     serializer_class = PhotoLineSerializer
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
     lookup_field = 'parent'

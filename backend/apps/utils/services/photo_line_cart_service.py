@@ -8,7 +8,7 @@ from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
 class PhotoLineCartService:
-    """Сервис для подготовки фотолиний к добавлению в корзину."""
+    """Сервис для подготовки пробника к добавлению в корзину."""
 
     def __init__(self, user, serializer):
         self.user = user
@@ -33,7 +33,7 @@ class PhotoLineCartService:
         return price
 
     def apply_bonus_coupon(self, total_price):
-        """Применить к итоговой цене фотолинии бонусный купон."""
+        """Применить к итоговой цене пробника бонусный купон."""
         if self.bonus_coupon:
             total_price = self.bonus_coupon.use_bonus_coupon_to_price(total_price)
         return total_price
@@ -63,7 +63,7 @@ class PhotoLineCartService:
         return total_price
 
     def calculate_the_cost(self):
-        """Посчитать стоимость фотолинии"""
+        """Посчитать стоимость пробника"""
         self.check_discount()
         for photo_line in self.serializer.data:
             photos = photo_line['photos']

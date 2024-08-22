@@ -33,7 +33,6 @@ class UserAdmin(BaseUserAdmin):
                     "last_name",
                     'phone_number',
                     'role',
-                    'promocode',
                     'is_verified',
                 )
             }
@@ -73,7 +72,6 @@ class UserAdmin(BaseUserAdmin):
                     "last_name",
                     'phone_number',
                     'role',
-                    'promocode',
                     'is_verified',
                 ),
             },
@@ -87,7 +85,6 @@ class UserAdmin(BaseUserAdmin):
         'last_name',
         'phone_number',
         'role',
-        'promocode',
         'is_verified',
     )
     search_fields = (
@@ -95,10 +92,8 @@ class UserAdmin(BaseUserAdmin):
         'first_name',
         'second_name',
         'last_name',
-        'promocode__code'
     )
     list_filter = ('role', 'is_verified')
-    raw_id_fields = ('promocode',)
     ordering = ('email', 'last_name', 'first_name')
     readonly_fields = ('last_login', 'date_joined')
 

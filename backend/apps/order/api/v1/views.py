@@ -1,19 +1,30 @@
-import loguru
+import requests
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.cart.models import Cart
+from apps.kindergarten.models import PhotoType
 from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
 from apps.order.models import Order, OrderItem
+from apps.order.models.const import OrderStatus
 
 from apps.utils.services import CartService
+from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
+from config.settings import (TERMINAL_KEY,
+                             T_PASSWORD,
+                             PAYMENT_INIT_URL,
+                             PAYMENT_GET_STATE_URL,
+                             TAXATION,
+                             VAT)
 
 User = get_user_model()
 
@@ -58,6 +69,89 @@ class OrderAPIView(APIView):
         return Response(serializer.data)
 
 
+class PaymentAPIView(APIView):
+    description = 'Выкуп фотографий'
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        user = request.user
+        order = get_object_or_404(Order, id=pk)
+        order_items = OrderItem.objects.filter(order_id=order.id)
+
+        payment_data = {
+            'Amount': int(order.order_price * 100),
+            'Description': self.description,
+            'OrderId': order.id,
+            'Password': T_PASSWORD,
+            'TerminalKey': TERMINAL_KEY,
+        }
+
+        token = generate_token_for_t_bank(payment_data)
+        payment_data.pop('Password')
+        payment_data['Receipt'] = {
+            'Items': [
+                {
+                    'Name': f'Фотография №{order_item.photo.number}, '
+                            f'{PhotoType(order_item.photo_type).label} - {order_item.amount}шт.',
+                    'Price': str(int(order_item.price * 100 / order_item.amount)),
+                    'Quantity': str(order_item.amount),
+                    'Amount': str(int(order_item.price * 100)),
+                    'Tax': VAT
+                } for order_item in order_items
+            ],
+            'Email': str(user.email),
+            'Taxation': TAXATION,
+        }
+        payment_data['Token'] = token
+
+        response = requests.post(
+            url=PAYMENT_INIT_URL,
+            json=payment_data
+        )
+
+        if response.json()['Success']:
+            payment_url = response.json()['PaymentURL']
+            Order.objects.filter(id=order.id).update(
+                payment_id=response.json()['PaymentId'],
+                status=OrderStatus.payment_awaiting
+            )
+            return Response(payment_url, status=status.HTTP_200_OK)
+        return Response(
+            f"{response.json()['Message']} {response.json()['Details']}",
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class GetPaymentStateAPIView(APIView):
+
+    def get(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
+        values = {
+            'TerminalKey': TERMINAL_KEY,
+            'PaymentId': order.payment_id,
+            'Password': T_PASSWORD,
+        }
+        token = generate_token_for_t_bank(values)
+        values.pop('Password')
+        values['Token'] = token
+        response = requests.post(
+            url=PAYMENT_GET_STATE_URL,
+            json=values
+        )
+        if response.json()['Success'] and response.json()['Status'] == 'CONFIRMED':
+            Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
+            return Response(
+                response.json()['Message'],
+                status=status.HTTP_200_OK
+            )
+
+        Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
+        return Response(
+            f"Заказ не оплачен.",
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
 class OldOrderAPIView(APIView):
     """Представление для заказа. (Старое - не актуально)."""
 
@@ -79,7 +173,7 @@ class OldOrderAPIView(APIView):
         cart_service.remove_cart(user)
         return Response(serializer.data)
 
-    @swagger_auto_schema(responses={"200": OrderSerializer(many=True)},)
+    @swagger_auto_schema(responses={"200": OrderSerializer(many=True)}, )
     def get(self, request):
         """Получение списка заказов пользователя."""
         orders = Order.objects.filter(user=request.user)
@@ -89,7 +183,8 @@ class OldOrderAPIView(APIView):
 
 class OldOrderOneAPIView(APIView):
     """Представление для одного заказа. (Старое - не актуально)."""
-    @swagger_auto_schema(responses={"200": OrderSerializer()},)
+
+    @swagger_auto_schema(responses={"200": OrderSerializer()}, )
     def get(self, request, pk):
         """Получение заказа."""
         order = get_object_or_404(Order, id=pk)
@@ -99,16 +194,17 @@ class OldOrderOneAPIView(APIView):
 
 class OldCartAPIView(APIView):
     """Представление для корзины (старая корзина - не актуально)"""
+
     @swagger_auto_schema(
         responses={
             "201": openapi.Response(
-                description="Отправить в корзину список фотолиний с указаний внутри каждой фото, типа фото, количества"
+                description="Отправить в корзину список пробников с указаний внутри каждой фото, типа фото, количества"
             )
         },
         request_body=PhotoLineCartSerializer
     )
     def post(self, request):
-        """Добавление в корзину списка фотолиний"""
+        """Добавление в корзину списка пробников"""
         serializer = PhotoLineCartSerializer(request.data, many=True)
         response = serializer.data.copy()
 
@@ -123,7 +219,7 @@ class OldCartAPIView(APIView):
 
         return Response(serializer.data)
 
-    @swagger_auto_schema(responses={"200": PhotoLineCartSerializer(many=True)},)
+    @swagger_auto_schema(responses={"200": PhotoLineCartSerializer(many=True)}, )
     def get(self, request):
         """Показать корзину."""
         cart = CartService(request)

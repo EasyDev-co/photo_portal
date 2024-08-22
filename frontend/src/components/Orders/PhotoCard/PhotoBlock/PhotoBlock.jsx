@@ -25,7 +25,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
               <div className={styles.checkboxInputWrap}>
                 <div className={styles.bookCheckbox}>
                   <div className={styles.bookDescr}>Фотокнига</div>
-                  <label class={styles.custom_checkbox}>
+                  <label className={styles.custom_checkbox}>
                     <input
                       className=''
                       id={blocksId}
@@ -34,18 +34,23 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
                       // onChange={(e)=>onChangeHandler(e.target.name, 0 ,  photo.photoLineId, e.target.checked , photo.photoLineId, blocksId)}
                       onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
                     />
-                    <div class={styles.checkbox}>
-                      <div class={styles.checkmark}></div>
+                    <div className={styles.checkbox}>
+                      <div className={styles.checkmark}></div>
                     </div>
                   </label>
-
                 </div>
                 <div className={styles.bookCheckbox}>
                   <div className={styles.bookDescr}>В электронном виде</div>
-                  <label class={styles.custom_checkbox}>
-                    <input type="checkbox" />
-                    <div class={styles.checkbox}>
-                      <div class={styles.checkmark}></div>
+                  <label className={styles.custom_checkbox}>
+                  <input  
+                      className='' 
+                      id={blocksId} 
+                      name={7} 
+                      type="checkbox" 
+                      onChange={(e) => handleCheckboxChange(e, photo.photoLineId)} 
+                    />
+                    <div className={styles.checkbox}>
+                      <div className={styles.checkmark}></div>
                     </div>
                   </label>
                 </div>

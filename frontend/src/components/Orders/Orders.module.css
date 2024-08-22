@@ -95,16 +95,9 @@
 .photoCardsForm {
     position: relative;
 }
-@media screen and (max-width: 460px) {
-    .photoCardsForm {
 
-    }
-}
 .photoCardsFormBlur {
-
     position: relative;
-    margin-bottom: 68px;
-    transition: 3s;
 }
 
 .photoCardsFormBlur::after {

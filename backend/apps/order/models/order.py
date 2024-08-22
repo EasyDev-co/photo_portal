@@ -35,7 +35,7 @@ class Order(TimeStampedMixin):
         PhotoLine,
         on_delete=models.PROTECT,
         related_name="orders",
-        verbose_name="Фотолиния",
+        verbose_name="Пробник",
     )
     is_digital = models.BooleanField(
         default=False,
@@ -49,6 +49,12 @@ class Order(TimeStampedMixin):
         choices=OrderStatus.choices,
         default=OrderStatus.created,
         verbose_name="Статус заказа",
+    )
+    payment_id = models.CharField(
+        max_length=20,
+        verbose_name="Идентификатор транзакции",
+        null=True,
+        blank=True
     )
 
     class Meta:

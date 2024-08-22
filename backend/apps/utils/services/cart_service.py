@@ -55,7 +55,7 @@ class CartService:
             return len(self.cart[user_id])
 
     def add_products_to_cart(self, user, product_list):
-        """Добавить в корзину фотолинию."""
+        """Добавить в корзину пробник."""
         if self.check_cart_exists(user):
             self.remove_cart(user=user)
         self.create_cart(user)

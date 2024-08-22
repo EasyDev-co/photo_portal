@@ -43,9 +43,6 @@ export const Orders = () => {
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
 
-  useClickOutside(blurRef, () => {
-    setIsBlur(false);
-  });
   const [isActiveForm, setIsActiveForm] = useState(false);
   useEffect(() => {
     let isMounted = true;
@@ -109,7 +106,6 @@ export const Orders = () => {
       const existingIndex = updatedState.findIndex(
         item => item.id === photoId && item.photo_type === newValue.photo_type
       );
-      console.log(existingIndex)
       if (existingIndex !== -1) {
         updatedState[existingIndex] = newValue;
       } else {
@@ -117,12 +113,14 @@ export const Orders = () => {
       }
       return updatedState;
     });
+
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
-
+  // console.log(orderValue)
   useEffect(() => {
-    const transformedData = transformData(orderValue);
 
+    const transformedData = transformData(orderValue);
+    // console.log(transformedData)
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
@@ -147,30 +145,35 @@ export const Orders = () => {
     }
   };
 
-  const handleCheckboxChange = (event, photoLineId) => {
-    const { checked, id } = event.target;
-
-    const updatedItems = orderValue.map(item => {
-      if (item.blockId == id) {
-        return {
-          ...item,
-          is_photobook: checked
-
-        };
-      }
-      return item;
-    });
-    setOrderValue(updatedItems);
-  };
-
-  const handleInputEmailChange = (event) => {
-    const updatedItems = orderValue.map(item => {
-      return {
-        ...item,
-        ['is_digital']: !!event.target.value
-      };
-    });
-    setOrderValue(updatedItems);
+  const handleCheckboxChange = (event, photoLineId) => { 
+    const { checked, name } = event.target; 
+    console.log(checked, name); 
+   
+    setOrderValue((prev) => { 
+      const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
+   
+      if (existingItemIndex > -1) { 
+        const updatedItem = { ...prev[existingItemIndex] }; 
+        if (name == 6) { 
+          updatedItem.is_photobook = checked; 
+        } else if (name == 7) { 
+          updatedItem.is_digital = checked; 
+        } 
+        return [ 
+          ...prev.slice(0, existingItemIndex), 
+          updatedItem, 
+          ...prev.slice(existingItemIndex + 1), 
+        ]; 
+      } else { 
+        const newItem = { 
+          id: photoLineId, 
+          photos: [], 
+          is_photobook: name == 6 ? checked : false, 
+          is_digital: name == 7 ? checked : false 
+        }; 
+        return [...prev, newItem]; 
+      } 
+    }); 
   };
 
   return (
@@ -208,7 +211,7 @@ export const Orders = () => {
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
                 <input className={true ? styles.promoInputActive : styles.promoInput}
-                  placeholder={true ? "Промо-код активирован" :"Введите промокод"}
+                  placeholder={true ? "Промо-код активирован" : "Введите промокод"}
                   type="text"
                   name="digital"
                 />

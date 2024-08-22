@@ -246,7 +246,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             name={"parentCity"}
                             id={"parentCity"}
                             value={inputValue.parentCity}
-                            isPencil
+                            isDisabled
+                            isNone
                             onChangeHandler={onChangeHandler}
                             setActiveBlur={setActiveBlur}
                         />
@@ -257,7 +258,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             name={"kindergarten"}
                             id={"kindergarten"}
                             value={inputValue.kindergarten}
-                            isPencil
+                            isDisabled
+                            isNone
                             onChangeHandler={onChangeHandler}
                             setActiveBlur={setActiveBlur}
                         />

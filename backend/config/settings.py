@@ -221,3 +221,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 PHONENUMBER_DEFAULT_REGION = 'RU'
 
 PHOTO_LINE_MEDIA_PATH = os.path.join(MEDIA_ROOT, 'photo_line')
+
+TERMINAL_KEY = os.environ.get('TERMINAL_KEY')
+T_PASSWORD = os.environ.get('T_PASSWORD')
+PAYMENT_INIT_URL = os.environ.get('PAYMENT_INIT_URL')
+PAYMENT_GET_STATE_URL = os.environ.get('PAYMENT_GET_STATE_URL')
+TAXATION = os.environ.get('TAXATION')
+VAT = os.environ.get('VAT')

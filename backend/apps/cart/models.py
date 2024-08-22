@@ -13,7 +13,7 @@ User = get_user_model()
 
 
 class CartPhotoLine(UUIDMixin):
-    """Фотолиния в корзине."""
+    """Пробник в корзине."""
     cart = models.ForeignKey(
         'Cart',
         on_delete=models.CASCADE,
@@ -24,7 +24,7 @@ class CartPhotoLine(UUIDMixin):
         PhotoLine,
         on_delete=models.CASCADE,
         related_name='cart_photo_lines',
-        verbose_name='Фотолиния',
+        verbose_name='Пробник',
     )
     is_digital = models.BooleanField(
         default=False,
@@ -42,8 +42,8 @@ class CartPhotoLine(UUIDMixin):
     )
 
     class Meta:
-        verbose_name = 'Фотолиния в корзине'
-        verbose_name_plural = 'Фотолинии в корзине'
+        verbose_name = 'Пробник в корзине'
+        verbose_name_plural = 'Пробники в корзине'
 
 
 class PhotoInCart(UUIDMixin):
@@ -58,7 +58,7 @@ class PhotoInCart(UUIDMixin):
         'CartPhotoLine',
         on_delete=models.CASCADE,
         related_name='photos_in_cart',
-        verbose_name='Фотолиния',
+        verbose_name='Пробник',
     )
     photo_type = models.PositiveSmallIntegerField(
         choices=PhotoType.choices,
@@ -104,7 +104,7 @@ class Cart(UUIDMixin, TimeStampedMixin):
             'cart',
             'photo_line',
         ),
-        verbose_name='Фотолинии',
+        verbose_name='Пробники',
     )
 
     class Meta:
