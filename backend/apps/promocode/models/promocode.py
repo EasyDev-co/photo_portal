@@ -1,3 +1,4 @@
+from decimal import Decimal
 from random import choice
 import string
 
@@ -79,3 +80,16 @@ class Promocode(UUIDMixin, TimeStampedMixin):
             code = generate_promo_code()
             if not Promocode.objects.filter(code=code).exists():
                 return code
+
+    def apply_discount(
+        self,
+        price: Decimal,
+        is_photobook: bool = False
+    ) -> Decimal:
+        """
+        Применяет скидку к стоимости.
+        """
+
+        discount_rate = self.discount_photobooks if is_photobook else self.discount_services
+        discount = Decimal(discount_rate) / 100
+        return price * (1 - discount)

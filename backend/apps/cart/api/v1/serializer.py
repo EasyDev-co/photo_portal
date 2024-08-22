@@ -97,8 +97,10 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         if validated_data['is_photobook']:
             photobook_price = region_prices.get(photo_type=PhotoType.photobook).price
             if promo_code and promo_code.discount_photobooks:
-                discount = Decimal(promo_code.discount_photobooks) / 100
-                photobook_price -= photobook_price * discount
+                photobook_price = promo_code.apply_discount(
+                    price=photobook_price,
+                    is_photobook=True
+                )
             total_price += photobook_price
 
 
@@ -113,8 +115,9 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                 if validated_data['is_digital']:
                     digital_price = region_prices.get(photo_type=PhotoType.digital).price
                     if promo_code and promo_code.discount_services:
-                        discount = Decimal(promo_code.discount_photobooks) / 100
-                        digital_price -= digital_price * discount
+                        digital_price = promo_code.apply_discount(
+                            price=digital_price
+                        )
                     total_price += digital_price
 
         # применение купона и промокода
