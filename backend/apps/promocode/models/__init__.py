@@ -1,2 +1,1 @@
-from .promocode import Promocode, PromocodePhotoTypes
-
+from .promocode import Promocode
