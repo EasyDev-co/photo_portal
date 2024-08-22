@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('photo', '0009_alter_phototheme_options'),
+        ('photo', '0010_alter_phototheme_options'),
         ('promocode', '0007_alter_promocodephototypes_photo_type'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

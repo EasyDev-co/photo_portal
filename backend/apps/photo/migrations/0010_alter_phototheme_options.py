@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('photo', '0008_phototheme_are_qrs_removed'),
+        ('photo', '0009_alter_photoline_options_alter_phototheme_options_and_more'),
     ]
 
     operations = [
