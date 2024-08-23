@@ -91,7 +91,8 @@ class OrderAPIView(APIView):
                     ))
 
         # пересчитываем стоимость позиции с учетом промокода и купона
-        coupon_amount = [Decimal(cart.bonus_coupon)]
+
+        coupon_amount = [Decimal(cart.bonus_coupon) if cart.bonus_coupon else 0]
         for order_item in order_items:
             if cart.order_fully_paid_by_coupon:
                 order_item.price = Decimal(0)
