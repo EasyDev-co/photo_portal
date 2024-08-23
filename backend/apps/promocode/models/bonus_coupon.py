@@ -18,7 +18,7 @@ class BonusCoupon(UUIDMixin, TimeStampedMixin):
     )
     balance = models.DecimalField(
         max_digits=10,
-        decimal_places=0,
+        decimal_places=2,
         verbose_name="Баланс купона",
     )
     is_active = models.BooleanField(
@@ -42,4 +42,4 @@ class BonusCoupon(UUIDMixin, TimeStampedMixin):
             return price
         self.balance = abs(price)
         self.save()
-        return Decimal(0)
+        return Decimal(1)

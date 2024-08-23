@@ -2,11 +2,9 @@ import loguru
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 
 from apps.cart.api.v1.serializer import PhotoInCartSerializer, CartPhotoLineSerializer, CartSerializer, CartPhotoLineCreateUpdateSerializer
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
-from apps.promocode.models.bonus_coupon import BonusCoupon
 
 
 class PhotoInCartAPIView(APIView):
