@@ -11,7 +11,7 @@ import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
 import { patchPhotoLine } from "../../http/patchPhotoLine";
 import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
-import { orderCreate } from "../../http/orderCreate";
+import { fetchOrderCreateWithTokenInterceptor, orderCreate } from "../../http/orderCreate";
 import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
@@ -137,10 +137,10 @@ export const Orders = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (orderValue.length !== 0) {
-      const order = await orderCreate(accessStor)
+     
+      const order = await  fetchOrderCreateWithTokenInterceptor(accessStor)
       if (order.ok) {
         const data = await order.json();
-        console.log(data)
         paymentCreate(accessStor, data[0].id)
           .then(res => {
             if (res.ok) {
