@@ -5,7 +5,7 @@ import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
-import { addPhotos, setCart } from "../../store/authSlice";
+import { addPhotos, setCart, setOrderId } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
@@ -16,6 +16,7 @@ import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
 import { fetchPaymentCreateTokenInterceptor, paymentCreate } from "../../http/fetchPayment";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-
+  const naviate = useNavigate()
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -137,32 +138,16 @@ export const Orders = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (orderValue.length !== 0) {
-     
-      const order = await  fetchOrderCreateWithTokenInterceptor(accessStor)
+      const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
       if (order.ok) {
         const data = await order.json();
-        paymentCreate(accessStor, data[0].id)
-          .then(res => {
-            if (res.ok) {
-              res.json()
-                .then(res => {
-                  console.log(res)
-                  window.location.href = res;
-                })
-            } else {
-              res.json()
-                .then(res => {
-                  console.log(res)
-                })
-            }
-          })
-
+        naviate('/orders/payment');
+        dispatch(setOrderId(data[0].id))
       } else {
         const data = await order.json();
         console.log(data)
       }
     }
-
   };
 
   const handleCheckboxChange = (event, photoLineId) => {

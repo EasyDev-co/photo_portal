@@ -38,7 +38,8 @@ const authSlice = createSlice({
         total_price:0,
         photoNumbers:[],
         role: 1,
-        kindergarten_id:''
+        kindergarten_id:'',
+        order_id:''
     },
     reducers: {
         setUser: (state, action) => {
@@ -150,6 +151,9 @@ const authSlice = createSlice({
             state.total_price += action.payload.map(elem=>{
                 return parseFloat(elem.total_price)
             })
+        },
+        setOrderId(state, action){
+            state.order_id = action.payload
         }
     }
 });
@@ -169,7 +173,8 @@ export const {
     addCartList,
     setCart,
     removePhotos,
-    setPhotoNumbers
+    setPhotoNumbers,
+    setOrderId
 } = authSlice.actions;
 
 

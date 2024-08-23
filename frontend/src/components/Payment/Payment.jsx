@@ -6,6 +6,9 @@ import t from '../../../src/assets/images/Payment/t.png'
 import sber from '../../../src/assets/images/Payment/sber.png'
 import sbp from '../../../src/assets/images/Payment/sbp.png'
 import { useState } from "react";
+import { paymentCreate } from "../../http/fetchPayment";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export const Payment = () => {
   const options = [
@@ -14,11 +17,29 @@ export const Payment = () => {
     { id: 3, label: 'Комиссия 3%', src: t },
     { id: 4, label: 'Комиссия 3%', src: mir },
   ];
+  const order_id = useSelector(state=> state.user.order_id);
   const [selectedOption, setSelectedOption] = useState(null);
-
+  const accessStor = localStorage.getItem('access');
+  
   const handleOptionClick = (id) => {
     setSelectedOption(id);
+    paymentCreate(accessStor, order_id)
+    .then(res => {
+      if (res.ok) {
+        res.json()
+          .then(res => {
+            console.log(res)
+            window.location.href = res;
+          })
+      } else {
+        res.json()
+          .then(res => {
+            console.log(res)
+          })
+      }
+    })
   };
+
   return (
     <div className={styles.paymentWrap}>
       <div>
@@ -37,7 +58,7 @@ export const Payment = () => {
                   transition: 'border-color 0.3s',
                   display: 'flex',
                   alignItems: 'center',
-                  height:'130px'
+                  height: '130px'
                 }}>
                   <PaymentItem
                     key={elem.id}
@@ -47,7 +68,7 @@ export const Payment = () => {
                   />
                 </div>
                 <div style={{
-                  color:'#6E6E6E'
+                  color: '#6E6E6E'
                 }}>{elem.label}</div>
               </div>
 
