@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.db import transaction
+from django.db import transaction, DatabaseError
 
 from rest_framework import serializers
 
@@ -127,13 +127,21 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         # применение купона и промокода
         if bonus_coupon:
-            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+            initial_total_price = total_price
+            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)  # цена после применения купона
+            if total_price == Decimal(1):
+                instance.cart.order_fully_paid_by_coupon = True
+            else:
+                instance.cart.bonus_coupon = initial_total_price - total_price
 
-        instance.total_price = total_price
-        instance.cart.promocode = promo_code
-        with transaction.atomic():
-            instance.cart.save()
-            instance.save()
+        try:
+            instance.total_price = total_price
+            instance.cart.promocode = promo_code
+            with transaction.atomic():
+                instance.cart.save()
+                instance.save()
+        except Exception:
+            raise serializers.ValidationError('Не удалось сохранить данные.')
         return instance
 
 

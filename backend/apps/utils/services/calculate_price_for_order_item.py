@@ -10,7 +10,8 @@ def calculate_price_for_order_item(
         order_item: OrderItem,
         prices_dict: dict,
         ransom_amount: Decimal,
-        promocode: Promocode = None
+        promocode: Promocode = None,
+        coupon_amount: list = None  # передаем через список, чтобы можно было изменять coupon_amount снаружи
 ):
     """Подсчет стоимости позиции заказа с учетом промокода и суммы выкупа."""
     try:
@@ -19,12 +20,20 @@ def calculate_price_for_order_item(
             return
         photo_price = prices_dict[order_item.photo_type]
         price = order_item.amount * photo_price
-        if promocode is None:
-            order_item.price = Decimal(price)
-            return
-        if order_item.photo_type == PhotoType.photobook:
-            order_item.price = promocode.apply_discount(Decimal(price), is_photobook=True)
-        else:
-            order_item.price = promocode.apply_discount(Decimal(price), is_photobook=False)
+
+        if promocode:
+            if order_item.photo_type == PhotoType.photobook:
+                price = promocode.apply_discount(Decimal(price), is_photobook=True)
+            else:
+                price = promocode.apply_discount(Decimal(price), is_photobook=False)
+
+        if len(coupon_amount) != 0 and coupon_amount[0] != 0:
+            coupon_amount[0] -= price
+            if coupon_amount[0] >= 0:
+                price = Decimal(0)
+            else:
+                price = abs(coupon_amount[0])
+                coupon_amount[0] = Decimal(0)
+        order_item.price = price
     except KeyError:
         raise PhotoPriceDoesNotExist

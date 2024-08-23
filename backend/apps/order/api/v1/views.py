@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import requests
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -88,14 +90,24 @@ class OrderAPIView(APIView):
                         order=order,
                     ))
 
-        # пересчитываем стоимость позиции с учетом промокода
+        # пересчитываем стоимость позиции с учетом промокода и купона
+        coupon_amount = [Decimal(cart.bonus_coupon)]
         for order_item in order_items:
+            if cart.order_fully_paid_by_coupon:
+                order_item.price = Decimal(0)
+                continue
             calculate_price_for_order_item(
                 order_item=order_item,
                 prices_dict=prices_dict,
                 ransom_amount=region.ransom_amount,
                 promocode=cart.promocode,
+                coupon_amount=coupon_amount
             )
+
+        # сетим в последний order_item 1, тк сумма заказа не может быть равна 0
+        if cart.order_fully_paid_by_coupon:
+            order_items[-1].price = Decimal(1)
+
         OrderItem.objects.bulk_create(order_items)
 
         serializer = OrderSerializer(orders, many=True)
