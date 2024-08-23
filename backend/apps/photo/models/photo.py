@@ -39,7 +39,7 @@ class Photo(UUIDMixin):
     )
 
     def __str__(self):
-        return f'Фото №{self.number}'
+        return f'Фотография №{self.number}'
 
     class Meta:
         verbose_name = 'Фотография'
