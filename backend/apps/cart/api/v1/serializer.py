@@ -1,7 +1,6 @@
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 
-import loguru
-from django.shortcuts import get_object_or_404
+from django.db import transaction, DatabaseError
 
 from rest_framework import serializers
 
@@ -57,17 +56,12 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     promo_code = serializers.CharField(required=False)
 
     def create(self, validated_data):
-        promo_code_data = validated_data.get('promo_code')
-        promo_code = None
-        if promo_code_data:
-            promo_code = Promocode.objects.filter(
-                code=promo_code_data, is_active=True
-            ).first()
-
         photos_in_cart = validated_data.pop('photos')
+        promo_code_data = validated_data.pop('promo_code', None)
         instance = CartPhotoLine.objects.create(**validated_data)
         user = self.context.get('request').user
         region_prices = PhotoPrice.objects.filter(region=validated_data['photo_line'].kindergarten.region)
+        ransom_amount = validated_data['photo_line'].kindergarten.region.ransom_amount
 
         bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
 
@@ -75,10 +69,22 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         photo_list = []
 
+        promo_code = None
+        if promo_code_data:
+            promo_code = Promocode.objects.filter(
+                code=promo_code_data, is_active=True
+            ).first()
+
+        # стоимость остальных фоток без фотокниги и э/ф
         for photo in photos_in_cart:
             price_per_piece = region_prices.get(photo_type=photo['photo_type']).price
 
             discount_price = price_per_piece
+
+            if promo_code and promo_code.discount_services:
+                discount_price = promo_code.apply_discount(
+                    price=price_per_piece
+                )
 
             photo_list.append(
                 PhotoInCart(
@@ -105,7 +111,6 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
 
         # стоимость электронных фото
-        ransom_amount = validated_data['photo_line'].kindergarten.region.ransom_amount
         if ransom_amount:
             if total_price >= ransom_amount:
                 if not validated_data['is_digital']:
@@ -122,10 +127,21 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         # применение купона и промокода
         if bonus_coupon:
-            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)
+            initial_total_price = total_price
+            total_price = bonus_coupon.use_bonus_coupon_to_price(total_price)  # цена после применения купона
+            if total_price == Decimal(1):
+                instance.cart.order_fully_paid_by_coupon = True
+            else:
+                instance.cart.bonus_coupon = initial_total_price - total_price
 
-        instance.total_price = total_price
-        instance.save()
+        try:
+            instance.total_price = total_price
+            instance.cart.promocode = promo_code
+            with transaction.atomic():
+                instance.cart.save()
+                instance.save()
+        except Exception:
+            raise serializers.ValidationError('Не удалось сохранить данные.')
         return instance
 
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from apps.promocode.models import Promocode
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
 
@@ -105,6 +106,25 @@ class Cart(UUIDMixin, TimeStampedMixin):
             'photo_line',
         ),
         verbose_name='Пробники',
+    )
+    promocode = models.ForeignKey(
+        Promocode,
+        on_delete=models.CASCADE,
+        related_name='carts',
+        verbose_name='Промокод',
+        null=True,
+        blank=True,
+    )
+    bonus_coupon = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Баланс купона",
+        null=True,
+        blank=True,
+    )
+    order_fully_paid_by_coupon = models.BooleanField(
+        default=False,
+        verbose_name="Заказ полностью оплачен купоном",
     )
 
     class Meta:

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import requests
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -16,6 +18,7 @@ from apps.order.models import Order, OrderItem
 from apps.order.models.const import OrderStatus
 
 from apps.utils.services import CartService
+from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
@@ -32,12 +35,19 @@ User = get_user_model()
 class OrderAPIView(APIView):
 
     def post(self, request):
-        cart = get_object_or_404(Cart, user=request.user)
+        user = request.user
+        cart = get_object_or_404(Cart, user=user)
         cart_photo_lines = cart.cart_photo_lines.select_related('cart')
+        region = cart.photo_lines.first().kindergarten.region
+        photo_prices = region.photo_prices.all()
+
+        prices_dict = {}
+        for photo_price in photo_prices:
+            prices_dict[photo_price.photo_type] = photo_price.price
 
         orders = [
             Order(
-                user=request.user,
+                user=user,
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
                 is_photobook=cart_photo_line.is_photobook,
@@ -51,19 +61,55 @@ class OrderAPIView(APIView):
         for order in orders:
             order_ids.append(order.id)
         orders = Order.objects.filter(id__in=order_ids)
-
+        order_items = []
         for cart_photo_line in cart_photo_lines:
             order = orders.get(photo_line__id=cart_photo_line.photo_line.id)
             photos_in_cart = cart_photo_line.photos_in_cart.select_related('cart_photo_line')
-            order_items = [
-                OrderItem(
-                    photo_type=photo_in_cart.photo_type,
-                    amount=photo_in_cart.quantity,
-                    order=order,
-                    photo=photo_in_cart.photo,
-                ) for photo_in_cart in photos_in_cart
-            ]
-            OrderItem.objects.bulk_create(order_items)
+            order_items.extend(
+                [
+                    OrderItem(
+                        photo_type=photo_in_cart.photo_type,
+                        amount=photo_in_cart.quantity,
+                        order=order,
+                        photo=photo_in_cart.photo,
+                    ) for photo_in_cart in photos_in_cart
+                ]
+            )
+
+            # добавляем э/ф и фотокнигу как order_item, если они есть
+            if order.is_digital:
+                order_items.append(
+                    OrderItem(
+                        photo_type=PhotoType.digital,
+                        order=order,
+                    ))
+            if order.is_photobook:
+                order_items.append(
+                    OrderItem(
+                        photo_type=PhotoType.photobook,
+                        order=order,
+                    ))
+
+        # пересчитываем стоимость позиции с учетом промокода и купона
+        coupon_amount = [Decimal(cart.bonus_coupon)]
+        for order_item in order_items:
+            if cart.order_fully_paid_by_coupon:
+                order_item.price = Decimal(0)
+                continue
+            calculate_price_for_order_item(
+                order_item=order_item,
+                prices_dict=prices_dict,
+                ransom_amount=region.ransom_amount,
+                promocode=cart.promocode,
+                coupon_amount=coupon_amount
+            )
+
+        # сетим в последний order_item 1, тк сумма заказа не может быть равна 0
+        if cart.order_fully_paid_by_coupon:
+            order_items[-1].price = Decimal(1)
+
+        OrderItem.objects.bulk_create(order_items)
+
         serializer = OrderSerializer(orders, many=True)
         cart_photo_lines.delete()
         return Response(serializer.data)
@@ -71,6 +117,7 @@ class OrderAPIView(APIView):
 
 class PaymentAPIView(APIView):
     description = 'Выкуп фотографий'
+
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
@@ -91,9 +138,9 @@ class PaymentAPIView(APIView):
         payment_data['Receipt'] = {
             'Items': [
                 {
-                    'Name': f'Фотография №{order_item.photo.number}, '
-                            f'{PhotoType(order_item.photo_type).label} - {order_item.amount}шт.',
-                    'Price': str(int(order_item.price * 100 / order_item.amount)),
+                    'Name': f'{str(order_item.photo) + ", " if order_item.photo else ""}'
+                            f'{PhotoType(order_item.photo_type).label}',
+                    'Price': str(int(order_item.price * 100)),
                     'Quantity': str(order_item.amount),
                     'Amount': str(int(order_item.price * 100)),
                     'Tax': VAT
