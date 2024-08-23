@@ -115,6 +115,17 @@ class Cart(UUIDMixin, TimeStampedMixin):
         null=True,
         blank=True,
     )
+    bonus_coupon = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Баланс купона",
+        null=True,
+        blank=True,
+    )
+    order_fully_paid_by_coupon = models.BooleanField(
+        default=False,
+        verbose_name="Заказ полностью оплачен купоном",
+    )
 
     class Meta:
         verbose_name = 'Корзина'
