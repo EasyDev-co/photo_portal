@@ -58,7 +58,6 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
             'role',
             'kindergarten_code',
-            'promocode',
             'is_verified'
 
         )
