@@ -51,6 +51,7 @@ class OrderAdmin(admin.ModelAdmin):
         'is_photobook',
         'created',
         'modified',
+        'payment_id'
     )
     inlines = [
         OrderItemInline

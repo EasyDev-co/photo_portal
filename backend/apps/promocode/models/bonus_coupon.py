@@ -40,6 +40,6 @@ class BonusCoupon(UUIDMixin, TimeStampedMixin):
             self.balance = Decimal(0)
             self.save()
             return price
-        self.balance = abs(price)
+        self.balance = abs(price) + Decimal(1)  # возвращаем на баланс рубль, который пользователь должен оплатить
         self.save()
-        return Decimal(0)
+        return Decimal(1)

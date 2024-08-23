@@ -31,6 +31,15 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
         on_delete=models.CASCADE,
         related_name='order_items',
         verbose_name='Фотография',
+        blank=True,
+        null=True
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена позиции",
+        null=True,
+        blank=True
     )
 
     class Meta:
@@ -39,14 +48,3 @@ class OrderItem(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return f"{self.photo_type}, {self.amount}"
-
-    @property
-    @admin.display(description='Цена')
-    def price(self):
-        region = self.order.photo_line.kindergarten.region
-        try:
-            photo_price = region.photo_prices.get(photo_type=self.photo_type).price
-            price = self.amount * photo_price
-        except PhotoPrice.DoesNotExist:
-            raise PhotoPriceDoesNotExist
-        return price
