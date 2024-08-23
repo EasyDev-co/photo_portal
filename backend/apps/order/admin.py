@@ -29,6 +29,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'id',
+        'payment_id',
         'order_price',
         'user',
         'kindergarten',
