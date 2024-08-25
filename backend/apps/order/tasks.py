@@ -3,12 +3,16 @@ import traceback
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+import requests
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
+from apps.order.models import Order
+from apps.order.models.const import OrderStatus
+from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from config.celery import BaseTask, app
-from config.settings import EMAIL_HOST_USER
+from config.settings import EMAIL_HOST_USER, TERMINAL_KEY, T_PASSWORD, PAYMENT_GET_STATE_URL
 
 from apps.photo.models import PhotoTheme
 from apps.user.models.email_error_log import EmailErrorLog
@@ -123,6 +127,53 @@ class SendDeadLineNotificationTask(BaseTask):
         super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
+class CheckIfOrdersPaid(BaseTask):
+    """
+    Задача для проверки статуса платежей у заказов, которые ожидают оплаты.
+    """
+
+    def run(self, *args, **kwargs):
+        awaiting_payment_orders = Order.objects.filter(
+            status=OrderStatus.payment_awaiting
+        )
+        for order in awaiting_payment_orders:
+            values = {
+                'TerminalKey': TERMINAL_KEY,
+                'PaymentId': order.payment_id,
+                'Password': T_PASSWORD,
+            }
+            token = generate_token_for_t_bank(values)
+            values.pop('Password')
+            values['Token'] = token
+            try:
+                response = requests.post(
+                    url=PAYMENT_GET_STATE_URL,
+                    json=values
+                )
+                if response.json()['Success']:
+                    if response.json()['Status'] == 'CONFIRMED':
+                        Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
+                    elif response.json()['Status'] in (
+                            'CANCELED',
+                            'DEADLINE_EXPIRED',
+                            'REJECTED',
+                            'AUTH_FAIL'
+                    ):
+                        Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
+                else:
+                    raise ValueError(f"{response.json()['Message']} {response.json()['Details']}")
+            except Exception as e:
+                Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
+                self.on_failure(
+                    exc=e,
+                    task_id=self.request.id,
+                    args=(),
+                    kwargs={'order_id': order.id},
+                    einfo=traceback.format_exc(),
+                )
+
+
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
+app.register_task(CheckIfOrdersPaid)
