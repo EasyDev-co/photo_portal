@@ -39,7 +39,11 @@ const authSlice = createSlice({
         photoNumbers:[],
         role: 1,
         kindergarten_id:'',
-        order_id:''
+        order:[
+            {
+                
+            }
+        ]
     },
     reducers: {
         setUser: (state, action) => {
@@ -153,7 +157,7 @@ const authSlice = createSlice({
             })
         },
         setOrderId(state, action){
-            state.order_id = action.payload
+            state.order = action.payload
         }
     }
 });

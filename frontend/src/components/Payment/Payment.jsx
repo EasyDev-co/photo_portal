@@ -17,27 +17,27 @@ export const Payment = () => {
     { id: 3, label: 'Комиссия 3%', src: t },
     { id: 4, label: 'Комиссия 3%', src: mir },
   ];
-  const order_id = useSelector(state=> state.user.order_id);
+  const order = useSelector(state => state.user.order);
   const [selectedOption, setSelectedOption] = useState(null);
   const accessStor = localStorage.getItem('access');
-  
+
   const handleOptionClick = (id) => {
     setSelectedOption(id);
-    paymentCreate(accessStor, order_id)
-    .then(res => {
-      if (res.ok) {
-        res.json()
-          .then(res => {
-            console.log(res)
-            window.location.href = res;
-          })
-      } else {
-        res.json()
-          .then(res => {
-            console.log(res)
-          })
-      }
-    })
+    paymentCreate(accessStor, order)
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(res => {
+              console.log(res)
+              window.location.href = res;
+            })
+        } else {
+          res.json()
+            .then(res => {
+              console.log(res)
+            })
+        }
+      })
   };
 
   return (

@@ -142,7 +142,7 @@ export const Orders = () => {
       if (order.ok) {
         const data = await order.json();
         naviate('/orders/payment');
-        dispatch(setOrderId(data[0].id))
+        dispatch(setOrderId(data))
       } else {
         const data = await order.json();
         console.log(data)
