@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 from apps.photo.models import Photo, PhotoLine, PhotoTheme
@@ -41,3 +43,23 @@ class CurrentPhotoThemeRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotoTheme
         fields = ('name', 'date_start', 'date_end')
+
+
+class PaidPhotoLineSerializer(serializers.ModelSerializer):
+    photo_theme_name = serializers.SerializerMethodField()
+    photo_theme_date = serializers.SerializerMethodField()
+    region = serializers.SerializerMethodField()
+    photos = PhotoRetrieveSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PhotoLine
+        fields = ('photos', 'region', 'photo_theme_name', 'photo_theme_date')
+
+    def get_photo_theme_name(self, obj):
+        return obj.photo_theme.name
+
+    def get_photo_theme_date(self, obj):
+        return format(datetime.date(obj.photo_theme.date_start), '%B %Y')
+
+    def get_region(self, obj):
+        return obj.kindergarten.region.name
