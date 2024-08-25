@@ -6,6 +6,9 @@ export const statePayment = async (access) => {
 
     const order = JSON.parse(getCookie('order'));
     
+    if(!order){
+        return
+    }
     for(let i = 0; i < order.length; i += 1){
 
         const url = `${localUrl}/api/v1/get_state/${order[i].id}`;
@@ -41,6 +44,5 @@ export const fetchStatePaymentTokenInterceptor = async (access, refresh) => {
         return response;
     } catch (error) {
         console.error('Ошибка при выполнении запроса:', error);
-        throw error;
     }
 };

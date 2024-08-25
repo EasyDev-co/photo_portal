@@ -4,32 +4,36 @@ import GalleryItem from "./GalleryItem";
 import { useSelector } from "react-redux";
 import { fetchStatePaymentTokenInterceptor, statePayment } from "../../http/statePayment";
 import { fetchGetPaidOrderTokenInterceptor } from "../../http/getPaidOrders";
+import { getCookie } from "../../utils/setCookie";
 export const Gallery = () => {
   const accessStor = localStorage.getItem('access');
-  const order = useSelector(state => state.user.order);
-  const [paidOrders, setPaidOrders] = useState([])
+  const [paidOrders, setPaidOrders] = useState([]);
+  const [isPaid, setIsPaid] = useState(false)
   useEffect(() => {
-    try {
-      fetchStatePaymentTokenInterceptor(accessStor)
-        .then(res => {
-          if (res.ok) {
-            res.json()
-              .then(res => {
-                console.log(res)
-              })
-          }
-        })
-    } catch (error) {
-      console.log(error)
+    const order = getCookie('order');
+    if (order) {
+      try {
+        fetchStatePaymentTokenInterceptor(accessStor)
+          .then(res => {
+            if (res.ok) {
+              res.json()
+                .then(res => {
+                  setIsPaid(res)
+                })
+            }
+          })
+      } catch (error) {
+        console.log(error)
+      }
     }
   }, [])
   useEffect(() => {
 
     fetchGetPaidOrderTokenInterceptor(accessStor)
-      .then(res=>{
-        if(res.ok){
+      .then(res => {
+        if (res.ok) {
           res.json()
-            .then(res=>{
+            .then(res => {
               setPaidOrders(res)
             })
         }
@@ -37,9 +41,13 @@ export const Gallery = () => {
   }, [])
   return <>
     <div className={styles.ordersWrap}>
-      <GalleryItem
-        orders={paidOrders} 
-      />
+      {isPaid !== 'OK' ?
+        <div className={styles.ordersInfo}>
+          Нет оплаченных заказов.
+        </div> : <GalleryItem
+          orders={paidOrders}
+        />}
+
     </div>
   </>;
 };

@@ -36,7 +36,9 @@
         margin: 0 15px 40px 15px;
     }
 }
-
+.ordersInfo{
+    margin: 100px 25px 0;
+}
 .titleWrap{
     display: flex;
     align-items: center;
