@@ -28,7 +28,6 @@ export const Gallery = () => {
     }
   }, [])
   useEffect(() => {
-
     fetchGetPaidOrderTokenInterceptor(accessStor)
       .then(res => {
         if (res.ok) {
@@ -39,14 +38,16 @@ export const Gallery = () => {
         }
       })
   }, [])
+
   return <>
     <div className={styles.ordersWrap}>
-      {isPaid !== 'OK' ?
+      {isPaid === 'OK' ?
+        <GalleryItem
+          orders={paidOrders}
+        /> :
         <div className={styles.ordersInfo}>
           Нет оплаченных заказов.
-        </div> : <GalleryItem
-          orders={paidOrders}
-        />}
+        </div>}
 
     </div>
   </>;

@@ -1,8 +1,6 @@
 import styles from './Gallery.module.css'
 
 const GalleryItem = ({ orders }) => {
-   
-    console.log(orders)
     return (
         <>
             {orders.map(elem => {
