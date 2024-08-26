@@ -1,7 +1,6 @@
 import styles from "./Orders.module.css";
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
-import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
@@ -9,12 +8,12 @@ import { addPhotos, setCart } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
-import { patchPhotoLine } from "../../http/patchPhotoLine";
-import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
-import { orderCreate } from "../../http/orderCreate";
-import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
+import { patchPhotoLine } from "../../http/photo/patchPhotoLine";
+import { fetchCartCreateWithTokenInterceptor } from "../../http/cart/cartCreate";
+import { orderCreate } from "../../http/order/orderCreate";
+import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photo/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
-import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
+import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
 
 export const Orders = () => {
   const dispatch = useDispatch();

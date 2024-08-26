@@ -4,7 +4,7 @@ import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBar } from "../NavBar/NavBar";
 import { ButtonBurger } from "./ButtonBurger/ButtonBurger";
 import { logo } from "../../constants/constants";
-import { fetchUserDataWithTokenInterceptor, getUserData } from "../../http/getUserData";
+import { fetchUserDataWithTokenInterceptor, getUserData } from "../../http/user/getUserData";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserData } from "../../store/authSlice";
 import { getCookie } from "../../utils/setCookie";

@@ -1,33 +1,32 @@
-import { localUrl } from "../constants/constants";
-import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./tokenRefreshCreate";
+import { localUrl } from "../../constants/constants";
+import { setCookie } from "../../utils/setCookie";
+import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-
-export const photoLineList = async (access) => {
-    const url = `${localUrl}/api/v1/photo/photo_line/`;
+export const getStats = async (access,id) => {
+    const url = `${localUrl}/api/v1/stats/${id}/`;
 
     const response = await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        },
+        }
+
     });
     return response;
 }
 
-export const fetchPhotoLineListWithTokenInterceptor = async (access, refresh) => {
+export const fetchGetStatsWithTokenInterceptor = async (access, id) => {
     try {
-        let response = await photoLineList(access)
+        let response = await getStats(access, id)
         if (!response.ok) {
-            localStorage.setItem('access','');
-            let createToken = await tokenRefreshCreate(refresh)
+            let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = photoLineList(res.access);
+                            response = getStats(res.access, id);
                         }
                     })
             }

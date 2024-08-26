@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import styles from "./Gallery.module.css";
-import { fetchGetOrderWithTokenInterceptor } from "../../http/getOrder";
+import { fetchGetOrderWithTokenInterceptor } from "../../http/order/getOrder";
 import GalleryItem from "./GalleryItem";
 export const Gallery = () => {
   const accessStor = localStorage.getItem('access');

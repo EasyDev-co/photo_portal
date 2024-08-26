@@ -6,7 +6,7 @@ import PaymentDiagram from "../../Payment/PaymentDiagram/PaymentDiagram";
 import Timer from "../../Payment/PaymentTimer/Timer";
 import MainButton from "../../Buttons/MainButton";
 import Dropdown from "./Dropdown/Dropdown";
-import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/getStats";
+import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/gallerey/getStats";
 import { useSelector } from "react-redux";
 
 const ManagerProfile = () => {

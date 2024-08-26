@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react';
 import PhotoBlock from './PhotoBlock';
 import { useDispatch, useSelector } from 'react-redux';
-import { patchPhotoLine } from '../../../../http/patchPhotoLine';
+import { patchPhotoLine } from '../../../../http/photo/patchPhotoLine';
 import styles from '../PhotoCard.module.css'
 import { removePhotos } from '../../../../store/authSlice';
 const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {

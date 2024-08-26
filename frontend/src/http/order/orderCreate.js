@@ -1,36 +1,37 @@
-import { localUrl } from "../constants/constants";
-import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./tokenRefreshCreate";
+import { localUrl } from "../../constants/constants";
+import { setCookie } from "../../utils/setCookie";
+import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const getStats = async (access,id) => {
-    const url = `${localUrl}/api/v1/stats/${id}/`;
-
+export const orderCreate = async (access) => {
+    const url = `${localUrl}/api/v1/order/`;
+    
     const response = await fetch(url, {
+        method:"POST",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        }
-
+        },
+        // body: JSON.stringify()
     });
     return response;
 }
 
-export const fetchGetStatsWithTokenInterceptor = async (access, id) => {
+export const fetchOrderCreateWithTokenInterceptor = async (access, refresh) => {
     try {
-        let response = await getStats(access, id)
+        let response = await orderCreate(access)
         if (!response.ok) {
-            let createToken = await tokenRefreshCreate()
+            localStorage.setItem('access','');
+            let createToken = await tokenRefreshCreate(refresh)
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getStats(res.access, id);
+                            response = orderCreate(res.access);
                         }
                     })
             }
-
         }
         return response;
     } catch (error) {

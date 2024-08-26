@@ -2,17 +2,17 @@ import MainButton from "../../Buttons/MainButton";
 import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
 import styles from "./ParentProfile.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setResetData, addUserData } from "../../../store/authSlice";
-import { parentResetPassCreate } from "../../../http/parentResetPassCreate";
+import { setResetData } from "../../../store/authSlice";
+import { parentResetPassCreate } from "../../../http/parent/parentResetPassCreate";
 import { useClickOutside } from "../../../utils/useClickOutside";
-import { parentVerifyResetCode } from "../../../http/parentVerifyResetCode";
-import { parentChangePass } from "../../../http/parentChangePass";
-import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/userPartialUpdate'
+import { parentVerifyResetCode } from "../../../http/parent/parentVerifyResetCode";
+import { parentChangePass } from "../../../http/parent/parentChangePass";
+import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/user/userPartialUpdate'
 
 const ParentProfile = ({ nurseryIsAuth }) => {
 
