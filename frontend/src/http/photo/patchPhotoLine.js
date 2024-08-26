@@ -1,4 +1,4 @@
-import { localUrl } from "../constants/constants";
+import { localUrl } from "../../constants/constants";
 
 
 export const patchPhotoLine = async (access, obj, id) => {

@@ -4,7 +4,7 @@ import PaymentDiagram from '../PaymentDiagram/PaymentDiagram';
 import styles from './PaymentTimer.module.css'
 import Timer from './Timer';
 import { useEffect } from 'react';
-import { fetchPhotoPriceWithTokenInterceptor } from '../../../http/getPhotoPrice';
+import { fetchPhotoPriceWithTokenInterceptor } from '../../../http/photo/getPhotoPrice';
 import { useDispatch } from 'react-redux';
 import { addPhotoPrice } from '../../../store/authSlice';
 

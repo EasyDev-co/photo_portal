@@ -21,8 +21,8 @@ class SendConfirmCodeTask(BaseTask):
         user: User = User.objects.get(id=user_id)
         code = default_token_generator.make_token(user)
         if code_purpose == CodePurpose.RESET_PASSWORD:
-            subject = 'Восстановление пароля'
-            message = 'Код восстановления пароля:\n'
+            subject = 'Сброс пароля'
+            message = 'Код для сброса пароля:\n'
         elif code_purpose == CodePurpose.CONFIRM_EMAIL:
             subject = 'Подтверждение почты'
             message = 'Код для подтверждения почты:\n'

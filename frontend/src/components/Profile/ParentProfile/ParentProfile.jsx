@@ -2,17 +2,17 @@ import MainButton from "../../Buttons/MainButton";
 import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
 import styles from "./ParentProfile.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setResetData, addUserData } from "../../../store/authSlice";
-import { parentResetPassCreate } from "../../../http/parentResetPassCreate";
+import { setResetData } from "../../../store/authSlice";
+import { parentResetPassCreate } from "../../../http/parent/parentResetPassCreate";
 import { useClickOutside } from "../../../utils/useClickOutside";
-import { parentVerifyResetCode } from "../../../http/parentVerifyResetCode";
-import { parentChangePass } from "../../../http/parentChangePass";
-import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/userPartialUpdate'
+import { parentVerifyResetCode } from "../../../http/parent/parentVerifyResetCode";
+import { parentChangePass } from "../../../http/parent/parentChangePass";
+import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/user/userPartialUpdate'
 
 const ParentProfile = ({ nurseryIsAuth }) => {
 
@@ -60,7 +60,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         fetchUserPartialUpdateWithTokenInterceptor(accessStor, {
             email: inputValue.parentEmail,
             first_name: inputValue.parentName,
-            second_name: inputValue.second_name,
+            second_name: inputValue.parentPatronymic,
             last_name: inputValue.parentSurname,
             phone_number: inputValue.parentPhone
         })
@@ -81,12 +81,14 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 parentEmail: res.email,
                                 parentName: res.first_name,
                                 parentSurname: res.last_name,
-                                parentPhone: res.phone_number
+                                parentPhone: res.phone_number,
+                                parentPatronymic: res.second_name
                             }))
                             localStorage.setItem('last_name', res.last_name);
                             localStorage.setItem('first_name', res.first_name);
                             localStorage.setItem('phone', res.phone_number);
                             localStorage.setItem('email', res.email);
+                            localStorage.setItem('secon_name', res.second_name);
                             setError({
                                 phone_number: '',
                                 message: '',

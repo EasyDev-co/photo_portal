@@ -22,7 +22,6 @@ import { Link } from "react-router-dom";
 export const NavBar = ({ localStorageValue, onClose }) => {
 
   const { isAuth } = useAuth();
-  const userData = useSelector(state => state.user.userData);
   useEffect(() => {
     //обработчик для клавиши "Esc"
     const handleEsc = (e) => {
@@ -46,10 +45,10 @@ export const NavBar = ({ localStorageValue, onClose }) => {
           <>
             <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
-                top={`${localStorageValue.last_name === null ? '' : localStorageValue.last_name} 
-                  ${localStorageValue.first_name === null ? '' : localStorageValue.first_name} 
-                  ${localStorageValue.second_name === null ? '' : localStorageValue.second_name}`}
-                bottom={localStorageValue.phone}
+               top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
+               ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
+               ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
+               bottom={localStorage.getItem('phone')}
               />
               <HeaderUserInfoItem
                 top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 

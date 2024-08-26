@@ -1,25 +1,23 @@
-import { localUrl } from "../constants/constants";
-import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./tokenRefreshCreate";
+import { localUrl } from "../../constants/constants";
+import { setCookie } from "../../utils/setCookie";
+import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 
-export const cartCreate = async (access, cart) => {
-    const url = `${localUrl}/api/v1/cart/`;
-    const response = await fetch(url,{
-        method:'POST',
-        credentials: 'include',
+export const getUserData = async (access) => {
+    const url = `${localUrl}/api/v1/user/`;
+
+    const response = await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        body: JSON.stringify(cart),
     });
     return response;
 }
 
-export const fetchCartCreateWithTokenInterceptor = async (access, refresh ,cart) => {
+export const fetchUserDataWithTokenInterceptor = async (access, refresh) => {
     try {
-        let response = await cartCreate(access, cart)
+        let response = await getUserData(access)
         if (!response.ok) {
             localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate(refresh)
@@ -29,10 +27,11 @@ export const fetchCartCreateWithTokenInterceptor = async (access, refresh ,cart)
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = cartCreate(res.access, cart);
+                            response = getUserData(res.access);
                         }
                     })
             }
+
         }
         return response;
     } catch (error) {
