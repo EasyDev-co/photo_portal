@@ -136,6 +136,8 @@ class CheckIfOrdersPaid(BaseTask):
         awaiting_payment_orders = Order.objects.filter(
             status=OrderStatus.payment_awaiting
         )
+        successful_paymemt_order_ids = []
+        failed_payment_order_ids = []
         for order in awaiting_payment_orders:
             values = {
                 'TerminalKey': TERMINAL_KEY,
@@ -153,18 +155,18 @@ class CheckIfOrdersPaid(BaseTask):
                 response_json = response.json()
                 if response_json['Success']:
                     if response_json['Status'] == 'CONFIRMED':
-                        Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
+                        successful_paymemt_order_ids.append(order.id)
                     elif response_json['Status'] in (
                             'CANCELED',
                             'DEADLINE_EXPIRED',
                             'REJECTED',
                             'AUTH_FAIL'
                     ):
-                        Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
+                        failed_payment_order_ids.append(order.id)
                 else:
                     raise ValueError(f"{response_json['Message']} {response_json['Details']}")
             except Exception as e:
-                Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
+                failed_payment_order_ids.append(order.id)
                 self.on_failure(
                     exc=e,
                     task_id=self.request.id,
@@ -172,6 +174,8 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
+        Order.objects.filter(id__in=successful_paymemt_order_ids).update(status=OrderStatus.paid_for)
+        Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
 
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
