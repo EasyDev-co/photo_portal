@@ -205,7 +205,11 @@ CELERY_BEAT_SCHEDULE = {
     "remove_old_qr_codes": {
         "task": "apps.photo.tasks.QRCodeRemoverTask",
         "schedule": crontab(minute='0', hour='*/48'),
-    }
+    },
+    "check_if_orders_has_been_paid": {
+            "task": "apps.order.tasks.CheckIfOrdersPaid",
+            "schedule": crontab(minute='*/1'),
+        }
 }
 
 SIMPLE_JWT = {

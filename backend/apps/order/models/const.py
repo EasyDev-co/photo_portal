@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from django.db import models
 
 
@@ -10,3 +12,12 @@ class OrderStatus(models.IntegerChoices):
     payment_awaiting = 5, 'Ожидает оплаты'
     failed = 6, 'Платеж отклонен'
     refunded = 7, 'Платеж возвращен'
+
+
+class PaymentStatus(StrEnum):
+    CONFIRMED = 'CONFIRMED'
+    CANCELED = 'CANCELED'
+    DEADLINE_EXPIRED = 'DEADLINE_EXPIRED'
+    REJECTED = 'REJECTED'
+    AUTH_FAIL = 'AUTH_FAIL'
+
