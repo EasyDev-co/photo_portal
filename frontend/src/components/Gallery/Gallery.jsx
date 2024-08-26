@@ -48,7 +48,6 @@ export const Gallery = () => {
         <div className={styles.ordersInfo}>
           Нет оплаченных заказов.
         </div>}
-
     </div>
   </>;
 };
