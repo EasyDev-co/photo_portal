@@ -39,12 +39,11 @@ class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        paid_orders = Order.objects.filter(
-            user=request.user,
-            status__in=(OrderStatus.paid_for, OrderStatus.completed),
+        paid_photo_lines = PhotoLine.objects.select_related('orders').filter(
+            orders__user=request.user,
+            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed)
         )
-        if paid_orders.exists():
-            paid_photo_lines = PhotoLine.objects.select_related('orders').filter(orders__in=paid_orders)
+        if paid_photo_lines.exists():
             serializer = PaidPhotoLineSerializer(paid_photo_lines, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
