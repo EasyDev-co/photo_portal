@@ -88,7 +88,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             localStorage.setItem('first_name', res.first_name);
                             localStorage.setItem('phone', res.phone_number);
                             localStorage.setItem('email', res.email);
-                            localStorage.setItem('secon_name', res.second_name);
+                            localStorage.setItem('second_name', res.second_name);
                             setError({
                                 phone_number: '',
                                 message: '',

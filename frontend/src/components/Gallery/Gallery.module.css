@@ -36,7 +36,9 @@
         margin: 0 15px 40px 15px;
     }
 }
-
+.ordersInfo{
+    margin: 100px 25px 0;
+}
 .titleWrap{
     display: flex;
     align-items: center;
@@ -68,6 +70,10 @@
     padding: 10px;
     border-radius: 8px;
     border:1px solid rgb(229, 229, 229);
+}
+.imgWrap>img{
+    width: 174px;
+    height: 260px;
 }
 .btnWrap{
     display: flex;

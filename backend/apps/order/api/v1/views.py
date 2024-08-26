@@ -16,6 +16,8 @@ from apps.kindergarten.models import PhotoType
 from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
 from apps.order.models import Order, OrderItem
 from apps.order.models.const import OrderStatus
+from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
+from apps.photo.models import PhotoLine
 
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
@@ -33,6 +35,18 @@ User = get_user_model()
 
 
 class OrderAPIView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        paid_photo_lines = PhotoLine.objects.select_related('orders').filter(
+            orders__user=request.user,
+            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed)
+        )
+        if paid_photo_lines.exists():
+            serializer = PaidPhotoLineSerializer(paid_photo_lines, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         user = request.user
@@ -52,7 +66,6 @@ class OrderAPIView(APIView):
                 is_digital=cart_photo_line.is_digital,
                 is_photobook=cart_photo_line.is_photobook,
                 order_price=cart_photo_line.total_price,
-
             ) for cart_photo_line in cart_photo_lines
         ]
         orders = Order.objects.bulk_create(orders)
