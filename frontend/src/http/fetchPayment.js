@@ -1,6 +1,6 @@
 import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./tokenRefreshCreate";
+import { tokenRefreshCreate } from "./parent/tokenRefreshCreate";
 
 export const paymentCreate = async (access, order) => {
     setCookie('order', JSON.stringify(order));

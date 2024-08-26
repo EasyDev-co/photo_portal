@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./Gallery.module.css";
 import GalleryItem from "./GalleryItem";
-import { useSelector } from "react-redux";
-import { fetchStatePaymentTokenInterceptor, statePayment } from "../../http/statePayment";
+import { fetchStatePaymentTokenInterceptor } from "../../http/statePayment";
 import { fetchGetPaidOrderTokenInterceptor } from "../../http/getPaidOrders";
 import { getCookie } from "../../utils/setCookie";
 export const Gallery = () => {
@@ -48,7 +47,6 @@ export const Gallery = () => {
         <div className={styles.ordersInfo}>
           Нет оплаченных заказов.
         </div>}
-
     </div>
   </>;
 };

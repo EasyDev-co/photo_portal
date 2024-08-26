@@ -1,7 +1,6 @@
 import styles from "./Orders.module.css";
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
-import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
@@ -9,21 +8,20 @@ import { addPhotos, setCart, setOrderId } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
-import { patchPhotoLine } from "../../http/patchPhotoLine";
-import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
-import { fetchOrderCreateWithTokenInterceptor, orderCreate } from "../../http/orderCreate";
-import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
+import { patchPhotoLine } from "../../http/photo/patchPhotoLine";
+import { fetchCartCreateWithTokenInterceptor } from "../../http/cart/cartCreate";
+import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photo/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
-import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
-import { fetchPaymentCreateTokenInterceptor, paymentCreate } from "../../http/fetchPayment";
-import { Link, useNavigate } from "react-router-dom";
+import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
+import { useNavigate } from "react-router-dom";
+import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
 
 export const Orders = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate()
+  
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
-  // const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
@@ -32,7 +30,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-  const naviate = useNavigate()
+
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -138,10 +136,11 @@ export const Orders = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (orderValue.length !== 0) {
+      
       const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
       if (order.ok) {
         const data = await order.json();
-        naviate('/orders/payment');
+        navigate('/orders/payment');
         dispatch(setOrderId(data))
       } else {
         const data = await order.json();
@@ -150,34 +149,35 @@ export const Orders = () => {
     }
   };
 
-  const handleCheckboxChange = (event, photoLineId) => {
-    const { checked, name } = event.target;
-
-    setOrderValue((prev) => {
-      const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
-
-      if (existingItemIndex > -1) {
-        const updatedItem = { ...prev[existingItemIndex] };
-        if (name == 6) {
-          updatedItem.is_photobook = checked;
-        } else if (name == 7) {
-          updatedItem.is_digital = checked;
-        }
-        return [
-          ...prev.slice(0, existingItemIndex),
-          updatedItem,
-          ...prev.slice(existingItemIndex + 1),
-        ];
-      } else {
-        const newItem = {
-          id: photoLineId,
-          photos: [],
-          is_photobook: name == 6 ? checked : false,
-          is_digital: name == 7 ? checked : false
-        };
-        return [...prev, newItem];
-      }
-    });
+  const handleCheckboxChange = (event, photoLineId) => { 
+    const { checked, name } = event.target; 
+    console.log(checked, name); 
+   
+    setOrderValue((prev) => { 
+      const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
+   
+      if (existingItemIndex > -1) { 
+        const updatedItem = { ...prev[existingItemIndex] }; 
+        if (name == 6) { 
+          updatedItem.is_photobook = checked; 
+        } else if (name == 7) { 
+          updatedItem.is_digital = checked; 
+        } 
+        return [ 
+          ...prev.slice(0, existingItemIndex), 
+          updatedItem, 
+          ...prev.slice(existingItemIndex + 1), 
+        ]; 
+      } else { 
+        const newItem = { 
+          id: photoLineId, 
+          photos: [], 
+          is_photobook: name == 6 ? checked : false, 
+          is_digital: name == 7 ? checked : false 
+        }; 
+        return [...prev, newItem]; 
+      } 
+    }); 
   };
 
   return (

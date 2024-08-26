@@ -1,4 +1,4 @@
-import { localUrl } from "../constants/constants";
+import { localUrl } from "../../constants/constants";
 import { addAccessTokenToHeaders } from "./addAccessToken";
 
 export const photoLineRead = async (id) => {
