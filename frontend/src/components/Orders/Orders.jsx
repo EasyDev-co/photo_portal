@@ -4,7 +4,7 @@ import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
-import { addPhotos, setCart } from "../../store/authSlice";
+import { addPhotos, setCart, setOrderId } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
@@ -18,7 +18,8 @@ import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCrea
 
 export const Orders = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate()
+  
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
   const [scanActive, setScanActive] = useState(false);
@@ -139,7 +140,7 @@ export const Orders = () => {
       const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
       if (order.ok) {
         const data = await order.json();
-        naviate('/orders/payment');
+        navigate('/orders/payment');
         dispatch(setOrderId(data))
       } else {
         const data = await order.json();
