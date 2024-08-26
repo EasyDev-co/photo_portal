@@ -4,7 +4,7 @@ import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
-import { addPhotos, setCart, setOrderId } from "../../store/authSlice";
+import { addPhotos, setCart } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
@@ -29,7 +29,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-  const naviate = useNavigate()
+
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -148,34 +148,35 @@ export const Orders = () => {
     }
   };
 
-  const handleCheckboxChange = (event, photoLineId) => {
-    const { checked, name } = event.target;
-
-    setOrderValue((prev) => {
-      const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
-
-      if (existingItemIndex > -1) {
-        const updatedItem = { ...prev[existingItemIndex] };
-        if (name == 6) {
-          updatedItem.is_photobook = checked;
-        } else if (name == 7) {
-          updatedItem.is_digital = checked;
-        }
-        return [
-          ...prev.slice(0, existingItemIndex),
-          updatedItem,
-          ...prev.slice(existingItemIndex + 1),
-        ];
-      } else {
-        const newItem = {
-          id: photoLineId,
-          photos: [],
-          is_photobook: name == 6 ? checked : false,
-          is_digital: name == 7 ? checked : false
-        };
-        return [...prev, newItem];
-      }
-    });
+  const handleCheckboxChange = (event, photoLineId) => { 
+    const { checked, name } = event.target; 
+    console.log(checked, name); 
+   
+    setOrderValue((prev) => { 
+      const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
+   
+      if (existingItemIndex > -1) { 
+        const updatedItem = { ...prev[existingItemIndex] }; 
+        if (name == 6) { 
+          updatedItem.is_photobook = checked; 
+        } else if (name == 7) { 
+          updatedItem.is_digital = checked; 
+        } 
+        return [ 
+          ...prev.slice(0, existingItemIndex), 
+          updatedItem, 
+          ...prev.slice(existingItemIndex + 1), 
+        ]; 
+      } else { 
+        const newItem = { 
+          id: photoLineId, 
+          photos: [], 
+          is_photobook: name == 6 ? checked : false, 
+          is_digital: name == 7 ? checked : false 
+        }; 
+        return [...prev, newItem]; 
+      } 
+    }); 
   };
 
   return (
