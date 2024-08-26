@@ -3,7 +3,7 @@ import styles from './Gallery.module.css'
 const GalleryItem = ({ orders }) => {
     return (
         <>
-            {orders.map(elem => {
+            {orders?.map(elem => {
                 return (
                     <div className={styles.galleryItemWrap}>
                         <div className={styles.titleWrap}>
@@ -15,7 +15,7 @@ const GalleryItem = ({ orders }) => {
                             </div>
                         </div>
                         <div className={styles.photosGallery}>
-                            {elem.photos.map(photo => {
+                            {elem.photos?.map(photo => {
                                 return (
                                     <div className={styles.imgWrap}>
                                         <img src={photo.photo} alt="" />
