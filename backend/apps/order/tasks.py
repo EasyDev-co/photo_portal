@@ -150,10 +150,11 @@ class CheckIfOrdersPaid(BaseTask):
                     url=PAYMENT_GET_STATE_URL,
                     json=values
                 )
-                if response.json()['Success']:
-                    if response.json()['Status'] == 'CONFIRMED':
+                response_json = response.json()
+                if response_json['Success']:
+                    if response_json['Status'] == 'CONFIRMED':
                         Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
-                    elif response.json()['Status'] in (
+                    elif response_json['Status'] in (
                             'CANCELED',
                             'DEADLINE_EXPIRED',
                             'REJECTED',
@@ -161,7 +162,7 @@ class CheckIfOrdersPaid(BaseTask):
                     ):
                         Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
                 else:
-                    raise ValueError(f"{response.json()['Message']} {response.json()['Details']}")
+                    raise ValueError(f"{response_json['Message']} {response_json['Details']}")
             except Exception as e:
                 Order.objects.filter(id=order.id).update(status=OrderStatus.failed)
                 self.on_failure(
