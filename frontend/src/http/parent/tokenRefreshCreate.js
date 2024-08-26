@@ -1,5 +1,5 @@
-import { localUrl } from "../constants/constants";
-import { getCookie } from "../utils/setCookie";
+import { localUrl } from "../../constants/constants";
+import { getCookie } from "../../utils/setCookie";
 
 
 export const tokenRefreshCreate = (refresh) => {

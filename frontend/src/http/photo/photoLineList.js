@@ -1,10 +1,10 @@
-import { localUrl } from "../constants/constants";
-import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./tokenRefreshCreate";
+import { localUrl } from "../../constants/constants";
+import { setCookie } from "../../utils/setCookie";
+import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 
-export const getUserData = async (access) => {
-    const url = `${localUrl}/api/v1/user/`;
+export const photoLineList = async (access) => {
+    const url = `${localUrl}/api/v1/photo/photo_line/`;
 
     const response = await fetch(url, {
         headers: {
@@ -15,9 +15,9 @@ export const getUserData = async (access) => {
     return response;
 }
 
-export const fetchUserDataWithTokenInterceptor = async (access, refresh) => {
+export const fetchPhotoLineListWithTokenInterceptor = async (access, refresh) => {
     try {
-        let response = await getUserData(access)
+        let response = await photoLineList(access)
         if (!response.ok) {
             localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate(refresh)
@@ -27,7 +27,7 @@ export const fetchUserDataWithTokenInterceptor = async (access, refresh) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getUserData(res.access);
+                            response = photoLineList(res.access);
                         }
                     })
             }

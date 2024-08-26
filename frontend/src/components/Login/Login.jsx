@@ -11,7 +11,7 @@ import danger from '../../assets/images/Auth/DangerCircle.svg'
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
-import { parentLoginCreate } from "../../http/parentLoginCreate";
+import { parentLoginCreate } from "../../http/parent/parentLoginCreate";
 
 export const Login = () => {
   const [activeBlur, setActiveBlur] = useState(false);

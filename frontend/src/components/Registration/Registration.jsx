@@ -7,7 +7,7 @@ import google from '../../assets/images/socials/G.svg'
 import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
-import { parentRegisterCreate } from "../../http/parentRegisterCreate";
+import { parentRegisterCreate } from "../../http/parent/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
 import { addQrIdPhoto, setEmail, setPhotoNumbers } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";

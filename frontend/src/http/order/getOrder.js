@@ -1,35 +1,34 @@
-import { localUrl } from "../constants/constants";
-import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./tokenRefreshCreate";
+import { localUrl } from "../../constants/constants";
+import { setCookie } from "../../utils/setCookie";
+import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const userPartialUpdate = async (access, obj) => {
-    const url = `${localUrl}/api/v1/user/`;
+export const getOrder = async (access) => {
+    const url = `${localUrl}/api/v1/order/`;
 
     const response = await fetch(url, {
-        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        body: JSON.stringify(obj)
     });
     return response;
 }
 
-export const fetchUserPartialUpdateWithTokenInterceptor = async (access, obj, refresh) => {
+export const fetchGetOrderWithTokenInterceptor = async (access) => {
     try {
-        let response = await userPartialUpdate(access, obj)
-        console.log(response.ok)
-        if (!response.ok) {
+        let response = await getOrder(access)
+        if (response.status === 401 || response.status === 403)  {
+            localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()
                     .then(res => {
                         setCookie('refresh', res.refresh);
                         localStorage.setItem('access', res.access);
-                        response = userPartialUpdate(access, obj);
+                        response = getOrder(res.access);
                     })
             }
+
         }
         return response;
     } catch (error) {

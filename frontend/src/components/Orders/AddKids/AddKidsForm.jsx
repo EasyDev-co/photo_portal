@@ -1,12 +1,12 @@
 import { memo, useRef, useState } from 'react';
 import styles from './AddKids.module.css'
-import { tokenRefreshCreate } from '../../../http/tokenRefreshCreate';
+import { tokenRefreshCreate } from '../../../http/parent/tokenRefreshCreate';
 import { setCookie } from '../../../utils/setCookie';
 import { addPhotos, setAccessToken } from '../../../store/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOnePhoto } from '../../../http/getOnePhoto';
+import { getOnePhoto } from '../../../http/photo/getOnePhoto';
 import { useClickOutside } from '../../../utils/useClickOutside';
-import { patchPhotoLine } from '../../../http/patchPhotoLine';
+import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
 
 const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
 

@@ -1,11 +1,10 @@
 import styles from '../Registration.module.css'
 import { useState } from "react";
 import InputField from "../../InputField/InputField";
-import { Link } from 'react-router-dom';
-import { parentResetPassCreate } from '../../../http/parentResetPassCreate';
+import { parentResetPassCreate } from '../../../http/parent/parentResetPassCreate';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-import { parentVerifyResetCode } from '../../../http/parentVerifyResetCode';
+import { parentVerifyResetCode } from '../../../http/parent/parentVerifyResetCode';
 import { setEmail, setCode } from '../../../store/authSlice';
 const ResetPassword = () => {
   const navigation = useNavigate();
