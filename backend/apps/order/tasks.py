@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from apps.order.models import Order
-from apps.order.models.const import OrderStatus
+from apps.order.models.const import OrderStatus, PaymentStatus
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from config.celery import BaseTask, app
 from config.settings import EMAIL_HOST_USER, TERMINAL_KEY, T_PASSWORD, PAYMENT_GET_STATE_URL
@@ -136,7 +136,7 @@ class CheckIfOrdersPaid(BaseTask):
         awaiting_payment_orders = Order.objects.filter(
             status=OrderStatus.payment_awaiting
         )
-        successful_paymemt_order_ids = []
+        successful_payment_order_ids = []
         failed_payment_order_ids = []
         for order in awaiting_payment_orders:
             values = {
@@ -154,13 +154,13 @@ class CheckIfOrdersPaid(BaseTask):
                 )
                 response_json = response.json()
                 if response_json['Success']:
-                    if response_json['Status'] == 'CONFIRMED':
-                        successful_paymemt_order_ids.append(order.id)
+                    if response_json['Status'] == PaymentStatus.CONFIRMED:
+                        successful_payment_order_ids.append(order.id)
                     elif response_json['Status'] in (
-                            'CANCELED',
-                            'DEADLINE_EXPIRED',
-                            'REJECTED',
-                            'AUTH_FAIL'
+                            PaymentStatus.CANCELED,
+                            PaymentStatus.REJECTED,
+                            PaymentStatus.DEADLINE_EXPIRED,
+                            PaymentStatus.AUTH_FAIL
                     ):
                         failed_payment_order_ids.append(order.id)
                 else:
@@ -174,7 +174,7 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
-        Order.objects.filter(id__in=successful_paymemt_order_ids).update(status=OrderStatus.paid_for)
+        Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
 
