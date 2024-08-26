@@ -60,7 +60,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         fetchUserPartialUpdateWithTokenInterceptor(accessStor, {
             email: inputValue.parentEmail,
             first_name: inputValue.parentName,
-            second_name: inputValue.second_name,
+            second_name: inputValue.parentPatronymic,
             last_name: inputValue.parentSurname,
             phone_number: inputValue.parentPhone
         })
@@ -81,12 +81,14 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 parentEmail: res.email,
                                 parentName: res.first_name,
                                 parentSurname: res.last_name,
-                                parentPhone: res.phone_number
+                                parentPhone: res.phone_number,
+                                parentPatronymic: res.second_name
                             }))
                             localStorage.setItem('last_name', res.last_name);
                             localStorage.setItem('first_name', res.first_name);
                             localStorage.setItem('phone', res.phone_number);
                             localStorage.setItem('email', res.email);
+                            localStorage.setItem('secon_name', res.second_name);
                             setError({
                                 phone_number: '',
                                 message: '',
