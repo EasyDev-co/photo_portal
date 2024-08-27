@@ -1,11 +1,10 @@
-import { localUrl } from "../constants/constants";
+import { localUrl } from "../../constants/constants";
 
-export const parentLoginCreate = async (email, password) => {
-    const url = `${localUrl}/api/v1/parent/login/`;
+export const parentResetPassCreate = async (email) => {
+    const url = `${localUrl}/api/v1/parent/reset_password/`;
 
     const sendData = {
         email: email,
-        password: password
     };
 
     const response = await fetch(url, {

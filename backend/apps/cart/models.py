@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from apps.promocode.models import Promocode
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
 
@@ -13,7 +14,7 @@ User = get_user_model()
 
 
 class CartPhotoLine(UUIDMixin):
-    """Фотолиния в корзине."""
+    """Пробник в корзине."""
     cart = models.ForeignKey(
         'Cart',
         on_delete=models.CASCADE,
@@ -24,7 +25,7 @@ class CartPhotoLine(UUIDMixin):
         PhotoLine,
         on_delete=models.CASCADE,
         related_name='cart_photo_lines',
-        verbose_name='Фотолиния',
+        verbose_name='Пробник',
     )
     is_digital = models.BooleanField(
         default=False,
@@ -42,8 +43,8 @@ class CartPhotoLine(UUIDMixin):
     )
 
     class Meta:
-        verbose_name = 'Фотолиния в корзине'
-        verbose_name_plural = 'Фотолинии в корзине'
+        verbose_name = 'Пробник в корзине'
+        verbose_name_plural = 'Пробники в корзине'
 
 
 class PhotoInCart(UUIDMixin):
@@ -58,7 +59,7 @@ class PhotoInCart(UUIDMixin):
         'CartPhotoLine',
         on_delete=models.CASCADE,
         related_name='photos_in_cart',
-        verbose_name='Фотолиния',
+        verbose_name='Пробник',
     )
     photo_type = models.PositiveSmallIntegerField(
         choices=PhotoType.choices,
@@ -104,7 +105,26 @@ class Cart(UUIDMixin, TimeStampedMixin):
             'cart',
             'photo_line',
         ),
-        verbose_name='Фотолинии',
+        verbose_name='Пробники',
+    )
+    promocode = models.ForeignKey(
+        Promocode,
+        on_delete=models.CASCADE,
+        related_name='carts',
+        verbose_name='Промокод',
+        null=True,
+        blank=True,
+    )
+    bonus_coupon = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Баланс купона",
+        null=True,
+        blank=True,
+    )
+    order_fully_paid_by_coupon = models.BooleanField(
+        default=False,
+        verbose_name="Заказ полностью оплачен купоном",
     )
 
     class Meta:

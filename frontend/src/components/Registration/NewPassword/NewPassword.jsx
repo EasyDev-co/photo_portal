@@ -1,7 +1,7 @@
 import styles from '../Registration.module.css'
 import { useState } from "react";
 import InputField from "../../InputField/InputField";
-import { parentChangePass } from '../../../http/parentChangePass';
+import { parentChangePass } from '../../../http/parent/parentChangePass';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 const NewPassword = () => {

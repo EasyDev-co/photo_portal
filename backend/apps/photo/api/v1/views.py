@@ -42,43 +42,56 @@ class PhotoRetrieveAPIView(RetrieveAPIView):
 
 
 class PhotoLineGetByPhotoNumberAPIView(APIView):
-    """Получение фотолинии по номерам фото."""
+    """Получение пробника по номерам фото."""
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
 
     @swagger_auto_schema(responses={"200": PhotoLineSerializer()}, )
     def post(self, request):
-        """Получение фотолинии по id"""
+        """Получение пробника по id"""
 
+        user = request.user
         photo_numbers = request.data['numbers']
         first_photo = get_object_or_404(Photo, number=photo_numbers[0])
         photo_line = first_photo.photo_line
+
+        if photo_line.kindergarten not in user.kindergarten.all():
+            return Response(
+                {'message': 'Фотолиния не относится к вашему детскому саду'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         photo_line_photos = photo_line.photos.select_related('photos')
-        numbers_in_photo_line = list(photo_line_photos.values_list('number', flat=True))
+        numbers_in_photo_line = list(
+            photo_line_photos.values_list('number', flat=True)
+        )
+
         if photo_numbers == numbers_in_photo_line:
             serializer = PhotoLineSerializer(photo_line)
 
             user_photo_count, created = UserPhotoCount.objects.get_or_create(
-                user=request.user,
-                photo_theme=photo_line.photo_theme
+                user=user,
+                photo_theme=photo_line.photo_theme,
             )
+
             if user_photo_count.count == 0:
                 return Response(
                     {'message': 'Вы достигли лимита'},
-                    status=status.HTTP_403_FORBIDDEN
+                    status=status.HTTP_403_FORBIDDEN,
                 )
+
             user_photo_count.count -= 1
             user_photo_count.save()
+
             return Response(serializer.data)
+
         return Response(
-            {'message': 'Фотолиния с указанными фотографиями не найдена'},
+            {'message': 'Пробник с указанными фотографиями не найден.'},
             status=status.HTTP_404_NOT_FOUND
         )
 
 
-
-
 class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
-    """Получение одной фотолинии или обновления родителя фотолинии."""
+    """Получение одного пробника или обновления родителя пробника."""
     http_method_names = ('get', 'patch')
     serializer_class = PhotoLineSerializer
     queryset = PhotoLine.objects.all()
@@ -86,7 +99,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
 
 
 class PhotoLinesGetByParent(ListAPIView):
-    """Получение всех фотолиний родителя"""
+    """Получение всех пробников родителя"""
     serializer_class = PhotoLineSerializer
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
     lookup_field = 'parent'

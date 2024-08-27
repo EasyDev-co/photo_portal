@@ -1,9 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 
-from apps.exceptions.api_exceptions import ParentNotFound
+from apps.exceptions.api_exceptions import UserNotFound
 from apps.user.models import User
-from apps.user.models.user import UserRole
 
 
 class EmailSerializer(serializers.Serializer):
@@ -12,8 +11,8 @@ class EmailSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         user = User.objects.filter(email=value).first()
-        if not user or user.role != UserRole.parent:
-            raise ParentNotFound
+        if not user:
+            raise UserNotFound
         return value
 
 

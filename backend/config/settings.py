@@ -17,12 +17,14 @@ DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = ['*']
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://127.0.0.1:3000",
-#     "http://localhost:3000",
-#     "http://localhost:8001",
-#     "http://localhost:8080",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "http://localhost:8001",
+    "http://localhost:8080",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -112,12 +114,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        },
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'apps.user.validators.CustomPasswordValidator',
     },
 ]
 
@@ -197,7 +205,11 @@ CELERY_BEAT_SCHEDULE = {
     "remove_old_qr_codes": {
         "task": "apps.photo.tasks.QRCodeRemoverTask",
         "schedule": crontab(minute='0', hour='*/48'),
-    }
+    },
+    "check_if_orders_has_been_paid": {
+            "task": "apps.order.tasks.CheckIfOrdersPaid",
+            "schedule": crontab(minute='*/1'),
+        }
 }
 
 SIMPLE_JWT = {

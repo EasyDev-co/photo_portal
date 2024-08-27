@@ -1,6 +1,6 @@
-import { localUrl } from "../constants/constants";
+import { localUrl } from "../../constants/constants";
 
-export const getOnePhoto = async (num,access) => {
+export const getPhotoByNumbers = async (num,access) => {
     const url = `${localUrl}/api/v1/photo/photo_line_by_numbers/`;
     
     const sendData = {

@@ -7,7 +7,7 @@ import google from '../../assets/images/socials/G.svg'
 import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
 import { Link, useNavigate } from "react-router-dom";
-import { parentRegisterCreate } from "../../http/parentRegisterCreate";
+import { parentRegisterCreate } from "../../http/parent/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
 import { addQrIdPhoto, setEmail, setPhotoNumbers } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
@@ -93,13 +93,34 @@ export const Registration = () => {
     const words = input.trim().split(/\s+/);
 
     // Проверяем, что слов ровно три
-    if (words.length !== 2) {
+    if (words.length < 2) {
       setErrorName({
         text: ['Длинна этого поля не может быть короче 1 слова.']
       })
       return
     }
 
+    if (words[0].length <= 2) {
+      setErrorName({
+        text: ['Длинна в этом поле не может быть короче 2 символов.']
+      })
+      return
+    }
+    if (words[1].length <= 2) {
+      setErrorName({
+        text: ['Длинна в этом поле не может быть короче 2 символов.']
+      })
+      return
+    }
+
+    for (let word of words) {
+      if (word.length >= 57) {
+        setErrorName({
+          text: ['Слишком много символов.']
+        })
+        return
+      }
+    }
     // Проверяем каждое слово на соответствие регулярному выражению
     for (let word of words) {
       if (!cyrillicPattern.test(word)) {
@@ -111,7 +132,7 @@ export const Registration = () => {
     }
 
     setErrorName({
-      text: ['']
+      text: []
     })
   }
   const onSubmitHandler = async (e) => {
@@ -156,8 +177,6 @@ export const Registration = () => {
     } else {
       setError({ pictureNumbers: ['Неправильный формат ввода. Введите 6 номеров фото через дефис.'] })
     }
-
-  
   }
 
   return <>
@@ -174,7 +193,6 @@ export const Registration = () => {
             <h1 className={styles.formHeader}>Регистрация</h1>
             <form ref={blurRef} onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
               <InputField
-                //  setActiveBlur={ setActiveBlur}
                 name={'gardenCode'}
                 placeholder={'Код сада'}
                 onChangeHandler={onChangeHandler}
@@ -205,7 +223,7 @@ export const Registration = () => {
                 isNone
                 isAuthForm
                 setActiveBlur={setActiveBlur}
-                value={inputValue.fullName}
+                value={inputValue.fullName && inputValue.fullName}
                 error={errorName.text}
               />
               <InputField

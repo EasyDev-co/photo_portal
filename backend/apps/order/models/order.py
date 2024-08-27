@@ -35,7 +35,7 @@ class Order(TimeStampedMixin):
         PhotoLine,
         on_delete=models.PROTECT,
         related_name="orders",
-        verbose_name="Фотолиния",
+        verbose_name="Пробник",
     )
     is_digital = models.BooleanField(
         default=False,

@@ -5,8 +5,8 @@ const authSlice = createSlice({
     name: 'user',
     initialState: {
         email: null,
-        access: localStorage.getItem('access'),
-        // access: true,
+        // access: localStorage.getItem('access'),
+        access: true,
         refresh: null,
         blur: false,
         code: null,
@@ -38,7 +38,12 @@ const authSlice = createSlice({
         total_price:0,
         photoNumbers:[],
         role: 1,
-        kindergarten_id:''
+        kindergarten_id:'',
+        order:[
+            {
+                
+            }
+        ]
     },
     reducers: {
         setUser: (state, action) => {
@@ -150,6 +155,9 @@ const authSlice = createSlice({
             state.total_price += action.payload.map(elem=>{
                 return parseFloat(elem.total_price)
             })
+        },
+        setOrderId(state, action){
+            state.order = action.payload
         }
     }
 });
@@ -169,7 +177,8 @@ export const {
     addCartList,
     setCart,
     removePhotos,
-    setPhotoNumbers
+    setPhotoNumbers,
+    setOrderId
 } = authSlice.actions;
 
 

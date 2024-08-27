@@ -4,7 +4,7 @@ import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBar } from "../NavBar/NavBar";
 import { ButtonBurger } from "./ButtonBurger/ButtonBurger";
 import { logo } from "../../constants/constants";
-import { fetchUserDataWithTokenInterceptor, getUserData } from "../../http/getUserData";
+import { fetchUserDataWithTokenInterceptor, getUserData } from "../../http/user/getUserData";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserData } from "../../store/authSlice";
 import { getCookie } from "../../utils/setCookie";
@@ -115,10 +115,10 @@ export const Header = () => {
             <div className={styles.rightBlock}>
               <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
-                  top={`${localStorageValue.last_name === null ? '' : localStorageValue.last_name} 
-                  ${localStorageValue.first_name === null ? '' : localStorageValue.first_name} 
-                  ${localStorageValue.second_name === null ? '' : localStorageValue.second_name}`}
-                  bottom={localStorageValue.phone}
+                  top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
+                  ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
+                  ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
+                  bottom={localStorage.getItem('phone')}
                 />
                 <HeaderUserInfoItem
                   top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 

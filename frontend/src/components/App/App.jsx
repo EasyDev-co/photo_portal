@@ -16,11 +16,13 @@ import NewPassword from "../Registration/NewPassword/NewPassword";
 import Verification from "../Registration/Verificattion.jsx/Verification";
 import { useAuth } from "../../utils/useAuth";
 import Account from "../Account/Account";
+import { useSelector } from "react-redux";
 export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuth } = useAuth();
-
+  const role = useSelector(state => state.user.role);
+  
   useEffect(() => {
     // Перенаправляем на "/orders" при входе на сайт
     if (location.pathname === "/") {
@@ -33,12 +35,13 @@ export const App = () => {
 
     }
   }, [location.pathname, navigate]);
-
+  
   return (
     <Routes>
       {isAuth ? <>
         <Route element={<Layout />}>
           <Route path={"/orders"} role={'manager'} element={<Account role={'parent'} />} />
+          {role !== 1 && <Route path={"/orders_manager"} element={<Orders/>}/>}
           <Route path={"/profile"} element={<Profile role={'parent'} />} />
           <Route path={"/gallery"} element={<Gallery />} />
           <Route path={"/about-us"} element={<AboutUs />} />

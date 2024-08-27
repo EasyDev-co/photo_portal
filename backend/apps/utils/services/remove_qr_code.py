@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db import connection, transaction
+from django.db import transaction
 from pytz import timezone
 
 import os
@@ -35,7 +35,7 @@ def remove_qr_code():
     # обновляем записи в БД
     with transaction.atomic():
 
-        # обнуление qr_code у фотолиний
+        # обнуление qr_code у пробников
         PhotoLine.objects.filter(
             photo_theme_id__in=expired_photo_theme_ids
         ).update(qr_code=None)

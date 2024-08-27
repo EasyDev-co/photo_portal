@@ -1,13 +1,13 @@
 import styles from '../Registration.module.css';
 import InputField from '../../InputField/InputField';
 import { useState } from 'react';
-import { parentEmailVerification } from '../../../http/parentEmailVerification';
+import { parentEmailVerification } from '../../../http/parent/parentEmailVerification';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPhotos, setUser } from '../../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../utils/useAuth';
-import { getOnePhoto } from '../../../http/getOnePhoto';
-import { patchPhotoLine } from '../../../http/patchPhotoLine';
+import { getOnePhoto } from '../../../http/photo/getOnePhoto';
+import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
 const Verification = () => {
     const initialState = {
         code: '',
@@ -16,12 +16,11 @@ const Verification = () => {
     const dispatch = useDispatch();
     const [inputValue, setInputValue] = useState(initialState);
     const [error, setError] = useState(null);
-    const { isAuth } = useAuth();
-    const idP = localStorage.getItem('idP');
     const email = useSelector(action => action.user.email);
     const navigation = useNavigate();
     const photoNumbers = useSelector(action => action.user.photoNumbers);
     const photoLineId = useSelector(action => action.user.photoLineId);
+    
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);

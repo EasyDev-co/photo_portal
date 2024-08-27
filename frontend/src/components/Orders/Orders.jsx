@@ -1,27 +1,28 @@
 import styles from "./Orders.module.css";
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
-import { useClickOutside } from "../../utils/useClickOutside";
 import { useDispatch, useSelector } from "react-redux";
 import AddKidsForm from "./AddKids/AddKidsForm";
 import Scaner from "../Scaner/Scaner";
-import { addPhotos, setCart } from "../../store/authSlice";
+import { addPhotos, setCart, setOrderId } from "../../store/authSlice";
 import { useAuth } from "../../utils/useAuth";
 import Block from "./PhotoCard/PhotoBlock/Block";
 import { transformData } from "./PhotoCard/utils/utils";
-import { patchPhotoLine } from "../../http/patchPhotoLine";
-import { fetchCartCreateWithTokenInterceptor } from "../../http/cartCreate";
-import { orderCreate } from "../../http/orderCreate";
-import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photoLineList";
+import { patchPhotoLine } from "../../http/photo/patchPhotoLine";
+import { fetchCartCreateWithTokenInterceptor } from "../../http/cart/cartCreate";
+import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photo/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
-import { fetchWithTokenInterceptor } from "../../http/getPhotoLine";
+import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
+import { useNavigate } from "react-router-dom";
+import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
+import Modal from "../Modal/Modlal";
 
 export const Orders = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate()
+  
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
-  // const [photos, setPhotos] = useState([]);
   const [scanActive, setScanActive] = useState(false);
   const [sessionData, setSessionData] = useState(sessionStorage.getItem('photoline'));
   const accessStor = localStorage.getItem('access');
@@ -30,7 +31,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-
+  const [modalActive, setModalActive] = useState(false)
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -135,20 +136,23 @@ export const Orders = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const order = await orderCreate(accessStor)
-    if (order.ok) {
-      const data = await order.json();
-      console.log(data)
-    } else {
-      const data = await order.json();
-      console.log(data)
+    if (orderValue.length !== 0) {
+      
+      const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
+      if (order.ok) {
+        const data = await order.json();
+        navigate('/orders/payment');
+        dispatch(setOrderId(data))
+      } else {
+        const data = await order.json();
+        console.log(data)
+      }
     }
   };
 
   const handleCheckboxChange = (event, photoLineId) => { 
     const { checked, name } = event.target; 
-    console.log(checked, name); 
-   
+
     setOrderValue((prev) => { 
       const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
    
@@ -203,9 +207,9 @@ export const Orders = () => {
                 setlineLenght={setlineLenght}
               />
             }
-
           </div>
-          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
+          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} />
+          <Modal active={modalActive} setActive={setModalActive}/>
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>

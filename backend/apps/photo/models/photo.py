@@ -7,7 +7,7 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin
 
 class SerialPhotoNumber(models.IntegerChoices):
     """
-    Порядковый номер фотографии в фотолинии.
+    Порядковый номер фотографии в пробнике.
     """
     photo_1 = 1, 'Фото 1'
     photo_2 = 2, 'Фото 2'
@@ -22,7 +22,7 @@ class Photo(UUIDMixin):
         PhotoLine,
         on_delete=models.PROTECT,
         related_name='photos',
-        verbose_name='Линия фотографий'
+        verbose_name='Пробник'
     )
     number = models.PositiveIntegerField(
         verbose_name='Номер',
@@ -39,7 +39,7 @@ class Photo(UUIDMixin):
     )
 
     def __str__(self):
-        return f'Фото №{self.number}'
+        return f'Фотография №{self.number}'
 
     class Meta:
         verbose_name = 'Фотография'
@@ -56,4 +56,4 @@ class Photo(UUIDMixin):
         existing_serial_numbers = photos_from_photo_line.values_list('serial_number', flat=True)
 
         if self.serial_number in existing_serial_numbers:
-            raise ValidationError('Такой порядковый номер в данной фотолинии уже существует.')
+            raise ValidationError('Такой порядковый номер в данном пробнике уже существует.')

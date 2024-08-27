@@ -4,7 +4,6 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from apps.kindergarten.models import Kindergarten
-from apps.promocode.models import Promocode
 from apps.user.managers import UserManager
 from apps.user.validators import validate_cyrillic
 from apps.utils.models_mixins.models_mixins import UUIDMixin
@@ -37,7 +36,6 @@ class User(UUIDMixin, AbstractUser):
         validators=[MinLengthValidator(2), validate_cyrillic],
         verbose_name='Фамилия'
     )
-
     role = models.PositiveSmallIntegerField(
         choices=UserRole.choices,
         default=UserRole.parent,
@@ -47,14 +45,6 @@ class User(UUIDMixin, AbstractUser):
         Kindergarten,
         related_name='users',
         verbose_name='Детский сад',
-    )
-    promocode = models.ForeignKey(
-        Promocode,
-        on_delete=models.CASCADE,
-        related_name='users',
-        verbose_name='Промокод',
-        blank=True,
-        null=True,
     )
     is_verified = models.BooleanField(
         default=False,
