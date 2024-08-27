@@ -9,6 +9,8 @@
   background-color: #fff;
   width: 100%;
   border-bottom: 1px solid #e5e5e5;
+  position: relative;
+  z-index: 10;
 }
 
 .container {

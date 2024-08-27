@@ -15,6 +15,7 @@ import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
 import { useNavigate } from "react-router-dom";
 import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
+import Modal from "../Modal/Modlal";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-
+  const [modalActive, setModalActive] = useState(false)
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -151,8 +152,7 @@ export const Orders = () => {
 
   const handleCheckboxChange = (event, photoLineId) => { 
     const { checked, name } = event.target; 
-    console.log(checked, name); 
-   
+
     setOrderValue((prev) => { 
       const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
    
@@ -207,9 +207,9 @@ export const Orders = () => {
                 setlineLenght={setlineLenght}
               />
             }
-
           </div>
-          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} />
+          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} />
+          <Modal active={modalActive} setActive={setModalActive}/>
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
