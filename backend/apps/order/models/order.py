@@ -1,11 +1,9 @@
-from rest_framework.exceptions import ValidationError
-
+from apps.order.models.orders_payment import OrdersPayment
 from apps.photo.models import PhotoLine
 from apps.utils.models_mixins.models_mixins import TimeStampedMixin
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from apps.kindergarten.models import Kindergarten
 from apps.order.models.const import OrderStatus
 
 User = get_user_model()
@@ -53,6 +51,14 @@ class Order(TimeStampedMixin):
     payment_id = models.CharField(
         max_length=20,
         verbose_name="Идентификатор транзакции",
+        null=True,
+        blank=True
+    )
+    order_payment = models.ForeignKey(
+        OrdersPayment,
+        on_delete=models.CASCADE,
+        related_name="orders",
+        verbose_name='Оплата заказа',
         null=True,
         blank=True
     )

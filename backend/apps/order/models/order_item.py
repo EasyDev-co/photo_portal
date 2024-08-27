@@ -1,10 +1,8 @@
-from django.contrib import admin
 from django.db import models
 
-from apps.exceptions.api_exceptions import PhotoPriceDoesNotExist
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from apps.order.models import Order
-from apps.kindergarten.models import PhotoType, PhotoPrice
+from apps.kindergarten.models import PhotoType
 from apps.photo.models import Photo
 
 

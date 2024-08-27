@@ -13,8 +13,10 @@ from rest_framework.views import APIView
 
 from apps.cart.models import Cart
 from apps.kindergarten.models import PhotoType
-from apps.order.api.v1.serializers import OrderSerializer, PhotoLineCartSerializer
-from apps.order.models import Order, OrderItem
+from apps.order.api.v1.serializers import (OrderSerializer,
+                                           PhotoLineCartSerializer,
+                                           OrderPaymentSerializer)
+from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
@@ -35,7 +37,6 @@ User = get_user_model()
 
 
 class OrderAPIView(APIView):
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -50,6 +51,7 @@ class OrderAPIView(APIView):
 
     def post(self, request):
         user = request.user
+        orders_payment = OrdersPayment.objects.create()
         cart = get_object_or_404(Cart, user=user)
         cart_photo_lines = cart.cart_photo_lines.select_related('cart')
         region = cart.photo_lines.first().kindergarten.region
@@ -66,6 +68,7 @@ class OrderAPIView(APIView):
                 is_digital=cart_photo_line.is_digital,
                 is_photobook=cart_photo_line.is_photobook,
                 order_price=cart_photo_line.total_price,
+                order_payment=orders_payment,
             ) for cart_photo_line in cart_photo_lines
         ]
         orders = Order.objects.bulk_create(orders)
@@ -124,8 +127,12 @@ class OrderAPIView(APIView):
 
         OrderItem.objects.bulk_create(order_items)
 
-        serializer = OrderSerializer(orders, many=True)
+        orders_payment.amount = sum(order.order_price for order in orders)
+        orders_payment.save()
+
+        serializer = OrderPaymentSerializer(orders_payment)
         cart_photo_lines.delete()
+
         return Response(serializer.data)
 
 
@@ -136,13 +143,14 @@ class PaymentAPIView(APIView):
 
     def get(self, request, pk):
         user = request.user
-        order = get_object_or_404(Order, id=pk)
-        order_items = OrderItem.objects.filter(order_id=order.id)
+        orders_payment = get_object_or_404(OrdersPayment, id=pk)
+        orders = orders_payment.orders.all()
+        order_items = OrderItem.objects.filter(order_id__in=orders.values_list('id', flat=True))
 
         payment_data = {
-            'Amount': int(order.order_price * 100),
+            'Amount': int(orders_payment.amount * 100),
             'Description': self.description,
-            'OrderId': order.id,
+            'OrderId': str(orders_payment.id),
             'Password': T_PASSWORD,
             'TerminalKey': TERMINAL_KEY,
         }
@@ -172,7 +180,7 @@ class PaymentAPIView(APIView):
 
         if response.json()['Success']:
             payment_url = response.json()['PaymentURL']
-            Order.objects.filter(id=order.id).update(
+            orders.update(
                 payment_id=response.json()['PaymentId'],
                 status=OrderStatus.payment_awaiting
             )
