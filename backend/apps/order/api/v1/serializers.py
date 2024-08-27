@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from apps.kindergarten.models import PhotoPrice, PhotoType
-from apps.order.models import Order, OrderItem
+from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus
 from apps.photo.models import Photo, PhotoLine
 from apps.user.models.user import UserRole
@@ -76,3 +76,10 @@ class OrderSerializer(serializers.ModelSerializer):
         """Метод для получения названия статуса заказа."""
         status = obj.status
         return OrderStatus(status).label
+
+
+class OrderPaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrdersPayment
+        fields = ['id', 'amount']

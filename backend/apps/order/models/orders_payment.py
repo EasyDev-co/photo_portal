@@ -16,4 +16,4 @@ class OrdersPayment(UUIDMixin, TimeStampedMixin):
         verbose_name_plural = "Оплата заказов"
 
     def __str__(self):
-        return f"{self.orders.values('payment_id')}, {self.amount}"
+        return f"{self.id}, {self.amount}"
