@@ -6,12 +6,7 @@ export const statePayment = async (access) => {
 
     const order = JSON.parse(getCookie('order'));
     
-    if(!order){
-        return
-    }
-    for(let i = 0; i < order.length; i += 1){
-
-        const url = `${localUrl}/api/v1/get_state/${order[i].id}`;
+    const url = `${localUrl}/api/v1/get_state/${order.id}`;
 
         const response = await fetch(url, {
             method: "GET",
@@ -21,7 +16,6 @@ export const statePayment = async (access) => {
             }
         });
         return response;
-    }
 }
 
 export const fetchStatePaymentTokenInterceptor = async (access, refresh) => {

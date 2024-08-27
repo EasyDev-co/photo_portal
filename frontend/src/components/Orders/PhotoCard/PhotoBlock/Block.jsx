@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import PhotoBlock from './PhotoBlock';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { patchPhotoLine } from '../../../../http/photo/patchPhotoLine';
 import styles from '../PhotoCard.module.css'
 import { removePhotos } from '../../../../store/authSlice';
@@ -21,7 +21,7 @@ const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHan
       for (let i = 0; i < addPhoto.length; i += 6) {
         blocks.push(addPhoto.slice(i, i + 6));
       }
-      // console.log('New blocks:', blocks);
+
       setPhotoBlocks(blocks);
      
     }
@@ -30,6 +30,7 @@ const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHan
   const handleRemoveBlock = async (indexToRemove, id) => {
     try {
       const res = await patchPhotoLine(accessStor, { "parent": null }, id);
+      localStorage.setItem('deadline','')
       const data = await res.json();
       setPhotoBlocks((prevBlocks) => {
         const newBlocks = prevBlocks.filter((_, index) => index !== indexToRemove);

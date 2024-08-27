@@ -5,7 +5,6 @@ import { parentEmailVerification } from '../../../http/parent/parentEmailVerific
 import { useDispatch, useSelector } from 'react-redux';
 import { addPhotos, setUser } from '../../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../utils/useAuth';
 import { getOnePhoto } from '../../../http/photo/getOnePhoto';
 import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
 const Verification = () => {

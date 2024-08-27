@@ -21,7 +21,7 @@ import { setCookie } from "../../utils/setCookie";
 export const Orders = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
-  
+
   const [lineLenght, setlineLenght] = useState(0)
   const addPhoto = useSelector(state => state.user.photos);
   const [scanActive, setScanActive] = useState(false);
@@ -46,6 +46,7 @@ export const Orders = () => {
   const blurRef = useRef(null);
 
   const [isActiveForm, setIsActiveForm] = useState(false);
+
   useEffect(() => {
     let isMounted = true;
     if (sessionData) {
@@ -73,6 +74,11 @@ export const Orders = () => {
         if (isMounted && res.ok) {
           res.json()
             .then(data => {
+              try {
+                localStorage.setItem('deadline', data[0].deadline);
+              } catch (error) {
+                console.log(error) 
+              }
               setlineLenght(data.length)
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
@@ -118,11 +124,8 @@ export const Orders = () => {
 
     setInputValue(prevInput => ({ ...prevInput, [name]: count }));
   };
-  // console.log(orderValue)
   useEffect(() => {
-
     const transformedData = transformData(orderValue);
-    // console.log(transformedData)
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
       .then(res => {
         if (res.ok) {
@@ -151,34 +154,34 @@ export const Orders = () => {
     }
   };
 
-  const handleCheckboxChange = (event, photoLineId) => { 
-    const { checked, name } = event.target; 
+  const handleCheckboxChange = (event, photoLineId) => {
+    const { checked, name } = event.target;
 
-    setOrderValue((prev) => { 
-      const existingItemIndex = prev.findIndex(item => item.id === photoLineId); 
-   
-      if (existingItemIndex > -1) { 
-        const updatedItem = { ...prev[existingItemIndex] }; 
-        if (name == 6) { 
-          updatedItem.is_photobook = checked; 
-        } else if (name == 7) { 
-          updatedItem.is_digital = checked; 
-        } 
-        return [ 
-          ...prev.slice(0, existingItemIndex), 
-          updatedItem, 
-          ...prev.slice(existingItemIndex + 1), 
-        ]; 
-      } else { 
-        const newItem = { 
-          id: photoLineId, 
-          photos: [], 
-          is_photobook: name == 6 ? checked : false, 
-          is_digital: name == 7 ? checked : false 
-        }; 
-        return [...prev, newItem]; 
-      } 
-    }); 
+    setOrderValue((prev) => {
+      const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
+
+      if (existingItemIndex > -1) {
+        const updatedItem = { ...prev[existingItemIndex] };
+        if (name == 6) {
+          updatedItem.is_photobook = checked;
+        } else if (name == 7) {
+          updatedItem.is_digital = checked;
+        }
+        return [
+          ...prev.slice(0, existingItemIndex),
+          updatedItem,
+          ...prev.slice(existingItemIndex + 1),
+        ];
+      } else {
+        const newItem = {
+          id: photoLineId,
+          photos: [],
+          is_photobook: name == 6 ? checked : false,
+          is_digital: name == 7 ? checked : false
+        };
+        return [...prev, newItem];
+      }
+    });
   };
 
   return (
@@ -210,7 +213,7 @@ export const Orders = () => {
             }
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} />
-          <Modal active={modalActive} setActive={setModalActive}/>
+          <Modal active={modalActive} setActive={setModalActive} />
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
