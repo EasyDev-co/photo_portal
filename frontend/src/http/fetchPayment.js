@@ -3,22 +3,19 @@ import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./parent/tokenRefreshCreate";
 
 export const paymentCreate = async (access, order) => {
-    setCookie('order', JSON.stringify(order));
 
-    for(let i = 0; i < order.length; i += 1){
-        
-        const url = `${localUrl}/api/v1/payment/${order[i].id}`;
+    const orderParse = JSON.parse(order);
 
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${access}`
-            },
-            // body: JSON.stringify()
-        });
-        return response;
-    }
+    const url = `${localUrl}/api/v1/payment/${orderParse.id}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access}`
+        }
+    });
+    return response;
 }
 
 export const fetchPaymentCreateTokenInterceptor = async (access, refresh, order) => {
