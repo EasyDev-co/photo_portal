@@ -7,13 +7,20 @@ const Account = () => {
 
     const [nurseryIsAuth, setNurseryIsAuth] = useState(false);
     const [isPayment, setIsPayment] = useState(false);
-    const role = useSelector(state=> state.user.role);
+    const role = useSelector(state => state.user.role);
+    const [isActive, setIsActive] = useState();
     return (
         <>
             <div className={''}>
-                {isPayment ? <Payment/> :
+                {isPayment ? <Payment /> :
                     <div>
-                        {role !== 1 ?  <ManagerProfile nurseryIsAuth={nurseryIsAuth} /> : <Orders />}
+                        {role !== 1 ?
+                            <ManagerProfile
+                                nurseryIsAuth={nurseryIsAuth}
+                                setIsActive={setIsActive}
+                                isActive={isActive} />
+                            :
+                            <Orders />}
                     </div>
                 }
             </div>

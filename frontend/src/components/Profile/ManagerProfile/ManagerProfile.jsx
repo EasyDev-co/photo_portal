@@ -8,11 +8,13 @@ import MainButton from "../../Buttons/MainButton";
 import Dropdown from "./Dropdown/Dropdown";
 import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/getStats";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
     const accessStor = localStorage.getItem('access');
     const kindergarten_id = useSelector(state => state.user.kindergarten_id);
+    const navigate = useNavigate()
     const [stats, setStats] = useState(
         {
             total_orders: 0,
@@ -53,38 +55,6 @@ const ManagerProfile = () => {
                         label={'Средний чек, руб'}
                         data={stats.average_order_value}
                     />
-                    {/* <StatisticItem
-                        label={'Сбор с заказа “Зимняя сказка”, руб'}
-                        data={'48 348'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    />
-                    <StatisticItem
-                        label={'Промо-код для сотрудников'}
-                        data={'code20'}
-                    /> */}
                 </div>
                 <div className={styles.checkWrap}>
                     <form className={styles.checkForm}>
@@ -96,7 +66,7 @@ const ManagerProfile = () => {
                         </div>
 
                     </form>
-                    <div>
+                    <div onClick={()=>navigate('/orders_manager')}>
                         <MainButton
                             value={'Заказ для себя'}
                         />
