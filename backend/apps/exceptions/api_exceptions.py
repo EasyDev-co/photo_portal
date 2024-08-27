@@ -13,10 +13,10 @@ class MissingKindergartenCode(APIException):
     default_code = 'missing_kindergarten_code'
 
 
-class ParentNotFound(APIException):
+class UserNotFound(APIException):
     status_code = 400
-    default_detail = 'Родитель с таким адресом электронной почты не найден.'
-    default_code = 'parent_not_found'
+    default_detail = 'Пользователь с таким адресом электронной почты не найден.'
+    default_code = 'user_not_found'
 
 
 class InvalidCode(APIException):
