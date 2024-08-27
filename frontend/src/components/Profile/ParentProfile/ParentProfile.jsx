@@ -24,11 +24,12 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const [error, setError] = useState({
         phone_number: '',
         message: '',
-        email: ''
+        email: '',
+        codeMessage:''
     });
     const [resetPassActive, setResetActive] = useState(true);
     const [generatePass, setPass] = useState(gen_password(12));
-    const [activeBlur, setActiveBlur] = useState(true)
+    const [activeBlur, setActiveBlur] = useState(true);
     const userData = useSelector(state => state.user.userData);
     const accessStor = localStorage.getItem('access');
 
@@ -74,8 +75,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 } else {
                     res.json()
                         .then(res => {
-                            console.log(res)
-
                             setInputValue(prev => ({
                                 ...prev,
                                 parentEmail: res.email,
@@ -131,19 +130,19 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const onResetSubmit = (e) => {
         e.preventDefault();
         parentVerifyResetCode(userData.email, inputValueReset.code)
-            .then(res => res.json())
             .then(res => {
-                if (res.message === 'Код верифицирован. Можете сменить пароль.') {
+                if (res.ok) {
                     parentChangePass(inputValueReset.code, resetDataUser.emailForReset, resetDataUser.newPass)
-                        .then(res => res.json())
                         .then(res => {
-                            if (res) {
+                            if(res.ok){
                                 setCodeWindow(false)
                             }
                         })
-                        .catch(res => {
-                            setCodeWindow(false)
-                        })
+                } else {
+                    res.json()
+                    .then(res=>{
+                        setError(prev => ({ ...prev, codeMessage: res.message }))
+                    })
                 }
             })
     }
@@ -169,6 +168,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 value={inputValueReset.code}
                                 onChangeHandler={onChangeReset}
                                 isNone
+                                error={error.codeMessage ? [error.codeMessage] : error.codeMessage}
                                 setActiveBlur={setActiveBlur}
                             />
                             <MainButton
@@ -280,19 +280,8 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     </div>
                     }
                 </form>
-                <form className={styles.formReset} onSubmit={(e)=> onSubmitToReset(e)} action="">
+                <form className={styles.formReset} onSubmit={(e) => onSubmitToReset(e)} action="">
                     <div className={styles.profileInputWrap}>
-                        {/* <InputField
-                            placeholder={"Старый пароль"}
-                            label={"Старый пароль"}
-                            type={"password"}
-                            name={"parentPass"}
-                            id={"parentPass"}
-                            value={inputValue.parentPass}
-                            onChangeHandler={onChangeHandler}
-                            autocomplete
-                            setActiveBlur={setActiveBlur}
-                        /> */}
                         <InputField
                             placeholder={generatePass}
                             label={"Новый пароль"}
@@ -304,24 +293,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentNewPass}
                             setActiveBlur={setActiveBlur}
                         />
-                        {/* {resetPassActive ? <InputField
-                            placeholder={'mail@mail.ru'}
-                            label={"Введите Email для изменения пароля"}
-                            type={"text"}
-                            name={"resetEmail"}
-                            id={"resetEmail"}
-                            isPencil
-                            onChangeHandler={onChangeHandler}
-                            value={inputValue.resetEmail}
-                            error={error.email}
-                            setActiveBlur={setActiveBlur}
-                        /> :
-                            <ResetPassButton
-                                setCodeWindow={setCodeWindow}
-                                setResetActive={setResetActive}
-                                value={'Укажите Email'}
-                            />
-                        } */}
+
                     </div>
                     <div>
                         <ResetPassButton
@@ -329,11 +301,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             setResetActive={setResetActive}
                             value={'Отправить код для смены пароля'}
                         />
-                        {/* <MainButton
-                            // isReset
-                            // setResetActive={setResetActive}
-                            value={"Отправить код для смены пароля"}
-                        /> */}
                     </div>
                 </form>
             </div>
