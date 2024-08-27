@@ -8,7 +8,7 @@ import { getOnePhoto } from '../../../http/photo/getOnePhoto';
 import { useClickOutside } from '../../../utils/useClickOutside';
 import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
 
-const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
+const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive }) => {
 
     const addPhoto = useSelector(state => state.user.photos);
     const [error, setError] = useState(false);
@@ -73,7 +73,6 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                                 res.json()
                                     .then(res => {
                                         dispatch(addPhotos(res))
-                                        // addBlock();
                                         patchPhotoLine(access, {
                                             "parent": idP
                                         }, res.id)
@@ -81,6 +80,11 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
                                     })
                             } else {
                                 setError('Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер!');
+                                res.json()
+                                    .then(res => {
+                                        console.log(res)
+                                        setModalActive(true)
+                                    })
                             }
                         })
                     setError('');
@@ -90,12 +94,8 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm }) => {
             });
             setIsActiveForm(false)
         } else {
-
             setError("Неправильный формат ввода. Введите 6 номеров фото через дефис.")
         }
-
-
-
 
     }
 
