@@ -29,7 +29,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     });
     const [resetPassActive, setResetActive] = useState(true);
     const [generatePass, setPass] = useState(gen_password(12));
-    const [activeBlur, setActiveBlur] = useState(true)
+    const [activeBlur, setActiveBlur] = useState(true);
     const userData = useSelector(state => state.user.userData);
     const accessStor = localStorage.getItem('access');
 
@@ -75,8 +75,6 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 } else {
                     res.json()
                         .then(res => {
-                            console.log(res)
-
                             setInputValue(prev => ({
                                 ...prev,
                                 parentEmail: res.email,
