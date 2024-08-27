@@ -16,6 +16,7 @@ import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
 import { useNavigate } from "react-router-dom";
 import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
 import Modal from "../Modal/Modlal";
+import { setCookie } from "../../utils/setCookie";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -137,11 +138,11 @@ export const Orders = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (orderValue.length !== 0) {
-      
       const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
       if (order.ok) {
         const data = await order.json();
         navigate('/orders/payment');
+        setCookie('order', JSON.stringify(data))
         dispatch(setOrderId(data))
       } else {
         const data = await order.json();

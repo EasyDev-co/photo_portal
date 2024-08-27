@@ -7,8 +7,7 @@ import sber from '../../../src/assets/images/Payment/sber.png'
 import sbp from '../../../src/assets/images/Payment/sbp.png'
 import { useState } from "react";
 import { paymentCreate } from "../../http/fetchPayment";
-import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { getCookie } from "../../utils/setCookie";
 
 export const Payment = () => {
   const options = [
@@ -17,18 +16,19 @@ export const Payment = () => {
     { id: 3, label: 'Комиссия 3%', src: t },
     { id: 4, label: 'Комиссия 3%', src: mir },
   ];
-  const order = useSelector(state => state.user.order);
+  // const order = useSelector(state => state.user.order);
   const [selectedOption, setSelectedOption] = useState(null);
   const accessStor = localStorage.getItem('access');
-
+  const order = getCookie('order');
   const handleOptionClick = (id) => {
     setSelectedOption(id);
+
     paymentCreate(accessStor, order)
       .then(res => {
+        console.log(res)
         if (res.ok) {
           res.json()
             .then(res => {
-              console.log(res)
               window.location.href = res;
             })
         } else {
