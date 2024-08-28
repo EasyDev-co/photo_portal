@@ -9,7 +9,7 @@ const Timer = ({ date, desc }) => {
         minutes: 0,
         seconds: 0
     });
-
+    const [themeName, setPhotoTheme] = useState(localStorage.getItem('theme_name'))
     useEffect(() => {
         let timeInterval = setInterval(() => {
             const deadline = localStorage.getItem('deadline');
@@ -24,7 +24,7 @@ const Timer = ({ date, desc }) => {
     return (
         <div className={styles.timerWidget}>
             <span className={styles.timerDesc}>
-                Осталось времени{desc}
+                Осталось времени на фотосессию: "{themeName}"
             </span>
             <div className={styles.timerWrap}>
                 <div className={styles.timer}>
