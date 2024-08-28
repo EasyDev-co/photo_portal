@@ -42,7 +42,8 @@ class OrderAPIView(APIView):
     def get(self, request):
         paid_photo_lines = PhotoLine.objects.select_related('orders').filter(
             orders__user=request.user,
-            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed)
+            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed),
+            orders__is_digital=True
         )
         if paid_photo_lines.exists():
             serializer = PaidPhotoLineSerializer(paid_photo_lines, many=True)
