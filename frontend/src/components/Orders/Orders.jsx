@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
 import Modal from "../Modal/Modlal";
 import { setCookie } from "../../utils/setCookie";
+import { getNearestDate } from "./utils/utils";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -75,9 +76,10 @@ export const Orders = () => {
           res.json()
             .then(data => {
               try {
-                localStorage.setItem('deadline', data[0].deadline);
+                const nearestDate = getNearestDate(data);
+                localStorage.setItem('deadline', nearestDate);
               } catch (error) {
-                console.log(error) 
+                console.log(error)
               }
               setlineLenght(data.length)
               data.forEach(elem => {
