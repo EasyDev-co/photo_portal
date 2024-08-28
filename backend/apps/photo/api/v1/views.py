@@ -1,4 +1,4 @@
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, FileResponse
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.photo.api.v1.permissions import IsPhotoPurchased
 from apps.photo.api.v1.serializers import (
     CurrentPhotoThemeRetrieveSerializer,
     PhotoLineSerializer,
@@ -122,15 +123,17 @@ class DownloadPhotoAPIView(APIView):
     """
     Скачивание фото.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPhotoPurchased]
 
     def get(self, request, photo_id):
         photo = get_object_or_404(Photo, id=photo_id)
 
+        file_path = photo.photo.path
+        file_name = f"{photo.number}.jpg"
+
         try:
-            with open(photo.photo.path, 'rb') as photo_file:
-                response = HttpResponse(photo_file.read(), content_type='image/jpeg')
-                response['Content-Disposition'] = f'attachment; filename={photo.number}.jpg'
-                return response
+            return FileResponse(
+                open(file_path, "rb"), as_attachment=True, filename=file_name
+            )
         except FileNotFoundError:
             raise Http404("Фото не найдено")
