@@ -33,7 +33,8 @@ export const Orders = () => {
   const [blocks, setBlocks] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
-  const [modalActive, setModalActive] = useState(false)
+  const [modalActive, setModalActive] = useState(false);
+  const [codeIsActive, setCodeActive] = useState(false);
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -45,7 +46,7 @@ export const Orders = () => {
   });
   const [isBlur, setIsBlur] = useState(false);
   const blurRef = useRef(null);
-
+  const timeoutId = useRef(null);
   const [isActiveForm, setIsActiveForm] = useState(false);
 
   useEffect(() => {
@@ -108,7 +109,8 @@ export const Orders = () => {
       photo_type: Number(name),
       is_photobook: isChecked,
       is_digital: false,
-      photoLineId: photoLineId
+      photoLineId: photoLineId,
+      promo_code: 'MZ8ADKZQWL'
     };
 
     setOrderValue(prev => {
@@ -186,6 +188,21 @@ export const Orders = () => {
     });
   };
 
+  const handlePromocodeChange = (e) => {
+    const newPromoCode = e.target.value;
+
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+    timeoutId.current = setTimeout(() => {
+      const updatedOrders = orderValue.map(order => ({
+        ...order, 
+        promo_code: newPromoCode, 
+      }));
+      setOrderValue(updatedOrders);
+    }, 1000);
+  };
+
   return (
     <div className={styles.ordersWrap}>
       <Scaner isAuth={isAuth} scanActive={scanActive} setScanActive={setScanActive} />
@@ -220,8 +237,8 @@ export const Orders = () => {
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
-                <input className={true ? styles.promoInputActive : styles.promoInput}
-                  placeholder={true ? "Промо-код активирован" : "Введите промокод"}
+                <input onChange={(e)=>handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
+                  placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
                   type="text"
                   name="digital"
                 />
