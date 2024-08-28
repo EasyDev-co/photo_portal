@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
-from django.db.models import Sum, Count, Case, When, Avg
+from django.db.models import Sum, Count, Avg
 from django.db.models.functions import Round
 from pytz import timezone
 from rest_framework import status
@@ -101,16 +101,19 @@ class KindergartenStatsAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        stats = (
-            Order.objects.filter(photo_line__kindergarten=kindergarten)
-            .aggregate(
-                total_orders=Count('id'),
-                total_amount=Round(Sum('order_price', default=0), 2),
-                completed_orders=Count(
-                    Case(When(status=OrderStatus.completed, then=1), default=0)
-                ),
-                average_order_value=Round(Avg('order_price', default=0), 2)
-            )
+        stats: dict = (
+                Order.objects.filter(
+                    photo_line__kindergarten=kindergarten
+                ).aggregate(
+                    total_orders=Count('id'),
+                    total_amount=Round(Sum('order_price', default=0), 2)
+                ) | Order.objects.filter(
+                    photo_line__kindergarten=kindergarten,
+                    status__in=(OrderStatus.completed, OrderStatus.paid_for)
+                ).aggregate(
+                    completed_orders=Count('id'),
+                    average_order_value=Round(Avg('order_price', default=0), 2)
+                )
         )
 
         serializer = KindergartenStatsSerializer(data=stats)
