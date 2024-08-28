@@ -54,8 +54,8 @@ const authSlice = createSlice({
         },
         removeUser: (state) => {
             state.email = null;
-            localStorage.setItem('access', '')
-
+            localStorage.clear();
+            window.location.reload();
         },
         setPhotoNumbers(state, action){
             state.photoNumbers = action.payload
@@ -74,12 +74,10 @@ const authSlice = createSlice({
             state.access = action.payload;
         },
         addPhotos(state, action) {
-            // Плоский массив фотографий
             const data = {  
                 photos: action.payload.photos.flat()
             };
-        
-            // Создаем множество для хранения уникальных id
+      
             const existingIds = new Set(state.photos.map(photo => photo.id));
         
             // Фильтруем фотографии по уникальному id
