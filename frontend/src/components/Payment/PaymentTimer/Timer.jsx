@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getTimeRemaining } from "./utils";
 import styles from './PaymentTimer.module.css'
 const Timer = ({ date, desc }) => {
-
+   
     const [time, setTime] = useState({
         days: 0,
         hours: 0,
@@ -12,9 +12,10 @@ const Timer = ({ date, desc }) => {
 
     useEffect(() => {
         let timeInterval = setInterval(() => {
-            const { total, days, hours, minutes } = getTimeRemaining(date);
+            const deadline = localStorage.getItem('deadline');
+            const { total, days, hours, minutes } = getTimeRemaining(deadline)
             setTime({ days, hours, minutes });
-            if (total <= 0) {
+            if (!deadline) {
                 clearInterval(timeInterval);
             }
         }, 1000)
@@ -25,18 +26,17 @@ const Timer = ({ date, desc }) => {
             <span className={styles.timerDesc}>
                 Осталось времени{desc}
             </span>
-
             <div className={styles.timerWrap}>
                 <div className={styles.timer}>
-                    <div className={styles.timerTime}>{time.days}</div>
+                    <div className={styles.timerTime}>{isNaN(time.days) ? 0 : time.days}</div>
                     <span>Дней</span>
                 </div>
                 <div className={styles.timer}>
-                    <div className={styles.timerTime}>{time.hours}</div>
+                    <div className={styles.timerTime}>{isNaN(time.hours) ? 0 : time.hours}</div>
                     <span>Часов</span>
                 </div>
                 <div className={styles.timer}>
-                    <div className={styles.timerTime}>{time.minutes}</div>
+                    <div className={styles.timerTime}>{isNaN(time.minutes) ? 0 : time.minutes}</div>
                     <span>Минут</span>
                 </div>
             </div>
