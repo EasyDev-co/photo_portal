@@ -102,16 +102,22 @@ class KindergartenStatsAPIView(APIView):
             )
 
         stats: dict = (
+                # получаем общее количество заказов в данном д/с
                 Order.objects.filter(
                     photo_line__kindergarten=kindergarten
                 ).aggregate(
-                    total_orders=Count('id'),
-                    total_amount=Round(Sum('order_price', default=0), 2)
-                ) | Order.objects.filter(
+                    total_orders=Count('id')
+                )
+                # объединяем словари
+                |
+                # получаем все завершенные/оплаченные заказы в данном д/с,
+                # общую сумму этих заказов и среднюю сумму чека
+                Order.objects.filter(
                     photo_line__kindergarten=kindergarten,
                     status__in=(OrderStatus.completed, OrderStatus.paid_for)
                 ).aggregate(
                     completed_orders=Count('id'),
+                    total_amount=Round(Sum('order_price', default=0), 2),
                     average_order_value=Round(Avg('order_price', default=0), 2)
                 )
         )
