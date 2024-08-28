@@ -76,8 +76,9 @@ export const Orders = () => {
           res.json()
             .then(data => {
               try {
-                const nearestDate = getNearestDate(data);
-                localStorage.setItem('deadline', nearestDate);
+                console.log(data)
+                // const nearestDate = getNearestDate(data);
+                // localStorage.setItem('deadline', nearestDate);
               } catch (error) {
                 console.log(error)
               }

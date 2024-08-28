@@ -1,5 +1,10 @@
 export function getNearestDate(dates) {
-    const dateObjects = dates.map(date => new Date(date.deadline));
+    const dateObjects = dates.map(date => {
+        return {
+            deadline: new Date(date.deadline),
+            
+        }
+    })
     
     const currentDate = new Date();
 
