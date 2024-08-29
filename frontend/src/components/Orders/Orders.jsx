@@ -76,13 +76,7 @@ export const Orders = () => {
         if (isMounted && res.ok) {
           res.json()
             .then(data => {
-              try {
-                const nearestDate = getNearestDate(data);
-                localStorage.setItem('deadline', nearestDate.deadline);
-                localStorage.setItem('theme_name', nearestDate.theme_name);
-              } catch (error) {
-                console.log(error)
-              }
+              getNearestDate(data);
               setlineLenght(data.length)
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
@@ -111,7 +105,7 @@ export const Orders = () => {
       is_photobook: isChecked,
       is_digital: false,
       photoLineId: photoLineId,
-      promo_code: 'MZ8ADKZQWL'
+      promo_code: ''
     };
 
     setOrderValue(prev => {

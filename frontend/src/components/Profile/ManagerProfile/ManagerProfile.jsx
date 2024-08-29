@@ -29,7 +29,6 @@ const ManagerProfile = () => {
                 if (res.ok) {
                     res.json()
                         .then(res => {
-                            console.log(res)
                             setStats(res)
                         })
                 }
