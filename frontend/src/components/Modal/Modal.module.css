@@ -41,6 +41,9 @@
     align-items: start;
     gap: 10px;
 }
+.modal__text>p>a{
+    color: #11BBD1;
+}
 .modal__text>p{
     line-height: 22px;
 }
