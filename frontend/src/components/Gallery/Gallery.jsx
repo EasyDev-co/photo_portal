@@ -6,7 +6,6 @@ import { fetchGetPaidOrderTokenInterceptor } from "../../http/getPaidOrders";
 export const Gallery = () => {
   const accessStor = localStorage.getItem('access');
   const [paidOrders, setPaidOrders] = useState([]);
-  const [isPaid, setIsPaid] = useState(false)
 
   useEffect(() => {
     fetchGetPaidOrderTokenInterceptor(accessStor)
