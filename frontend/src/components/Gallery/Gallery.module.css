@@ -66,18 +66,37 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
+
+
+@media screen and (max-width: 360px) {
+    .photosGallery{
+        justify-content: center;
+    }
+}
 .imgWrap{
     padding: 10px;
     border-radius: 8px;
     border:1px solid rgb(229, 229, 229);
+    cursor: pointer;
 }
 .imgWrap>img{
+    width: 174px;
+    height: 260px;
+}
+.imgWrapActive{
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgb(17, 187, 209);
+    cursor: pointer;
+}
+.imgWrapActive>img{
     width: 174px;
     height: 260px;
 }
 .btnWrap{
     display: flex;
     justify-content: end;
+    padding: 30px 0;
 }
 .galleryBtn{
     background-color: rgb(17, 187, 209);
