@@ -23,6 +23,7 @@ export const App = () => {
   const { isAuth } = useAuth();
   const role = useSelector(state => state.user.role);
   
+  
   useEffect(() => {
     // Перенаправляем на "/orders" при входе на сайт
     if (location.pathname === "/") {
