@@ -8,7 +8,7 @@ import { getOnePhoto } from '../../../http/photo/getOnePhoto';
 import { useClickOutside } from '../../../utils/useClickOutside';
 import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
 
-const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive }) => {
+const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, setModalText }) => {
 
     const addPhoto = useSelector(state => state.user.photos);
     const [error, setError] = useState(false);
@@ -84,6 +84,12 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive }
                                     .then(res => {
                                         console.log(res)
                                         setModalActive(true)
+                                        setModalText(
+                                        < p >
+                                            Вы превысили лимит добавления детей.Если у вас четверо детей, то напишите нам на
+                                            < span > fotodetstvo1@yandex.ru </span >
+                                            и мы проверим информацию
+                                        </p >)
                                     })
                             }
                         })
