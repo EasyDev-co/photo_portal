@@ -1,12 +1,34 @@
-import styles from './Gallery.module.css'
+import styles from './Gallery.module.css';
 import { fetchDownloadPhotoWithInterceptor } from '../../http/photo/downloadPhoto';
+import { useState } from 'react';
 
 const GalleryItem = ({ orders }) => {
     const accessStor = localStorage.getItem('access');
+    const [activePhoto, setActivePhoto] = useState([]);
+    const [activeIds, setActiveIds] = useState([]);
+
+    const handleActivePhoto = (id, photo_theme_date, photo_theme_name, number) => {
+        setActivePhoto(prev => {
+            const photoIndex = prev.findIndex(photo => photo.id === id);
+            if (photoIndex !== -1) {
+                // Если фото уже есть, удалить его
+                setActiveIds(prevIds => prevIds.filter(activeId => activeId !== id));
+                return prev.filter(photo => photo.id !== id);
+            } else {
+                // Если фото нет, добавить его 
+                setActiveIds(prevIds => [...prevIds, id]);
+                return [...prev, {
+                    id: id,
+                    photo_theme_date: photo_theme_date,
+                    photo_theme_name: photo_theme_name,
+                    number: number
+                }];
+            }
+        });
+    }
 
     const fetchData = (id) => {
-        
-        orders[id].photos.forEach(elem => {
+        activePhoto.forEach((elem) => {
             fetchDownloadPhotoWithInterceptor(elem.id, accessStor)
                 .then(response => {
                     if (!response.ok) {
@@ -18,16 +40,19 @@ const GalleryItem = ({ orders }) => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `${orders[id].photo_theme_name}_${orders[id].photo_theme_date}_${elem.number}.jpg`;
+                    a.download = `${elem.photo_theme_name}_${elem.photo_theme_date}_${elem.number}.jpg`;
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
                     URL.revokeObjectURL(url);
+                    setActivePhoto([]);
+                    setActiveIds([]);
                 })
                 .catch(error => console.error('Ошибка при загрузке изображения:', error));
         })
-
     }
+
+    console.log(activePhoto);
 
     return (
         <>
@@ -43,23 +68,27 @@ const GalleryItem = ({ orders }) => {
                             </div>
                         </div>
                         <div className={styles.photosGallery}>
-                            {elem.photos.map(photo => {
+                            {elem.photos.map((photo, i) => {
+                                const isActive = activeIds.includes(photo.id);
                                 return (
-                                    <div key={photo.id}  className={styles.imgWrap}>
+                                    <div
+                                        onClick={() => handleActivePhoto(photo.id, elem.photo_theme_date, elem.photo_theme_name, photo.number)}
+                                        key={photo.id}
+                                        className={isActive ? styles.imgWrapActive : styles.imgWrap}
+                                    >
                                         <img src={photo.photo} alt="" />
                                     </div>
                                 )
                             })}
                         </div>
-                        <div className={styles.btnWrap}>
-                            <button onClick={() => fetchData(i)}className={styles.galleryBtn}>
-                                Скачать
-                            </button>
-                        </div>
                     </div>
                 )
-            })
-            }
+            })}
+            <div className={styles.btnWrap}>
+                <button onClick={() => fetchData()} className={styles.galleryBtn}>
+                    Скачать
+                </button>
+            </div>
         </>
     );
 }
