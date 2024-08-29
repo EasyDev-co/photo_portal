@@ -155,7 +155,11 @@ export const Orders = () => {
       } catch (error) {
         console.log(error)
         setModalActive(true)
-        setModalText('Извините, произошла ошибка. Пожалуйста, свяжитесь с нашей технической поддержкой для решения проблемы.')
+        setModalText(
+          <p>
+            Извините, произошла ошибка. Пожалуйста, свяжитесь с нашей технической поддержкой для решения проблемы.
+            <span> fotodetstvo1@yandex.ru </span>
+          </p>)
       }
     }
   };
@@ -233,8 +237,8 @@ export const Orders = () => {
               />
             }
           </div>
-          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} setModalText={setModalText}/>
-          <Modal active={modalActive} setActive={setModalActive} text={modalText}/>
+          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} setModalText={setModalText} />
+          <Modal active={modalActive} setActive={setModalActive} text={modalText} />
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
