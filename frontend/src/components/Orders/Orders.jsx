@@ -34,6 +34,7 @@ export const Orders = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [orderValue, setOrderValue] = useState([]);
   const [modalActive, setModalActive] = useState(false);
+  const [modalText, setModalText] = useState('')
   const [codeIsActive, setCodeActive] = useState(false);
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
@@ -140,15 +141,21 @@ export const Orders = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (orderValue.length !== 0) {
-      const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
-      if (order.ok) {
-        const data = await order.json();
-        navigate('/orders/payment');
-        setCookie('order', JSON.stringify(data))
-        dispatch(setOrderId(data))
-      } else {
-        const data = await order.json();
-        console.log(data)
+      try {
+        const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
+        if (order.ok) {
+          const data = await order.json();
+          navigate('/orders/payment');
+          setCookie('order', JSON.stringify(data))
+          dispatch(setOrderId(data))
+        } else {
+          const data = await order.json();
+          console.log(data)
+        }
+      } catch (error) {
+        console.log(error)
+        setModalActive(true)
+        setModalText('Извините, произошла ошибка. Пожалуйста, свяжитесь с нашей технической поддержкой для решения проблемы.')
       }
     }
   };
@@ -191,8 +198,8 @@ export const Orders = () => {
     }
     timeoutId.current = setTimeout(() => {
       const updatedOrders = orderValue.map(order => ({
-        ...order, 
-        promo_code: newPromoCode, 
+        ...order,
+        promo_code: newPromoCode,
       }));
       setOrderValue(updatedOrders);
     }, 1000);
@@ -226,13 +233,13 @@ export const Orders = () => {
               />
             }
           </div>
-          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} />
-          <Modal active={modalActive} setActive={setModalActive} />
+          <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} setModalText={setModalText}/>
+          <Modal active={modalActive} setActive={setModalActive} text={modalText}/>
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromoPromocode}>
               <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
-                <input onChange={(e)=>handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
+                <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
                   placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
                   type="text"
                   name="digital"
