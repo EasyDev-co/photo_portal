@@ -13,7 +13,7 @@ import { fetchCartCreateWithTokenInterceptor } from "../../http/cart/cartCreate"
 import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photo/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
 import Modal from "../Modal/Modlal";
 import { setCookie } from "../../utils/setCookie";
@@ -157,7 +157,7 @@ export const Orders = () => {
         setModalActive(true)
         setModalText(
           <p>
-            Извините, произошла ошибка. Пожалуйста, свяжитесь с нашей технической поддержкой для решения проблемы.
+            Похоже, что у вас есть неоплаченный заказ,<Link to={'/orders/payment'}> перейдите по этой ссылке </Link>для оплаты
             <span> fotodetstvo1@yandex.ru </span>
           </p>)
       }
