@@ -1,26 +1,34 @@
 export function getNearestDate(dates) {
+    // Парсинг входящего массива дат в объекты с deadline и theme_name
     const dateObjects = dates.map(date => {
         return {
             deadline: new Date(date.deadline),
             theme_name: date.photo_theme.name
         }
-    })
+    });
 
-    const currentDate = new Date();
+    // Получение текущего времени
+    const now = new Date();
 
-    let nearestDate = dateObjects[0].deadline;
-    let minDiff = Math.abs(currentDate - dateObjects[0].deadline);
-    
-    for (let i = 1; i < dateObjects.length; i++) {
-        const diff = Math.abs(currentDate - dateObjects[i].deadline);
-        if (diff < minDiff) {
-            minDiff = diff;
-            nearestDate = {
-                deadline: dateObjects[i].deadline,
-                theme_name: dateObjects[i].theme_name
-            }
-        }
+    // Фильтрация дат, которые еще не наступили или наступили прямо сейчас
+    const futureDates = dateObjects.filter(dateObj => dateObj.deadline.getTime() >= now.getTime());
+
+    if (futureDates.length === 0) {
+        // Если нет будущих дат, записываем пустое значение
+        localStorage.setItem('deadline', '');
+        localStorage.setItem('theme_name', '');
+        return;
     }
-    
-    return nearestDate
+
+    // Поиск ближайшей даты
+    let closestDateObj = futureDates[0];
+    futureDates.forEach(dateObj => {
+        if (dateObj.deadline.getTime() < closestDateObj.deadline.getTime()) {
+            closestDateObj = dateObj;
+        }
+    });
+
+    // Запись ближайшей даты и темы в localStorage
+    localStorage.setItem('deadline', closestDateObj.deadline.toISOString());
+    localStorage.setItem('theme_name', closestDateObj.theme_name);
 }
