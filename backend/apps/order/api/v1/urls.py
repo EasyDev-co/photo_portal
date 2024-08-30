@@ -1,11 +1,14 @@
 from django.urls import path
 
-from apps.order.api.v1.views import (OrderAPIView,
-                                     OldCartAPIView,
-                                     OldOrderAPIView,
-                                     OldOrderOneAPIView,
-                                     PaymentAPIView,
-                                     GetPaymentStateAPIView)
+from apps.order.api.v1.views import (
+    OrderAPIView,
+    OldCartAPIView,
+    OldOrderAPIView,
+    OldOrderOneAPIView,
+    PaymentAPIView,
+    GetPaymentStateAPIView,
+    OrdersPaymentAPIView
+)
 
 urlpatterns = [
     path('order/', OrderAPIView.as_view(), name='order'),
@@ -15,4 +18,5 @@ urlpatterns = [
     path('payment/<uuid:pk>', PaymentAPIView.as_view(), name='payment'),
     path('get_state/<int:pk>', GetPaymentStateAPIView.as_view(), name='get_state'),
     path('get_paid_orders/', OrderAPIView.as_view(), name='get_paid_orders'),
+    path('orders_payment/<uuid:pk>', OrdersPaymentAPIView.as_view(), name='orders_payment'),
 ]

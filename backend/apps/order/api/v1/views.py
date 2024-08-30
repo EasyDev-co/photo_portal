@@ -13,9 +13,11 @@ from rest_framework.views import APIView
 
 from apps.cart.models import Cart
 from apps.kindergarten.models import PhotoType
-from apps.order.api.v1.serializers import (OrderSerializer,
-                                           PhotoLineCartSerializer,
-                                           OrderPaymentSerializer)
+from apps.order.api.v1.serializers import (
+    OrderSerializer,
+    PhotoLineCartSerializer,
+    OrdersPaymentSerializer
+)
 from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
@@ -26,12 +28,14 @@ from apps.utils.services.calculate_price_for_order_item import calculate_price_f
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
-from config.settings import (TERMINAL_KEY,
-                             T_PASSWORD,
-                             PAYMENT_INIT_URL,
-                             PAYMENT_GET_STATE_URL,
-                             TAXATION,
-                             VAT)
+from config.settings import (
+    TERMINAL_KEY,
+    T_PASSWORD,
+    PAYMENT_INIT_URL,
+    PAYMENT_GET_STATE_URL,
+    TAXATION,
+    VAT
+)
 
 User = get_user_model()
 
@@ -131,7 +135,7 @@ class OrderAPIView(APIView):
         orders_payment.amount = sum(order.order_price for order in orders)
         orders_payment.save()
 
-        serializer = OrderPaymentSerializer(orders_payment)
+        serializer = OrdersPaymentSerializer(orders_payment)
         cart_photo_lines.delete()
 
         return Response(serializer.data)
@@ -220,6 +224,23 @@ class GetPaymentStateAPIView(APIView):
             f"Заказ не оплачен.",
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class OrdersPaymentAPIView(APIView):
+    """
+    Вью для просмотра заказа перед оплатой и удаления заказа.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        orders_payment = get_object_or_404(OrdersPayment, id=pk)
+        serializer = OrdersPaymentSerializer(orders_payment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        orders_payment = get_object_or_404(OrdersPayment, id=pk)
+        orders_payment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OldOrderAPIView(APIView):
