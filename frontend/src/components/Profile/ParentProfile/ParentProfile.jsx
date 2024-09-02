@@ -7,17 +7,21 @@ import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setResetData } from "../../../store/authSlice";
+import { setOrderId, setResetData } from "../../../store/authSlice";
 import { parentResetPassCreate } from "../../../http/parent/parentResetPassCreate";
 import { useClickOutside } from "../../../utils/useClickOutside";
 import { parentVerifyResetCode } from "../../../http/parent/parentVerifyResetCode";
 import { parentChangePass } from "../../../http/parent/parentChangePass";
 import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/user/userPartialUpdate'
+import { fetchOrderCreateWithTokenInterceptor } from "../../../http/order/orderCreate";
+import { setCookie } from "../../../utils/setCookie";
+import { useNavigate } from "react-router-dom";
 
 const ParentProfile = ({ nurseryIsAuth }) => {
 
     const [codeWindowActive, setCodeWindow] = useState(false)
-    const codeRef = useRef(null)
+    const codeRef = useRef(null);
+    const navigate = useNavigate();
     useClickOutside(codeRef, () => {
         setCodeWindow(false)
     })
@@ -25,7 +29,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         phone_number: '',
         message: '',
         email: '',
-        codeMessage:''
+        codeMessage: ''
     });
     const [resetPassActive, setResetActive] = useState(true);
     const [generatePass, setPass] = useState(gen_password(12));
@@ -55,6 +59,22 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
     }
+    const onSubmitOrderHandler = async (e) => {
+        try {
+            const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
+            if (order.ok) {
+                const data = await order.json();
+                setCookie('order', JSON.stringify(data))
+                dispatch(setOrderId(data));
+                navigate(`/cart/${data.id}`, { state: data });
+            } else {
+                const data = await order.json();
+                console.log(data)
+            }
+        } catch (error) {
+
+        }
+    };
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
@@ -134,15 +154,15 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 if (res.ok) {
                     parentChangePass(inputValueReset.code, resetDataUser.emailForReset, resetDataUser.newPass)
                         .then(res => {
-                            if(res.ok){
+                            if (res.ok) {
                                 setCodeWindow(false)
                             }
                         })
                 } else {
                     res.json()
-                    .then(res=>{
-                        setError(prev => ({ ...prev, codeMessage: res.message }))
-                    })
+                        .then(res => {
+                            setError(prev => ({ ...prev, codeMessage: res.message }))
+                        })
                 }
             })
     }
@@ -151,6 +171,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setResetValue(newInput);
     }
+
 
     return (
         <div className={styles.profileWrap}>
@@ -305,6 +326,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 </form>
             </div>
             <PaymentTimer
+                onSubmitHandler={onSubmitOrderHandler}
                 count={'3 500'} />
         </div>
     );
