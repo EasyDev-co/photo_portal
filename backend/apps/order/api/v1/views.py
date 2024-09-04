@@ -197,7 +197,7 @@ class PaymentAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         except JSONDecodeError as e:
-            return Response(status=response.status_code)
+            return Response(f"Ошибка {e}", status=response.status_code)
 
 
 class GetPaymentStateAPIView(APIView):
