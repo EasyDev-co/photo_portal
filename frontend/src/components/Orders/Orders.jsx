@@ -36,6 +36,7 @@ export const Orders = () => {
   const [modalActive, setModalActive] = useState(false);
   const [modalText, setModalText] = useState('')
   const [codeIsActive, setCodeActive] = useState(false);
+  const [payOrder, setPayOrder] = useState({})
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -78,7 +79,7 @@ export const Orders = () => {
           res.json()
             .then(data => {
               getNearestDate(data);
-              setlineLenght(data.length)
+              setlineLenght(data.length);
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)
@@ -139,27 +140,21 @@ export const Orders = () => {
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (orderValue.length !== 0) {
       try {
         const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
         if (order.ok) {
           const data = await order.json();
-          navigate('/orders/payment');
           setCookie('order', JSON.stringify(data))
-          dispatch(setOrderId(data))
+          dispatch(setOrderId(data));
+          navigate(`/cart/${data.id}`, {state: data});
         } else {
           const data = await order.json();
           console.log(data)
         }
       } catch (error) {
-        console.log(error)
-        setModalActive(true)
-        setModalText(
-          <p>
-            Похоже, что у вас есть неоплаченный заказ,<Link to={'/orders/payment'}> перейдите по этой ссылке </Link>для оплаты
-            <span> fotodetstvo1@yandex.ru </span>
-          </p>)
+        
       }
     }
   };
@@ -278,6 +273,7 @@ export const Orders = () => {
         </div>
         <div className={styles.paymentTimerWrap}>
           <PaymentTimer
+            payOrder={payOrder}
             formId={'orderForm'}
             onSubmitHandler={onSubmitHandler}
             count={'3 500'}

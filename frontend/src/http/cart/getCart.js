@@ -1,24 +1,24 @@
-import { localUrl } from "../constants/constants";
-import { setCookie } from "../utils/setCookie";
-import { tokenRefreshCreate } from "./parent/tokenRefreshCreate";
 
-export const paymentCreate = async (access, order) => {
+import { localUrl } from "../../constants/constants";
+import { setCookie } from "../../utils/setCookie";
+import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-    const url = `${localUrl}/api/v1/payment/${order.id}`;
 
+export const getCart = async (access, id) => {
+    const url = `${localUrl}/api/v1/orders_payment/${id}`;
     const response = await fetch(url, {
-        method: "GET",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        }
+        },
+
     });
     return response;
 }
 
-export const fetchPaymentCreateTokenInterceptor = async (access, refresh, order) => {
+export const fetchGetCartWithTokenInterceptor = async (access, id, refresh) => {
     try {
-        let response = await paymentCreate(access, order)
+        let response = await getCart(access, id)
         if (!response.ok) {
             localStorage.setItem('access', '');
             let createToken = await tokenRefreshCreate(refresh)
@@ -28,7 +28,7 @@ export const fetchPaymentCreateTokenInterceptor = async (access, refresh, order)
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = paymentCreate(res.access, order);
+                            response = getCart(res.access, id);
                         }
                     })
             }

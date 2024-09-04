@@ -8,15 +8,20 @@ export const Gallery = () => {
   const [paidOrders, setPaidOrders] = useState([]);
 
   useEffect(() => {
-    fetchGetPaidOrderTokenInterceptor(accessStor)
-      .then(res => {
-        if (res.ok) {
-          res.json()
-            .then(res => {
-              setPaidOrders(res)
-            })
-        }
-      })
+    try {
+      fetchGetPaidOrderTokenInterceptor(accessStor)
+        .then(res => {
+          if (res.ok) {
+            res.json()
+              .then(res => {
+                setPaidOrders(res)
+              })
+          }
+        })
+    } catch (error) {
+        
+    }
+
   }, [])
 
   return <>

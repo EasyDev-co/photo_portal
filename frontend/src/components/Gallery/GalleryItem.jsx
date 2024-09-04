@@ -52,8 +52,6 @@ const GalleryItem = ({ orders }) => {
         })
     }
 
-    console.log(activePhoto);
-
     return (
         <>
             {orders.map((elem, i) => {

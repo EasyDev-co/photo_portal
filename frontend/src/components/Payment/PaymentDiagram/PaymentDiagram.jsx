@@ -3,7 +3,7 @@ import styles from './PaymentDiagram.module.css'
 import { useSelector } from 'react-redux';
 
 
-const PaymentDiagram = ({text}) => {
+const PaymentDiagram = ({text, amount}) => {
     const [count, setCount] = useState(0)
     const cart = useSelector(state=>state.user.cart);
 
@@ -21,7 +21,7 @@ const PaymentDiagram = ({text}) => {
         <div className={styles.diagramWrap}>
             <span>{text}</span>
             <div className={styles.diagramCircle}>
-                <div className={styles.count}>{count},00</div>
+                <div className={styles.count}>{count ? `${count},00` : `${amount?.slice(0, amount.length - 3) ? amount?.slice(0, amount.length - 3) : 0 },00`}</div>
                 <span>рублей</span>
             </div>
         </div>

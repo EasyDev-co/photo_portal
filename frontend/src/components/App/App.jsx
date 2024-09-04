@@ -17,6 +17,7 @@ import Verification from "../Registration/Verificattion.jsx/Verification";
 import { useAuth } from "../../utils/useAuth";
 import Account from "../Account/Account";
 import { useSelector } from "react-redux";
+import Cart from "../Cart/Cart";
 export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export const App = () => {
           <Route path={"/gallery"} element={<Gallery />} />
           <Route path={"/about-us"} element={<AboutUs />} />
           <Route path={"/rules"} element={<Rules />} />
+          <Route path={"/cart/:id"} element={<Cart/>}/>
           <Route path={"orders/payment"} element={<Payment />} />
           <Route path="/*" element={<NotFound />} />
         </Route>
