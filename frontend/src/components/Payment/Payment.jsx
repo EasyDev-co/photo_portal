@@ -7,7 +7,6 @@ import sber from '../../../src/assets/images/Payment/sber.png'
 import sbp from '../../../src/assets/images/Payment/sbp.png'
 import { useEffect, useState } from "react";
 import { paymentCreate } from "../../http/fetchPayment";
-import { getCookie } from "../../utils/setCookie";
 import { useBlocker, useLocation } from "react-router-dom";
 import PaymentModal from "../Modal/PaymentModal";
 import { fetchCartDeleteWithTokenInterceptor } from "../../http/cart/cartDelete";
@@ -34,20 +33,21 @@ export const Payment = () => {
 
   const handleOptionClick = (id) => {
     setSelectedOption(id);
-    paymentCreate(accessStor, location.state)
+    try {
+      paymentCreate(accessStor, location.state)
       .then(res => {
         if (res.ok) {
           res.json()
             .then(res => {
               window.location.href = res;
             })
-        } else {
-          res.json()
-            .then(res => {
-              console.log(res)
-            })
         }
       })
+    } catch (error) {
+      console.log(error)
+    }
+   
+     
   };
 
   const deleteCartItem = () => {
@@ -94,13 +94,12 @@ export const Payment = () => {
                 Покинуть
               </button>
             </div>
-
           </div>}
         />
         <div className={styles.paymentItemWrap}>
-          {options.map(elem => {
+          {options.map((elem, i) => {
             return (
-              <div className={styles.wrapItemBox}>
+              <div key={i} className={styles.wrapItemBox}>
                 <div onClick={() => handleOptionClick(elem.id)} style={{
                   border: '1px solid',
                   borderColor: selectedOption === elem.id ? '#11BBD1' : '#E5E5E5', // Подсветка рамки
