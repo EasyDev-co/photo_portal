@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from requests import JSONDecodeError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -183,18 +184,20 @@ class PaymentAPIView(APIView):
             url=PAYMENT_INIT_URL,
             json=payment_data
         )
-
-        if response.json()['Success']:
-            payment_url = response.json()['PaymentURL']
-            orders.update(
-                payment_id=response.json()['PaymentId'],
-                status=OrderStatus.payment_awaiting
+        try:
+            if response.json()['Success']:
+                payment_url = response.json()['PaymentURL']
+                orders.update(
+                    payment_id=response.json()['PaymentId'],
+                    status=OrderStatus.payment_awaiting
+                )
+                return Response(payment_url, status=status.HTTP_200_OK)
+            return Response(
+                f"{response.json()['Message']} {response.json()['Details']}",
+                status=status.HTTP_400_BAD_REQUEST
             )
-            return Response(payment_url, status=status.HTTP_200_OK)
-        return Response(
-            f"{response.json()['Message']} {response.json()['Details']}",
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        except JSONDecodeError as e:
+            return Response(status=response.status_code)
 
 
 class GetPaymentStateAPIView(APIView):
