@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from requests import JSONDecodeError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -20,6 +21,7 @@ from apps.order.api.v1.serializers import (
 )
 from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus
+from apps.order.permissions import IsOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
 
@@ -182,18 +184,20 @@ class PaymentAPIView(APIView):
             url=PAYMENT_INIT_URL,
             json=payment_data
         )
-
-        if response.json()['Success']:
-            payment_url = response.json()['PaymentURL']
-            orders.update(
-                payment_id=response.json()['PaymentId'],
-                status=OrderStatus.payment_awaiting
+        try:
+            if response.json()['Success']:
+                payment_url = response.json()['PaymentURL']
+                orders.update(
+                    payment_id=response.json()['PaymentId'],
+                    status=OrderStatus.payment_awaiting
+                )
+                return Response(payment_url, status=status.HTTP_200_OK)
+            return Response(
+                f"{response.json()['Message']} {response.json()['Details']}",
+                status=status.HTTP_400_BAD_REQUEST
             )
-            return Response(payment_url, status=status.HTTP_200_OK)
-        return Response(
-            f"{response.json()['Message']} {response.json()['Details']}",
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        except JSONDecodeError as e:
+            return Response(status=response.status_code)
 
 
 class GetPaymentStateAPIView(APIView):
@@ -228,18 +232,21 @@ class GetPaymentStateAPIView(APIView):
 
 class OrdersPaymentAPIView(APIView):
     """
-    Вью для просмотра заказа перед оплатой и удаления заказа.
+    Вью для просмотра заказов перед оплатой и удаления заказов.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsOwner)
+
+    def get_object(self, pk):
+        obj = get_object_or_404(OrdersPayment, id=pk)
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def get(self, request, pk):
-        orders_payment = get_object_or_404(OrdersPayment, id=pk)
-        serializer = OrdersPaymentSerializer(orders_payment)
+        serializer = OrdersPaymentSerializer(self.get_object(pk))
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
-        orders_payment = get_object_or_404(OrdersPayment, id=pk)
-        orders_payment.delete()
+        self.get_object(pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
