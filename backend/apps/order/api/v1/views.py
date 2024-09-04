@@ -20,6 +20,7 @@ from apps.order.api.v1.serializers import (
 )
 from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus
+from apps.order.permissions import IsOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
 
@@ -228,18 +229,21 @@ class GetPaymentStateAPIView(APIView):
 
 class OrdersPaymentAPIView(APIView):
     """
-    Вью для просмотра заказа перед оплатой и удаления заказа.
+    Вью для просмотра заказов перед оплатой и удаления заказов.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsOwner)
+
+    def get_object(self, pk):
+        obj = get_object_or_404(OrdersPayment, id=pk)
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def get(self, request, pk):
-        orders_payment = get_object_or_404(OrdersPayment, id=pk)
-        serializer = OrdersPaymentSerializer(orders_payment)
+        serializer = OrdersPaymentSerializer(self.get_object(pk))
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
-        orders_payment = get_object_or_404(OrdersPayment, id=pk)
-        orders_payment.delete()
+        self.get_object(pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
