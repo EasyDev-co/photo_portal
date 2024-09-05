@@ -36,7 +36,9 @@ from config.settings import (
     PAYMENT_INIT_URL,
     PAYMENT_GET_STATE_URL,
     TAXATION,
-    VAT
+    VAT,
+    FFD_VERSION,
+    PAYMENT_METHOD
 )
 
 User = get_user_model()
@@ -175,6 +177,8 @@ class PaymentAPIView(APIView):
                     'Tax': VAT
                 } for order_item in order_items
             ],
+            'FfdVersion': FFD_VERSION,
+            'PaymentMethod': PAYMENT_METHOD,
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
