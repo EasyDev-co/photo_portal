@@ -38,16 +38,20 @@ const Cart = () => {
                             }
                         }
                     })
-                    .then(()=>{
-                        setTimeout(()=>{
-                            if(blocker.location.pathname === '/sign-in'){
-                                navigate('/sign-in');
-                                localStorage.clear();
-                                window.location.reload();
-                                return;
+                    .then(() => {
+                        setTimeout(() => {
+                            try {
+                                if (blocker.location.pathname === '/sign-in') {
+                                    navigate('/sign-in');
+                                    localStorage.clear();
+                                    window.location.reload();
+                                    return;
+                                }
+                            } catch (error) {
+
                             }
                             navigate('/orders');
-                        },100)
+                        }, 100)
                     })
 
             } catch (error) {
@@ -105,13 +109,13 @@ const Cart = () => {
                     </div>}
                 />
                 <div className={styles.cartWrap}>
-                    {order.orders?.map((elem,i) => {
+                    {order.orders?.map((elem, i) => {
                         return (
                             <div key={i} className={styles.cartBlock}>
                                 <div className={styles.orderHeader}>
                                     Заказ от {convertDate(elem.created)} "{elem.photo_theme}"
                                 </div>
-                                {elem.order_items?.map((el,_i) => {
+                                {elem.order_items?.map((el, _i) => {
                                     return (
                                         <div key={_i} className={styles.orderInfo}>
                                             <div>
