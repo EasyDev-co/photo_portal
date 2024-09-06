@@ -122,7 +122,7 @@ const Cart = () => {
                                                 <div>
                                                     {el.photo_type} ({el.amount})шт
                                                 </div>
-                                                <div className={styles.photoNumber}>№{el.photo_number}</div>
+                                                {el.photo_number && <div className={styles.photoNumber}>№{el.photo_number}</div>}
                                             </div>
 
                                             <div>
