@@ -12,7 +12,6 @@ import aboutUsFirst from "../assets/images/AboutUsPhotos/PhotoG.jpg";
 import aboutUsSecond from "../assets/images/AboutUsPhotos/PhotoM.jpg";
 import quotesIcon from "../assets/images/quotes.svg";
 
-
 const userInfo = {
   surname: "Иванова",
   name: "Ольга",

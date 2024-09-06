@@ -118,9 +118,13 @@ const Cart = () => {
                                 {elem.order_items?.map((el, _i) => {
                                     return (
                                         <div key={_i} className={styles.orderInfo}>
-                                            <div>
-                                                {el.photo_type} ({el.amount})шт
+                                            <div className={styles.orderCartInfo}>
+                                                <div>
+                                                    {el.photo_type} ({el.amount})шт
+                                                </div>
+                                                <div className={styles.photoNumber}>№{el.photo_number}</div>
                                             </div>
+
                                             <div>
                                                 {el.price} р
                                             </div>
