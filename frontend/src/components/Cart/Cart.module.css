@@ -121,3 +121,12 @@
     font-size: 15px;
     font-weight: 700;
 }
+
+.orderCartInfo{
+    display: flex;
+    flex-direction: column;
+}
+.photoNumber{
+    font-size: 11px;
+    color: #797979;
+}
