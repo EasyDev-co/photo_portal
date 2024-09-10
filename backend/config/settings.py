@@ -212,7 +212,7 @@ CELERY_BEAT_SCHEDULE = {
         },
     "delete_expired_orders": {
                 "task": "apps.order.tasks.DeleteExpiredOrders",
-                "schedule": crontab(minute='*/1'),
+                "schedule": crontab(minute='*/15'),
             }
 }
 
