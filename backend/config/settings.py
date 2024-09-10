@@ -209,7 +209,11 @@ CELERY_BEAT_SCHEDULE = {
     "check_if_orders_has_been_paid": {
             "task": "apps.order.tasks.CheckIfOrdersPaid",
             "schedule": crontab(minute='*/1'),
-        }
+        },
+    "delete_expired_orders": {
+                "task": "apps.order.tasks.DeleteExpiredOrders",
+                "schedule": crontab(minute='*/15'),
+            }
 }
 
 SIMPLE_JWT = {

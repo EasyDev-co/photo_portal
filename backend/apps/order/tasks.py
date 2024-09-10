@@ -7,6 +7,7 @@ import requests
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus, PaymentStatus
@@ -178,7 +179,27 @@ class CheckIfOrdersPaid(BaseTask):
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
 
+class DeleteExpiredOrders(BaseTask):
+    """Крон для удаления заказов, которые находятся в статусе Создан >12 часов."""
+
+    def run(self, *args, **kwargs):
+        try:
+            Order.objects.filter(
+                status=OrderStatus.created,
+                created__lte=timezone.now() - timezone.timedelta(hours=12)
+            ).delete()
+        except Exception as e:
+            self.on_failure(
+                exc=e,
+                task_id=self.request.id,
+                args=(),
+                kwargs={},
+                einfo=traceback.format_exc(),
+            )
+
+
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
 app.register_task(CheckIfOrdersPaid)
+app.register_task(DeleteExpiredOrders)
