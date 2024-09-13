@@ -225,7 +225,7 @@ class ParseNotificationFiscalization(BaseTask):
             with transaction.atomic():
                 # создаем объект Receipt
                 Receipt.objects.create(
-                    receipt=parsed_data['receipt'],
+                    receipt_url=parsed_data['receipt'],
                     user=orders_payment.orders.first().user,
                     kindergarten=orders_payment.orders.first().photo_line.kindergarten,
                     orders_payment=orders_payment,

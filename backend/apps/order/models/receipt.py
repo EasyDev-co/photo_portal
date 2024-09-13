@@ -16,8 +16,8 @@ class Receipt(UUIDMixin, TimeStampedMixin):
         related_name="receipts",
         verbose_name="Пользователь",
     )
-    receipt = models.FileField(
-        upload_to="receipts/",
+    receipt_url = models.URLField(
+        verbose_name="Ссылка на чек",
         null=True,
         blank=True,
     )
