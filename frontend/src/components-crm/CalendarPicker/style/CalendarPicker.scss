@@ -1,0 +1,26 @@
+.calendarpicker-wrap{
+    &>.air-datepicker{
+        width: 772px;
+        height: fit-content
+    }
+    .air-datepicker-body--cells.-days-{
+        grid-auto-rows: 100px;
+    }
+    .air-datepicker-cell {
+        font-size: 15px;
+        font-weight: 500;
+        width: 110px;
+        height: 100px;
+    }
+    .air-datepicker-nav--action[data-action='prev']{
+        right: 120px;
+    }
+    .air-datepicker-nav--action[data-action='next']{
+        right: 35px;
+    }
+    .air-datepicker-nav{
+        position: relative !important;
+        border: none;
+        padding: 35px;
+    }
+}

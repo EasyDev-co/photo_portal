@@ -20,7 +20,23 @@
     border: 1px solid #4f46e5 !important;
   
 }
-
+.air-datepicker-nav{
+    position: relative !important;
+    border: none;
+    padding: 15px;
+}
+.air-datepicker-nav--action{
+    position: absolute;
+}
+.air-datepicker-nav--action[data-action='next']{
+    right: 0;
+}
+.air-datepicker-nav--action[data-action='prev']{
+    right: 40px;
+}
+.air-datepicker-nav--action path{
+    stroke: #000000;
+}
 .air-datepicker-body--cells.-days- {
     grid-template-columns: repeat(7, 1fr);
     grid-auto-rows: 64px

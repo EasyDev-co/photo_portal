@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, ButtonGroup } from "react-bootstrap";
+import { useState } from "react";
+import { Button } from "react-bootstrap";
 import './styles/Kindergartens.scss';
 import ClientFilter from "../../components-crm/ClientFilter/ClientFilter";
 import ClientCard from "../../components-crm/ClientCard/ClientCard";
@@ -31,10 +31,13 @@ const Kindergartens = () => {
                 <div>
                     <Button className="create-btn">Создать</Button>
                 </div>
+               
             </div>
             <div className="">
                 <ClientFilter />
-                <div className="d-flex flex-wrap gap-3">
+                <div className="d-flex flex-wrap gap-3" style={{
+                    height: 'calc(100vh - 80px)'
+                }}>
                     {currentItems.map(item => (
                         <ClientCard key={item.id} data={item} /> // Используйте ключ для оптимизации
                     ))}
