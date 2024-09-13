@@ -1,19 +1,34 @@
 import traceback
 
 from datetime import datetime, timedelta
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 import requests
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from apps.order.models import Order
-from apps.order.models.const import OrderStatus, PaymentStatus
+from apps.kindergarten.models import PhotoType
+from apps.order.models import Order, NotificationFiscalization, OrdersPayment, OrderItem
+from apps.order.models.const import OrderStatus, PaymentStatus, PaymentMethod
+from apps.order.models.receipt import Receipt
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
+from apps.utils.services.parse_notification_to_get_receipt import ParseNotificationToGetReceipt
 from config.celery import BaseTask, app
-from config.settings import EMAIL_HOST_USER, TERMINAL_KEY, T_PASSWORD, PAYMENT_GET_STATE_URL
+from config.settings import (
+    EMAIL_HOST_USER,
+    TERMINAL_KEY,
+    PAYMENT_GET_STATE_URL,
+    VAT,
+    TAXATION,
+    FFD_VERSION,
+    SEND_CLOSING_RECEIPT_URL,
+    PAYMENT_OBJECT,
+    MEASUREMENT_UNIT
+)
 
 from apps.photo.models import PhotoTheme
 from apps.user.models.email_error_log import EmailErrorLog
@@ -143,10 +158,8 @@ class CheckIfOrdersPaid(BaseTask):
             values = {
                 'TerminalKey': TERMINAL_KEY,
                 'PaymentId': order.payment_id,
-                'Password': T_PASSWORD,
             }
             token = generate_token_for_t_bank(values)
-            values.pop('Password')
             values['Token'] = token
             try:
                 response = requests.post(
@@ -198,8 +211,110 @@ class DeleteExpiredOrders(BaseTask):
             )
 
 
+class ParseNotificationFiscalization(BaseTask):
+    """Задача для парсинга нотификации о фискализации от т-банка."""
+
+    def run(self, notification_id: UUID):
+        try:
+            notification = NotificationFiscalization.objects.get(id=notification_id)
+
+            # обрабатываем нотификацию
+            parsed_data = ParseNotificationToGetReceipt(
+                notification.notification
+            ).parse_notification()
+
+            # достаем заказ по id, который пришел в нотификации
+            orders_payment = OrdersPayment.objects.get(
+                id=parsed_data['orders_payment_id']
+            )
+
+            with transaction.atomic():
+                # создаем объект Receipt
+                Receipt.objects.create(
+                    receipt=parsed_data['receipt'],
+                    user=orders_payment.orders.first().user,
+                    kindergarten=orders_payment.orders.first().photo_line.kindergarten,
+                    orders_payment=orders_payment,
+                )
+
+                # сохраняем запись об успешной обработке нотификации
+                notification.was_processed = True
+                notification.save()
+
+        except Exception as e:
+            self.on_failure(
+                exc=e,
+                task_id=self.request.id,
+                args=(),
+                kwargs={'notification_id': notification_id},
+                einfo=traceback.format_exc(),
+            )
+
+
+class SendClosingReceiptTask(BaseTask):
+    """Отправка закрывающего чека, когда все заказы у orders_payment находятся в статусе Выполнен."""
+
+    def run(self, *args, **kwargs):
+        try:
+            # достаем OrdersPayment, у которых выполнены все заказы
+            orders_payments = OrdersPayment.objects.filter(
+                orders__status=OrderStatus.completed,
+                is_closing_receipt_sent=False
+            )
+            for orders_payment in orders_payments:
+                orders = orders_payment.orders.all()
+                orders_items = OrderItem.objects.filter(
+                    order_id__in=orders.values_list('id', flat=True)
+                )
+                payment_data = {
+                    'PaymentId': orders.first().payment_id,
+                    'TerminalKey': TERMINAL_KEY,
+                }
+                token = generate_token_for_t_bank(payment_data)
+                payment_data['Receipt'] = {
+                    'Items': [
+                        {
+                            'Name': f'{str(order_item.photo) + ", " if order_item.photo else ""}'
+                                    f'{PhotoType(order_item.photo_type).label}',
+                            'Price': str(int(order_item.price * 100)),
+                            'Quantity': str(order_item.amount),
+                            'Amount': str(int(order_item.price * 100)),
+                            'Tax': VAT,
+                            'PaymentMethod': PaymentMethod.FULL_PAYMENT,
+                            'PaymentObject': PAYMENT_OBJECT,
+                            'MeasurementUnit': MEASUREMENT_UNIT
+                        } for order_item in orders_items
+                    ],
+                    'Email': str(orders.first().user.email),
+                    'Taxation': TAXATION,
+                    'FfdVersion': FFD_VERSION,
+                }
+                payment_data['Token'] = token
+
+                response = requests.post(
+                    url=SEND_CLOSING_RECEIPT_URL,
+                    json=payment_data
+                )
+                if response.json()['Success'] and response.json()['ErrorCode'] == '0':
+                    orders_payment.is_closing_receipt_sent = True
+                    orders_payment.save()
+                else:
+                    raise Exception(response.json()['Message'])
+
+        except Exception as e:
+            self.on_failure(
+                exc=e,
+                task_id=self.request.id,
+                args=(),
+                kwargs={},
+                einfo=traceback.format_exc(),
+            )
+
+
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
 app.register_task(CheckIfOrdersPaid)
 app.register_task(DeleteExpiredOrders)
+parse_notification_fiscalization = app.register_task(ParseNotificationFiscalization)
+# app.register_task(SendClosingReceiptTask)

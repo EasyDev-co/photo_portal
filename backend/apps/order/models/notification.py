@@ -4,9 +4,7 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
 
 class NotificationFiscalization(UUIDMixin, TimeStampedMixin):
-    notification = models.JSONField(
-        default=dict
-    )
+    notification = models.JSONField()
     was_processed = models.BooleanField(
         default=False
     )

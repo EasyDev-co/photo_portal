@@ -7,7 +7,8 @@ from apps.order.api.v1.views import (
     OldOrderOneAPIView,
     PaymentAPIView,
     GetPaymentStateAPIView,
-    OrdersPaymentAPIView
+    OrdersPaymentAPIView,
+    NotificationFiscalizationAPIView
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path('get_state/<int:pk>', GetPaymentStateAPIView.as_view(), name='get_state'),
     path('get_paid_orders/', OrderAPIView.as_view(), name='get_paid_orders'),
     path('orders_payment/<uuid:pk>', OrdersPaymentAPIView.as_view(), name='orders_payment'),
+    path('notification/', NotificationFiscalizationAPIView.as_view(), name='notification'),
 ]
