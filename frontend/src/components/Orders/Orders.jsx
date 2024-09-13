@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable no-constant-condition */
 import styles from "./Orders.module.css";
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
@@ -154,7 +156,7 @@ export const Orders = () => {
           console.log(data)
         }
       } catch (error) {
-        
+        console.log(error)
       }
     }
   };

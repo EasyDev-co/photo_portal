@@ -1,0 +1,159 @@
+@import url(../../../styles/variables.scss);
+
+.btn_filter{
+    border-radius: 6px;
+    padding: 12px 16px;
+    width: 250px;
+    height: 48px;
+    padding-left: 40px;
+}
+
+.datepicker-wrap{
+    position: relative;
+}
+.calendar-img{
+    position: absolute;
+    top: 55%;
+    left: 15px;
+}
+.btn_filter:focus{
+    border: 1px solid #4f46e5 !important;
+  
+}
+
+.air-datepicker-body--cells.-days- {
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 64px
+}
+
+.air-datepicker {
+    width: 450px;
+    height: 470px;
+    padding: 15px !important;
+    border: none !important;
+    box-shadow: 0px 4px 20px 0px rgba(36, 62, 37, 0.15) !important;
+    backdrop-filter: blur(20px);
+    background: rgb(255, 255, 255);
+}
+
+.air-datepicker-nav--title {
+    color: #000000;
+    font-weight: 600;
+    font-size: 24px;
+
+    &.air-datepicker-nav--title>i {
+        color: #000000;
+    }
+}
+.air-datepicker-cell.-month-{
+    width: auto !important;
+}
+.air-datepicker-cell.-year-{
+    width: auto !important;
+}
+.air-datepicker-cell {
+    font-size: 15px;
+    font-weight: 500;
+    width: 64px;
+    height: 64px;
+}
+.air-datepicker-body--cells.-months- {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 64px;
+}
+[data-past-day='pastDay'] {
+    color: #191E3433 !important;
+}
+
+.air-datepicker-body--day-name {
+    color: #232323 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+
+}
+
+[data-action='next'] {
+    stroke: #232323 !important;
+    stroke-width: 1px !important;
+}
+
+[data-action='prev'] {
+    stroke: #f4f5f633 !important;
+    stroke-width: 1px !important;
+}
+
+.-current- {
+    color: #ffffff !important;
+    background-color: #6366f1;
+    border-radius: 0;
+}
+.-selected-{
+    color: #ffffff !important;
+    background-color: #6366f1 !important;
+    border-radius: 0;
+}
+.-focus-{
+    background-color: #a5b4fc !important;
+    border-radius: 0 !important;
+}
+
+
+.btn_wrap {
+    position: relative;
+}
+
+.btn_wrap::after {
+    position: absolute;
+    content: " ";
+    display: block;
+    // background-image: url(./Vector.svg);
+    background-repeat: no-repeat;
+    right: 12px;
+    top: 45%;
+    background-size: 10px;
+    width: 10px;
+    height: 6px;
+}
+
+.btn_wrap-active:after {
+    position: absolute;
+    content: " ";
+    display: block;
+    // background-image: url(./Vector\ \(2\).svg);
+    background-repeat: no-repeat;
+    right: 12px;
+    top: 45%;
+    background-size: 10px;
+    width: 10px;
+    height: 6px;
+}
+
+.btn_wrap-remove {
+    cursor: pointer;
+}
+
+.btn_wrap-remove:after {
+    position: absolute;
+    content: "";
+    display: block;
+    // background-image: url(./exit1.svg);
+    background-repeat: no-repeat;
+    right: 12px;
+    top: 40%;
+    background-size: 10px;
+    width: 10px;
+    height: 10px;
+}
+
+.btn_wrap-remove:before {
+    position: absolute;
+    content: "";
+    display: block;
+    // background-image: url(./exit2.svg);
+    background-repeat: no-repeat;
+    right: 12px;
+    top: 40%;
+    background-size: 10px;
+    width: 10px;
+    height: 10px;
+}

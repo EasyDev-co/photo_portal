@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import styles from "./Header.module.css";
 import React, { useState, useEffect, useRef } from "react";
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
@@ -9,8 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addUserData } from "../../store/authSlice";
 import { getCookie } from "../../utils/setCookie";
 import { useAuth } from "../../utils/useAuth";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const [cookieData, setCookieData] = useState(getCookie('refresh'));

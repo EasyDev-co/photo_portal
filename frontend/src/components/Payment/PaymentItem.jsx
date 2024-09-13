@@ -1,4 +1,5 @@
 import styles from "./Payment.module.css";
+
 const PaymentItem = ({ src, label, id, selectedOption, handleOptionClick}) => {
     return (
         <div className={styles.paymentItemLinkWrap}>

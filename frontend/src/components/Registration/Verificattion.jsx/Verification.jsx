@@ -7,6 +7,7 @@ import { addPhotos, setUser } from '../../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { getOnePhoto } from '../../../http/photo/getOnePhoto';
 import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
+
 const Verification = () => {
     const initialState = {
         code: '',
@@ -57,7 +58,7 @@ const Verification = () => {
                 setError(data);
             }
         } catch (error) {
-
+            console.log(error)
         }
         setInputValue(initialState);
     }

@@ -19,7 +19,7 @@ export const Gallery = () => {
           }
         })
     } catch (error) {
-        
+      console.log(error)
     }
 
   }, [])

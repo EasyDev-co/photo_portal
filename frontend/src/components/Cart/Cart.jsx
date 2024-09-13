@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from 'react';
 import styles from './Cart.module.css'
 import { convertDate } from './utils';
@@ -48,7 +49,7 @@ const Cart = () => {
                                     return;
                                 }
                             } catch (error) {
-
+                                console.log(error)
                             }
                             navigate('/orders');
                         }, 100)
@@ -77,7 +78,7 @@ const Cart = () => {
                         }
                     })
             } catch (error) {
-
+                console.log(error)
             }
         }
     }, [accessStor, id, value]);

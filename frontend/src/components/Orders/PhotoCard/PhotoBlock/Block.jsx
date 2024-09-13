@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { patchPhotoLine } from '../../../../http/photo/patchPhotoLine';
 import styles from '../PhotoCard.module.css'
 import { removePhotos } from '../../../../store/authSlice';
+
 const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
 
   const [photoBlocks, setPhotoBlocks] = useState([]);

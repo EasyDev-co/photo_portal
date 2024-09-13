@@ -1,7 +1,10 @@
-import React, { memo, useState } from 'react';
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable react/display-name */
+import { memo } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
-const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
+
+const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
 
   return (
     <div key={index} className={styles.photoCardsWrap}>

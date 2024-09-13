@@ -1,0 +1,61 @@
+@import './variables.scss';
+@import './fonts.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Graphik LCG', sans-serif;
+}
+
+a,
+a:visited {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+input,
+button {
+  border: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'Graphik LCG', sans-serif;
+}
+p{
+  padding: 0;
+  margin: 0;
+}
+button::before,
+button::after {
+  border: none;
+  outline: none;
+}
+
+.page-crm {
+  padding: 102px 32px 0 290px;
+  background: #eef2ff;
+}
+.cursor-pointer{
+  cursor: pointer;
+}

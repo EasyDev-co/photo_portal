@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { parentVerifyResetCode } from '../../../http/parent/parentVerifyResetCode';
 import { setEmail, setCode } from '../../../store/authSlice';
+
 const ResetPassword = () => {
   const navigation = useNavigate();
 
@@ -25,7 +26,7 @@ const ResetPassword = () => {
   const onSubmitHandler = async (e) => {
 
     e.preventDefault();
-        setInputValue({ resetEmail: '', resetCode: '' });
+    setInputValue({ resetEmail: '', resetCode: '' });
     if (!onReset) {
       dispatch(
         setEmail({
@@ -42,14 +43,14 @@ const ResetPassword = () => {
           localStorage.setItem('onReset', 'true')
           setOnReset(true);
           console.log(data)
-      
+
         } else {
           const data = await response.json();
           console.log(data)
           localStorage.setItem('onReset', 'false')
         }
       } catch (error) {
-
+        console.log(error)
       }
     }
     if (onReset) {
@@ -57,7 +58,6 @@ const ResetPassword = () => {
         const response = await parentVerifyResetCode(email, inputValue.resetCode)
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           localStorage.setItem('onReset', 'false')
           navigation('/password-reset/new-password');
           dispatch(
@@ -71,7 +71,7 @@ const ResetPassword = () => {
           console.log(data)
         }
       } catch (error) {
-
+        console.log(error)
       }
     }
   }
@@ -84,7 +84,7 @@ const ResetPassword = () => {
             <div className={styles.regFormContainer}>
               <h1 className={styles.formHeader}>Восстановление пароля</h1>
               <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
-                {localStorage.getItem('onReset') === 'true'?
+                {localStorage.getItem('onReset') === 'true' ?
                   <InputField
                     name={'resetCode'}
                     onChangeHandler={onChangeHandler}

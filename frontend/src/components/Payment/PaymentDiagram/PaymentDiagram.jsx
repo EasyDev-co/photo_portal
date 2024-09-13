@@ -14,6 +14,7 @@ const PaymentDiagram = ({text, amount}) => {
             }, 0);
             setCount(sumTotalPrice);
         } catch (error) {
+            console.log(error)
         }
         
     }, [cart]);
