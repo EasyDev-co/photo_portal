@@ -31,7 +31,6 @@ from apps.photo.models import PhotoLine
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
-from apps.utils.services.parse_user_agent import parse_headers_to_get_data
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
 from config.settings import (
@@ -186,7 +185,6 @@ class PaymentAPIView(APIView):
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
-        payment_data['DATA'] = parse_headers_to_get_data(request.headers)
         payment_data['Token'] = token
         response = requests.post(
             url=PAYMENT_INIT_URL,
