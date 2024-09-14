@@ -8,7 +8,9 @@ from apps.order.api.v1.views import (
     PaymentAPIView,
     GetPaymentStateAPIView,
     OrdersPaymentAPIView,
-    NotificationFiscalizationAPIView
+    NotificationFiscalizationAPIView,
+    SearchAPIView,
+    DownloadReceiptsAPIView
 )
 
 urlpatterns = [
@@ -21,4 +23,6 @@ urlpatterns = [
     path('get_paid_orders/', OrderAPIView.as_view(), name='get_paid_orders'),
     path('orders_payment/<uuid:pk>', OrdersPaymentAPIView.as_view(), name='orders_payment'),
     path('notification/', NotificationFiscalizationAPIView.as_view(), name='notification'),
+    path('search/', SearchAPIView.as_view(), name='search'),
+    path('download_receipts/<uuid:pk>', DownloadReceiptsAPIView.as_view(), name='download_receipts'),
 ]

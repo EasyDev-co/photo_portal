@@ -9,6 +9,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
 from apps.photo.api.v1.serializers import PhotoThemeSerializer
+from apps.order.models import Receipt
 from apps.user.models import User
 from apps.user.models.manager_bonus import ManagerBonus
 from apps.user.validators import validate_cyrillic
@@ -66,6 +67,22 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+
+class ReceiptSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения ссылки на чек."""
+    class Meta:
+        model = Receipt
+        fields = ['orders_payment', 'receipt_url']
+
+
+class SearchUserSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения пользователя и его чеков."""
+    receipts_urls = ReceiptSerializer(many=True, read_only=True, source='receipts')
+
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'second_name', 'receipts_urls']
 
 
 class UserGetSerializer(serializers.ModelSerializer):

@@ -2,6 +2,8 @@ from decimal import Decimal
 
 import requests
 from django.contrib.auth import get_user_model
+from django.db.models import Value
+from django.db.models.functions import Concat, Lower
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -15,19 +17,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.cart.models import Cart
+from apps.kindergarten.api.v1.permissions import IsManager
 from apps.kindergarten.models import PhotoType
 from apps.order.api.v1.serializers import (
     OrderSerializer,
     PhotoLineCartSerializer,
     OrdersPaymentSerializer,
 )
-from apps.order.models import Order, OrderItem, OrdersPayment
+from apps.order.models import Order, OrderItem, OrdersPayment, Receipt
 from apps.order.models.const import OrderStatus, PaymentMethod
 from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.order.tasks import parse_notification_fiscalization
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
+from apps.user.api.v1.serializers import SearchUserSerializer, ReceiptSerializer
 
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
@@ -44,6 +48,7 @@ from config.settings import (
     PAYMENT_OBJECT,
     MEASUREMENT_UNIT
 )
+
 
 User = get_user_model()
 
@@ -199,7 +204,6 @@ class PaymentAPIView(APIView):
                     'Tax': VAT,
                     'PaymentMethod': str(PaymentMethod.FULL_PREPAYMENT),
                     'PaymentObject': PAYMENT_OBJECT,
-                    'MeasurementUnit': MEASUREMENT_UNIT
                 } for order_item in order_items
             ],
             'FfdVersion': FFD_VERSION,
@@ -289,14 +293,55 @@ class NotificationFiscalizationAPIView(APIView):
                 notification=request.data,
             )
 
-            # запускаем задачу для обработки нотификации, передавая id созданного объекта NotificationFiscalization
-            parse_notification_fiscalization.delay(
-                notification_fiscalization.id
-            )
+            if request.data['Success'] and request.data['Status'] == 'RECEIPT':
+
+                # запускаем задачу для обработки нотификации, передавая id созданного объекта NotificationFiscalization
+                parse_notification_fiscalization.delay(
+                    notification_fiscalization.id
+                )
             return Response(status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+class SearchAPIView(APIView):
+    """Вью для поиска пользователей по имени в детских садах менеджера."""
+    permission_classes = (IsManager,)
+
+    def post(self, request):
+        manager = request.user
+        name = request.data.get('name', '').lower()
+
+        # аннотируем поле full_name и фильтруем по совпадению имени и детским садам
+        queryset = User.objects.annotate(
+            full_name=Lower(
+                Concat(
+                    'last_name',
+                    Value(' '),
+                    'first_name',
+                    Value(' '),
+                    'second_name',
+                )
+            )
+        ).filter(
+            full_name__icontains=name,
+            kindergarten__in=manager.kindergarten.all()
+        )
+
+        serializer = SearchUserSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DownloadReceiptsAPIView(APIView):
+
+    permission_classes = (IsManager,)
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, id=pk)
+        receipts = Receipt.objects.filter(user=user)
+        serializer = ReceiptSerializer(receipts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class OldOrderAPIView(APIView):
