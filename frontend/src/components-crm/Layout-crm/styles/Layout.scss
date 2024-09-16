@@ -171,3 +171,17 @@
 .search-wrap{
     min-width: 220px;
 }
+.go-back-header{
+    cursor: pointer;
+}
+.go-back-header::after{
+    content: "";
+    position: absolute;
+    background-image: url(../../../assets/icons/arrow-black.svg);
+    background-size: 11px;
+    width: 11px;
+    height: 20px;
+    background-repeat: no-repeat;
+    left: 32px;
+    cursor: pointer;
+}

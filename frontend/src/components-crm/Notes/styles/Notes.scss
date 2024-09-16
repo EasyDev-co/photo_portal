@@ -1,0 +1,36 @@
+@import '../../../styles/variables.scss';
+
+.nav-tabs {
+    font-weight: 600;
+    font-size: 14px;
+    color: $gray-900;
+    border: none !important;
+}
+
+.nav-link:hover {
+    border: none;
+}
+
+.nav-link {
+    color: $gray-900;
+    border: none !important;
+    box-shadow: none !important;
+}
+.nav-link:focus{
+    border: none;
+}
+.nav-link.active {
+    border: none;
+    border-bottom: 2px solid $primary-600 !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.truncate {
+    white-space: nowrap;
+    /* Текст не переносится */
+    overflow: hidden;
+    /* Обрезаем всё за пределами блока */
+    text-overflow: ellipsis;
+    /* Добавляем многоточие */
+}

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import './styles/Layout.scss';
 import logo from '../../assets/logos/PP_Logo.png';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -18,13 +20,15 @@ import write from '../../assets/icons/icon-button.svg';
 import bell from '../../assets/icons/bell.svg';
 import person from '../../assets/icons/person.jpg';
 
+
 const LayoutCrm = () => {
     const BASE = '#25243D';
     const BLUE = '#4F46E5';
 
     const location = useLocation();
     const navigate = useNavigate();
-
+    
+    
     const [clientRadioValue, setСlientRadioValue] = useState('1');
     const [employeesRadioValue, setEmployeesRadioValue] = useState('3');
 
@@ -75,34 +79,46 @@ const LayoutCrm = () => {
             </div>
         );
     }
+
     return (
         <>
             <header>
                 <div className='position-fixed header bg-white z-3'>
-                    <div className='search-container d-flex justify-content-between align-items-center gap-4' >
-                        <div className='search-wrap'>
-                            <Search />
-                        </div>
-                        <div className='d-flex align-items-center'>
-                            <div className='cursor-pointer'>
-                                <img src={write} alt="" />
+                    {location.pathname.split('/').length - 1 >= 3 ?
+                        <>
+                            <div className='search-container go-back-header d-flex justify-content-center align-items-center gap-4 fw-600' style={{
+                                fontSize: '20px'
+                            }} onClick={()=>navigate(-1)}>
+                                Название садика
+                            </div>
+                        </>
+                        :
+                        <div className='search-container d-flex justify-content-between align-items-center gap-4' >
+                            <div className='search-wrap'>
+                                <Search />
                             </div>
                             <div className='d-flex align-items-center'>
-                                <div className='px-3 cursor-pointer'>
-                                    <img src={bell} alt="" />
+                                <div className='cursor-pointer'>
+                                    <img src={write} alt="" />
                                 </div>
-                                <div className='d-flex align-items-center '>
-                                    <div className='pe-2 cursor-pointer'>
-                                        <img src={person} alt="" />
+                                <div className='d-flex align-items-center'>
+                                    <div className='px-3 cursor-pointer'>
+                                        <img src={bell} alt="" />
                                     </div>
-                                    <div>
-                                        <div>Марк Ифанасьев</div>
-                                        <div className='fs-13 text-black-50'>Директор</div>
+                                    <div className='d-flex align-items-center '>
+                                        <div className='pe-2 cursor-pointer'>
+                                            <img src={person} alt="" />
+                                        </div>
+                                        <div>
+                                            <div>Марк Ифанасьев</div>
+                                            <div className='fs-13 text-black-50'>Директор</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    }
+
                 </div>
                 <nav className="navbar position-fixed top-0 start-0 layout-bg text-white d-flex flex-column justify-content-start flex-nowrap" style={{ width: '257px', height: '100vh' }}>
                     <div className="container justify-content-center cursor-pointer border-bottom border-grey py-2 px-3 ">
@@ -259,7 +275,7 @@ const LayoutCrm = () => {
                     </div>
                 </nav>
             </header>
-            <Outlet/>
+            <Outlet />
         </>
 
     );

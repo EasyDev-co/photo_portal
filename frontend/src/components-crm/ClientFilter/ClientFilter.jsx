@@ -8,9 +8,7 @@ import people from '../../assets/icons/people.svg'
 import filterBtn from '../../assets/icons/filter_button.svg'
 import filterBtnA from '../../assets/icons/filter-btn-a.svg'
 import { Accordion } from 'react-bootstrap';
-
-
-
+import calendar from '../../assets/icons/calendar-event.svg'
 
 const ClientFilter = () => {
     const [isActive, setIsActive] = useState(false);
@@ -22,7 +20,7 @@ const ClientFilter = () => {
             <div className='d-flex align-items-center gap-3'>
                 <Form className='d-flex column-gap-3 flex-wrap mb-3'>
                     <Form.Group className="" controlId="formBasicEmail">
-                        <Form.Label>Детский сад</Form.Label>
+                        <Form.Label className="text-secondary">Детский сад</Form.Label>
                         <Form.Select className='shadow-none'>
                             <option className='select-option' hidden>Не указано</option>
                             <option className='select-option'>От А до Я</option>
@@ -30,7 +28,7 @@ const ClientFilter = () => {
                         </Form.Select>
                     </Form.Group>
                     <Form.Group className="" controlId="formBasicPassword">
-                        <Form.Label>Регион</Form.Label>
+                        <Form.Label className="text-secondary">Регион</Form.Label>
                         <Form.Select className='shadow-none'>
                             <option hidden >Регион</option>
                             <option className='select-option'>Default select</option>
@@ -41,6 +39,7 @@ const ClientFilter = () => {
                             label={'Дата взаимодействия'}
                             placeholder={'Не указано'}
                             setIsActive={setIsActive}
+                            img={calendar}
                             isActive={isActive}
                             navTitles={{
                                 days: 'MMMM <i>yyyy</i>',
@@ -49,7 +48,7 @@ const ClientFilter = () => {
                     </Form.Group>
                     <Form.Group>
                         <div className='form-control-wrap'>
-                            <Form.Label>Менеджер</Form.Label>
+                            <Form.Label className="text-secondary">Менеджер</Form.Label>
                             <Form.Control className='shadow-none' placeholder='Не указано' />
                             <div className="control-img">
                                 <img src={people} alt="" />
@@ -67,7 +66,7 @@ const ClientFilter = () => {
                         <div>
                             <Form className='d-flex column-gap-3 flex-wrap mb-3'>
                                 <Form.Group className="" controlId="formBasicEmail">
-                                    <Form.Label>Тип садика</Form.Label>
+                                    <Form.Label className="text-secondary">Тип садика</Form.Label>
                                     <Form.Select className='shadow-none'>
                                         <option className='select-option' hidden>Не указано</option>
                                         <option className='select-option'>От А до Я</option>
@@ -75,7 +74,7 @@ const ClientFilter = () => {
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="" controlId="formBasicPassword">
-                                    <Form.Label>Тип клиента</Form.Label>
+                                    <Form.Label className="text-secondary">Тип клиента</Form.Label>
                                     <Form.Select className='shadow-none'>
                                         <option hidden >Регион</option>
                                         <option className='select-option'>Default select</option>
@@ -85,6 +84,7 @@ const ClientFilter = () => {
                                     <DatePicker
                                         label={'Дата фотосессии'}
                                         placeholder={'Не указано'}
+                                        img={calendar}
                                         setIsActive={setIsActive}
                                         isActive={isActive}
                                         navTitles={{
@@ -97,6 +97,7 @@ const ClientFilter = () => {
                                         label={'Дата звонка'}
                                         placeholder={'Не указано'}
                                         setIsActive={setIsActive}
+                                        img={calendar}
                                         isActive={isActive}
                                         navTitles={{
                                             days: 'MMMM <i>yyyy</i>',
@@ -104,12 +105,12 @@ const ClientFilter = () => {
                                         }} />
                                 </Form.Group>
                                 <Form.Group>
-                                    <Form.Label>Скидка %</Form.Label>
-                                    <Form.Control className='shadow-none' placeholder='Не указано' />
+                                    <Form.Label className="text-secondary">Скидка %</Form.Label>
+                                    <Form.Control className='shadow-none ps-3' placeholder='Не указано' />
                                 </Form.Group>
                                 <Form.Group>
-                                    <Form.Label>Колличество детей</Form.Label>
-                                    <Form.Control className='shadow-none' placeholder='Не указано' />
+                                    <Form.Label className="text-secondary">Колличество детей</Form.Label>
+                                    <Form.Control className='shadow-none ps-3' placeholder='Не указано' />
                                 </Form.Group>
                             </Form>
                         </div>

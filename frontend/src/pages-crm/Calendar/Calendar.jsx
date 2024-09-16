@@ -1,6 +1,6 @@
 import { Button, Pagination } from "react-bootstrap";
 import './styles/Calendar.scss';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CalendarPicker from "../../components-crm/CalendarPicker/CalendarPicker";
 import { Form } from "react-bootstrap";
 import camera from '../../assets/icons/camera.svg'
@@ -9,16 +9,26 @@ import PhotoshootCard from "../../components-crm/PhotoshootCard/PhotoshootCard";
 import { arrayOfObjects } from "../../constants/mockData";
 import BarChart from "../../components-crm/Chart/Chart";
 import { Card } from "react-bootstrap";
+import FilterModal from "../../components-crm/Modals/FilterModal/FilterModal";
+import { useWindowHeight } from '@react-hook/window-size'
+import { createRef } from "react";
+
 
 const Calendar = () => {
     const [isActive, setIsActive] = useState(true);
+    const [isModalActive, setIsModalActive] = useState(true);
 
     const itemsPerPage = 6; // Количество карточек на странице
     const [currentPage, setCurrentPage] = useState(1);
-
+    const [heightComponent, setHeight] = useState();
     const totalItems = arrayOfObjects.length; // Общее количество карточек
     const totalPages = Math.ceil(totalItems / itemsPerPage); // Общее количество страниц
 
+    const refComponent = createRef();
+
+    useEffect(() => {
+        setHeight(refComponent.current.getBoundingClientRect().height)
+    }, [refComponent]);
     // Функция для получения карточек на текущей странице
     const paginate = (array, page_number, page_size) => {
         return array.slice((page_number - 1) * page_size, page_number * page_size);
@@ -30,13 +40,12 @@ const Calendar = () => {
         setCurrentPage(pageNumber);
     };
     return (
-        <div className="page-crm">
+        <div ref={refComponent} className="page-crm">
             <div className="header-title">
                 <h1 className="">Клиенты</h1>
                 <div>
                     <Button className="create-btn">Создать</Button>
                 </div>
-
             </div>
             <div className="d-flex column-gap-4 flex-wrap">
                 <CalendarPicker
@@ -124,6 +133,12 @@ const Calendar = () => {
                     </div>
                 </div>
             </div>
+            <FilterModal
+                active={isModalActive}
+                setActive={setIsModalActive}
+                text={"adadsadsad"}
+                height={heightComponent}
+            />
         </div>
     );
 }

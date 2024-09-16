@@ -5,11 +5,12 @@ import Popover from 'react-bootstrap/Popover';
 import burger from '../../assets/icons/card-burger.svg'
 import pencilSq from '../../assets/icons/pencil-square.svg'
 import trash from '../../assets/icons/trash.svg'
+import { useNavigate } from "react-router-dom";
 
 const ClientCard = ({data}) => {
-    
-    return (
-        <Card className="card-shadow" style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px' }}>
+    const navigate = useNavigate();
+    return ( 
+        <Card onClick={()=>navigate(`/crm/kindergartens/${data.id}`)} className="card-shadow" style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px' }}>
             <Card.Header className="card-header" style={{ border: 'none' }}>
                 <div className="card-header-title">
                     Название садика {data.id}

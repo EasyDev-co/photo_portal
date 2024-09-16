@@ -22,6 +22,8 @@ import Cart from "../Cart/Cart";
 import LayoutCrm from "../../components-crm/Layout-crm/Layout-crm";
 import Kindergartens from "../../pages-crm/Kindergartens/Kindergartens";
 import Calendar from '../../pages-crm/Calendar/Calendar'
+import MainCrm from "../../pages-crm/KindergartensInfo/KindergartensInfo";
+import KindergartensInfo from "../../pages-crm/KindergartensInfo/KindergartensInfo";
 
 export const App = () => {
   const location = useLocation();
@@ -80,13 +82,13 @@ export const App = () => {
               <Route path="/password-reset/new-password" element={<NewPassword />} />
             </Route>
             <Route element={<LayoutCrm />}>
-              <Route path="/crm/kindergartens" element={<Kindergartens/>} />
-              <Route path="/crm/calendar" element={<Calendar/>} />
+              <Route path="/crm/kindergartens" element={<Kindergartens />} />
+              <Route path="/crm/kindergartens/:id" element={<KindergartensInfo />} />
+              <Route path="/crm/calendar" element={<Calendar />} />
               <Route path="/*" element={<>qwdqwdqwdqw</>} />
             </Route>
           </>
         }
-
       </Routes>
     </>
 

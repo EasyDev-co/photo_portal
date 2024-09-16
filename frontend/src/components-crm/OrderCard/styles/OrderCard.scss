@@ -1,0 +1,15 @@
+@import '../../../styles/variables.scss';
+
+.call-item {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid $gray-300;
+    font-weight: 500;
+    font-size: 16px;
+    color: $secondary-color;
+    display: flex;
+    justify-content: space-between;
+}
+.map-wrap{
+    width: 100%;
+}

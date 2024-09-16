@@ -42,10 +42,12 @@ button {
   cursor: pointer;
   font-family: 'Graphik LCG', sans-serif;
 }
-p{
+
+p {
   padding: 0;
   margin: 0;
 }
+
 button::before,
 button::after {
   border: none;
@@ -56,6 +58,12 @@ button::after {
   padding: 102px 32px 100px 290px;
   background: #eef2ff;
 }
-.cursor-pointer{
+
+.cursor-pointer {
   cursor: pointer;
+}
+.card-shadow {
+  box-shadow: 0 10px 13px 0 rgba(17, 38, 146, 0.05);
+  height: -moz-fit-content;
+  height: fit-content;
 }

@@ -4,31 +4,46 @@ import "air-datepicker/air-datepicker.css";
 import './style/DatePicker.scss'
 import { useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
-import calendar from '../../assets/icons/calendar-event.svg'
+
 
 function DatePicker(props) {
-
+    const {setIsActive, placeholder, label, img} = props;
     let $input = useRef();
     let dp = useRef();
     // Start init
     useEffect(() => {
-        // Save instance for the further update
-        dp.current = new AirDatepicker($input.current, { ...props });
+        dp.current = new AirDatepicker($input.current, {
+            ...props,
+        });
+
+        // Очистка экземпляра datepicker при размонтировании
+        return () => {
+            dp.current.destroy();
+        };
     }, []);
+
 
     useEffect(() => {
         // Update if props are changed
         dp.current.update({ ...props });
         // dp.current.$el.value = 'Дата'
-        props.setIsActive(dp.current.visible)
+        setIsActive(dp.current.visible)
     }, [props]);
 
     return (
         <div className="datepicker-wrap">
-            <Form.Label>{props.label}</Form.Label>
-            <Form.Control className="btn_filter shadow-none" id="datepicker" placeholder={props.placeholder} ref={$input} />
+            <Form.Label className="text-secondary" style={props.isModal && {
+                fontSize: '12px',
+                fontWeight: '600',
+                 paddingBottom: '16px',
+                 margin:'0'
+            }}>{label}</Form.Label>
+            <Form.Control className="btn_filter shadow-none" id="datepicker" style={props.isModal && {
+                height: '38px',
+                padding: '8px 16px 8px 40px'
+            }} placeholder={placeholder} ref={$input} />
             <div className="calendar-img">
-                <img src={calendar} alt="" />
+                <img src={img} alt="" />
             </div>
         </div>
     )
