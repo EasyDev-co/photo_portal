@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from requests import JSONDecodeError
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
@@ -17,11 +18,13 @@ from apps.kindergarten.models import PhotoType
 from apps.order.api.v1.serializers import (
     OrderSerializer,
     PhotoLineCartSerializer,
-    OrdersPaymentSerializer
+    OrdersPaymentSerializer,
 )
 from apps.order.models import Order, OrderItem, OrdersPayment
-from apps.order.models.const import OrderStatus
+from apps.order.models.const import OrderStatus, PaymentMethod
+from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOwner
+from apps.order.tasks import parse_notification_fiscalization
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
 
@@ -32,11 +35,13 @@ from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
 from config.settings import (
     TERMINAL_KEY,
-    T_PASSWORD,
     PAYMENT_INIT_URL,
     PAYMENT_GET_STATE_URL,
     TAXATION,
-    VAT
+    VAT,
+    FFD_VERSION,
+    PAYMENT_OBJECT,
+    MEASUREMENT_UNIT
 )
 
 User = get_user_model()
@@ -158,12 +163,10 @@ class PaymentAPIView(APIView):
             'Amount': int(orders_payment.amount * 100),
             'Description': self.description,
             'OrderId': str(orders_payment.id),
-            'Password': T_PASSWORD,
             'TerminalKey': TERMINAL_KEY,
         }
 
         token = generate_token_for_t_bank(payment_data)
-        payment_data.pop('Password')
         payment_data['Receipt'] = {
             'Items': [
                 {
@@ -172,14 +175,17 @@ class PaymentAPIView(APIView):
                     'Price': str(int(order_item.price * 100)),
                     'Quantity': str(order_item.amount),
                     'Amount': str(int(order_item.price * 100)),
-                    'Tax': VAT
+                    'Tax': VAT,
+                    'PaymentMethod': PaymentMethod.FULL_PREPAYMENT,
+                    'PaymentObject': PAYMENT_OBJECT,
+                    'MeasurementUnit': MEASUREMENT_UNIT
                 } for order_item in order_items
             ],
+            'FfdVersion': FFD_VERSION,
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
         payment_data['Token'] = token
-
         response = requests.post(
             url=PAYMENT_INIT_URL,
             json=payment_data
@@ -207,10 +213,8 @@ class GetPaymentStateAPIView(APIView):
         values = {
             'TerminalKey': TERMINAL_KEY,
             'PaymentId': order.payment_id,
-            'Password': T_PASSWORD,
         }
         token = generate_token_for_t_bank(values)
-        values.pop('Password')
         values['Token'] = token
         response = requests.post(
             url=PAYMENT_GET_STATE_URL,
@@ -248,6 +252,30 @@ class OrdersPaymentAPIView(APIView):
     def delete(self, request, pk):
         self.get_object(pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class NotificationFiscalizationAPIView(APIView):
+    """Вью для получения нотификации о фискализации от т-банка."""
+
+    def post(self, request):
+        try:
+            # проверяем, что в запросе пришел json
+            if not isinstance(request.data, dict):
+                raise ValidationError(detail='Невалидные данные.', code='invalid_request_data')
+
+            # создаем объект NotificationFiscalization с данными из запроса
+            notification_fiscalization = NotificationFiscalization.objects.create(
+                notification=request.data,
+            )
+
+            # запускаем задачу для обработки нотификации, передавая id созданного объекта NotificationFiscalization
+            parse_notification_fiscalization.delay(
+                notification_fiscalization.id
+            )
+            return Response(status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class OldOrderAPIView(APIView):

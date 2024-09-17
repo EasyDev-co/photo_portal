@@ -21,3 +21,8 @@ class PaymentStatus(StrEnum):
     REJECTED = 'REJECTED'
     AUTH_FAIL = 'AUTH_FAIL'
 
+
+class PaymentMethod(StrEnum):
+    """Способы оплаты для инициализации платежа и формирования чека."""
+    FULL_PREPAYMENT = 'full_prepayment'
+    FULL_PAYMENT = 'full_payment'
