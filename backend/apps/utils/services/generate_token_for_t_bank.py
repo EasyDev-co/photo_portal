@@ -29,7 +29,7 @@ def generate_token_for_t_bank(values: dict) -> str:
     concatenated_values = ''.join([
         format_value(value) for value in sorted_parameters.values() if value is not None
     ])
-
+    values.pop('Password')
     # вычисляем SHA-256
     hash_object = hashlib.sha256(concatenated_values.encode('utf-8'))
     return hash_object.hexdigest()

@@ -176,7 +176,7 @@ class PaymentAPIView(APIView):
                     'Quantity': str(order_item.amount),
                     'Amount': str(int(order_item.price * 100)),
                     'Tax': VAT,
-                    'PaymentMethod': PaymentMethod.FULL_PREPAYMENT,
+                    'PaymentMethod': str(PaymentMethod.FULL_PREPAYMENT),
                     'PaymentObject': PAYMENT_OBJECT,
                     'MeasurementUnit': MEASUREMENT_UNIT
                 } for order_item in order_items
