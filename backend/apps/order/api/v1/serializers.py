@@ -35,6 +35,7 @@ class PhotoLineCartSerializer(serializers.Serializer):
     photos = PhotoCartSerializer(many=True)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     is_digital = serializers.BooleanField(default=False)
+    is_free_calendar = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField()
 
 
@@ -48,7 +49,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     """Сериализатор для получения заказов."""
-    is_more_ransom_amount = serializers.SerializerMethodField()
+    is_more_ransom_amount_for_digital_photos = serializers.SerializerMethodField()
+    is_more_ransom_amount_for_calendar = serializers.SerializerMethodField()
     user_role = serializers.SerializerMethodField()
     order_items = OrderItemSerializer(many=True)
     status = serializers.SerializerMethodField()
@@ -58,10 +60,18 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     @staticmethod
-    def get_is_more_ransom_amount(obj):
+    def get_is_more_ransom_amount_for_digital_photos(obj):
         """Метод для проверки превышения суммы выкупа."""
-        ransom_amount = obj.photo_line.kindergarten.region.ransom_amount
-        if obj.order_price >= ransom_amount:
+        ransom_amount_for_digital_photos = obj.photo_line.kindergarten.region.ransom_amount_for_digital_photos
+        if obj.order_price >= ransom_amount_for_digital_photos:
+            return True
+        return False
+
+    @staticmethod
+    def get_is_more_ransom_amount_for_calendar(obj):
+        """Метод для проверки превышения суммы выкупа."""
+        ransom_amount_for_calendar = obj.photo_line.kindergarten.region.ransom_amount_for_calendar
+        if obj.order_price >= ransom_amount_for_calendar:
             return True
         return False
 

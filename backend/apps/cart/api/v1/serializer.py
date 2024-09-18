@@ -34,6 +34,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
     photos = serializers.SerializerMethodField()
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
+    is_free_calendar = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     @staticmethod
@@ -52,6 +53,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     )
     photos = PhotoInCartSerializer(many=True)
     is_digital = serializers.BooleanField(default=False)
+    is_free_calendar = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     promo_code = serializers.CharField(required=False)
 
@@ -60,8 +62,21 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         promo_code_data = validated_data.pop('promo_code', None)
         instance = CartPhotoLine.objects.create(**validated_data)
         user = self.context.get('request').user
-        region_prices = PhotoPrice.objects.filter(region=validated_data['photo_line'].kindergarten.region)
-        ransom_amount = validated_data['photo_line'].kindergarten.region.ransom_amount
+        region_prices = PhotoPrice.objects.filter(
+            region=validated_data['photo_line'].kindergarten.region
+        )
+        ransom_amount_for_digital_photos = (
+            validated_data['photo_line']
+            .kindergarten
+            .region
+            .ransom_amount_for_digital_photos
+        )
+        ransom_amount_for_calendar = (
+            validated_data['photo_line']
+            .kindergarten
+            .region
+            .ransom_amount_for_calendar
+        )
 
         bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
 
@@ -109,10 +124,9 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                 )
             total_price += photobook_price
 
-
         # стоимость электронных фото
-        if ransom_amount:
-            if total_price >= ransom_amount:
+        if ransom_amount_for_digital_photos:
+            if total_price >= ransom_amount_for_digital_photos:
                 if not validated_data['is_digital']:
                     instance.is_digital = True
                     instance.save()
@@ -124,6 +138,11 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                             price=digital_price
                         )
                     total_price += digital_price
+
+        # выкуп для бесплатного календаря
+        if ransom_amount_for_calendar and total_price >= ransom_amount_for_calendar:
+            instance.is_free_calendar = True
+            instance.save()
 
         # применение купона и промокода
         if bonus_coupon:
@@ -151,3 +170,4 @@ class CartSerializer(serializers.Serializer):
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
+    is_free_calendar = serializers.BooleanField(default=False)

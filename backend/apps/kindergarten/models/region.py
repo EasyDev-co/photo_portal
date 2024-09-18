@@ -17,8 +17,13 @@ class Region(UUIDMixin):
         validators=[validate_cyrillic_space_dash, MinLengthValidator(2)],
         unique=True
     )
-    ransom_amount = models.PositiveSmallIntegerField(
-        verbose_name='Сумма выкупа',
+    ransom_amount_for_digital_photos = models.PositiveSmallIntegerField(
+        verbose_name='Сумма выкупа для электронных фотографий',
+        null=True,
+        blank=True
+    )
+    ransom_amount_for_calendar = models.PositiveSmallIntegerField(
+        verbose_name='Сумма выкупа для календаря',
         null=True,
         blank=True
     )
