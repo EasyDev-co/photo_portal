@@ -10,6 +10,10 @@ class OrdersPayment(UUIDMixin, TimeStampedMixin):
         null=True,
         blank=True,
     )
+    is_closing_receipt_sent = models.BooleanField(
+        default=False,
+        verbose_name='Отправлен закрывающий чек'
+    )
 
     class Meta:
         verbose_name = "Оплата заказа"

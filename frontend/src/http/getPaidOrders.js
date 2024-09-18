@@ -11,8 +11,7 @@ export const getPaidOrders = async (access) => {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        },
-        // body: JSON.stringify()
+        }
     });
     return response;
 }

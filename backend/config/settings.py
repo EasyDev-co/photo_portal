@@ -209,7 +209,11 @@ CELERY_BEAT_SCHEDULE = {
     "check_if_orders_has_been_paid": {
             "task": "apps.order.tasks.CheckIfOrdersPaid",
             "schedule": crontab(minute='*/1'),
-        }
+        },
+    "delete_expired_orders": {
+                "task": "apps.order.tasks.DeleteExpiredOrders",
+                "schedule": crontab(minute='*/15'),
+            }
 }
 
 SIMPLE_JWT = {
@@ -238,5 +242,9 @@ TERMINAL_KEY = os.environ.get('TERMINAL_KEY')
 T_PASSWORD = os.environ.get('T_PASSWORD')
 PAYMENT_INIT_URL = os.environ.get('PAYMENT_INIT_URL')
 PAYMENT_GET_STATE_URL = os.environ.get('PAYMENT_GET_STATE_URL')
+SEND_CLOSING_RECEIPT_URL = os.environ.get('SEND_CLOSING_RECEIPT_URL')
 TAXATION = os.environ.get('TAXATION')
 VAT = os.environ.get('VAT')
+FFD_VERSION = os.environ.get('FFD_VERSION')
+PAYMENT_OBJECT = os.environ.get('PAYMENT_OBJECT')
+MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
