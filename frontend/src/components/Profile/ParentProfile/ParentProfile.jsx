@@ -13,6 +13,7 @@ import { useClickOutside } from "../../../utils/useClickOutside";
 import { parentVerifyResetCode } from "../../../http/parent/parentVerifyResetCode";
 import { parentChangePass } from "../../../http/parent/parentChangePass";
 import { fetchUserPartialUpdateWithTokenInterceptor } from '../../../http/user/userPartialUpdate'
+import Modal from "../../Modal/Modlal";
 
 const ParentProfile = ({ nurseryIsAuth }) => {
 
@@ -46,6 +47,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
         resetEmail: ''
     });
 
+    const [modalActive, setModalActive] = useState(false);
     const [inputValueReset, setResetValue] = useState({
         code: ''
     });
@@ -93,6 +95,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                                 message: '',
                                 email: ''
                             })
+                            setModalActive(true)
                         })
                 }
             })
@@ -154,6 +157,12 @@ const ParentProfile = ({ nurseryIsAuth }) => {
 
     return (
         <div className={styles.profileWrap}>
+            <Modal
+                active={modalActive}
+                setActive={setModalActive}
+                success
+                text={'Данные были успешно изменены!'}
+            />
             <div className={styles.profileFormsWrap}>
                 {codeWindowActive &&
                     <form onSubmit={(e) => onResetSubmit(e)} className={styles.codeResetForm} action="">
@@ -235,7 +244,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             value={inputValue.parentEmail}
                             isPencil
                             onChangeHandler={onChangeHandler}
-                            error={error.message ? [error.message] : error.message}
+                            error={error.email ? [error.email] : error.email}
                             setActiveBlur={setActiveBlur}
                         />
 

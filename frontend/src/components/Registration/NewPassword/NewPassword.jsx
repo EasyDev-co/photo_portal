@@ -14,6 +14,11 @@ const NewPassword = () => {
     const email = useSelector(action => action.user.email);
     const code = useSelector(action => action.user.code);
     const navigation = useNavigate();
+    const [error, setError] = useState({
+        new_password: '',
+        repeat_pass: ''
+    }
+    );
 
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
@@ -21,6 +26,12 @@ const NewPassword = () => {
     }
     const onSubmitHandler = async (e) => {
         e.preventDefault();
+        if(inputValue.newPassword != inputValue.repeatNewPass){
+            setError({
+                repeat_pass: ['Пароли не совпадают!']
+            })
+            return;
+        }
         try {
             const response = await parentChangePass(code, email, inputValue.newPassword)
             if (response.ok) {
@@ -29,6 +40,7 @@ const NewPassword = () => {
                 navigation('/sign-in')
             } else {
                 const data = await response.json();
+                setError(data)
             }
         } catch (error) {
 
@@ -50,6 +62,7 @@ const NewPassword = () => {
                                     placeholder={'Новый пароль'}
                                     isAuthForm
                                     isNone
+                                    error={error.new_password ? [error.new_password] : error.new_password}
                                     value={inputValue.newPassword}
                                 />
                                 <InputField
@@ -59,6 +72,7 @@ const NewPassword = () => {
                                     placeholder={'Подтвердите новый пароль'}
                                     isAuthForm
                                     isNone
+                                    error={error.repeat_pass ? [error.repeat_pass] : error.repeat_pass}
                                     value={inputValue.repeatNewPass}
                                 />
                                 <button className={styles.authButton}>Продолжить</button>

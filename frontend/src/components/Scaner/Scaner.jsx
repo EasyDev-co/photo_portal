@@ -1,13 +1,15 @@
 import styles from './Scaner.module.css'
 import { useState, useEffect } from 'react';
-
+import Modal from '../Modal/Modlal'
 import { Html5Qrcode } from 'html5-qrcode';
 import { useDispatch } from 'react-redux';
 import { addQrIdPhoto } from '../../store/authSlice';
 
-const Scaner = ({ scanActive, setScanActive, isAuth }) => {
+
+const Scaner = ({ scanActive, setScanActive, isAuth, setModalActive, modalActive }) => {
     const dispatch = useDispatch();
     const [qrMessage, setQrMessage] = useState('');
+
     useEffect(() => {
         const config = {
             fps: 10,
@@ -16,16 +18,22 @@ const Scaner = ({ scanActive, setScanActive, isAuth }) => {
                 height: 400
             }
         }
+
         const html5QrCode = new Html5Qrcode('qrCodeContainer');
 
         const qrScannerStop = () => {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop();
+            try {
+                if (html5QrCode && html5QrCode.isScanning) {
+                    html5QrCode.stop();
+                }
+            } catch (error) {
+
             }
+
         }
-        
+
         const qrCodeSuccess = (decodeTxt) => {
-            if(!isAuth){
+            if (!isAuth) {
                 window.location.href = decodeTxt;
             }
             setQrMessage(decodeTxt);
@@ -37,6 +45,10 @@ const Scaner = ({ scanActive, setScanActive, isAuth }) => {
         }
         if (scanActive) {
             html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccess)
+                .catch(err => {
+                    setModalActive(true);
+                    setScanActive(false)
+                })
             setQrMessage('')
         } else {
             qrScannerStop();
@@ -44,11 +56,12 @@ const Scaner = ({ scanActive, setScanActive, isAuth }) => {
         return (() => {
             qrScannerStop()
         })
+
     }, [scanActive])
 
     return (
         <div onClick={() => setScanActive(false)} className={scanActive ? styles.scanerActive : styles.scaner}>
-            <div id='qrCodeContainer' ></div>
+            <div id='qrCodeContainer'></div>
         </div>
     );
 }
