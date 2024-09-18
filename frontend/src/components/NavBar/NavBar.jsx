@@ -15,7 +15,6 @@ import {
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBarItem } from "./NavBarItem/NavBarItem";
 import { SocialItem } from "../SocialItem/SocialItem";
-import { useSelector } from "react-redux";
 import { useAuth } from "../../utils/useAuth";
 import { Link } from "react-router-dom";
 
@@ -45,13 +44,14 @@ export const NavBar = ({ localStorageValue, onClose }) => {
           <>
             <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
-               top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
-               ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
+                top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
+               ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')}
                ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
-               bottom={localStorage.getItem('phone')}
+                bottom={localStorage.getItem('phone')}
               />
               <HeaderUserInfoItem
-                top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
+                isKindergarten
+                top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')},
                   ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
                 bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
               />

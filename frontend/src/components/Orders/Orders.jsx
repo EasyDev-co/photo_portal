@@ -154,7 +154,12 @@ export const Orders = () => {
           console.log(data)
         }
       } catch (error) {
-        
+        setModalActive(true)
+        setModalText(
+          <p>
+            Похоже, что у вас есть неоплаченный заказ,<Link to={'/orders/payment'}> перейдите по этой ссылке </Link>для оплаты
+            <span> fotodetstvo1@yandex.ru </span>
+          </p>)
       }
     }
   };
@@ -212,6 +217,7 @@ export const Orders = () => {
           <h1 className={styles.profileTitle}>Выбор фотографии
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
+        
           <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             {addPhoto.length === 0 ? <div>
               У Вас пока нет заказов
@@ -271,7 +277,10 @@ export const Orders = () => {
             </div>
           }
         </div>
-        <div className={styles.paymentTimerWrap}>
+        <div className={styles.paymentTimerWrap} style={{
+          padding: '69px 0 160px 0',
+          maxWidth: '380px'
+        }}>
           <PaymentTimer
             payOrder={payOrder}
             formId={'orderForm'}
