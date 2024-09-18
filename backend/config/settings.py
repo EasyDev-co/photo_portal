@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'apps.promocode',
     'apps.user',
     'apps.cart',
+
+    # Приложения CRM
+    'apps_crm.notifications'
 ]
 
 MIDDLEWARE = [
