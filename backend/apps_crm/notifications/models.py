@@ -31,7 +31,7 @@ class Notification(UUIDMixin, TimeStampedMixin):
         on_delete=models.CASCADE,
         verbose_name="Тип связанной сущности"
     )
-    object_id = models.PositiveIntegerField(
+    object_id = models.CharField(
         verbose_name="ID связанной сущности"
     )
     content_object = GenericForeignKey("content_type", "object_id")
@@ -43,7 +43,7 @@ class Notification(UUIDMixin, TimeStampedMixin):
     class Meta:
         verbose_name = "Уведомление"
         verbose_name_plural = "Уведомления"
-        ordering = ["-created_at"]
+        ordering = ["-created"]
 
     def __str__(self):
         return f"Уведомление для {self.user} по {self.content_object}"
