@@ -1,0 +1,132 @@
+.ordersWrap {
+    margin: 0 0 0 140px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+@media screen and (max-width: 1000px) {
+    .ordersWrap {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .ordersWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .ordersWrap {
+        margin: 0 15px 40px 15px;
+    }
+}
+.profileTitle {
+    color: #090909;
+    font-family: "Nunito";
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 20px;
+    padding: 60px 40px 40px 0;
+    position: relative;
+}
+
+@media screen and (max-width: 768px) {
+    .profileTitle {
+        margin-left: 0;
+        padding: 40px 20px 40px 0;
+    }
+}
+.cartBlock{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 25px;
+    border-radius: 12px;
+  
+}
+.diagramContainer{
+    padding: 35px;
+    -webkit-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 12px;
+}
+.cartContainer{
+    display: flex;
+    gap: 35px;
+    padding: 0 35px 0 0;
+
+}
+@media (max-width: 620px) {
+    .cartContainer{
+        flex-direction: column;
+        padding: 0;
+    }
+ }
+.cartWrap{
+    width: 100%;
+    -webkit-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    padding: 25px;
+    border-radius: 12px;
+}
+@media (max-width: 620px) {
+   .cartWrap{
+        width: auto;
+   }
+}
+.orderHeader{
+    font-weight: 700;
+    padding: 15px 0;
+}
+.orderInfo{
+    display: flex;
+    justify-content: space-between;
+}
+.btnWrap{
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+.mainButton{
+    background-color: rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+.deleteButton{
+    background-color: #e52c2c;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+.resetButton{
+    background-color: rgb(255, 255, 255);
+    border:1px solid rgb(17, 187, 209);
+    color:  rgb(17, 187, 209);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.orderCartInfo{
+    display: flex;
+    flex-direction: column;
+}
+.photoNumber{
+    font-size: 11px;
+    color: #797979;
+}

@@ -56,6 +56,7 @@ const authSlice = createSlice({
             state.email = null;
             localStorage.clear();
             window.location.reload();
+
         },
         setPhotoNumbers(state, action){
             state.photoNumbers = action.payload

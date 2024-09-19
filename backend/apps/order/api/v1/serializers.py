@@ -78,8 +78,36 @@ class OrderSerializer(serializers.ModelSerializer):
         return OrderStatus(status).label
 
 
-class OrderPaymentSerializer(serializers.ModelSerializer):
+class OrderItemDetailSerializer(serializers.ModelSerializer):
+    photo_number = serializers.SerializerMethodField()
+    photo_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = ['photo_number', 'photo_type', 'amount', 'price']
+
+    def get_photo_number(self, obj):
+        return obj.photo.number if obj.photo else None
+
+    def get_photo_type(self, obj):
+        return PhotoType(obj.photo_type).label
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    photo_theme = serializers.SerializerMethodField()
+    order_items = OrderItemDetailSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ['photo_theme', 'created', 'order_items']
+
+    def get_photo_theme(self, obj):
+        return obj.photo_line.photo_theme.name
+
+
+class OrdersPaymentSerializer(serializers.ModelSerializer):
+    orders = OrderDetailSerializer(many=True)
 
     class Meta:
         model = OrdersPayment
-        fields = ['id', 'amount']
+        fields = ['id', 'amount', 'orders']
