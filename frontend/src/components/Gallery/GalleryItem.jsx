@@ -69,13 +69,16 @@ const GalleryItem = ({ orders }) => {
                             {elem.photos.map((photo, i) => {
                                 const isActive = activeIds.includes(photo.id);
                                 return (
-                                    <div
-                                        onClick={() => handleActivePhoto(photo.id, elem.photo_theme_date, elem.photo_theme_name, photo.number)}
-                                        key={photo.id}
-                                        className={isActive ? styles.imgWrapActive : styles.imgWrap}
-                                    >
-                                        <img src={photo.photo} alt="" />
-                                    </div>
+                      
+                                        <div
+                                            onClick={() => handleActivePhoto(photo.id, elem.photo_theme_date, elem.photo_theme_name, photo.number)}
+                                            key={photo.id}
+                                            className={isActive ? styles.imgWrapActive : styles.imgWrap}
+                                        >
+                                            <img src={photo.photo} alt="" />
+                                            <div className={styles.photoNumber}>Фото № {photo.number}</div>
+                                        </div>
+           
                                 )
                             })}
                         </div>

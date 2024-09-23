@@ -20,7 +20,7 @@ export const fetchGetCartWithTokenInterceptor = async (access, id, refresh) => {
     try {
         let response = await getCart(access, id)
         if (!response.ok) {
-            localStorage.setItem('access', '');
+            // localStorage.setItem('access', '');
             let createToken = await tokenRefreshCreate(refresh)
             if (createToken.ok) {
                 createToken.json()

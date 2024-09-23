@@ -2,9 +2,9 @@ import { localUrl } from "../constants/constants";
 import { setCookie } from "../utils/setCookie";
 import { tokenRefreshCreate } from "./parent/tokenRefreshCreate";
 
-export const paymentCreate = async (access, order) => {
+export const paymentCreate = async (access, id) => {
 
-    const url = `${localUrl}/api/v1/payment/${order.id}`;
+    const url = `${localUrl}/api/v1/payment/${id}`;
 
     const response = await fetch(url, {
         method: "GET",
@@ -20,7 +20,7 @@ export const fetchPaymentCreateTokenInterceptor = async (access, refresh, order)
     try {
         let response = await paymentCreate(access, order)
         if (!response.ok) {
-            localStorage.setItem('access', '');
+            // localStorage.setItem('access', '');
             let createToken = await tokenRefreshCreate(refresh)
             if (createToken.ok) {
                 createToken.json()
