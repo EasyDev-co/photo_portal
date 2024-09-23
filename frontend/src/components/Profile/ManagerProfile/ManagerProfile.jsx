@@ -6,9 +6,12 @@ import PaymentDiagram from "../../Payment/PaymentDiagram/PaymentDiagram";
 import Timer from "../../Payment/PaymentTimer/Timer";
 import MainButton from "../../Buttons/MainButton";
 import Dropdown from "./Dropdown/Dropdown";
-import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/gallerey/getStats";
+import { getStats } from "../../../http/gallerey/getStats";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+import { getNearestDate } from "../../Orders/utils/utils";
+import { fetchPhotoLineListWithTokenInterceptor } from "../../../http/photo/photoLineList";
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
@@ -35,6 +38,17 @@ const ManagerProfile = () => {
             })
     }, [accessStor, kindergarten_id])
 
+    useEffect(() => {
+        fetchPhotoLineListWithTokenInterceptor(accessStor, '')
+            .then(res => {
+                if (res.ok) {
+                    res.json()
+                        .then(data => {
+                            getNearestDate(data);
+                        })
+                }
+            })
+    }, [accessStor])
     return (
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
@@ -65,7 +79,7 @@ const ManagerProfile = () => {
                         </div>
 
                     </form>
-                    <div onClick={()=>navigate('/orders_manager')}>
+                    <div onClick={() => navigate('/orders_manager')}>
                         <MainButton
                             value={'Заказ для себя'}
                         />
@@ -75,7 +89,6 @@ const ManagerProfile = () => {
 
             </div>
             <div className={styles.paymentTimerWrap}>
-
                 <PaymentDiagram
                     count={'3 500'}
                     label={'Ваш бонус:'}
