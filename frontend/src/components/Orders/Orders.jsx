@@ -140,7 +140,6 @@ export const Orders = () => {
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
-    // e.preventDefault();
     if (orderValue.length !== 0) {
       try {
         const order = await fetchOrderCreateWithTokenInterceptor(accessStor)

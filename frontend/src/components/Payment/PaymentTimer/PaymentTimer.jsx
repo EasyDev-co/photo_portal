@@ -11,7 +11,8 @@ import { addPhotoPrice } from '../../../store/authSlice';
 const PaymentTimer = ({onSubmitHandler, payOrder}) => {
     const accessStor = localStorage.getItem('access');
     const country = localStorage.getItem('regionName');
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    
     useEffect(() => {
         fetchPhotoPriceWithTokenInterceptor(accessStor, country)
             .then(res => res.json())

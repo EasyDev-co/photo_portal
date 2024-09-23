@@ -10,6 +10,8 @@ import { paymentCreate } from "../../http/fetchPayment";
 import { useBlocker, useLocation } from "react-router-dom";
 import PaymentModal from "../Modal/PaymentModal";
 import { fetchCartDeleteWithTokenInterceptor } from "../../http/cart/cartDelete";
+import { getCookie } from "../../utils/setCookie";
+import Modal from "../Modal/Modlal";
 
 export const Payment = () => {
   const options = [
@@ -24,36 +26,46 @@ export const Payment = () => {
   const location = useLocation();
   const [value, setValue] = useState(false);
   const [activeModal, setActiveModal] = useState(false);
-
+  const [errModal, setErrModal] = useState(false);
+  const [errMessage, setErrMessage] = useState('');
   let blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       !value &&
       currentLocation.pathname !== nextLocation.pathname
   );
+  function errModalActive(errMessage) {
+    setErrModal(true)
+    setErrMessage(errMessage)
+  }
 
   const handleOptionClick = (id) => {
+    console.log(location.state)
+    let order = getCookie('order')
+
     setSelectedOption(id);
     try {
-      paymentCreate(accessStor, location.state)
-      .then(res => {
-        if (res.ok) {
-          res.json()
-            .then(res => {
-              window.location.href = res;
-            })
-        }
-      })
+      paymentCreate(accessStor, location.state.id || JSON.parse(order).id)
+        .then(res => {
+          if (res.ok) {
+            res.json()
+              .then(res => {
+                window.location.href = res;
+              })
+          } else {
+            res.json()
+              .then(res => errModalActive(res))
+          }
+        })
     } catch (error) {
       console.log(error)
     }
-   
-     
   };
 
   const deleteCartItem = () => {
+    let order = getCookie('order')
     if (!value) {
       try {
-        fetchCartDeleteWithTokenInterceptor(accessStor, location.state.id)
+        fetchCartDeleteWithTokenInterceptor(accessStor, location.state.id || JSON.parse(order).id)
           .then(res => {
             if (res.ok) {
               setValue(true);
@@ -62,9 +74,9 @@ export const Payment = () => {
               }
             }
           })
-
       } catch (error) {
         console.error("Ошибка при удалении элемента корзины:", error);
+        blocker.proceed();
       }
     }
 
@@ -80,6 +92,11 @@ export const Payment = () => {
         <h1 className={styles.paymentTitle}>
           Выберите способ оплаты
         </h1>
+        <Modal
+          active={errModal}
+          setActive={setErrModal}
+          text={errMessage}
+        />
         <PaymentModal
           active={activeModal}
           setActive={setActiveModal}
@@ -98,6 +115,7 @@ export const Payment = () => {
         />
         <div className={styles.paymentItemWrap}>
           {options.map((elem, i) => {
+            console.log(elem)
             return (
               <div key={i} className={styles.wrapItemBox}>
                 <div onClick={() => handleOptionClick(elem.id)} style={{

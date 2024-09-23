@@ -12,7 +12,6 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
         {photos.map((photo, index) => (
           <div key={index} className={styles.photoCardWrapper}>
             <PhotoCard
-
               blocksId={blocksId}
               photoId={photo.id}
               photo={photo.photo}
