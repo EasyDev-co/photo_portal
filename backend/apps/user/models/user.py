@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
@@ -57,6 +58,14 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True
     )
+    managed_kindergarten = models.OneToOneField(
+        Kindergarten,
+        on_delete=models.SET_NULL,
+        related_name='manager',
+        verbose_name='Детский сад (заведующий)',
+        null=True,
+        blank=True
+    )
 
     objects = UserManager()
 
@@ -69,6 +78,17 @@ class User(UUIDMixin, AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.second_name} {self.last_name}"
+
+    def clean(self):
+        super().clean()
+        if self.role == UserRole.manager:
+            if not self.managed_kindergarten:
+                raise ValidationError("Заведующий должен быть связан с одним детским садом.")
+            if self.kindergarten.exists() and self.kindergarten.first() != self.managed_kindergarten:
+                raise ValidationError("Заведующий не может иметь несколько детских садов.")
+        else:
+            if self.managed_kindergarten:
+                raise ValidationError("Только заведующий может иметь связанный детский сад.")
 
 
 class StaffUser(User):
