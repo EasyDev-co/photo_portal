@@ -218,6 +218,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.photo.tasks.UpdatePhotoThemeActivityTask",
         "schedule": crontab(minute='0', hour='*/1'),
     },
+    "calculate_ransom": {
+        "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
+        "schedule": crontab(minute='0', hour='*/4'),
+    },
 }
 
 SIMPLE_JWT = {

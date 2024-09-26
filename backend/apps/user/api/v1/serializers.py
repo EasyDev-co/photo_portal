@@ -8,7 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from phonenumber_field.serializerfields import PhoneNumberField
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
-from apps.photo.api.v1.serializers import CurrentPhotoThemeRetrieveSerializer
+from apps.photo.api.v1.serializers import PhotoThemeSerializer
 from apps.user.models import User
 from apps.user.models.manager_bonus import ManagerBonus
 from apps.user.validators import validate_cyrillic
@@ -126,7 +126,7 @@ class ManagerBonusSerializer(serializers.ModelSerializer):
     """
     Сериализатор для бонуса заведующей.
     """
-    photo_theme = CurrentPhotoThemeRetrieveSerializer(read_only=True)
+    photo_theme = PhotoThemeSerializer(read_only=True)
 
     class Meta:
         model = ManagerBonus
