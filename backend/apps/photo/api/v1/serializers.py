@@ -15,14 +15,14 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
         fields = ('id', 'number', 'photo')
 
 
-class CurrentPhotoThemeRetrieveSerializer(serializers.ModelSerializer):
+class PhotoThemeSerializer(serializers.ModelSerializer):
     """
     Сериализатор для получения темы фотосессии.
     """
 
     class Meta:
         model = PhotoTheme
-        fields = ('name', 'date_start', 'date_end')
+        fields = ('id', 'name', 'date_start', 'date_end')
 
 
 class PhotoLineSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class PhotoLineSerializer(serializers.ModelSerializer):
     photos = PhotoRetrieveSerializer(many=True, read_only=True)
     ransom_amount_for_digital_photos = serializers.SerializerMethodField()
     ransom_amount_for_calendar = serializers.SerializerMethodField()
-    photo_theme = CurrentPhotoThemeRetrieveSerializer(read_only=True, required=False)
+    photo_theme = PhotoThemeSerializer(read_only=True, required=False)
 
     class Meta:
         model = PhotoLine
