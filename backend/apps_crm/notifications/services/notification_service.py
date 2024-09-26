@@ -13,13 +13,17 @@ class NotificationService:
 
     def list_all_notifications(self):
         """Получить все уведомления в системе."""
-        return self.notification_repository.get_all()
+        return self.notification_repository.list()
 
     def list_user_notifications(self, user: User):
         """Получить все уведомления для пользователя."""
-        return self.notification_repository.get_all_for_user(user)
+        return self.notification_repository.list(user=user)
 
     def mark_notification_as_read(self, notification_id: str):
         """Отметить уведомление как прочитанное."""
-        return self.notification_repository.mark_as_read(notification_id)
+        notification = self.notification_repository.get_obj(id=notification_id)
+        if notification:
+            # Обновляем объект через update_obj
+            return self.notification_repository.update_obj(notification, is_read=True)
+        return None
 
