@@ -126,18 +126,20 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         # стоимость электронных фото
         if ransom_amount_for_digital_photos:
-            if total_price >= ransom_amount_for_digital_photos:
-                if not validated_data['is_digital']:
-                    instance.is_digital = True
-                    instance.save()
-            else:
-                if validated_data['is_digital']:
-                    digital_price = region_prices.get(photo_type=PhotoType.digital).price
-                    if promo_code and promo_code.discount_services:
-                        digital_price = promo_code.apply_discount(
-                            price=digital_price
-                        )
-                    total_price += digital_price
+
+            if not validated_data['is_digital'] and total_price >= ransom_amount_for_digital_photos:
+                instance.is_digital = True
+                instance.save()
+
+            elif validated_data['is_digital'] and total_price < ransom_amount_for_digital_photos:
+                digital_price = region_prices.get(photo_type=PhotoType.digital).price
+
+                if promo_code and promo_code.discount_services:
+                    digital_price = promo_code.apply_discount(
+                        price=digital_price
+                    )
+
+                total_price += digital_price
 
         # выкуп для бесплатного календаря
         if ransom_amount_for_calendar and total_price >= ransom_amount_for_calendar:
