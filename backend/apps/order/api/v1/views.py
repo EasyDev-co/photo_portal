@@ -79,6 +79,7 @@ class OrderAPIView(APIView):
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
                 is_photobook=cart_photo_line.is_photobook,
+                is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,
                 order_payment=orders_payment,
             ) for cart_photo_line in cart_photo_lines
@@ -104,7 +105,7 @@ class OrderAPIView(APIView):
                 ]
             )
 
-            # добавляем э/ф и фотокнигу как order_item, если они есть
+            # добавляем э/ф, фотокнигу и бесплатный календарь как order_item, если они есть
             if order.is_digital:
                 order_items.append(
                     OrderItem(
@@ -115,6 +116,13 @@ class OrderAPIView(APIView):
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.photobook,
+                        order=order,
+                    ))
+            if order.is_free_calendar:
+                order_items.append(
+                    OrderItem(
+                        photo_type=PhotoType.free_calendar,
+                        photo=photos_in_cart.first().photo,
                         order=order,
                     ))
 
@@ -128,7 +136,7 @@ class OrderAPIView(APIView):
             calculate_price_for_order_item(
                 order_item=order_item,
                 prices_dict=prices_dict,
-                ransom_amount=region.ransom_amount,
+                ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
                 promocode=cart.promocode,
                 coupon_amount=coupon_amount
             )
