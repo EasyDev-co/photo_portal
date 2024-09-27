@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import requests
 from django.contrib.auth import get_user_model
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -23,7 +24,7 @@ from apps.order.api.v1.serializers import (
 from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus, PaymentMethod
 from apps.order.models.notification import NotificationFiscalization
-from apps.order.permissions import IsOwner
+from apps.order.permissions import IsOrdersPaymentOwner
 from apps.order.tasks import parse_notification_fiscalization
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
@@ -51,15 +52,27 @@ class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        paid_photo_lines = PhotoLine.objects.select_related('orders').filter(
-            orders__user=request.user,
-            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed),
-            orders__is_digital=True
+        user = request.user
+
+        # достаем все фотолинии, для которых есть оплаченный или завершенный заказ
+        photo_lines = PhotoLine.objects.filter(
+            kindergarten__in=user.kindergarten.all(),
+            parent=user,
+            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed)
         )
-        if paid_photo_lines.exists():
-            serializer = PaidPhotoLineSerializer(paid_photo_lines, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # проверяем наличие фотолиний у пользователя
+        if not photo_lines.exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # аннотируем на основе связанного заказа
+        photo_lines = photo_lines.annotate(
+            is_digital=F('orders__is_digital')
+        ).order_by('photo_theme__date_end')
+
+        serializer = PaidPhotoLineSerializer(photo_lines, many=True)
+
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         user = request.user
@@ -79,6 +92,7 @@ class OrderAPIView(APIView):
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
                 is_photobook=cart_photo_line.is_photobook,
+                is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,
                 order_payment=orders_payment,
             ) for cart_photo_line in cart_photo_lines
@@ -104,7 +118,7 @@ class OrderAPIView(APIView):
                 ]
             )
 
-            # добавляем э/ф и фотокнигу как order_item, если они есть
+            # добавляем э/ф, фотокнигу и бесплатный календарь как order_item, если они есть
             if order.is_digital:
                 order_items.append(
                     OrderItem(
@@ -115,6 +129,13 @@ class OrderAPIView(APIView):
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.photobook,
+                        order=order,
+                    ))
+            if order.is_free_calendar:
+                order_items.append(
+                    OrderItem(
+                        photo_type=PhotoType.free_calendar,
+                        photo=photos_in_cart.first().photo,
                         order=order,
                     ))
 
@@ -128,7 +149,7 @@ class OrderAPIView(APIView):
             calculate_price_for_order_item(
                 order_item=order_item,
                 prices_dict=prices_dict,
-                ransom_amount=region.ransom_amount,
+                ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
                 promocode=cart.promocode,
                 coupon_amount=coupon_amount
             )
@@ -238,7 +259,7 @@ class OrdersPaymentAPIView(APIView):
     """
     Вью для просмотра заказов перед оплатой и удаления заказов.
     """
-    permission_classes = (IsAuthenticated, IsOwner)
+    permission_classes = (IsAuthenticated, IsOrdersPaymentOwner)
 
     def get_object(self, pk):
         obj = get_object_or_404(OrdersPayment, id=pk)
