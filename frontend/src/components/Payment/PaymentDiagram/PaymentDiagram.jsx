@@ -15,9 +15,8 @@ const PaymentDiagram = ({text, amount}) => {
             setCount(sumTotalPrice);
         } catch (error) {
         }
-        
     }, [cart]);
-    return ( 
+    return (
         <div className={styles.diagramWrap}>
             <span>{text}</span>
             <div className={styles.diagramCircle}>
