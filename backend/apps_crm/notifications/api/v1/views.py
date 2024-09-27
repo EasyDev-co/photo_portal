@@ -9,27 +9,24 @@ from apps_crm.notifications.api.v1.serializers import (
 
 
 class NotificationListAPIView(APIView):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.notification_service = self.request.container.notification_service()
 
     def get(self, request):
         """Возвращает все уведомления пользователя."""
+        service = request.container.notification_service()
         user = request.user
-        notifications = self.notification_service.list_user_notifications(user)
+        notifications = service.list_user_notifications(user)
 
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AllNotificationsAPIView(APIView):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.notification_service = self.request.container.notification_service()
 
     def get(self, request):
         """Получить все уведомления в системе."""
-        notifications = self.notification_service.list_all_notifications()
+        service = request.container.notification_service()
+
+        notifications = service.list_all_notifications()
 
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
