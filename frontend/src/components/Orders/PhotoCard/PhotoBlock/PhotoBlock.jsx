@@ -1,8 +1,9 @@
 import React, { memo, useState } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
-const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
-
+import oke from '../../../../assets/images/pngwing.com.png'
+const PhotoBlock = memo(({ price, priceCalendar, blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
+  console.log(price)
   return (
     <div style={{
       display: 'flex',
@@ -59,7 +60,6 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
                     </label>
                   </div>
                 </div>
-
                 <button className={styles.mainButton} onClick={() => handleRemoveBlock(blocksId, photo.photoLineId)}>Удалить блок</button>
               </div>
             }
@@ -67,34 +67,40 @@ const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeH
         ))}
       </div>
       <div className={styles.orderPromo}>
-        {[{
-          text: "Отправить электронную версию на электронную почту",
-          input: true,
-        }, {
-          text: "При заказе от 2000 рублей, к такой-то дате, вы получите все фото в электронном виде",
-          input: false,
-        }, {
-          text: "При заказе от 2700 рублей, эл. версия всех фотографий календаря в подарок",
-          input: false,
-        }].map((promo, index) => (
-          <div key={index} className={styles.promoStringWrap}>
-            <div className={styles.dot}></div>
-            {promo.input ? (
-              <div className={styles.promoInputWrapp}>
-                <span className={styles.promoString}>{promo.text}</span>
-                <input
-                  className={styles.promoInput}
-                  placeholder="Электронный адрес*"
-                  type="text"
-                  name="digital"
-                // onChange={(e) => handleInputEmailChange(e)}
-                />
-              </div>
-            ) : (
-              <span className={styles.promoString}>{promo.text}</span>
-            )}
+        <div className={styles.promoStringWrap}>
+          <div className={styles.dot}></div>
+          <div className={styles.promoInputWrapp}>
+            <span className={styles.promoString}>Отправить электронную версию на электронную почту</span>
+            <input
+              className={styles.promoInput}
+              placeholder="Электронный адрес*"
+              type="text"
+              name="digital"
+              style={{ width: '94%' }}
+            />
           </div>
-        ))}
+        </div>
+        
+        <div key={index} className={styles.promoStringWrap}>
+          {price.total_price >= priceCalendar.ransom_amount_for_digital_photos ?
+            <div>
+              <img src={oke} alt="" />
+            </div>
+            :
+            <div className={styles.dot}></div>
+          }
+          <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_digital_photos} рублей, вы получите все фото в электронном виде</span>
+        </div>
+        <div key={index} className={styles.promoStringWrap}>
+          {price.total_price >= priceCalendar.ransom_amount_for_calendar ?
+            <div>
+              <img src={oke} alt="" />
+            </div>
+            :
+            <div className={styles.dot}></div>
+          }
+          <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_calendar} рублей, эл. версия всех фотографий календаря в подарок</span>
+        </div>
       </div>
     </div>
   );

@@ -56,7 +56,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                blocksId={blocksId}
+                    blocksId={blocksId}
                     photoLineId={photoLineId}
                     isChecked={isChecked}
                     photoId={photoId}
@@ -67,7 +67,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                blocksId={blocksId}
+                    blocksId={blocksId}
                     photoLineId={photoLineId}
                     isChecked={isChecked}
                     photoId={photoId}
@@ -78,7 +78,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                blocksId={blocksId}
+                    blocksId={blocksId}
                     photoLineId={photoLineId}
                     isChecked={isChecked}
                     photoId={photoId}
@@ -89,7 +89,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
                 <Counter
-                blocksId={blocksId}
+                    blocksId={blocksId}
                     photoLineId={photoLineId}
                     isChecked={isChecked}
                     photoId={photoId}
