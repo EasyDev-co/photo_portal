@@ -37,6 +37,7 @@ class PhotoInline(admin.TabularInline):
     extra = 0
     ordering = ('number',)
     readonly_fields = ('photo_img',)
+    exclude = ('watermarked_photo',)
 
     @admin.display(description='Фото')
     def photo_img(self, obj):
@@ -103,6 +104,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ('photo_line', 'number', 'photo')
+    exclude = ('watermarked_photo',)
     raw_id_fields = ('photo_line',)
     readonly_fields = ('photo_img',)
 

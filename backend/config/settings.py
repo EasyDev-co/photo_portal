@@ -260,3 +260,5 @@ VAT = os.environ.get('VAT')
 FFD_VERSION = os.environ.get('FFD_VERSION')
 PAYMENT_OBJECT = os.environ.get('PAYMENT_OBJECT')
 MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
+
+LOGO_PATH = os.environ.get('LOGO_PATH')
