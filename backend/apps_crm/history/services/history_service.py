@@ -10,5 +10,5 @@ class HistoryService:
         self.history_repository = history_repository
 
     def list_user_history(self, user: User):
-        """Получить все уведомления для пользователя."""
+        """Получить историю изменений пользвоателя."""
         return self.history_repository.list(actor=user)
