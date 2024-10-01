@@ -21,6 +21,10 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name='Удалены ли QR коды',
         default=False
     )
+    ransom_counted = models.BooleanField(
+        verbose_name='Выкуп подсчитан',
+        default=False
+    )
 
     def __str__(self):
         return f'{self.name}'

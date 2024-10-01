@@ -34,6 +34,7 @@ class UserAdmin(BaseUserAdmin):
                     'phone_number',
                     'role',
                     'is_verified',
+                    'managed_kindergarten'
                 )
             }
         ),
@@ -73,6 +74,7 @@ class UserAdmin(BaseUserAdmin):
                     'phone_number',
                     'role',
                     'is_verified',
+                    'managed_kindergarten'
                 ),
             },
         ),
@@ -86,6 +88,7 @@ class UserAdmin(BaseUserAdmin):
         'phone_number',
         'role',
         'is_verified',
+        'managed_kindergarten'
     )
     search_fields = (
         'email',
@@ -211,8 +214,7 @@ class ConfirmCodeAdmin(admin.ModelAdmin):
 class ManagerBonus(admin.ModelAdmin):
     list_display = (
         'user',
-        'start_period_date',
-        'end_period_date',
+        'photo_theme',
         'bonus_size',
         'total_bonus',
         'paid_for',

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.photo.api.v1.serializers import (
-    CurrentPhotoThemeRetrieveSerializer,
+    PhotoThemeSerializer,
     PhotoLineSerializer,
     PhotoRetrieveSerializer
 )
@@ -118,7 +118,7 @@ class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
     Получение информации об актуальной теме фотосессии.
     """
     queryset = PhotoTheme.objects.filter(is_active=True)
-    serializer_class = CurrentPhotoThemeRetrieveSerializer
+    serializer_class = PhotoThemeSerializer
 
 
 class DownloadPhotoAPIView(APIView):

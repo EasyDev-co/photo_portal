@@ -211,13 +211,21 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute='0', hour='*/48'),
     },
     "check_if_orders_has_been_paid": {
-            "task": "apps.order.tasks.CheckIfOrdersPaid",
-            "schedule": crontab(minute='*/1'),
-        },
+        "task": "apps.order.tasks.CheckIfOrdersPaid",
+        "schedule": crontab(minute='*/1'),
+    },
     "delete_expired_orders": {
-                "task": "apps.order.tasks.DeleteExpiredOrders",
-                "schedule": crontab(minute='*/15'),
-            }
+        "task": "apps.order.tasks.DeleteExpiredOrders",
+        "schedule": crontab(minute='*/15'),
+    },
+    "update_photo_theme_activity": {
+        "task": "apps.photo.tasks.UpdatePhotoThemeActivityTask",
+        "schedule": crontab(minute='0', hour='*/1'),
+    },
+    "calculate_ransom": {
+        "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
+        "schedule": crontab(minute='0', hour='*/4'),
+    },
 }
 
 SIMPLE_JWT = {
