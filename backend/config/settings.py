@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'apps.promocode',
     'apps.user',
     'apps.cart',
+
+    # Приложения CRM
+    'apps_crm.notifications'
 ]
 
 MIDDLEWARE = [
@@ -62,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middleware.DependencyInjectorMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
