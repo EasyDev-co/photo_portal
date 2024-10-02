@@ -6,6 +6,8 @@ import { useBlocker, useLocation, useNavigate } from 'react-router-dom';
 import { fetchGetCartWithTokenInterceptor } from '../../http/cart/getCart';
 import { fetchCartDeleteWithTokenInterceptor } from '../../http/cart/cartDelete';
 import PaymentModal from '../Modal/PaymentModal';
+import { paymentCreate } from '../../http/fetchPayment';
+import Modal from '../Modal/Modlal';
 
 const Cart = () => {
 
@@ -16,13 +18,19 @@ const Cart = () => {
     const navigate = useNavigate();
     const [activeModal, setActiveModal] = useState(false);
     const [order, setOrder] = useState({})
-
+    const [errModal, setErrModal] = useState(false);
+    const [errMessage, setErrMessage] = useState('');
     let blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
             !value &&
             currentLocation.pathname !== nextLocation.pathname &&
             nextLocation.pathname !== '/orders/payment'
     );
+
+    function errModalActive(errMessage) {
+        setErrModal(true)
+        setErrMessage(errMessage)
+    }
 
     const deleteCartItem = () => {
         setActiveModal(false);
@@ -62,7 +70,25 @@ const Cart = () => {
 
     };
     const payCartItem = () => {
-        navigate('/orders/payment', { state: { id: id } });
+        try {
+            paymentCreate(accessStor, id)
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(res => {
+                                window.location.href = res;
+                            })
+                    } else {
+                        res.json()
+                            .then(res => {
+                                errModalActive(res);
+                                console.log(res)
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
         setValue(true);
     }
 
@@ -92,6 +118,12 @@ const Cart = () => {
                 Корзина
             </h1>
             <div className={styles.cartContainer}>
+
+                <Modal
+                    active={errModal}
+                    setActive={setErrModal}
+                    text={errMessage}
+                />
                 <PaymentModal
                     active={activeModal}
                     setActive={setActiveModal}

@@ -13,7 +13,6 @@ const Modal = ({ active, setActive, text, success }) => {
                         {text}
                     </div>
                 }
-
             </div>
         </div>
     );

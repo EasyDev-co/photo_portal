@@ -39,9 +39,7 @@ export const Payment = () => {
   }
 
   const handleOptionClick = (id) => {
-    console.log(location.state)
-    let order = getCookie('order')
-
+    let order = getCookie('order');
     setSelectedOption(id);
     try {
       paymentCreate(accessStor, location.state.id || JSON.parse(order).id)
@@ -115,7 +113,6 @@ export const Payment = () => {
         />
         <div className={styles.paymentItemWrap}>
           {options.map((elem, i) => {
-            console.log(elem)
             return (
               <div key={i} className={styles.wrapItemBox}>
                 <div onClick={() => handleOptionClick(elem.id)} style={{

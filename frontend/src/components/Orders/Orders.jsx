@@ -167,7 +167,7 @@ export const Orders = () => {
         setModalActive(true)
         setModalText(
           <p>
-            Похоже, что у вас есть неоплаченный заказ,<Link to={'/orders/payment'}> перейдите по этой ссылке </Link>для оплаты
+            Похоже, что у вас есть неоплаченный заказ, обратитесь в поддержку 
             <span> fotodetstvo1@yandex.ru </span>
           </p>)
       }
