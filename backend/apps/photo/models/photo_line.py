@@ -10,6 +10,7 @@ from apps.kindergarten.models import Kindergarten
 from config.settings import TIME_ZONE
 from .photo_theme import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin
+from ..fields import NullImageField
 
 User = get_user_model()
 
@@ -27,7 +28,7 @@ class PhotoLine(UUIDMixin):
         verbose_name='Детский сад',
         related_name='photo_lines',
     )
-    qr_code = models.ImageField(
+    qr_code = NullImageField(
         upload_to='photo_line/',
         verbose_name="QR код",
         unique=True,
