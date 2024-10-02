@@ -32,6 +32,7 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
                 desc={':'}
             />
             <PaymentDiagram
+                bonus={'00,0'}
             />
             <PaymentButton
                 payOrder={payOrder}
