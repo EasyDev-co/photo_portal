@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 const PaymentDiagram = ({ text, amount, label, bonus }) => {
     const [count, setCount] = useState(0)
     const cart = useSelector(state => state.user.cart);
-    console.log(cart)
+    
     useEffect(() => {
         try {
             const sumTotalPrice = cart?.reduce((sum, item) => {

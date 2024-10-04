@@ -2,21 +2,21 @@ import React, { memo, useState } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
 import oke from '../../../../assets/images/pngwing.com.png'
-const PhotoBlock = memo(({ price, priceCalendar, blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
+const PhotoBlock = memo(({ price, priceCalendar, blocksId, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
   
   return (
     <div style={{
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <div key={index} className={styles.photoCardsWrap}>
+      <div className={styles.photoCardsWrap}>
         {photos.map((photo, index) => (
-          <div key={index} className={styles.photoCardWrapper}>
+          <div key={`${index}-${photo.number}`} className={styles.photoCardWrapper}>
             <PhotoCard
               blocksId={blocksId}
               photoId={photo.id}
               photo={photo.photo}
-              key={index}
+              
               number={photo.number}
               onChangeHandler={onChangeHandler}
               inputValue={inputValue}
@@ -81,7 +81,7 @@ const PhotoBlock = memo(({ price, priceCalendar, blocksId, index, photos, handle
           </div>
         </div>
         
-        <div key={index} className={styles.promoStringWrap}>
+        <div className={styles.promoStringWrap}>
           {price.total_price >= priceCalendar.ransom_amount_for_digital_photos ?
             <div>
               <img src={oke} alt="" />
@@ -91,7 +91,7 @@ const PhotoBlock = memo(({ price, priceCalendar, blocksId, index, photos, handle
           }
           <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_digital_photos} рублей, вы получите все фото в электронном виде</span>
         </div>
-        <div key={index} className={styles.promoStringWrap}>
+        <div className={styles.promoStringWrap}>
           {price.total_price >= priceCalendar.ransom_amount_for_calendar ?
             <div>
               <img src={oke} alt="" />
