@@ -3,7 +3,7 @@ import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
 import oke from '../../../../assets/images/pngwing.com.png'
 const PhotoBlock = memo(({ price, priceCalendar, blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
-  console.log(price)
+  
   return (
     <div style={{
       display: 'flex',
