@@ -226,6 +226,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
         "schedule": crontab(minute='0', hour='*/4'),
     },
+    "send_closing_receipts": {
+        "task": "apps.order.tasks.SendClosingReceiptsTask",
+        "schedule": crontab(minute='0', hour='*/1'),
+    },
 }
 
 SIMPLE_JWT = {
