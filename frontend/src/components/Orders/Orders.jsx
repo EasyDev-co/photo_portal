@@ -79,7 +79,7 @@ export const Orders = () => {
   }, [accessStor, sessionData])
 
   useEffect(() => {
-    let isMounted = true; // добавляем переменную для отслеживания монтирования
+    let isMounted = true; 
     fetchPhotoLineListWithTokenInterceptor(accessStor, '')
       .then(res => {
         if (isMounted && res.ok) {

@@ -50,7 +50,6 @@ const Block = ({ price, priceCalendar, setlineLenght, addPhoto, orderValue, setO
           isChecked={isChecked}
           setIsChecked={setIsChecked}
           handleCheckboxChange={handleCheckboxChange}
-          index={index}
           key={index}
           photos={block}
           onChangeHandler={onChangeHandler}
