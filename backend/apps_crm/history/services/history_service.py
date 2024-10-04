@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from django.contrib.auth import get_user_model
 
 from apps_crm.history.repositories.history_repository import HistoryRepository
@@ -12,3 +14,9 @@ class HistoryService:
     def list_user_history(self, user: User):
         """Получить историю изменений пользвоателя."""
         return self.history_repository.list(actor=user)
+
+    def list_object_history(self, model_name: str, object_id: UUID):
+        """Получить историю изменений объекта."""
+        return self.history_repository.list(
+            object_pk=object_id, content_type__model=model_name
+        )
