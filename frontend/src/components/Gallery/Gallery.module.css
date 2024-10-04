@@ -111,3 +111,7 @@
     flex-direction: column;
     gap: 25px;
 }
+.photoNumber{
+    padding: 5px 0;
+    font-size: 15px;
+}

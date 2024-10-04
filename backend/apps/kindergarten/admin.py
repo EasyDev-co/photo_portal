@@ -56,9 +56,17 @@ class KindergartenAdmin(admin.ModelAdmin):
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ransom_amount')
+    list_display = (
+        'name',
+        'ransom_amount_for_digital_photos',
+        'ransom_amount_for_calendar'
+    )
     ordering = ('name',)
-    search_fields = ('name', 'ransom_amount',)
+    search_fields = (
+        'name',
+        'ransom_amount_for_digital_photos',
+        'ransom_amount_for_calendar'
+    )
     inlines = [
         KindergartenInline,
         PhotoPriceInline

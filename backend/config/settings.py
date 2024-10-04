@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'apps.promocode',
     'apps.user',
     'apps.cart',
+
+    # Приложения CRM
+    'apps_crm.notifications'
 ]
 
 MIDDLEWARE = [
@@ -62,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middleware.DependencyInjectorMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -204,16 +208,24 @@ CELERY_BEAT_SCHEDULE = {
     },
     "remove_old_qr_codes": {
         "task": "apps.photo.tasks.QRCodeRemoverTask",
-        "schedule": crontab(minute='0', hour='*/48'),
+        "schedule": crontab(minute='0', hour='*/1'),
     },
     "check_if_orders_has_been_paid": {
-            "task": "apps.order.tasks.CheckIfOrdersPaid",
-            "schedule": crontab(minute='*/1'),
-        },
+        "task": "apps.order.tasks.CheckIfOrdersPaid",
+        "schedule": crontab(minute='*/1'),
+    },
     "delete_expired_orders": {
-                "task": "apps.order.tasks.DeleteExpiredOrders",
-                "schedule": crontab(minute='*/15'),
-            }
+        "task": "apps.order.tasks.DeleteExpiredOrders",
+        "schedule": crontab(minute='*/15'),
+    },
+    "update_photo_theme_activity": {
+        "task": "apps.photo.tasks.UpdatePhotoThemeActivityTask",
+        "schedule": crontab(minute='0', hour='*/1'),
+    },
+    "calculate_ransom": {
+        "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
+        "schedule": crontab(minute='0', hour='*/4'),
+    },
 }
 
 SIMPLE_JWT = {
@@ -248,3 +260,5 @@ VAT = os.environ.get('VAT')
 FFD_VERSION = os.environ.get('FFD_VERSION')
 PAYMENT_OBJECT = os.environ.get('PAYMENT_OBJECT')
 MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
+
+LOGO_PATH = os.environ.get('LOGO_PATH')

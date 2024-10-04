@@ -9,13 +9,14 @@ from apps.promocode.models import Promocode
 def calculate_price_for_order_item(
         order_item: OrderItem,
         prices_dict: dict,
-        ransom_amount: Decimal,
+        ransom_amount_for_digital_photos: Decimal,
         promocode: Promocode = None,
         coupon_amount: list = None  # передаем через список, чтобы можно было изменять coupon_amount снаружи
 ):
     """Подсчет стоимости позиции заказа с учетом промокода и суммы выкупа."""
     try:
-        if order_item.photo_type == PhotoType.digital and order_item.order.order_price >= ransom_amount:
+        if (order_item.photo_type == PhotoType.digital
+                and order_item.order.order_price >= ransom_amount_for_digital_photos):
             order_item.price = Decimal(0)
             return
         photo_price = prices_dict[order_item.photo_type]

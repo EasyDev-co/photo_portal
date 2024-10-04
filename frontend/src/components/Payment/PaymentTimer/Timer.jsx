@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTimeRemaining } from "./utils";
 import styles from './PaymentTimer.module.css'
-const Timer = ({ date, desc }) => {
+const Timer = ({ date, desc, isStats }) => {
    
     const [time, setTime] = useState({
         days: 0,
@@ -11,21 +11,33 @@ const Timer = ({ date, desc }) => {
     });
     const [themeName, setPhotoTheme] = useState(localStorage.getItem('theme_name'))
     useEffect(() => {
-        let timeInterval = setInterval(() => {
-            const deadline = localStorage.getItem('deadline');
-            setPhotoTheme(localStorage.getItem('theme_name'));
-            const { total, days, hours, minutes } = getTimeRemaining(deadline)
-            setTime({ days, hours, minutes });
-            if (!deadline) {
-                clearInterval(timeInterval);
-            }
-        }, 1000)
+        if(isStats){
+            let timeInterval = setInterval(() => {
+                setPhotoTheme(localStorage.getItem('theme_name'));
+                const { total, days, hours, minutes } = getTimeRemaining(date)
+                setTime({ days, hours, minutes });
+                if (!date) {
+                    clearInterval(timeInterval);
+                }
+            }, 1000)
+        } else {
+            let timeInterval = setInterval(() => {
+                const deadline = localStorage.getItem('deadline');
+                setPhotoTheme(localStorage.getItem('theme_name'));
+                const { total, days, hours, minutes } = getTimeRemaining(deadline)
+                setTime({ days, hours, minutes });
+                if (!deadline) {
+                    clearInterval(timeInterval);
+                }
+            }, 1000)
+        }
+       
     }, [])
 
     return (
         <div className={styles.timerWidget}>
             <span className={styles.timerDesc}>
-                Осталось времени на фотосессию: {themeName && `"${themeName}"`}
+                Осталось времени на фотосессию: {themeName && `"${isStats? desc : themeName}"`}
             </span>
             <div className={styles.timerWrap}>
                 <div className={styles.timer}>

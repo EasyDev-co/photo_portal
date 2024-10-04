@@ -36,7 +36,14 @@ export const Orders = () => {
   const [modalActive, setModalActive] = useState(false);
   const [modalText, setModalText] = useState('')
   const [codeIsActive, setCodeActive] = useState(false);
-  const [payOrder, setPayOrder] = useState({})
+  const [payOrder, setPayOrder] = useState({});
+  const [price, setPrice] = useState({
+    total_price: ''
+  })
+  const [priceCalendar, setPriceCalendar] = useState({
+    ransom_amount_for_digital_photos: 2222,
+    ransom_amount_for_calendar: 3333,
+  })
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -59,6 +66,10 @@ export const Orders = () => {
           if (isMounted && res.ok) {
             res.json()
               .then(data => {
+                setPriceCalendar({
+                  ransom_amount_for_digital_photos: data.ransom_amount_for_digital_photos,
+                  ransom_amount_for_calendar: data.ransom_amount_for_calendar,
+                })
                 dispatch(addPhotos(data));
                 patchPhotoLine(accessStor, { "parent": idP }, data.id)
               })
@@ -68,7 +79,6 @@ export const Orders = () => {
         isMounted = false;
       };
     }
-
   }, [accessStor, sessionData])
 
   useEffect(() => {
@@ -132,15 +142,16 @@ export const Orders = () => {
         if (res.ok) {
           res.json()
             .then(res => {
+              setPrice({
+                total_price: res[0]?.total_price || ''
+              })
               dispatch(setCart(res))
             })
-
         }
       })
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
-    // e.preventDefault();
     if (orderValue.length !== 0) {
       try {
         const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
@@ -148,16 +159,15 @@ export const Orders = () => {
           const data = await order.json();
           setCookie('order', JSON.stringify(data))
           dispatch(setOrderId(data));
-          navigate(`/cart/${data.id}`, {state: data});
+          navigate(`/cart/${data.id}`, { state: data });
         } else {
           const data = await order.json();
-          console.log(data)
         }
       } catch (error) {
         setModalActive(true)
         setModalText(
           <p>
-            Похоже, что у вас есть неоплаченный заказ,<Link to={'/orders/payment'}> перейдите по этой ссылке </Link>для оплаты
+            Похоже, что у вас есть неоплаченный заказ, обратитесь в поддержку 
             <span> fotodetstvo1@yandex.ru </span>
           </p>)
       }
@@ -217,12 +227,13 @@ export const Orders = () => {
           <h1 className={styles.profileTitle}>Выбор фотографии
             <button onClick={() => setScanActive(!scanActive)} className={styles.qrCodeBtn}></button>
           </h1>
-        
           <div id="orderForm" className={isBlur ? styles.photoCardsFormBlur : styles.photoCardsForm}>
             {addPhoto.length === 0 ? <div>
               У Вас пока нет заказов
             </div> :
               <Block
+                price={price}
+                priceCalendar={priceCalendar}
                 addPhoto={addPhoto}
                 orderValue={orderValue}
                 setOrderValue={setOrderValue}

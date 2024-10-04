@@ -138,8 +138,8 @@ export const Login = () => {
                 <button className={styles.authButton}>Продолжить</button>
               </form>
               <div className={styles.loginLinkWrap}>
-                <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}>Зарегистрируйтесь</span> </Link></p>
-                <div className={styles.socialList}>
+                <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}> Зарегистрируйтесь!</span> </Link></p>
+                {/* <div className={styles.socialList}>
                   <span>Войти через</span>
                   <div className={styles.socialWrap}>
                     <div>
@@ -158,10 +158,9 @@ export const Login = () => {
                       <img className={styles.socialIcon} src={mail} alt="" />
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
-
           </div>
         </div>
       </div>

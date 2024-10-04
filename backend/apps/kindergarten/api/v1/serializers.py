@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from apps.kindergarten.models import PhotoPrice, Kindergarten, Region
+from apps.kindergarten.models import PhotoPrice, Kindergarten, Region, Ransom
+from apps.photo.api.v1.serializers import PhotoThemeSerializer
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -45,3 +46,19 @@ class KindergartenStatsSerializer(serializers.Serializer):
         max_digits=10,
         decimal_places=2
     )
+
+
+class RansomSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для выкупа по детскому саду.
+    """
+    kindergarten = KindergartenSerializer()
+    photo_theme = PhotoThemeSerializer()
+
+    class Meta:
+        model = Ransom
+        fields = (
+            'kindergarten',
+            'photo_theme',
+            'ransom_amount'
+        )

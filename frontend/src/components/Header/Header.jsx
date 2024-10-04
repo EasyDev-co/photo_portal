@@ -52,6 +52,9 @@ export const Header = () => {
     return () => clearInterval(intervalId);
   }, [localStorageValue]);
   useEffect(() => {
+    if (!localStorage.getItem('access')) {
+      return;
+    }
     fetchUserDataWithTokenInterceptor(accessStor, refresh)
       .then(res => {
         if (res.ok) {

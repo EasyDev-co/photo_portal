@@ -10,8 +10,7 @@ export const getCart = async (access, id) => {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        },
-
+        }
     });
     return response;
 }
@@ -20,7 +19,6 @@ export const fetchGetCartWithTokenInterceptor = async (access, id, refresh) => {
     try {
         let response = await getCart(access, id)
         if (!response.ok) {
-            localStorage.setItem('access', '');
             let createToken = await tokenRefreshCreate(refresh)
             if (createToken.ok) {
                 createToken.json()
