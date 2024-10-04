@@ -41,8 +41,8 @@ export const Orders = () => {
     total_price: ''
   })
   const [priceCalendar, setPriceCalendar] = useState({
-    ransom_amount_for_digital_photos: 2222,
-    ransom_amount_for_calendar: 3333,
+    ransom_amount_for_digital_photos: '',
+    ransom_amount_for_calendar: '',
   })
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
@@ -66,10 +66,7 @@ export const Orders = () => {
           if (isMounted && res.ok) {
             res.json()
               .then(data => {
-                setPriceCalendar({
-                  ransom_amount_for_digital_photos: data.ransom_amount_for_digital_photos,
-                  ransom_amount_for_calendar: data.ransom_amount_for_calendar,
-                })
+
                 dispatch(addPhotos(data));
                 patchPhotoLine(accessStor, { "parent": idP }, data.id)
               })
@@ -90,6 +87,10 @@ export const Orders = () => {
             .then(data => {
               getNearestDate(data);
               setlineLenght(data.length);
+              setPriceCalendar({
+                ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
+                ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
+              })
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)
@@ -167,7 +168,7 @@ export const Orders = () => {
         setModalActive(true)
         setModalText(
           <p>
-            Похоже, что у вас есть неоплаченный заказ, обратитесь в поддержку 
+            Похоже, что у вас есть неоплаченный заказ, обратитесь в поддержку
             <span> fotodetstvo1@yandex.ru </span>
           </p>)
       }
