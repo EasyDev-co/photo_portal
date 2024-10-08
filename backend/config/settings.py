@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'apps.cart',
 
     # Приложения CRM
-    'apps_crm.notifications'
+    'apps_crm.notifications',
+    'apps_crm.roles',
 ]
 
 MIDDLEWARE = [
