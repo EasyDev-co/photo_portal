@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'drf_yasg',
     "phonenumber_field",
+    'auditlog',
 
     # Приложения
     'apps.kindergarten',
@@ -53,7 +54,8 @@ INSTALLED_APPS = [
     'apps.cart',
 
     # Приложения CRM
-    'apps_crm.notifications'
+    'apps_crm.notifications',
+    'apps_crm.history',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'config.middleware.DependencyInjectorMiddleware',
+    'auditlog.middleware.AuditlogMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -261,4 +264,5 @@ FFD_VERSION = os.environ.get('FFD_VERSION')
 PAYMENT_OBJECT = os.environ.get('PAYMENT_OBJECT')
 MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
 
+AUDITLOG_INCLUDE_ALL_MODELS = True
 LOGO_PATH = os.environ.get('LOGO_PATH')
