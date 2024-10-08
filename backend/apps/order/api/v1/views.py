@@ -198,8 +198,7 @@ class PaymentAPIView(APIView):
                     'Amount': str(int(order_item.price * 100)),
                     'Tax': VAT,
                     'PaymentMethod': str(PaymentMethod.FULL_PREPAYMENT),
-                    'PaymentObject': PAYMENT_OBJECT,
-                    'MeasurementUnit': MEASUREMENT_UNIT
+                    'PaymentObject': PAYMENT_OBJECT
                 } for order_item in order_items
             ],
             'FfdVersion': FFD_VERSION,

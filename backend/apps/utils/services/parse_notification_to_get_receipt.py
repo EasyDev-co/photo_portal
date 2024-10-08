@@ -11,7 +11,7 @@ class ParseNotificationToGetReceipt:
         return self.notification['Token'] == generate_token_for_t_bank(self.notification)
 
     def parse_notification(self) -> dict | None:
-        if self._validate_token():
+        if self._validate_token() and self.notification['Url']:
             parsed_data = {
                 'receipt': self.notification['Url'],
                 'orders_payment_id': self.notification['OrderId']

@@ -49,7 +49,7 @@ export const App = () => {
           <Route path={"/about-us"} element={<AboutUs />} />
           <Route path={"/rules"} element={<Rules />} />
           <Route path={"/cart/:id"} element={<Cart/>}/>
-          <Route path={"orders/payment"} element={<Payment />} />
+          {/* <Route path={"orders/payment"} element={<Payment />} /> */}
           <Route path="/*" element={<NotFound />} />
         </Route>
         <Route element={<AuthRoutes />}>

@@ -78,9 +78,8 @@ const authSlice = createSlice({
             const data = {  
                 photos: action.payload.photos.flat()
             };
-      
+            
             const existingIds = new Set(state.photos.map(photo => photo.id));
-        
             // Фильтруем фотографии по уникальному id
             const updateData = {
                 ...data,

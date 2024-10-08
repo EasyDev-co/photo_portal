@@ -211,7 +211,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "remove_old_qr_codes": {
         "task": "apps.photo.tasks.QRCodeRemoverTask",
-        "schedule": crontab(minute='0', hour='*/48'),
+        "schedule": crontab(minute='0', hour='*/1'),
     },
     "check_if_orders_has_been_paid": {
         "task": "apps.order.tasks.CheckIfOrdersPaid",
@@ -265,3 +265,4 @@ PAYMENT_OBJECT = os.environ.get('PAYMENT_OBJECT')
 MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
 
 AUDITLOG_INCLUDE_ALL_MODELS = True
+LOGO_PATH = os.environ.get('LOGO_PATH')
