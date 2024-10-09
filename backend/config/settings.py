@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # Приложения CRM
     'apps_crm.notifications',
     'apps_crm.roles',
+    'apps_crm.registration',
 ]
 
 MIDDLEWARE = [
@@ -179,6 +180,10 @@ REST_FRAMEWORK = {
     )
 }
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
 REDIS_DB_CELERY = os.environ.get('REDIS_DB_CELERY')
@@ -226,7 +231,7 @@ CELERY_BEAT_SCHEDULE = {
     "calculate_ransom": {
         "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
         "schedule": crontab(minute='0', hour='*/4'),
-    },
+    }
 }
 
 SIMPLE_JWT = {

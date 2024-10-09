@@ -16,11 +16,18 @@ class UserRole(models.IntegerChoices):
     """
     parent = 1, 'Родитель'
     manager = 2, 'Заведующий'
+    staff = 3, 'Сотрудник компании'
 
 
 class User(UUIDMixin, AbstractUser):
-    username = None
-    email = models.EmailField(unique=True)
+    username = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name='Имя пользователя',
+        null=True,
+        blank=True
+    )
+    email = models.EmailField(unique=True, null=True, blank=True)
     first_name = models.CharField(
         max_length=56,
         validators=[MinLengthValidator(2), validate_cyrillic],
