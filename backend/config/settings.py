@@ -231,7 +231,7 @@ CELERY_BEAT_SCHEDULE = {
     "calculate_ransom": {
         "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
         "schedule": crontab(minute='0', hour='*/4'),
-    }
+    },
 }
 
 SIMPLE_JWT = {
