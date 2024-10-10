@@ -1,6 +1,6 @@
 from django.urls import path
-from .providers import google, yandex, mailru
-from . import views
+from apps.oauth.api.v1.providers import google, yandex, mailru
+from apps.oauth.api.v1 import views
 
 urlpatterns = [
     # Google URLs

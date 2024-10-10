@@ -7,7 +7,7 @@ from rest_framework import status
 from django.contrib.auth import login
 from django.core.mail import send_mail
 from requests.exceptions import RequestException
-from ..utils import create_or_get_user  # импорт функции из utils.py
+from apps.oauth.api.v1.utils import create_or_get_user
 
 
 @api_view(['GET'])
