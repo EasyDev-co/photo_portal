@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useDispatch } from "react-redux";
 import styles from "./NavBarItem.module.css";
 import { Link } from "react-router-dom";

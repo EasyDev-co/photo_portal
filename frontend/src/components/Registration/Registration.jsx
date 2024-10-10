@@ -6,12 +6,12 @@ import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
 import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate , useLocation } from "react-router-dom";
 import { parentRegisterCreate } from "../../http/parent/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
 import { addQrIdPhoto, setEmail, setPhotoNumbers } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
-import { useLocation } from "react-router-dom";
+
 import danger from '../../assets/images/Auth/DangerCircle.svg'
 import Scaner from "../Scaner/Scaner";
 import Modal from "../Modal/Modlal";
@@ -176,7 +176,7 @@ export const Registration = () => {
           validateFullName(inputValue.fullName)
         }
       } catch (error) {
-
+        console.log(error)
       }
     } else {
       setError({ pictureNumbers: ['Неправильный формат ввода. Введите 6 номеров фото через дефис.'] })
@@ -273,9 +273,9 @@ export const Registration = () => {
                 </label>
               </div>
               {error.isChecked &&
-                error.isChecked?.map(elem => {
+                error.isChecked?.map((elem, i) => {
                   return (
-                    <div className={styles.wrongPass}>
+                    <div key={i} className={styles.wrongPass}>
                       <img src={danger} alt="" />
                       <span>{elem}</span>
                     </div>

@@ -4,6 +4,7 @@ import InputField from "../../InputField/InputField";
 import { parentChangePass } from '../../../http/parent/parentChangePass';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+
 const NewPassword = () => {
     const initialState = {
         newPassword: '',
@@ -43,7 +44,7 @@ const NewPassword = () => {
                 setError(data)
             }
         } catch (error) {
-
+            console.log(error)
         }
     }
 

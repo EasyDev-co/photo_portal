@@ -1,10 +1,13 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable react/display-name */
 /* eslint-disable react-hooks/rules-of-hooks */
 import styles from './PhotoCard.module.css'
 import Counter from './Counter/Counter';
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useRef, memo } from 'react';
 import { useClickOutside } from '../../../utils/useClickOutside';
 
-const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, onSubmitHandler, number, photo, setIsBlur, blurRef, getChangeData, photoId }) => {
+const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inputValue, number, photo, setIsBlur, photoId }) => {
     const [isScale, setIsScale] = useState(false);
     const [count, setCount] = useState(0);
 

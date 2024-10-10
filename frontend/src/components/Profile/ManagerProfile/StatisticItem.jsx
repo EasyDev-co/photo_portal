@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import styles from './StatisticItem.module.css'
 
 const StatisticItem = ({ label, data, isCopy, setIsCopy,timer }) => {

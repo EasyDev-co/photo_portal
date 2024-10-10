@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { parentVerifyResetCode } from '../../../http/parent/parentVerifyResetCode';
 import { setEmail, setCode } from '../../../store/authSlice';
+
 const ResetPassword = () => {
   const navigation = useNavigate();
 
@@ -54,7 +55,7 @@ const ResetPassword = () => {
           localStorage.setItem('onReset', 'false')
         }
       } catch (error) {
-
+        console.log(error)
       }
     }
     if (onReset) {
@@ -75,7 +76,7 @@ const ResetPassword = () => {
           setError(data)
         }
       } catch (error) {
-
+        console.log(error)
       }
     }
   }

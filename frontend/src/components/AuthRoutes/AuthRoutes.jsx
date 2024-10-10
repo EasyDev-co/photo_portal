@@ -1,4 +1,5 @@
-import { Outlet } from "react-router-dom"; // для рендеринга вложенных маршрутов
+import { Outlet } from "react-router-dom";
+ // для рендеринга вложенных маршрутов
 export const AuthRoutes = () => {
   return (
     <div className="body">

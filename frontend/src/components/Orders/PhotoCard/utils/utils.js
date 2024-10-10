@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 export function transformData(data) {
     const result = [];
 

@@ -1,0 +1,41 @@
+@import '../../../styles/variables.scss';
+
+.form-check-custom>input {
+    // background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27%3e%3ccircle r=%273%27 fill=%27rgba%28158, 197, 254, 1%29%27/%3e%3c/svg%3e') !important;
+    background-color: #ffffff !important;
+    border: 1px solid $secondary-color !important;
+}
+
+.form-check-custom>input:checked {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3E%3C/svg%3E") !important;
+    background-color: $blue-300 !important;
+    border: 1px solid $secondary-light-color !important;
+}
+
+.form-check-custom>input:focus {
+    box-shadow: none;
+}
+
+.accord_checkbox-wrap {
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.accord_checkbox-wrap::-webkit-scrollbar {
+    width: 5px;
+    /* Ширина всего элемента навигации */
+}
+
+.accord_checkbox-wrap::-webkit-scrollbar-track {
+    background: #fff;
+    /* Цвет дорожки */
+}
+
+.accord_checkbox-wrap::-webkit-scrollbar-thumb {
+    background-color: $primary-500;
+    /* Цвет бегунка */
+    border-radius: 20px;
+    /* Округление бегунка */
+    border: 3px solid $primary-500;
+    /* Оформление границ бегунка */
+}

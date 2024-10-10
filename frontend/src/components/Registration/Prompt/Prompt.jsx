@@ -6,10 +6,12 @@ import children4 from '../../../assets/images/Auth/kids/children4.png'
 import children5 from '../../../assets/images/Auth/kids/children5.png'
 import children6 from '../../../assets/images/Auth/kids/children6.png'
 import logo from '../../../assets/images/Auth/Frame1000004273.png'
+import { useState } from 'react'
 
-const Prompt = ({ activeWidget, highlight, blurRef }) => {
+const Prompt = ({activeWidget,highlight,blurRef}) => {
+  
+    return ( 
 
-    return (
         <div ref={blurRef} className={styles.promptWrap}>
             <div className={styles.promptImgWrap}>
                 <div>

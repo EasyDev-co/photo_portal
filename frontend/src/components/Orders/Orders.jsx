@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable no-constant-condition */
 import styles from "./Orders.module.css";
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
@@ -165,12 +167,7 @@ export const Orders = () => {
           const data = await order.json();
         }
       } catch (error) {
-        setModalActive(true)
-        setModalText(
-          <p>
-            Похоже, что у вас есть неоплаченный заказ, обратитесь в поддержку
-            <span> fotodetstvo1@yandex.ru </span>
-          </p>)
+        console.log(error)
       }
     }
   };
