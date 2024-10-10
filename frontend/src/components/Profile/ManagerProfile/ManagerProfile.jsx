@@ -12,31 +12,88 @@ import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/galle
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import { getNearestDate } from "../../Orders/utils/utils";
+import { fetchPhotoLineListWithTokenInterceptor } from "../../../http/photo/photoLineList";
+import { managerBonus } from "../../../http/gallerey/managerBonus";
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-flip';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+
+
+// import required modules
+import { EffectFlip, Pagination, Navigation } from 'swiper/modules';
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
     const accessStor = localStorage.getItem('access');
-    const kindergarten_id = useSelector(state => state.user.kindergarten_id);
     const navigate = useNavigate()
-    const [stats, setStats] = useState(
-        {
+    const [bonus, setBonus] = useState([])
+    const [stats, setStats] = useState({
+        current_stats: {
             total_orders: 0,
             completed_orders: 0,
             average_order_value: "0.00",
             total_amount: "0.00"
         }
+    }
     );
-    useEffect(() => {
-        getStats(accessStor, kindergarten_id)
-            .then(res => {
-                if (res.ok) {
-                    res.json()
-                        .then(res => {
-                            setStats(res)
-                        })
-                }
-            })
-    }, [accessStor, kindergarten_id])
 
+    useEffect(() => {
+        try {
+            fetchPhotoLineListWithTokenInterceptor(accessStor, '')
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(data => {
+                                getNearestDate(data);
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
+
+    }, [accessStor])
+
+    useEffect(() => {
+        try {
+            getStats(accessStor)
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(res => {
+                                console.log(res)
+                                setStats(res)
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
+
+    }, [])
+
+    useEffect(() => {
+        try {
+            managerBonus(accessStor)
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(res => {
+                                setBonus(res)
+                                console.log(res)
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [])
     return (
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
@@ -44,7 +101,7 @@ const ManagerProfile = () => {
                 <div className={styles.profileWidget}>
                     <StatisticItem
                         label={'Количество заказов'}
-                        data={`${stats.completed_orders} из ${stats.total_orders}`}
+                        data={`${stats.current_stats.completed_orders} из ${stats.current_stats.total_orders}`}
                     />
                     <StatisticItem
                         setIsCopy={setIsCopy}
@@ -54,7 +111,7 @@ const ManagerProfile = () => {
                     />
                     <StatisticItem
                         label={'Средний чек, руб'}
-                        data={stats.average_order_value}
+                        data={stats.current_stats.average_order_value}
                     />
                 </div>
                 <div className={styles.checkWrap}>
@@ -67,7 +124,7 @@ const ManagerProfile = () => {
                         </div>
 
                     </form>
-                    <div onClick={()=>navigate('/orders_manager')}>
+                    <div onClick={() => navigate('/orders_manager')}>
                         <MainButton
                             value={'Заказ для себя'}
                         />
@@ -76,23 +133,42 @@ const ManagerProfile = () => {
                 </div>
 
             </div>
-            <div className={styles.paymentTimerWrap}>
-
-                <PaymentDiagram
-                    count={'3 500'}
-                    label={'Ваш бонус:'}
-                />
-                <StatisticItem
-                    timer
-                    label={'Итого'}
-                    data={stats.total_amount}
-                />
-                <Timer
-                    date={'Sat Jun 30 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}
-                    desc={' на фотосессию “Зимняя сказка”'}
-                />
+            <div  className={styles.paymentTimerWrap}>
+            <Swiper
+                effect={'flip'}
+                grabCursor={true}
+                navigation={true}
+                modules={[EffectFlip, Pagination, Navigation]}
+                className="mySwiper"
+            >
+                {bonus?.map(elem => {
+                    return (
+                            <SwiperSlide key={elem.id} style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '80px'
+                            }}>
+                                <PaymentDiagram
+                                    count={'3 500'}
+                                    label={'Ваш бонус:'}
+                                    bonus={elem.total_bonus}
+                                />
+                                <StatisticItem
+                                    timer
+                                    label={'Итого'}
+                                    data={stats.current_stats.total_amount}
+                                />
+                                <Timer
+                                    isStats
+                                    date={elem.photo_theme.date_end}
+                                    desc={elem.photo_theme.name}
+                                />
+                            </SwiperSlide>
+                    )
+                })}
+            </Swiper>
             </div>
-
         </div>
     );
 }

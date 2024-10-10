@@ -14,6 +14,7 @@ class PhotoType(models.IntegerChoices):
     magnet = 4, 'Магнит'
     calendar = 5, 'Календарь'
     photobook = 6, 'Фотокнига'
+    free_calendar = 7, 'Календарь в подарок'
     digital = 0, 'Электронные фото'
 
 
@@ -28,7 +29,9 @@ class PhotoPrice(UUIDMixin):
         Region,
         on_delete=models.PROTECT,
         related_name='photo_prices',
-        verbose_name='Регион'
+        verbose_name='Регион',
+        null=True,
+        blank=True
     )
     photo_type = models.PositiveSmallIntegerField(
         choices=PhotoType.choices,
@@ -37,8 +40,18 @@ class PhotoPrice(UUIDMixin):
     )
 
     def __str__(self):
-        return f'Фото ({self.photo_type}) {self.price}'
+        return f'Фото ({self.get_photo_type_display()}) {self.price}'
 
     class Meta:
         verbose_name = 'Цена фото'
         verbose_name_plural = 'Цены фото'
+
+    def get_price_for_region(self, region_name):
+        """Возвращает цену для указанного региона или общую цену, если регион не Москва/СПБ."""
+        if region_name == 'Москва':
+            return self.price
+        elif region_name == 'Санкт-Петербург':
+            return self.price
+        else:
+            common_price = PhotoPrice.objects.filter(region__isnull=True, photo_type=self.photo_type).first()
+            return common_price.price if common_price else self.price

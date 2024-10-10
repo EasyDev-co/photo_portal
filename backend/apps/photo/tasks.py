@@ -2,6 +2,7 @@ import traceback
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from apps.photo.models import PhotoTheme
 from apps.promocode.models import Promocode
@@ -50,4 +51,17 @@ def generate_promocodes_for_photo_theme(photo_theme_id):
     Promocode.objects.bulk_create(promo_codes)
 
 
+class UpdatePhotoThemeActivityTask(BaseTask):
+    """
+    Поиск и деактивация фототем, у которых прошел дедлайн.
+    """
+    def run(self, *args, **kwargs):
+        # деактивируем прошедшие фототемы
+        PhotoTheme.objects.filter(
+            is_active=True,
+            date_end__lt=timezone.now()
+        ).update(is_active=False)
+
+
 app.register_task(QRCodeRemoverTask)
+app.register_task(UpdatePhotoThemeActivityTask)

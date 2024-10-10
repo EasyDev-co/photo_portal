@@ -1,8 +1,12 @@
+from io import BytesIO
+
+from django.core.files.base import ContentFile
 from django.db import models
 from django.core.exceptions import ValidationError
 
 from .photo_line import PhotoLine
 from apps.utils.models_mixins.models_mixins import UUIDMixin
+from apps.utils.services.add_watermark import add_watermark
 
 
 class SerialPhotoNumber(models.IntegerChoices):
@@ -32,7 +36,12 @@ class Photo(UUIDMixin):
         upload_to='photo/',
         verbose_name='Фотография'
     )
-
+    watermarked_photo = models.ImageField(
+        upload_to='watermarked_photo/',
+        verbose_name='Фотография с водяным знаком',
+        blank=True,
+        null=True
+    )
     serial_number = models.PositiveSmallIntegerField(
         choices=SerialPhotoNumber.choices,
         verbose_name='Порядковый номер'
@@ -57,3 +66,20 @@ class Photo(UUIDMixin):
 
         if self.serial_number in existing_serial_numbers:
             raise ValidationError('Такой порядковый номер в данном пробнике уже существует.')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.watermarked_photo:
+            watermarked_photo = add_watermark(
+                photo_path=self.photo,
+            )
+            # Сохраняем изображение в байтовый поток
+            buffer = BytesIO()
+            watermarked_photo.save(buffer, format='JPEG')
+            buffer.seek(0)
+
+            # Сохраняем как объект Django
+            self.watermarked_photo.save(
+                f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
+                ContentFile(buffer.read()),
+            )

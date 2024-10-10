@@ -16,17 +16,6 @@ import { setUser } from "../../store/authSlice";
 import { parentLoginCreate } from "../../http/parent/parentLoginCreate";
 
 export const Login = () => {
-  const [activeBlur, setActiveBlur] = useState(false);
-  const [wrongPassord, setWrongPassword] = useState(false);
-  const [isActiveAuth, setIsActiveAuth] = useState(true);
-  const [isActiveReset, setIsActiveReset] = useState(false);
-
-  const [error, setError] = useState({
-    non_field_errors:'',
-  });
-  const dispatch = useDispatch();
-  const navigation = useNavigate();
-
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -34,12 +23,38 @@ export const Login = () => {
     email: '',
     password: '',
     repeatPassword: ''
-  }
+  };
+
+  const [activeBlur, setActiveBlur] = useState(false);
+  const [wrongPassord, setWrongPassword] = useState(false);
+  const [isActiveAuth, setIsActiveAuth] = useState(true);
+  const [isActiveReset, setIsActiveReset] = useState(false);
   const [inputValue, setInputValue] = useState(initialState);
+  const [error, setError] = useState({
+    non_field_errors: '',
+  });
+  const dispatch = useDispatch();
+  const navigation = useNavigate();
+
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
   }
+  // function validateLogin(input) {
+  //   // Регулярное выражение для проверки кириллических букв
+  //   const cyrillicPattern = /^[А-ЯЁа-яё]+$/;
+
+  //   if (input.length < 2) {
+  //     setError({
+  //       non_field_errors: ['Длинна этого поля не может быть короче 1 слова.']
+  //     })
+  //     return
+  //   }
+
+  //   setError({
+  //     non_field_errors: []
+  //   })
+  // }
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
@@ -56,13 +71,14 @@ export const Login = () => {
         navigation('/')
       } else {
         const data = await response.json();
-        setError(data);
+        setError({
+          non_field_errors: ['Проверьте правильность введенных данных!']
+        })
       }
     } catch (error) {
       console.log(error)
     }
     setInputValue(initialState);
-
   }
   return (
     <>
@@ -124,8 +140,8 @@ export const Login = () => {
                 <button className={styles.authButton}>Продолжить</button>
               </form>
               <div className={styles.loginLinkWrap}>
-                <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}>Зарегистрируйтесь</span> </Link></p>
-                <div className={styles.socialList}>
+                <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}> Зарегистрируйтесь!</span> </Link></p>
+                {/* <div className={styles.socialList}>
                   <span>Войти через</span>
                   <div className={styles.socialWrap}>
                     <div>
@@ -144,10 +160,9 @@ export const Login = () => {
                       <img className={styles.socialIcon} src={mail} alt="" />
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
-
           </div>
         </div>
       </div>

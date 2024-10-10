@@ -53,6 +53,9 @@ export const Header = () => {
     return () => clearInterval(intervalId);
   }, [localStorageValue]);
   useEffect(() => {
+    if (!localStorage.getItem('access')) {
+      return;
+    }
     fetchUserDataWithTokenInterceptor(accessStor, refresh)
       .then(res => {
         if (res.ok) {
@@ -115,13 +118,14 @@ export const Header = () => {
           {isAuth ?
             <div className={styles.rightBlock}>
               <ul className={styles.userInfoList}>
-              <HeaderUserInfoItem
+                <HeaderUserInfoItem
                   top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
                   ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
                   ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
                   bottom={localStorage.getItem('phone')}
                 />
                 <HeaderUserInfoItem
+                  isKindergarten
                   top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
                   ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
                   bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
@@ -132,7 +136,6 @@ export const Header = () => {
               <Link to={'/sign-in'}>Войти</Link>
             </div>
           }
-
           {windowWidth <= 768 && (
             <>
               {navBarState ? (

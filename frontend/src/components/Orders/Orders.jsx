@@ -38,7 +38,14 @@ export const Orders = () => {
   const [modalActive, setModalActive] = useState(false);
   const [modalText, setModalText] = useState('')
   const [codeIsActive, setCodeActive] = useState(false);
-  const [payOrder, setPayOrder] = useState({})
+  const [payOrder, setPayOrder] = useState({});
+  const [price, setPrice] = useState({
+    total_price: ''
+  })
+  const [priceCalendar, setPriceCalendar] = useState({
+    ransom_amount_for_digital_photos: '',
+    ransom_amount_for_calendar: '',
+  })
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
     "15x20": 0,
@@ -61,6 +68,7 @@ export const Orders = () => {
           if (isMounted && res.ok) {
             res.json()
               .then(data => {
+
                 dispatch(addPhotos(data));
                 patchPhotoLine(accessStor, { "parent": idP }, data.id)
               })
@@ -70,11 +78,10 @@ export const Orders = () => {
         isMounted = false;
       };
     }
-
   }, [accessStor, sessionData])
 
   useEffect(() => {
-    let isMounted = true; // добавляем переменную для отслеживания монтирования
+    let isMounted = true; 
     fetchPhotoLineListWithTokenInterceptor(accessStor, '')
       .then(res => {
         if (isMounted && res.ok) {
@@ -82,6 +89,10 @@ export const Orders = () => {
             .then(data => {
               getNearestDate(data);
               setlineLenght(data.length);
+              setPriceCalendar({
+                ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
+                ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
+              })
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)
@@ -134,15 +145,16 @@ export const Orders = () => {
         if (res.ok) {
           res.json()
             .then(res => {
+              setPrice({
+                total_price: res[0]?.total_price || ''
+              })
               dispatch(setCart(res))
             })
-
         }
       })
   }, [orderValue])
 
   const onSubmitHandler = async (e) => {
-    // e.preventDefault();
     if (orderValue.length !== 0) {
       try {
         const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
@@ -150,10 +162,9 @@ export const Orders = () => {
           const data = await order.json();
           setCookie('order', JSON.stringify(data))
           dispatch(setOrderId(data));
-          navigate(`/cart/${data.id}`, {state: data});
+          navigate(`/cart/${data.id}`, { state: data });
         } else {
           const data = await order.json();
-          console.log(data)
         }
       } catch (error) {
         console.log(error)
@@ -219,6 +230,8 @@ export const Orders = () => {
               У Вас пока нет заказов
             </div> :
               <Block
+                price={price}
+                priceCalendar={priceCalendar}
                 addPhoto={addPhoto}
                 orderValue={orderValue}
                 setOrderValue={setOrderValue}
@@ -273,7 +286,10 @@ export const Orders = () => {
             </div>
           }
         </div>
-        <div className={styles.paymentTimerWrap}>
+        <div className={styles.paymentTimerWrap} style={{
+          padding: '69px 0 160px 0',
+          maxWidth: '380px'
+        }}>
           <PaymentTimer
             payOrder={payOrder}
             formId={'orderForm'}

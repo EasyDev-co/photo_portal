@@ -19,7 +19,7 @@ export const fetchPhotoLineListWithTokenInterceptor = async (access, refresh) =>
     try {
         let response = await photoLineList(access)
         if (!response.ok) {
-            localStorage.setItem('access','');
+            // localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate(refresh)
             if (createToken.ok) {
                 createToken.json()

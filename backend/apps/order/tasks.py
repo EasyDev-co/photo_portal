@@ -1,19 +1,28 @@
 import traceback
 
 from datetime import datetime, timedelta
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 import requests
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from apps.order.models import Order
-from apps.order.models.const import OrderStatus, PaymentStatus
+from apps.kindergarten.models import PhotoType
+from apps.order.models import Order, NotificationFiscalization, OrdersPayment, OrderItem
+from apps.order.models.const import OrderStatus, PaymentStatus, PaymentMethod
+from apps.order.models.receipt import Receipt
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
+from apps.utils.services.parse_notification_to_get_receipt import ParseNotificationToGetReceipt
 from config.celery import BaseTask, app
-from config.settings import EMAIL_HOST_USER, TERMINAL_KEY, T_PASSWORD, PAYMENT_GET_STATE_URL
+from config.settings import (
+    EMAIL_HOST_USER,
+    TERMINAL_KEY,
+    PAYMENT_GET_STATE_URL
+)
 
 from apps.photo.models import PhotoTheme
 from apps.user.models.email_error_log import EmailErrorLog
@@ -143,10 +152,8 @@ class CheckIfOrdersPaid(BaseTask):
             values = {
                 'TerminalKey': TERMINAL_KEY,
                 'PaymentId': order.payment_id,
-                'Password': T_PASSWORD,
             }
             token = generate_token_for_t_bank(values)
-            values.pop('Password')
             values['Token'] = token
             try:
                 response = requests.post(
@@ -198,8 +205,49 @@ class DeleteExpiredOrders(BaseTask):
             )
 
 
+class ParseNotificationFiscalization(BaseTask):
+    """Задача для парсинга нотификации о фискализации от т-банка."""
+
+    def run(self, notification_id: UUID):
+        try:
+            notification = NotificationFiscalization.objects.get(id=notification_id)
+
+            # обрабатываем нотификацию
+            parsed_data = ParseNotificationToGetReceipt(
+                notification.notification
+            ).parse_notification()
+
+            # достаем заказ по id, который пришел в нотификации
+            orders_payment = OrdersPayment.objects.get(
+                id=parsed_data['orders_payment_id']
+            )
+
+            with transaction.atomic():
+                # создаем объект Receipt
+                Receipt.objects.create(
+                    receipt_url=parsed_data['receipt'],
+                    user=orders_payment.orders.first().user,
+                    kindergarten=orders_payment.orders.first().photo_line.kindergarten,
+                    orders_payment=orders_payment,
+                )
+
+                # сохраняем запись об успешной обработке нотификации
+                notification.was_processed = True
+                notification.save()
+
+        except Exception as e:
+            self.on_failure(
+                exc=e,
+                task_id=self.request.id,
+                args=(),
+                kwargs={'notification_id': notification_id},
+                einfo=traceback.format_exc(),
+            )
+
+
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
 app.register_task(CheckIfOrdersPaid)
 app.register_task(DeleteExpiredOrders)
+parse_notification_fiscalization = app.register_task(ParseNotificationFiscalization)

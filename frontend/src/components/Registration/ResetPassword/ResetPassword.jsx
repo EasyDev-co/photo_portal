@@ -17,6 +17,11 @@ const ResetPassword = () => {
   const [onReset, setOnReset] = useState(false);
   const dispatch = useDispatch();
   const email = useSelector(action => action.user.email);
+  const [error, setError] = useState({
+    email: '',
+    message: '',
+    detail: ''
+  });
 
   const onChangeHandler = (event) => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
@@ -46,7 +51,7 @@ const ResetPassword = () => {
 
         } else {
           const data = await response.json();
-          console.log(data)
+          setError(data)
           localStorage.setItem('onReset', 'false')
         }
       } catch (error) {
@@ -68,7 +73,7 @@ const ResetPassword = () => {
           setInputValue({ resetEmail: '', resetCode: '' });
         } else {
           const data = await response.json();
-          console.log(data)
+          setError(data)
         }
       } catch (error) {
         console.log(error)
@@ -92,6 +97,7 @@ const ResetPassword = () => {
                     placeholder={'Код'}
                     isAuthForm
                     isNone
+                    error={error.message ? [error.message] : error.message}
                     value={inputValue.resetCode}
                   /> :
                   <InputField
@@ -102,11 +108,10 @@ const ResetPassword = () => {
                     isAuthForm
                     isNone
                     value={inputValue.resetEmail}
+                    error={error.email ? [error.email] : error.email ? [error.detail] : error.detail ? [error.detail] : error.detail}
                   />
                 }
-
                 <button className={styles.authButton}>Продолжить</button>
-
               </form>
             </div>
           </div>

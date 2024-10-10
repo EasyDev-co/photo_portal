@@ -24,7 +24,8 @@ const Verification = () => {
     const onChangeHandler = (event) => {
         const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
         setInputValue(newInput);
-    }
+    };
+    
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         try {

@@ -26,6 +26,7 @@
     justify-content: center;
     opacity: 1;
     pointer-events: all;
+    z-index: 1;
 }
 .modal__content {
     width: 385px;

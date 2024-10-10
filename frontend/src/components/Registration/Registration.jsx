@@ -14,6 +14,7 @@ import { useClickOutside } from "../../utils/useClickOutside";
 
 import danger from '../../assets/images/Auth/DangerCircle.svg'
 import Scaner from "../Scaner/Scaner";
+import Modal from "../Modal/Modlal";
 
 export const Registration = () => {
 
@@ -22,11 +23,13 @@ export const Registration = () => {
   const [isChecked, setIsChecked] = useState(false);
   const accessStor = localStorage.getItem('access');
   const navigate = useNavigate();
+
   useEffect(() => {
     if (accessStor) {
       navigate('/orders')
     }
   }, [])
+
   const initialState = {
     gardenCode: '',
     pictureNumbers: '',
@@ -34,9 +37,10 @@ export const Registration = () => {
     email: '',
     password: '',
     repeatPassword: ''
-  }
+  };
 
-  const [activeBlur, setActiveBlur] = useState(false)
+  const [modalActive, setModalActive] = useState(false);
+  const [activeBlur, setActiveBlur] = useState(false);
   const [inputValue, setInputValue] = useState(initialState);
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState({
@@ -52,12 +56,10 @@ export const Registration = () => {
   });
   const [errorName, setErrorName] = useState({
     text: ''
-  })
+  });
   const navigation = useNavigate();
-  const email = useSelector(action => action.user.email);
   const dispatch = useDispatch();
   const [scanActive, setScanActive] = useState(false);
-
 
   useEffect(() => {
     let photos = [];
@@ -66,6 +68,7 @@ export const Registration = () => {
         photos.push(value);
       }
     });
+
     setInputValue({
       gardenCode: searchParams.get('kindergarten_code') || '',
       pictureNumbers: photos.join('-') || ''
@@ -135,6 +138,7 @@ export const Registration = () => {
       text: []
     })
   }
+  
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     const regex = /^\d+(-\d+){5}$/;
@@ -182,9 +186,12 @@ export const Registration = () => {
   return <>
     <div className={styles.login}>
       <Scaner
+        modalActive={modalActive}
+        setModalActive={setModalActive}
         scanActive={scanActive}
         setScanActive={setScanActive}
       />
+
       <div className={styles.container}>
         <div className={activeBlur ? styles.blurContainer : ' '}></div>
         <div className={styles.regFormWrap}>
@@ -256,11 +263,9 @@ export const Registration = () => {
                 value={inputValue.repeatPassword}
                 error={error.repeatPass}
               />
-
-
               <div className={isChecked ? styles.privacyCheckbox : styles.privacyCheckboxUnCheck}>
                 <input className={styles.privacyInput} onChange={(e) => setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
-                <label htmlFor="privacy">
+                <label htmlFor="">
                   <p>
                     Даю согласие на обработку своих персональных данных.
                     <span> С соглашением ознакомлен.</span>
@@ -281,7 +286,7 @@ export const Registration = () => {
             </form>
             <div className={styles.loginLinkWrap}>
               <p>Если есть аккаунт, выполните <Link to={'/sign-in'}><span className={styles.loginEnter}>Вход</span> </Link> </p>
-              <div className={styles.socialList}>
+              {/* <div className={styles.socialList}>
                 <span>Войти через</span>
                 <div className={styles.socialWrap}>
                   <div>
@@ -300,10 +305,14 @@ export const Registration = () => {
                     <img className={styles.socialIcon} src={mail} alt="" />
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
-
+          <Modal
+            active={modalActive}
+            setActive={setModalActive}
+            text={'Пожалуйста, разрешите браузеру использовать веб-камеру!'}
+          />
         </div>
       </div>
     </div>

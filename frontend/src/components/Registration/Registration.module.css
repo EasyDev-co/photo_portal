@@ -212,10 +212,10 @@
 
 @media (min-width: 360px) and (max-width: 767px) {
   .privacyCheckbox {
-    gap: 8px;
+    gap: 16px;
   }
   .privacyCheckbox>label>p {
-    font-size: 15px;
+    font-size: 20px;
   }
 }
 

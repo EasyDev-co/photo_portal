@@ -18,7 +18,7 @@ export const fetchGetOrderWithTokenInterceptor = async (access) => {
     try {
         let response = await getOrder(access)
         if (response.status === 401 || response.status === 403)  {
-            localStorage.setItem('access','');
+            // localStorage.setItem('access','');
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
                 createToken.json()

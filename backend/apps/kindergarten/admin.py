@@ -19,13 +19,7 @@ class PhotoPriceInline(admin.TabularInline):
 
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'region',
-        'code',
-        'has_photobook',
-        'locality'
-    )
+    list_display = ('name', 'region', 'code', 'has_photobook', 'locality')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code')
@@ -38,35 +32,34 @@ class KindergartenAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if obj:
-            return (
-                'region',
-                'name',
-                'code',
-                'has_photobook',
-                'qr_image',
-                'qr_code'
-            )
-        return (
-            'region',
-            'name',
-            'code',
-            'has_photobook'
-        )
+            return ('region', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code')
+        return ('region', 'name', 'code', 'has_photobook')
 
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ransom_amount')
+    list_display = ('name', 'ransom_amount_for_digital_photos', 'ransom_amount_for_calendar')
     ordering = ('name',)
-    search_fields = ('name', 'ransom_amount',)
-    inlines = [
-        KindergartenInline,
-        PhotoPriceInline
-    ]
+    search_fields = ('name', 'ransom_amount_for_digital_photos', 'ransom_amount_for_calendar')
+    inlines = [KindergartenInline, PhotoPriceInline]
 
 
 @admin.register(PhotoPrice)
 class PhotoPriceAdmin(admin.ModelAdmin):
-    list_display = ('price', 'photo_type', 'region')
+    list_display = ('get_price_display', 'photo_type', 'region')
     raw_id_fields = ('region',)
     ordering = ('region',)
+
+    def get_price_display(self, obj):
+        if obj.region:
+            return f'Цена для {obj.region.name}: {obj.price}'
+        return f'Общая цена для остальных регионов: {obj.price}'
+
+    get_price_display.short_description = 'Цены для регионов'
+
+    def save_model(self, request, obj, form, change):
+        if not obj.region and PhotoPrice.objects.filter(region__isnull=True, photo_type=obj.photo_type).exists():
+            raise ValueError('Общая цена для данного типа фотографий уже существует.')
+        if obj.region and obj.region.name in ['Москва', 'Санкт-Петербург'] and obj.price == 0:
+            raise ValueError(f'Необходимо указать цену для региона {obj.region.name}.')
+        super().save_model(request, obj, form, change)

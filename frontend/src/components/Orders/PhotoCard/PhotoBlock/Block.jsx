@@ -7,14 +7,14 @@ import { removePhotos } from '../../../../store/authSlice';
 
 const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
 
+
   const [photoBlocks, setPhotoBlocks] = useState([]);
   const dispatch = useDispatch();
   const accessStor = localStorage.getItem('access');
 
-  useEffect(()=>{
+  useEffect(() => {
     setlineLenght(photoBlocks.length)
-  },[photoBlocks])
-
+  }, [photoBlocks])
 
   useEffect(() => {
     if (addPhoto && addPhoto.length > 0) {
@@ -22,16 +22,14 @@ const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHan
       for (let i = 0; i < addPhoto.length; i += 6) {
         blocks.push(addPhoto.slice(i, i + 6));
       }
-
       setPhotoBlocks(blocks);
-     
     }
   }, [addPhoto]);
 
   const handleRemoveBlock = async (indexToRemove, id) => {
     try {
       const res = await patchPhotoLine(accessStor, { "parent": null }, id);
-      localStorage.setItem('deadline','')
+      localStorage.setItem('deadline', '')
       const data = await res.json();
       setPhotoBlocks((prevBlocks) => {
         const newBlocks = prevBlocks.filter((_, index) => index !== indexToRemove);
@@ -45,14 +43,15 @@ const Block = ({ setlineLenght, addPhoto, orderValue, setOrderValue, onChangeHan
   };
 
   return (
-    <div  className={styles.block}>
+    <div className={styles.block}>
       {photoBlocks?.map((block, index) => (
         <PhotoBlock
+          price={price}
+          priceCalendar={priceCalendar}
           blocksId={index}
           isChecked={isChecked}
           setIsChecked={setIsChecked}
           handleCheckboxChange={handleCheckboxChange}
-          index={index}
           key={index}
           photos={block}
           onChangeHandler={onChangeHandler}
