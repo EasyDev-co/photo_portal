@@ -11,18 +11,18 @@ User = get_user_model()
 
 class UserService:
     @staticmethod
-    def create_user(first_name, last_name, role_name, region_name, logged_in_user_id):
+    def create_user(first_name, last_name, email, role_name, region_name, logged_in_user_id):
+
+        if User.objects.filter(email=email).exists():
+            raise ValueError(f"Пользователь с email '{email}' уже существует.")
         # Генерация логина и пароля
-        username = get_random_string(
-            length=8, allowed_chars=string.ascii_letters + string.digits
-        )
         password = get_random_string(
             length=8, allowed_chars=string.ascii_letters + string.digits
         )
 
         # Создание пользователя
         user = User(
-            username=username,
+            email=email,
             first_name=first_name,
             last_name=last_name,
             is_active=True,
@@ -52,9 +52,9 @@ class UserService:
         send_user_credentials.delay(
             user_id=logged_in_user_id,
             password=password,
-            username=username,
             first_name=first_name,
             last_name=last_name,
+            email=email,
         )
 
         return user

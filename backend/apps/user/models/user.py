@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -20,14 +20,8 @@ class UserRole(models.IntegerChoices):
 
 
 class User(UUIDMixin, AbstractUser):
-    username = models.CharField(
-        max_length=100,
-        unique=True,
-        verbose_name='Имя пользователя',
-        null=True,
-        blank=True
-    )
-    email = models.EmailField(unique=True, null=True, blank=True)
+    username = None
+    email = models.EmailField(unique=True)
     first_name = models.CharField(
         max_length=56,
         validators=[MinLengthValidator(2), validate_cyrillic],
@@ -77,6 +71,7 @@ class User(UUIDMixin, AbstractUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     class Meta:

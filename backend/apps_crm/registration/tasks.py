@@ -9,13 +9,18 @@ User = get_user_model()
 
 
 class SendUserCredentialsTask(BaseTask):
+
     name = "send_user_credentials"
 
-    def process(self, user_id, password, username, first_name, last_name, *args, **kwargs):
+    def process(self, user_id, password, first_name, last_name, email, *args, **kwargs):
         user: User = User.objects.get(id=user_id)
 
-        subject = f'Данные для входа в систему'
-        message = f'Данные для пользователя {first_name} {last_name}:\nВаш логин: {username}\nВаш пароль: {password}'
+        subject = 'Ваши учетные данные для входа'
+        message = (
+            f'Здравствуйте, {first_name} {last_name}!\n'
+            f'Ваш email для входа: {email}\n'
+            f'Ваш пароль: {password}\n'
+        )
 
         try:
             send_mail(
@@ -43,18 +48,4 @@ class SendUserCredentialsTask(BaseTask):
         super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
-class ResendUserCredentials(BaseTask):
-    def process(self, *args, **kwargs):
-        email_error_logs = EmailErrorLog.objects.filter(
-            confirm_code__is_used=False,
-            is_sent=False,
-        )
-        for email_error_log in email_error_logs:
-            send_user_credentials.delay(
-                user_id=email_error_log.user.id,
-                code_purpose=email_error_log.confirm_code.purpose
-            )
-        email_error_logs.update(is_sent=True)
-
 send_user_credentials = app.register_task(SendUserCredentialsTask)
-app.register_task(ResendUserCredentials)
