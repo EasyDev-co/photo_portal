@@ -3,14 +3,43 @@ import './styles/KindergartensInfo.scss'
 import { arrayOfObjects } from "../../constants/mockData";
 import DatePicker from "../../components-crm/DatePicker/DatePicker";
 import calendar from '../../assets/icons/calendar-event.svg'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OrderCard from "../../components-crm/OrderCard/OrderCard";
 import Notes from "../../components-crm/Notes/Notes";
+import { fetchSingleClientCardsWithTokenInterceptor } from "../../http/client-cards/getClientCard";
+import { useParams } from "react-router-dom";
 
 
 const KindergartensInfo = () => {
 
+    const { id } = useParams();
     const [isActive, setIsActive] = useState(false);
+    const [clientCardData, setClientCardData] = useState(null); // State to store fetched client card data
+    const access = localStorage.getItem('access'); // Get access token
+
+
+    useEffect(() => {
+        const fetchClientCard = async () => {
+            try {
+                const response = await fetchSingleClientCardsWithTokenInterceptor(access, id); // Use the function to fetch data
+                if (response.ok) {
+                    const data = await response.json(); // Parse the response JSON
+                    setClientCardData(data); // Store the data in state
+                    console.log(data); // Log the fetched data
+                } else {
+                    console.error('Failed to fetch single client card');
+                }
+            } catch (error) {
+                console.error('Error fetching single client card:', error);
+            }
+        };
+
+        fetchClientCard(); // Call the fetch function on component mount
+    }, [access]);
+
+    console.log(clientCardData);
+    
+if(clientCardData){
     return (
         <div className="page-crm">
             <div className="d-flex gap-3">
@@ -24,7 +53,7 @@ const KindergartensInfo = () => {
                             <CardHeader style={{
                                 fontSize: '20px'
                             }} className="border-0 fw-600 p-0">
-                                Детский сад ромашка
+                                Детский сад {clientCardData.name}
                             </CardHeader>
                             <Card.Body className="fw-400 text-secondary p-0">
                                 120 детей, VIP
@@ -125,7 +154,7 @@ const KindergartensInfo = () => {
                         </Card>
                     </div>
                     <div className="card-shadow">
-                        <OrderCard />
+                        <OrderCard region={clientCardData.region.country} city={clientCardData.region.name}/>
                     </div>
                 </div>
                 <div className="flex-grow-1 d-flex flex-column gap-3">
@@ -310,6 +339,7 @@ const KindergartensInfo = () => {
 
         </div>
     );
+}
 }
 
 export default KindergartensInfo;

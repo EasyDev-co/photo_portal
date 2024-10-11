@@ -6,7 +6,7 @@ import { useState } from "react";
 import './styles/OrderCard.scss'
 import LocationMap from "../YMap/LocationMap";
 
-const OrderCard = () => {
+const OrderCard = ({region, city}) => {
     const [isActive, setIsActive] = useState(false);
     return (
 
@@ -35,11 +35,11 @@ const OrderCard = () => {
                     <div className="d-flex gap-3">
                         <Form.Group className="flex-grow-1">
                             <Form.Label className="text-secondary">Регион</Form.Label>
-                            <Form.Control className='shadow-none ps-3' placeholder='Не указано' />
+                            <Form.Control className='shadow-none ps-3' placeholder={`${region}`} />
                         </Form.Group>
                         <Form.Group className="flex-grow-1">
                             <Form.Label className="text-secondary">Город</Form.Label>
-                            <Form.Control className='shadow-none ps-3' placeholder='Не указано' />
+                            <Form.Control className='shadow-none ps-3' placeholder={`${city}`} />
                         </Form.Group>
                         <Form.Group className="flex-grow-1">
                             <Form.Label className="text-secondary">Адрес</Form.Label>
