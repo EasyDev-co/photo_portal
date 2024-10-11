@@ -56,8 +56,8 @@ INSTALLED_APPS = [
 
     # Приложения CRM
     'apps_crm.notifications',
+    'apps_crm.roles',
     'apps_crm.history',
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
