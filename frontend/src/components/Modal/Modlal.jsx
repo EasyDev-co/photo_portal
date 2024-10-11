@@ -3,7 +3,7 @@
 import style from './Modal.module.css'
 import danger from '../../assets/images/Auth/DangerCircle.svg'
 
-const Modal = ({ active, setActive, text }) => {
+const Modal = ({ active, setActive, text, success }) => {
 
     return (
         <div className={active ? style.modal__active : style.modal} onClick={() => setActive(false)}>

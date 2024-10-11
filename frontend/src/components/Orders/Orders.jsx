@@ -89,10 +89,15 @@ export const Orders = () => {
             .then(data => {
               getNearestDate(data);
               setlineLenght(data.length);
-              setPriceCalendar({
-                ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
-                ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
-              })
+              if (data.length > 0) {
+                setPriceCalendar({
+                  ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
+                  ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
+                });
+              } else {
+                // Handle the case where data is empty
+                console.warn('Data is empty:', data);
+              }
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)

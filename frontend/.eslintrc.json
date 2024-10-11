@@ -26,19 +26,22 @@
     "react-refresh",
     "import"
   ],
-  "settings": {
-    "react": {
-      "version": "detect" // Автоматически определяет установленную версию React
-    },
-    "import/resolver": {
-      "node": {
-        "extensions": [
-          ".js",
-          ".jsx"
-        ]
-      }
-    }
+"settings": {
+  "react": {
+    "version": "detect"
   },
+  "import/resolver": {
+    "node": {
+      "extensions": [
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".json"
+      ]
+    }
+  }
+},
   "rules": {
     "react/jsx-filename-extension": [
       1,

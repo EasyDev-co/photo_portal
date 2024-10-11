@@ -1,24 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import './styles/Kindergartens.scss';
 import ClientFilter from "../../components-crm/ClientFilter/ClientFilter";
 import ClientCard from "../../components-crm/ClientCard/ClientCard";
 import { arrayOfObjects } from "../../constants/mockData"; // Импорт ваших данных
 import { Pagination } from "react-bootstrap";
+import { fetchClientCardsWithTokenInterceptor } from "../../http/client-cards/getClientCards";
 
 const Kindergartens = () => {
-    const itemsPerPage = 12; // Количество карточек на странице
+    const itemsPerPage = 12; // Number of cards per page
     const [currentPage, setCurrentPage] = useState(1);
+    const [clientCards, setClientCards] = useState([]); // State for storing client cards
+    const access = localStorage.getItem('access'); // Get the access token from local storage
 
-    const totalItems = arrayOfObjects.length; // Общее количество карточек
-    const totalPages = Math.ceil(totalItems / itemsPerPage); // Общее количество страниц
+    useEffect(() => {
+        const fetchClientCards = async () => {
+            try {
+                const response = await fetchClientCardsWithTokenInterceptor(access);
+                if (response.ok) {
+                    const data = await response.json(); // Parse the JSON response
+                    setClientCards(data); // Update state with fetched data
+                } else {
+                    console.error('Failed to fetch client cards');
+                }
+            } catch (error) {
+                console.error('Error fetching client cards:', error);
+            }
+        };
 
-    // Функция для получения карточек на текущей странице
+        fetchClientCards();
+    }, [access]); // Fetch when the component mounts or when the access token changes
+
+    console.log(clientCards);
+    
+
+    // Function for pagination
     const paginate = (array, page_number, page_size) => {
         return array.slice((page_number - 1) * page_size, page_number * page_size);
     };
 
-    const currentItems = paginate(arrayOfObjects, currentPage, itemsPerPage);
+    const currentItems = paginate(clientCards, currentPage, itemsPerPage);
+    const totalItems = clientCards.length; // Update total items from fetched data
+    const totalPages = Math.ceil(totalItems / itemsPerPage); // Calculate total pages
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
