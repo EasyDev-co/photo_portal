@@ -286,3 +286,5 @@ YANDEX_REDIRECT_URI = os.getenv('YANDEX_REDIRECT_URI', 'http://localhost:8000/ap
 MAILRU_CLIENT_ID = os.getenv('MAILRU_CLIENT_ID')
 MAILRU_CLIENT_SECRET = os.getenv('MAILRU_CLIENT_SECRET')
 MAILRU_REDIRECT_URI = os.getenv('MAILRU_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/mailru/')
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')

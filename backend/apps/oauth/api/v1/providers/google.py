@@ -76,11 +76,10 @@ def google_callback(request):
         # Авторизация пользователя
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
-        return Response({
-            'email': email,
-            'name': f"{first_name} {last_name}",
-            'access_token': access_token,
-        }, status=status.HTTP_200_OK)
+        # Редирект на фронтенд с токеном
+        frontend_url = settings.FRONTEND_URL
+        redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
+        return redirect(redirect_url)
 
     except RequestException as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
