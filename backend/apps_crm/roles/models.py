@@ -45,6 +45,24 @@ class Region(UUIDMixin, TimeStampedMixin):
         return self.name
 
 
+class Permission(UUIDMixin, TimeStampedMixin):
+    """
+    Модель прав доступа.
+    """
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="Название права"
+    )
+
+    class Meta:
+        verbose_name = "Право"
+        verbose_name_plural = "Права"
+
+    def __str__(self):
+        return self.name
+
+
 class Role(UUIDMixin, TimeStampedMixin):
     """
     Модель роли сотрудника в компании.
@@ -64,6 +82,12 @@ class Role(UUIDMixin, TimeStampedMixin):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name="Родительская роль"
+    )
+    permissions = models.ManyToManyField(
+        Permission,
+        blank=True,
+        related_name="roles",
+        verbose_name="Права"
     )
 
     class Meta:

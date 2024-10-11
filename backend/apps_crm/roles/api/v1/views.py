@@ -1,8 +1,36 @@
 from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from apps_crm.roles.models import Role
-from apps_crm.roles.api.v1.serializers import RoleSerializer
+from rest_framework.permissions import IsAdminUser
+
+from apps_crm.roles.models import (
+    Department, Region, Role, Permission
+)
+from apps_crm.roles.api.v1.serializers import (
+    DepartmentSerializer,
+    RegionSerializer,
+    RoleSerializer,
+    PermissionSerializer
+)
+
+
+class RegionViewSet(viewsets.ModelViewSet):
+    """Вьюсет для управления регионами (CRUD операции)."""
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+    permission_classes = [IsAdminUser]
+
+
+class DepartmentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для управления отделами (CRUD операции)."""
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+    permission_classes = [IsAdminUser]
+
+
+class PermissionViewSet(viewsets.ModelViewSet):
+    """Вьюсет для управления правами (CRUD операции)."""
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    permission_classes = [IsAdminUser]
 
 
 class RoleViewSet(viewsets.ModelViewSet):
@@ -11,22 +39,4 @@ class RoleViewSet(viewsets.ModelViewSet):
     """
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    permission_classes = [IsAdminUser]
