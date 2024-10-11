@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # Приложения CRM
     'apps_crm.notifications',
     'apps_crm.roles',
+    'apps_crm.registration',
     'apps_crm.history',
 
 MIDDLEWARE = [
@@ -181,6 +182,10 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')

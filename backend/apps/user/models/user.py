@@ -16,6 +16,7 @@ class UserRole(models.IntegerChoices):
     """
     parent = 1, 'Родитель'
     manager = 2, 'Заведующий'
+    staff = 3, 'Сотрудник компании'
 
 
 class User(UUIDMixin, AbstractUser):

@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/', include('apps.kindergarten.api.urls')),
     path('api/', include('apps.cart.api.urls')),
     path('api/crm/', include('apps_crm.notifications.api.urls')),
+    path('api/crm/', include('apps_crm.registration.api.urls')),
     path('api/crm/', include('apps_crm.history.api.urls')),
     path('api/crm/', include('apps_crm.client_cards.api.urls')),
     path('api/oauth/', include('apps.oauth.api.urls')),
