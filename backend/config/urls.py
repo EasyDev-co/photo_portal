@@ -1,7 +1,6 @@
 from django.conf.urls.static import static
 from django.urls import path, include
 from django.contrib import admin
-
 from config import settings
 from config.redoc import schema_view
 
@@ -14,6 +13,9 @@ urlpatterns = [
     path('api/', include('apps.cart.api.urls')),
     path('api/crm/', include('apps_crm.notifications.api.urls')),
     path('api/crm/', include('apps_crm.registration.api.urls')),
+    path('api/crm/', include('apps_crm.history.api.urls')),
+    path('api/crm/', include('apps_crm.client_cards.api.urls')),
+    path('api/oauth/', include('apps.oauth.api.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

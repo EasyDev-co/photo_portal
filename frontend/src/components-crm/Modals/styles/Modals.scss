@@ -1,0 +1,102 @@
+@import '../../../styles/variables.scss';
+
+.modal-custom {
+    // height: 100vh;
+    // width: 100vw;
+    // top: 0;
+    // right: 0;
+    // backdrop-filter: blur(5px);
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    // transform: scale(0);
+    pointer-events: none;
+    transition: .5s;
+    opacity: 0;
+    --bs-modal-margin: 0;
+
+    &__header {
+        border-bottom: 1px solid $gray-400
+    }
+}
+
+.modal__active {
+    // transform: scale(1);
+    // height: 100vh;
+    // width: 100vw;
+    // position: fixed;
+    // top: 0;
+    // right: 0;
+    // backdrop-filter: blur(5px);
+    // display: flex;
+    // align-items: end;
+    // justify-content: end;
+    // opacity: 1;
+    // z-index: 4;
+    // pointer-events: all;
+}
+
+.modal__content {
+    width: 350px;
+    border-radius: 12px;
+    border-bottom: none;
+    background-color: #fff;
+    -webkit-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border: 1px solid #ced4da;
+    position: absolute;
+    top: 70px;
+    right: 0;
+    height: max-content;
+    z-index: 3;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.modal__text {
+    display: flex;
+    align-items: start;
+    gap: 10px;
+}
+
+.modal__text>p>a {
+    color: #11BBD1;
+}
+
+.modal__text>p {
+    line-height: 22px;
+}
+
+.modal__header {
+    border-bottom: 1px solid $gray-400
+}
+
+.btn-filter-apply {
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #fff;
+    background-color: $primary-500;
+    border-color: $primary-500;
+}
+.btn-filter-apply:hover{
+    background-color: $primary-400;
+    border-color: $primary-400;
+}
+
+
+.btn-filter-reset {
+    font-weight: 600;
+    font-size: 14px;
+    background-color: #fff;
+    color: $primary-600;
+    border-color: $primary-500;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+.btn-filter-reset:hover{
+    background-color: $primary-400;
+    border-color: $primary-400;
+}

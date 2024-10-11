@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import MainButton from "../../Buttons/MainButton";
 import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
@@ -5,8 +7,8 @@ import styles from "./ParentProfile.module.css";
 import { useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector , useDispatch } from "react-redux";
+
 import { setOrderId, setResetData } from "../../../store/authSlice";
 import { parentResetPassCreate } from "../../../http/parent/parentResetPassCreate";
 import { useClickOutside } from "../../../utils/useClickOutside";
@@ -75,7 +77,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                 console.log(data)
             }
         } catch (error) {
-
+            console.log(error)
         }
     };
 

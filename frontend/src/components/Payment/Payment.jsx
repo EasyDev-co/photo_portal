@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import styles from "./Payment.module.css";
 import PaymentDiagram from "./PaymentDiagram/PaymentDiagram";
 import PaymentItem from "./PaymentItem";

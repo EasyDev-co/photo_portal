@@ -1,0 +1,29 @@
+@import url('../../../styles/variables.scss');
+
+.header-title{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 32px;
+}
+
+.create-btn{
+    background: #6366f1;
+    padding: 10px 16px;
+    border: none;
+}
+
+.create-btn:hover{
+    background-color: #818cf8;
+    border: none;
+}
+
+.page-link{
+    color: #6c757d;
+}
+
+.active>.page-link{
+    background-color: #6366f1;
+    border: none;
+    border-radius: 4px
+}

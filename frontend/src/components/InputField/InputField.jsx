@@ -1,8 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import { useState, useRef } from 'react';
 import style from './InputField.module.css'
 import { useClickOutside } from '../../utils/useClickOutside';
 import Prompt from '../Registration/Prompt/Prompt';
 import danger from '../../assets/images/Auth/DangerCircle.svg'
+
 const InputField = (
     {
         placeholder,

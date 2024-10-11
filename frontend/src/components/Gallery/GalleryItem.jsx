@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import styles from './Gallery.module.css';
 import { fetchDownloadPhotoWithInterceptor } from '../../http/photo/downloadPhoto';
 import { useState } from 'react';

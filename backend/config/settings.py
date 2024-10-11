@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'drf_yasg',
     "phonenumber_field",
+    'auditlog',
 
     # Приложения
     'apps.kindergarten',
@@ -51,12 +52,13 @@ INSTALLED_APPS = [
     'apps.promocode',
     'apps.user',
     'apps.cart',
+    'apps.oauth',
 
     # Приложения CRM
     'apps_crm.notifications',
     'apps_crm.roles',
     'apps_crm.registration',
-]
+    'apps_crm.history',
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -68,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'config.middleware.DependencyInjectorMiddleware',
+    'auditlog.middleware.AuditlogMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -267,4 +270,26 @@ FFD_VERSION = os.environ.get('FFD_VERSION')
 PAYMENT_OBJECT = os.environ.get('PAYMENT_OBJECT')
 MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
 
+AUDITLOG_INCLUDE_ALL_MODELS = True
 LOGO_PATH = os.environ.get('LOGO_PATH')
+
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/google/')
+
+YANDEX_CLIENT_ID = os.getenv('YANDEX_CLIENT_ID')
+YANDEX_CLIENT_SECRET = os.getenv('YANDEX_CLIENT_SECRET')
+YANDEX_REDIRECT_URI = os.getenv('YANDEX_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/yandex/')
+
+MAILRU_CLIENT_ID = os.getenv('MAILRU_CLIENT_ID')
+MAILRU_CLIENT_SECRET = os.getenv('MAILRU_CLIENT_SECRET')
+MAILRU_REDIRECT_URI = os.getenv('MAILRU_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/mailru/')
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
