@@ -3,6 +3,7 @@ import Orders from "../Orders/Orders";
 import { Payment } from "../Payment/Payment";
 import ManagerProfile from "../Profile/ManagerProfile/ManagerProfile";
 import { useState } from "react";
+
 const Account = () => {
 
     const [nurseryIsAuth, setNurseryIsAuth] = useState(false);

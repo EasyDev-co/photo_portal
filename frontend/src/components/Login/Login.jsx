@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useState } from "react";
 import styles from "./Login.module.css";
 import InputField from "../InputField/InputField";
@@ -6,9 +8,9 @@ import vk from '../../assets/images/socials/Vkcolor.svg'
 import google from '../../assets/images/socials/G.svg'
 import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
 import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
 import danger from '../../assets/images/Auth/DangerCircle.svg'
-import { useNavigate } from "react-router-dom";
+
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
 import { parentLoginCreate } from "../../http/parent/parentLoginCreate";
@@ -74,7 +76,7 @@ export const Login = () => {
         })
       }
     } catch (error) {
-
+      console.log(error)
     }
     setInputValue(initialState);
   }

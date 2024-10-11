@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable no-constant-condition */
 import styles from "./Orders.module.css";
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PaymentTimer from '../Payment/PaymentTimer/PaymentTimer';
@@ -87,10 +89,15 @@ export const Orders = () => {
             .then(data => {
               getNearestDate(data);
               setlineLenght(data.length);
-              setPriceCalendar({
-                ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
-                ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
-              })
+              if (data.length > 0) {
+                setPriceCalendar({
+                  ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
+                  ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
+                });
+              } else {
+                // Handle the case where data is empty
+                console.warn('Data is empty:', data);
+              }
               data.forEach(elem => {
                 dispatch(addPhotos(elem));
                 patchPhotoLine(accessStor, { "parent": idP }, elem.id)
@@ -165,12 +172,7 @@ export const Orders = () => {
           const data = await order.json();
         }
       } catch (error) {
-        setModalActive(true)
-        setModalText(
-          <p>
-            Похоже, что у вас есть неоплаченный заказ, обратитесь в поддержку
-            <span> fotodetstvo1@yandex.ru </span>
-          </p>)
+        console.log(error)
       }
     }
   };

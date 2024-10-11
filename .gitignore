@@ -165,4 +165,4 @@ celery.dockerfile
 static
 media
 dumps
-.DS_Store
+.DS_store

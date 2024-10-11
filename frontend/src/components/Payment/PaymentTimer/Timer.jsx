@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTimeRemaining } from "./utils";
 import styles from './PaymentTimer.module.css'
+
 const Timer = ({ date, desc, isStats }) => {
    
     const [time, setTime] = useState({

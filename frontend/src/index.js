@@ -1,11 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { BrowserRouter, createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
+import './styles/globals.scss';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
 import { App } from "./components/App/App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from 'react-redux'
 import store from "../src/store";
+
 const router = createBrowserRouter(createRoutesFromElements(<Route path='*' element={<App />} />));
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

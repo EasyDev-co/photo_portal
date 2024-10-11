@@ -1,0 +1,44 @@
+.card-shadow {
+    box-shadow: 0 10px 13px 0 rgba(17, 38, 146, 0.05);
+    height: fit-content;
+}
+
+.card-wrap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-column-gap: 24px;
+    grid-row-gap: 24px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+}
+.card-header-title{
+    font-weight: 600;
+    font-size: 20px;
+}
+.card-footer{
+    background-color: #fff;
+}
+.card-burger{
+    cursor: pointer;
+}
+.card-popup-btn{
+    display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 8px;
+   padding: 8px 0 8px 0
+}
+.card-icon{
+    cursor: pointer;
+}
+.popover-arrow::after{
+    display: none !important;
+}
+.popover-arrow::before{
+    display: none !important;
+}
