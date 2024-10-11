@@ -12,7 +12,11 @@ class Department(UUIDMixin, TimeStampedMixin):
     Модель отдела, который может быть назначен сотруднику.
     Содержит название отдела.
     """
-    name = models.CharField(max_length=100, verbose_name="Название отдела")
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название отдела",
+        unique=True
+        )
 
     class Meta:
         verbose_name = "Отдел"
@@ -27,7 +31,11 @@ class Region(UUIDMixin, TimeStampedMixin):
     Модель региона, который может быть назначен сотруднику.
     Содержит название региона.
     """
-    name = models.CharField(max_length=100, verbose_name="Название региона")
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название региона",
+        unique=True
+    )
 
     class Meta:
         verbose_name = "Регион"
@@ -42,7 +50,11 @@ class Role(UUIDMixin, TimeStampedMixin):
     Модель роли сотрудника в компании.
     Содержит название роли, связь с отделом и родительской ролью.
     """
-    name = models.CharField(max_length=100, verbose_name="Название роли")
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название роли",
+        unique=True
+    )
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, verbose_name="Отдел"
     )
