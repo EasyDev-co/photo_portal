@@ -27,7 +27,7 @@ class PermissionSerializer(serializers.ModelSerializer):
     """Сериализатор для прав."""
     class Meta:
         model = Permission
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'description']
 
 
 class RoleSerializer(serializers.ModelSerializer):

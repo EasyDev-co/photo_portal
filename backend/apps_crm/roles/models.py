@@ -54,6 +54,10 @@ class Permission(UUIDMixin, TimeStampedMixin):
         unique=True,
         verbose_name="Название права"
     )
+    description = models.TextField(
+        blank=True,
+        verbose_name="Описание права"
+    )
 
     class Meta:
         verbose_name = "Право"
