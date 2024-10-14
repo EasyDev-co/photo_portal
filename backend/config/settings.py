@@ -24,6 +24,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8001",
     "http://localhost:8080",
+    "http://77.232.37.60:3000"
 ]
 
 INSTALLED_APPS = [
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     'apps_crm.roles',
     'apps_crm.registration',
     'apps_crm.history',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -245,7 +247,7 @@ SIMPLE_JWT = {
 }
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+#CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
 CORS_ALLOW_CREDENTIALS = True
 
 CART_SESSION_ID = 'cart'
@@ -276,7 +278,6 @@ LOGO_PATH = os.environ.get('LOGO_PATH')
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 

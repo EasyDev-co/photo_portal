@@ -28,7 +28,7 @@ const Scaner = ({ scanActive, setScanActive, isAuth, setModalActive, modalActive
                 if (html5QrCode && html5QrCode.isScanning) {
                     html5QrCode.stop();
                 }
-            } catch (error) {
+            } catch (error) { console.error(error)
 
             }
 

@@ -265,7 +265,7 @@ export const Registration = () => {
               />
               <div className={isChecked ? styles.privacyCheckbox : styles.privacyCheckboxUnCheck}>
                 <input className={styles.privacyInput} onChange={(e) => setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
-                <label htmlFor="">
+                <label htmlFor="privacy">
                   <p>
                     Даю согласие на обработку своих персональных данных.
                     <span> С соглашением ознакомлен.</span>

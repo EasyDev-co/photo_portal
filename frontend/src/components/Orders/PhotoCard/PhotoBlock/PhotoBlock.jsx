@@ -4,7 +4,7 @@ import { memo } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
 
-const PhotoBlock = memo(({ blocksId, index, photos, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
+const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
 
   return (
     <div style={{
