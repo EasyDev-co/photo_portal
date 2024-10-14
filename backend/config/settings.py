@@ -24,6 +24,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8001",
     "http://localhost:8080",
+    "http://77.232.37.60:3000"
 ]
 
 INSTALLED_APPS = [
@@ -236,6 +237,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.kindergarten.tasks.CalculateRansomOfPastPhotoThemes",
         "schedule": crontab(minute='0', hour='*/4'),
     },
+    "send_closing_receipts": {
+        "task": "apps.order.tasks.SendClosingReceiptsTask",
+        "schedule": crontab(minute='0', hour='*/1'),
+    },
 }
 
 SIMPLE_JWT = {
@@ -246,7 +251,7 @@ SIMPLE_JWT = {
 }
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+#CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
 CORS_ALLOW_CREDENTIALS = True
 
 CART_SESSION_ID = 'cart'
@@ -273,7 +278,6 @@ MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
 
 AUDITLOG_INCLUDE_ALL_MODELS = True
 LOGO_PATH = os.environ.get('LOGO_PATH')
-
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')

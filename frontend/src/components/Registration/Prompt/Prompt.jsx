@@ -41,7 +41,7 @@ const Prompt = ({activeWidget,highlight,blurRef}) => {
             <div className={!highlight ? styles.promptImgName : styles.promptImgNameFalse}>
                 {[1,2,3,4,5,6].map((elem, i) => {
                     return (
-                        <span>901.jpg</span>
+                        <span key={i}>901.jpg</span>
                     )
                 })}
             </div>

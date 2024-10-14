@@ -28,6 +28,7 @@ import 'swiper/css/navigation';
 
 // import required modules
 import { EffectFlip, Pagination, Navigation } from 'swiper/modules';
+
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
     const accessStor = localStorage.getItem('access');
