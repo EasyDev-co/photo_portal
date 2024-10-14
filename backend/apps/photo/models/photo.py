@@ -3,10 +3,25 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.db import models
 from django.core.exceptions import ValidationError
+import boto3
 
 from .photo_line import PhotoLine
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 from apps.utils.services.add_watermark import add_watermark
+from django.conf import settings
+
+
+# Инициализация boto3 клиента
+def get_s3_client():
+    session = boto3.session.Session()
+    s3_client = session.client(
+        service_name='s3',
+        region_name=settings.YC_REGION,
+        endpoint_url=settings.YC_S3_ENDPOINT,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+    return s3_client
 
 
 class SerialPhotoNumber(models.IntegerChoices):
@@ -83,3 +98,18 @@ class Photo(UUIDMixin):
                 f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
                 ContentFile(buffer.read()),
             )
+
+        # Загрузка фотографии в S3
+        folder_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
+        file_name = f'{folder_name}{self.number}.jpg'
+
+        s3_client = get_s3_client()
+        with self.photo.open('rb') as img_file:
+            s3_client.upload_fileobj(img_file, settings.YC_BUCKET_NAME, file_name)
+
+    def delete(self, *args, **kwargs):
+        # Удаление фотографии из S3
+        file_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/{self.name}.jpg'
+        s3_client = get_s3_client()
+        s3_client.delete_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name)
+        super().delete(*args, **kwargs)
