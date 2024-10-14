@@ -12,7 +12,11 @@ class Department(UUIDMixin, TimeStampedMixin):
     Модель отдела, который может быть назначен сотруднику.
     Содержит название отдела.
     """
-    name = models.CharField(max_length=100, verbose_name="Название отдела")
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название отдела",
+        unique=True
+        )
 
     class Meta:
         verbose_name = "Отдел"
@@ -27,11 +31,37 @@ class Region(UUIDMixin, TimeStampedMixin):
     Модель региона, который может быть назначен сотруднику.
     Содержит название региона.
     """
-    name = models.CharField(max_length=100, verbose_name="Название региона")
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название региона",
+        unique=True
+    )
 
     class Meta:
         verbose_name = "Регион"
         verbose_name_plural = "Регионы"
+
+    def __str__(self):
+        return self.name
+
+
+class Permission(UUIDMixin, TimeStampedMixin):
+    """
+    Модель прав доступа.
+    """
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="Название права"
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name="Описание права"
+    )
+
+    class Meta:
+        verbose_name = "Право"
+        verbose_name_plural = "Права"
 
     def __str__(self):
         return self.name
@@ -42,7 +72,11 @@ class Role(UUIDMixin, TimeStampedMixin):
     Модель роли сотрудника в компании.
     Содержит название роли, связь с отделом и родительской ролью.
     """
-    name = models.CharField(max_length=100, verbose_name="Название роли")
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Название роли",
+        unique=True
+    )
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, verbose_name="Отдел"
     )
@@ -52,6 +86,12 @@ class Role(UUIDMixin, TimeStampedMixin):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name="Родительская роль"
+    )
+    permissions = models.ManyToManyField(
+        Permission,
+        blank=True,
+        related_name="roles",
+        verbose_name="Права"
     )
 
     class Meta:
