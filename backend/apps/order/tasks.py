@@ -21,7 +21,12 @@ from config.celery import BaseTask, app
 from config.settings import (
     EMAIL_HOST_USER,
     TERMINAL_KEY,
-    PAYMENT_GET_STATE_URL
+    PAYMENT_GET_STATE_URL,
+    SEND_CLOSING_RECEIPT_URL,
+    VAT,
+    PAYMENT_OBJECT,
+    TAXATION,
+    FFD_VERSION
 )
 
 from apps.photo.models import PhotoTheme
@@ -245,9 +250,70 @@ class ParseNotificationFiscalization(BaseTask):
             )
 
 
+class SendClosingReceiptsTask(BaseTask):
+    """
+    Отправка закрывающего чека, когда все заказы у orders_payment находятся в статусе выполнен.
+    """
+
+    def run(self, *args, **kwargs):
+        try:
+            # достаем OrdersPayment, у которых выполнены все заказы
+            orders_payments = OrdersPayment.objects.filter(
+                orders__status=OrderStatus.completed,
+                is_closing_receipt_sent=False
+            )
+            for orders_payment in orders_payments:
+                orders = orders_payment.orders.all()
+                orders_items = OrderItem.objects.filter(
+                    order__in=orders
+                )
+                payment_data = {
+                    'PaymentId': orders.first().payment_id,
+                    'TerminalKey': TERMINAL_KEY,
+                }
+                token = generate_token_for_t_bank(payment_data)
+                payment_data['Receipt'] = {
+                    'Items': [
+                        {
+                            'Name': f'{str(order_item.photo) + ", " if order_item.photo else ""}'
+                                    f'{PhotoType(order_item.photo_type).label}',
+                            'Price': str(int(order_item.price * 100)),
+                            'Quantity': str(order_item.amount),
+                            'Amount': str(int(order_item.price * 100)),
+                            'Tax': VAT,
+                            'PaymentMethod': str(PaymentMethod.FULL_PAYMENT),
+                            'PaymentObject': PAYMENT_OBJECT
+                        } for order_item in orders_items
+                    ],
+                    'Email': str(orders.first().user.email),
+                    'Taxation': TAXATION,
+                    'FfdVersion': FFD_VERSION,
+                }
+                payment_data['Token'] = token
+                response = requests.post(
+                    url=SEND_CLOSING_RECEIPT_URL,
+                    json=payment_data
+                )
+                if response.json()['Success'] and response.json()['ErrorCode'] == '0':
+                    orders_payment.is_closing_receipt_sent = True
+                    orders_payment.save()
+                else:
+                    raise Exception(response.json()['Message'])
+
+        except Exception as e:
+            self.on_failure(
+                exc=e,
+                task_id=self.request.id,
+                args=(),
+                kwargs={},
+                einfo=traceback.format_exc(),
+            )
+
+
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
 app.register_task(CheckIfOrdersPaid)
 app.register_task(DeleteExpiredOrders)
 parse_notification_fiscalization = app.register_task(ParseNotificationFiscalization)
+app.register_task(SendClosingReceiptsTask)
