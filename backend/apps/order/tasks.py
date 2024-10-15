@@ -289,6 +289,9 @@ class SendClosingReceiptsTask(BaseTask):
                     'Taxation': TAXATION,
                     'FfdVersion': FFD_VERSION,
                 }
+                payment_data['Payments'] = {
+                    'Electronic': str(orders_payment.amount)
+                }
                 payment_data['Token'] = token
                 response = requests.post(
                     url=SEND_CLOSING_RECEIPT_URL,
