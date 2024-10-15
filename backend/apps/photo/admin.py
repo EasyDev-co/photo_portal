@@ -37,11 +37,11 @@ class PhotoInline(admin.TabularInline):
     extra = 0
     ordering = ('number',)
     readonly_fields = ('photo_img',)
-    exclude = ('watermarked_photo',)
+    exclude = ('watermarked_photo_file',)
 
     @admin.display(description='Фото')
     def photo_img(self, obj):
-        return mark_safe(f'<img src="{obj.photo.url}" width="200" height="200" />')
+        return mark_safe(f'<img src="{obj.photo_file.url}" width="200" height="200" />')
 
 
 @admin.register(PhotoTheme)
@@ -103,15 +103,9 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
-    list_display = ('photo_line', 'number', 'photo')
-    exclude = ('watermarked_photo',)
+    list_display = ('photo_line', 'number', 'photo_path')
     raw_id_fields = ('photo_line',)
-    readonly_fields = ('photo_img',)
-
-    @admin.display(description='Фото')
-    def photo_img(self, obj):
-        if obj:
-            return mark_safe(f'<img src="{obj.photo.url}" width="200" height="200" />')
+    readonly_fields = ('photo_path',)
 
 
 class RegionFilter(admin.SimpleListFilter):

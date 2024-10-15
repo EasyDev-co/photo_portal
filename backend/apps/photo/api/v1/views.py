@@ -130,12 +130,5 @@ class DownloadPhotoAPIView(APIView):
     def get(self, request, photo_id):
         photo = get_object_or_404(Photo, id=photo_id)
 
-        file_path = photo.photo.path
-        file_name = f"{photo.number}.jpg"
-
-        try:
-            return FileResponse(
-                open(file_path, "rb"), as_attachment=True, filename=file_name
-            )
-        except FileNotFoundError:
-            raise Http404("Фото не найдено")
+        # Возвращаем URL фотографии из облака
+        return Response({'photo_url': photo.photo_url})

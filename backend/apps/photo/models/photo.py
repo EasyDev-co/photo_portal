@@ -47,12 +47,13 @@ class Photo(UUIDMixin):
         verbose_name='Номер',
         unique=True
     )
-    photo = models.ImageField(
-        upload_to='photo/',
+    # Заменяем ImageField на FileField, так как мы не будем сохранять фото локально
+    photo_file = models.FileField(
+        upload_to='',
         verbose_name='Фотография'
     )
-    watermarked_photo = models.ImageField(
-        upload_to='watermarked_photo/',
+    watermarked_photo_file = models.FileField(
+        upload_to='',
         verbose_name='Фотография с водяным знаком',
         blank=True,
         null=True
@@ -60,6 +61,12 @@ class Photo(UUIDMixin):
     serial_number = models.PositiveSmallIntegerField(
         choices=SerialPhotoNumber.choices,
         verbose_name='Порядковый номер'
+    )
+    photo_path = models.CharField(
+        verbose_name='Путь к фотографии',
+        max_length=255,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
@@ -83,33 +90,54 @@ class Photo(UUIDMixin):
             raise ValidationError('Такой порядковый номер в данном пробнике уже существует.')
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if not self.watermarked_photo:
-            watermarked_photo = add_watermark(
-                photo_path=self.photo,
-            )
-            # Сохраняем изображение в байтовый поток
-            buffer = BytesIO()
-            watermarked_photo.save(buffer, format='JPEG')
-            buffer.seek(0)
-
-            # Сохраняем как объект Django
-            self.watermarked_photo.save(
-                f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
-                ContentFile(buffer.read()),
-            )
+        # Генерация водяного знака
+        photo_file = self.photo_file
+        if not photo_file:
+            raise ValidationError("Фото не выбрано")
 
         # Загрузка фотографии в S3
         folder_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
         file_name = f'{folder_name}{self.number}.jpg'
 
         s3_client = get_s3_client()
-        with self.photo.open('rb') as img_file:
-            s3_client.upload_fileobj(img_file, settings.YC_BUCKET_NAME, file_name)
+
+        try:
+            # Перемещаем указатель файла в начало
+            photo_file.seek(0)
+            # Читаем содержимое файла
+            file_content = photo_file.read()
+            # Загружаем файл в S3
+            s3_client.put_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name, Body=file_content)
+            # Сохраняем путь к фотографии
+            self.photo_path = file_name
+            # Перемещаем указатель файла обратно в начало для дальнейших операций
+            photo_file.seek(0)
+        except Exception as e:
+            raise ValidationError(f"Ошибка при загрузке файла в облако: {str(e)}")
+
+        # Теперь сохраняем сам объект
+        super().save(*args, **kwargs)
+
+        # Генерация и сохранение водяного знака
+        if not self.watermarked_photo_file:
+            with self.photo_file.open('rb') as img_file:
+                watermarked_photo = add_watermark(photo_path=img_file)
+
+                # Сохраняем изображение в байтовый поток
+                buffer = BytesIO()
+                watermarked_photo.save(buffer, format='JPEG')
+                buffer.seek(0)
+
+                # Сохраняем как объект Django
+                self.watermarked_photo_file.save(
+                    f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
+                    ContentFile(buffer.read()),
+                )
 
     def delete(self, *args, **kwargs):
         # Удаление фотографии из S3
-        file_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/{self.name}.jpg'
+        file_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/{self.number}.jpg'
         s3_client = get_s3_client()
         s3_client.delete_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name)
         super().delete(*args, **kwargs)
+
