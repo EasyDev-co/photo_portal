@@ -128,16 +128,26 @@ class Photo(UUIDMixin):
                 watermarked_photo.save(buffer, format='JPEG')
                 buffer.seek(0)
 
-                # Сохраняем как объект Django
+                # Сохраняем как объект Django (локальное хранение)
                 self.watermarked_photo_file.save(
                     f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
                     ContentFile(buffer.read()),
                 )
 
     def delete(self, *args, **kwargs):
-        # Удаление фотографии из S3
-        file_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/{self.number}.jpg'
         s3_client = get_s3_client()
-        s3_client.delete_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name)
-        super().delete(*args, **kwargs)
 
+        # Логирование удаления
+        print(f"Попытка удаления файла: {self.photo_path}")
+
+        if self.photo_path:
+            try:
+                # Попытка удалить основную фотографию из S3
+                s3_client.delete_object(Bucket=settings.YC_BUCKET_NAME, Key=self.photo_path)
+                print(f"Файл {self.photo_path} успешно удален из S3.")
+            except Exception as e:
+                print(f"Ошибка при удалении файла {self.photo_path} из S3: {str(e)}")
+                raise ValidationError(f"Ошибка при удалении файла из облака: {str(e)}")
+
+        # Удаление объекта из базы данных
+        super().delete(*args, **kwargs)

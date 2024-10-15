@@ -20,6 +20,7 @@ from apps.utils.services.calculate_photo_popularity import (
 from config.settings import PHOTO_LINE_URL
 from apps.utils.services import generate_qr_code
 from django.core.files.base import ContentFile
+from django.conf import settings
 
 
 class CustomMessageMixin:
@@ -41,7 +42,19 @@ class PhotoInline(admin.TabularInline):
 
     @admin.display(description='Фото')
     def photo_img(self, obj):
-        return mark_safe(f'<img src="{obj.photo_file.url}" width="200" height="200" />')
+        if obj.photo_path:
+            return mark_safe(
+                f'<img src="https://{settings.YC_BUCKET_NAME}.storage.yandexcloud.net/{obj.photo_path}" width="200" height="200" />')
+        return "Фото не загружено"
+
+    # Переопределяем метод удаления для инлайна
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            try:
+                obj.delete()  # Вызов переопределённого метода delete
+                self.message_user(request, f"Фотография {obj} успешно удалена.", level=messages.SUCCESS)
+            except ValidationError as e:
+                self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
 @admin.register(PhotoTheme)
@@ -106,6 +119,22 @@ class PhotoAdmin(admin.ModelAdmin):
     list_display = ('photo_line', 'number', 'photo_path')
     raw_id_fields = ('photo_line',)
     readonly_fields = ('photo_path',)
+
+    @admin.display(description='Фото')
+    def photo_img(self, obj):
+        if obj.photo_path:
+            return mark_safe(
+                f'<img src="https://{settings.YC_BUCKET_NAME}.storage.yandexcloud.net/{obj.photo_path}" width="200" height="200" />')
+        return "Фото не загружено"
+
+    # Переопределяем метод удаления для PhotoAdmin
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            try:
+                obj.delete()  # Вызов переопределённого метода delete
+                self.message_user(request, f"Фотография {obj} успешно удалена.", level=messages.SUCCESS)
+            except ValidationError as e:
+                self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
 class RegionFilter(admin.SimpleListFilter):
