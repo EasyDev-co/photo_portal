@@ -277,9 +277,9 @@ class SendClosingReceiptsTask(BaseTask):
                         {
                             'Name': f'{str(order_item.photo) + ", " if order_item.photo else ""}'
                                     f'{PhotoType(order_item.photo_type).label}',
-                            'Price': str(int(order_item.price * 100)),
-                            'Quantity': str(order_item.amount),
-                            'Amount': str(int(order_item.price * 100)),
+                            'Price': int(order_item.price * 100),
+                            'Quantity': order_item.amount,
+                            'Amount': int(order_item.price * 100),
                             'Tax': VAT,
                             'PaymentMethod': str(PaymentMethod.FULL_PAYMENT),
                             'PaymentObject': PAYMENT_OBJECT
@@ -290,7 +290,7 @@ class SendClosingReceiptsTask(BaseTask):
                     'FfdVersion': FFD_VERSION,
                 }
                 payment_data['Payments'] = {
-                    'Electronic': str(orders_payment.amount)
+                    'AdvancePayment': int(orders_payment.amount * 100)
                 }
                 payment_data['Token'] = token
                 response = requests.post(
