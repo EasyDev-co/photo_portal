@@ -25,7 +25,8 @@ const Notes = () => {
                         </div>
                     </Card.Header>
                     <Card.Body className="py-2" style={{
-                        maxWidth: '545px'
+                        maxWidth: '545px',
+                        fontSize: '15px'
                     }}>
                         <div className="truncate text-secondary">
                             Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -44,7 +45,8 @@ const Notes = () => {
                         </div>
                     </Card.Header>
                     <Card.Body className="py-2" style={{
-                        maxWidth: '545px'
+                        maxWidth: '545px',
+                        fontSize: '15px'
                     }}>
                         <div className="truncate text-secondary">
                             Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -63,7 +65,8 @@ const Notes = () => {
                         </div>
                     </Card.Header>
                     <Card.Body className="py-2" style={{
-                        maxWidth: '545px'
+                        maxWidth: '545px',
+                        fontSize: '15px'
                     }}>
                         <div className="truncate text-secondary">
                             Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.

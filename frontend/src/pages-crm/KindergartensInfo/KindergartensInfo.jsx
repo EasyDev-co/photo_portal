@@ -48,10 +48,11 @@ if(clientCardData){
                         <Card className="border-0 d-flex flex-column gap-2 card-shadow" style={{
                             padding: '24px',
                             width: '470px',
-                            height: 'auto'
+                            height: 'auto',
+                            fontSize: '15px'
                         }}>
                             <CardHeader style={{
-                                fontSize: '20px'
+                                fontSize: '17px'
                             }} className="border-0 fw-600 p-0">
                                 Детский сад {clientCardData.name}
                             </CardHeader>
@@ -65,12 +66,12 @@ if(clientCardData){
                             height: 'auto'
                         }}>
                             <CardHeader style={{
-                                fontSize: '20px',
+                                fontSize: '17px',
                             }} className="border-0 fw-600 p-0">
                                 Процент заведующих:
                             </CardHeader>
                             <CardHeader style={{
-                                fontSize: '20px',
+                                fontSize: '17px',
 
                             }} className="border-0 fw-600 p-0">
                                 Скидка:
@@ -83,7 +84,7 @@ if(clientCardData){
                             gap: '24px'
                         }}>
                             <CardHeader style={{
-                                fontSize: '20px',
+                                fontSize: '17px',
                             }} className="border-0 fw-600 p-0">
                                 Текущие задачи
                             </CardHeader>
@@ -92,16 +93,17 @@ if(clientCardData){
                             }}>
                                 {arrayOfObjects.map(elem => {
                                     return (
-                                        <Card key={elem.id} className="d-flex flex-row align-items-center justify-content-between p-2 ">
+                                        <Card key={elem.id} className="d-flex flex-row align-items-center justify-content-between p-3 ">
                                             <div>
                                                 <CardHeader style={{
-                                                    fontSize: '20px',
+                                                    fontSize: '15px',
 
                                                 }} className="border-0 fw-500 p-0">
                                                     Название задачи
                                                 </CardHeader>
                                                 <Card.Body className="p-0" style={{
-                                                    color: '#0a58ca'
+                                                    color: '#0a58ca',
+                                                    fontSize: '15px'
                                                 }}>
                                                     До 08.08.2024
                                                 </Card.Body>
@@ -126,7 +128,7 @@ if(clientCardData){
                             gap: '24px'
                         }}>
                             <Card.Header style={{
-                                fontSize: '20px',
+                                fontSize: '17px',
 
                             }} className="border-0 fw-600 p-0">
                                 Текущая фотосессия
@@ -135,7 +137,7 @@ if(clientCardData){
                                 <Form className="d-flex gap-3">
                                     <Form.Group className="w-50">
                                         <DatePicker
-                                            label={'Дата взаимодействия'}
+                                            label={'Дата начала'}
                                             placeholder={'Не указано'}
                                             setIsActive={setIsActive}
                                             img={calendar}
@@ -167,7 +169,7 @@ if(clientCardData){
                         }}>
                             <Card className="border-0 p-2 text-center ">
 
-                                <Card.Header className="border-0 fw-600 p-0 justify-content-center" style={{ fontSize: '20px' }}>
+                                <Card.Header className="border-0 fw-600 p-0 justify-content-center" style={{ fontSize: '17px' }}>
                                     Марк Ифанасьев
                                 </Card.Header>
                                 <Card.Title className="fs-6 text-secondary">
@@ -187,7 +189,7 @@ if(clientCardData){
                         height: 'auto'
                     }}>
                         <Card.Header style={{
-                            fontSize: '20px',
+                            fontSize: '17px',
 
                         }} className="border-0 fw-600 p-0">
                             Заметки
@@ -200,7 +202,7 @@ if(clientCardData){
                         height: 'auto'
                     }}>
                         <Card.Header style={{
-                            fontSize: '20px',
+                            fontSize: '17px',
 
                         }} className="border-0 fw-600 p-0">
                             История заказов
@@ -217,7 +219,8 @@ if(clientCardData){
                                 </div>
                             </Card.Header>
                             <Card.Body className="py-2" style={{
-                                maxWidth: '545px'
+                                maxWidth: '545px',
+                                fontSize: '15px'
                             }}>
                                 <div className="truncate text-secondary">
                                     Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -236,7 +239,8 @@ if(clientCardData){
                                 </div>
                             </Card.Header>
                             <Card.Body className="py-2" style={{
-                                maxWidth: '545px'
+                                maxWidth: '545px',
+                                fontSize: '15px'
                             }}>
                                 <div className="truncate text-secondary">
                                     Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -255,7 +259,8 @@ if(clientCardData){
                                 </div>
                             </Card.Header>
                             <Card.Body className="py-2" style={{
-                                maxWidth: '545px'
+                                maxWidth: '545px',
+                                fontSize: '15px'
                             }}>
                                 <div className="truncate text-secondary">
                                     Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -269,7 +274,7 @@ if(clientCardData){
                         height: 'auto'
                     }}>
                         <Card.Header style={{
-                            fontSize: '20px',
+                            fontSize: '17px',
 
                         }} className="border-0 fw-600 p-0">
                             История изменений
@@ -286,7 +291,8 @@ if(clientCardData){
                                 </div>
                             </Card.Header>
                             <Card.Body className="py-2" style={{
-                                maxWidth: '545px'
+                                maxWidth: '545px',
+                                fontSize: '15px'
                             }}>
                                 <div className="truncate text-secondary">
                                     Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -305,7 +311,8 @@ if(clientCardData){
                                 </div>
                             </Card.Header>
                             <Card.Body className="py-2" style={{
-                                maxWidth: '545px'
+                                maxWidth: '545px',
+                                fontSize: '15px'
                             }}>
                                 <div className="truncate text-secondary">
                                     Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
@@ -324,7 +331,8 @@ if(clientCardData){
                                 </div>
                             </Card.Header>
                             <Card.Body className="py-2" style={{
-                                maxWidth: '545px'
+                                maxWidth: '545px',
+                                fontSize: '15px'
                             }}>
                                 <div className="truncate text-secondary">
                                     Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
