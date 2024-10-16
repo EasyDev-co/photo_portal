@@ -12,7 +12,7 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ('id', 'number', 'photo_url', 'watermarked_photo')  # Добавляем поле photo_url
+        fields = ('id', 'number', 'photo_file', 'watermarked_photo')
 
 
 class PhotoThemeSerializer(serializers.ModelSerializer):

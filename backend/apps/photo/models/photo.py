@@ -1,3 +1,4 @@
+import os
 from io import BytesIO
 
 from django.core.files.base import ContentFile
@@ -52,8 +53,8 @@ class Photo(UUIDMixin):
         upload_to='',
         verbose_name='Фотография'
     )
-    watermarked_photo_file = models.FileField(
-        upload_to='',
+    watermarked_photo = models.ImageField(
+        upload_to='watermarked_photo/',
         verbose_name='Фотография с водяным знаком',
         blank=True,
         null=True
@@ -90,49 +91,56 @@ class Photo(UUIDMixin):
             raise ValidationError('Такой порядковый номер в данном пробнике уже существует.')
 
     def save(self, *args, **kwargs):
-        # Генерация водяного знака
-        photo_file = self.photo_file
-        if not photo_file:
-            raise ValidationError("Фото не выбрано")
+        if self.photo_file:
+            # Сохраняем локальный путь к файлу
+            local_path = self.photo_file.path if hasattr(self.photo_file, 'path') else None
 
-        # Загрузка фотографии в S3
-        folder_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
-        file_name = f'{folder_name}{self.number}.jpg'
+            # Загрузка фотографии в S3
+            folder_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
+            file_name = f'{folder_name}{self.number}.jpg'
 
-        s3_client = get_s3_client()
+            s3_client = get_s3_client()
 
-        try:
-            # Перемещаем указатель файла в начало
-            photo_file.seek(0)
-            # Читаем содержимое файла
-            file_content = photo_file.read()
-            # Загружаем файл в S3
-            s3_client.put_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name, Body=file_content)
-            # Сохраняем путь к фотографии
-            self.photo_path = file_name
-            # Перемещаем указатель файла обратно в начало для дальнейших операций
-            photo_file.seek(0)
-        except Exception as e:
-            raise ValidationError(f"Ошибка при загрузке файла в облако: {str(e)}")
+            try:
+                # Перемещаем указатель файла в начало
+                self.photo_file.seek(0)
+                # Читаем содержимое файла
+                file_content = self.photo_file.read()
+                # Загружаем файл в S3
+                s3_client.put_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name, Body=file_content)
+                # Сохраняем путь к фотографии в облаке
+                self.photo_path = file_name
+
+                # Генерация водяного знака
+                super().save(*args, **kwargs)
+                if not self.watermarked_photo:
+                    watermarked_photo = add_watermark(
+                        photo_path=self.photo_file,
+                    )
+                    # Сохраняем изображение в байтовый поток
+                    buffer = BytesIO()
+                    watermarked_photo.save(buffer, format='JPEG')
+                    buffer.seek(0)
+
+                    # Сохраняем как объект Django
+                    self.watermarked_photo.save(
+                        f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
+                        ContentFile(buffer.read()),
+                    )
+
+                # Удаляем локальный файл после успешной загрузки в облако
+                if local_path and os.path.exists(local_path):
+                    os.remove(local_path)
+                    print(f"Локальный файл {local_path} успешно удален.")
+
+                # Очищаем поле photo_file, так как файл теперь в облаке
+                self.photo_file = None
+
+            except Exception as e:
+                raise ValidationError(f"Ошибка при загрузке файла в облако: {str(e)}")
 
         # Теперь сохраняем сам объект
         super().save(*args, **kwargs)
-
-        # Генерация и сохранение водяного знака
-        if not self.watermarked_photo_file:
-            with self.photo_file.open('rb') as img_file:
-                watermarked_photo = add_watermark(photo_path=img_file)
-
-                # Сохраняем изображение в байтовый поток
-                buffer = BytesIO()
-                watermarked_photo.save(buffer, format='JPEG')
-                buffer.seek(0)
-
-                # Сохраняем как объект Django (локальное хранение)
-                self.watermarked_photo_file.save(
-                    f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
-                    ContentFile(buffer.read()),
-                )
 
     def delete(self, *args, **kwargs):
         s3_client = get_s3_client()

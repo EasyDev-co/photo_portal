@@ -1,7 +1,9 @@
-from django.http import Http404, FileResponse
+import boto3
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import (
     RetrieveAPIView,
     RetrieveUpdateAPIView,
@@ -21,6 +23,7 @@ from apps.photo.permissions import (
     HasPermissionCanViewPhotoLine,
     IsPhotoPurchased
 )
+from config import settings
 
 
 class PhotoRetieveByIdAPIView(RetrieveAPIView):
@@ -123,12 +126,32 @@ class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
 
 class DownloadPhotoAPIView(APIView):
     """
-    Скачивание фото.
+    Скачивание фото из облака.
     """
     permission_classes = [IsAuthenticated, IsPhotoPurchased]
 
     def get(self, request, photo_id):
-        photo = get_object_or_404(Photo, id=photo_id)
+        try:
+            photo = Photo.objects.get(id=photo_id)
+        except Photo.DoesNotExist:
+            raise NotFound("Фото не найдено")
 
-        # Возвращаем URL фотографии из облака
-        return Response({'photo_url': photo.photo_url})
+        # Инициализация клиента S3
+        s3_client = boto3.client(
+            's3',
+            region_name=settings.YC_REGION,
+            endpoint_url=settings.YC_S3_ENDPOINT,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        )
+
+        try:
+            # Получение объекта из S3
+            file_obj = s3_client.get_object(Bucket=settings.YC_BUCKET_NAME, Key=photo.photo_path)
+
+            # Создание HTTP-ответа
+            response = HttpResponse(file_obj['Body'].read(), content_type='image/jpeg')
+            response['Content-Disposition'] = f'attachment; filename="{photo.number}.jpg"'
+            return response
+        except Exception as e:
+            raise NotFound(f"Ошибка при получении файла: {str(e)}")
