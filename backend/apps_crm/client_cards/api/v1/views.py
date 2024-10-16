@@ -37,6 +37,23 @@ class ClientCardDetailView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, id):
+        """Удаляет карточку клиента."""
+        service = request.container.client_card_service()
+        client_card = service.get_client_card(client_card_id=id)
+
+        if not client_card:
+            return Response(
+                {"detail": "Карточка клиента не найдена."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        service.client_cards_repository.delete_obj(id=client_card.id)
+        return Response(
+            {"detail": "Карточка клиента успешно удалена."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
 
 class ClientCardListView(APIView):
 
