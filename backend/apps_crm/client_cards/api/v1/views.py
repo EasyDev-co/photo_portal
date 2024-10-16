@@ -1,8 +1,14 @@
+import logging
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
+from apps_crm.client_cards.api.v1.serializers import \
+    (
+    KindergartenCreateSerializer, KindergartenUpdateSerializer
+)
 
 
 class ClientCardDetailView(APIView):
@@ -14,6 +20,22 @@ class ClientCardDetailView(APIView):
 
         serializer = KindergartenSerializer(client_card)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, id):
+        """Частичное обновление карточки клиента."""
+        service = request.container.client_card_service()
+        client_card = service.get_client_card(client_card_id=id)
+
+        serializer = KindergartenUpdateSerializer(
+            client_card, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ClientCardListView(APIView):
@@ -36,3 +58,14 @@ class ClientCardListView(APIView):
             response.append(kindergarten_data)
 
         return Response(response, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """Создает новую карточку."""
+        serializer = KindergartenCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

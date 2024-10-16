@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Sum, Count
 from django.db.models.functions import Round
@@ -55,3 +57,6 @@ class ClientCardsService:
         current_serializer.is_valid(raise_exception=True)
 
         return current_serializer.data
+
+    def create_client_card(self,  **kwargs):
+        return self.client_cards_repository.create_obj(**kwargs)
