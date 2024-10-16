@@ -130,7 +130,9 @@ class Employee(UUIDMixin, TimeStampedMixin):
         verbose_name_plural = "Сотрудники"
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.second_name} {self.user.last_name} - {self.role.name}"
+        user_name = f"{self.user.first_name} {self.user.last_name}" if self.user else "Данные сотрудника не указаны"
+        role_name = self.role.name if self.role else "Роль не указана"
+        return f"{user_name} - {role_name}"
 
 
 class ClientCard(UUIDMixin, TimeStampedMixin):
@@ -160,4 +162,5 @@ class ClientCard(UUIDMixin, TimeStampedMixin):
         verbose_name_plural = "Карточки клиентов"
 
     def __str__(self):
-        return f"{self.client.first_name} {self.client.last_name}"
+        client_name = f"{self.client.first_name} {self.client.last_name}" if self.client else "Данные клиента не указаны"
+        return client_name

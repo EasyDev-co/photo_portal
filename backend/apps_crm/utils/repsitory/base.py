@@ -28,3 +28,9 @@ class BaseRepository(Generic[T]):
             setattr(instance, field, value)
         instance.save()
         return instance
+
+    def delete_obj(self, **kwargs) -> None:
+        """Удаление объекта по параметрам"""
+        instance = self.get_obj(**kwargs)
+        if instance:
+            instance.delete()
