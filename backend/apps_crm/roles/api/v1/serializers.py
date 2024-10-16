@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from apps_crm.roles.models import (
-    Role, Department, Region, Permission
+    ClientCard, Role, Department, Region, Permission
 )
 
 
@@ -155,3 +155,9 @@ class RoleSerializer(serializers.ModelSerializer):
             instance.permissions.values_list('name', flat=True)
         )
         return representation
+
+
+class ClientCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientCard
+        fields = ['id', 'client', 'responsible_manager', 'region']
