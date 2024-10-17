@@ -1,12 +1,27 @@
+import os
 from io import BytesIO
 
-from django.core.files.base import ContentFile
 from django.db import models
 from django.core.exceptions import ValidationError
+import boto3
 
 from .photo_line import PhotoLine
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 from apps.utils.services.add_watermark import add_watermark
+from django.conf import settings
+
+
+# Инициализация boto3 клиента
+def get_s3_client():
+    session = boto3.session.Session()
+    s3_client = session.client(
+        service_name='s3',
+        region_name=settings.YC_REGION,
+        endpoint_url=settings.YC_S3_ENDPOINT,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+    return s3_client
 
 
 class SerialPhotoNumber(models.IntegerChoices):
@@ -32,8 +47,8 @@ class Photo(UUIDMixin):
         verbose_name='Номер',
         unique=True
     )
-    photo = models.ImageField(
-        upload_to='photo/',
+    photo_file = models.FileField(
+        upload_to='',
         verbose_name='Фотография'
     )
     watermarked_photo = models.ImageField(
@@ -45,6 +60,12 @@ class Photo(UUIDMixin):
     serial_number = models.PositiveSmallIntegerField(
         choices=SerialPhotoNumber.choices,
         verbose_name='Порядковый номер'
+    )
+    photo_path = models.CharField(
+        verbose_name='Путь к фотографии',
+        max_length=255,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
@@ -68,18 +89,56 @@ class Photo(UUIDMixin):
             raise ValidationError('Такой порядковый номер в данном пробнике уже существует.')
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if not self.watermarked_photo:
-            watermarked_photo = add_watermark(
-                photo_path=self.photo,
-            )
-            # Сохраняем изображение в байтовый поток
-            buffer = BytesIO()
-            watermarked_photo.save(buffer, format='JPEG')
-            buffer.seek(0)
+        if self.photo_file:
+            # Сохраняем локальный путь к файлу
+            local_path = self.photo_file.path if hasattr(self.photo_file, 'path') else None
 
-            # Сохраняем как объект Django
-            self.watermarked_photo.save(
-                f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
-                ContentFile(buffer.read()),
-            )
+            # Загрузка фотографии в S3
+            folder_name = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
+            file_name = f'{folder_name}{self.number}.jpg'
+
+            s3_client = get_s3_client()
+
+            try:
+                # Перемещаем указатель файла в начало
+                self.photo_file.seek(0)
+
+                # Генерация водяного знака перед загрузкой в S3
+                watermarked_photo = add_watermark(photo_path=self.photo_file)
+
+                # Сохраняем изображение с водяным знаком в байтовый поток
+                buffer = BytesIO()
+                watermarked_photo.save(buffer, format='JPEG')
+                buffer.seek(0)
+
+                # Загрузка фотографии с водяным знаком в S3
+                s3_client.put_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name, Body=buffer.read())
+
+                # Сохраняем путь к фотографии в облаке
+                self.photo_path = file_name
+
+                # Удаляем локальный файл после успешной загрузки в облако (если был сохранен локально)
+                if local_path and os.path.exists(local_path):
+                    os.remove(local_path)
+                    print(f"Локальный файл {local_path} успешно удален.")
+
+                self.photo_file = None
+
+            except Exception as e:
+                raise ValidationError(f"Ошибка при загрузке файла в облако: {str(e)}")
+
+        # Теперь сохраняем сам объект
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        s3_client = get_s3_client()
+        if self.photo_path:
+            try:
+                s3_client.delete_object(Bucket=settings.YC_BUCKET_NAME, Key=self.photo_path)
+                print(f"Файл {self.photo_path} успешно удален из S3.")
+            except Exception as e:
+                print(f"Ошибка при удалении файла {self.photo_path} из S3: {str(e)}")
+                raise ValidationError(f"Ошибка при удалении файла из облака: {str(e)}")
+
+        # Удаление объекта из базы данных
+        super().delete(*args, **kwargs)

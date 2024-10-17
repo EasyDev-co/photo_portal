@@ -36,12 +36,15 @@ class PhotoInline(admin.TabularInline):
     model = Photo
     extra = 0
     ordering = ('number',)
-    readonly_fields = ('photo_img',)
     exclude = ('watermarked_photo',)
 
-    @admin.display(description='Фото')
-    def photo_img(self, obj):
-        return mark_safe(f'<img src="{obj.photo.url}" width="200" height="200" />')
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            try:
+                obj.delete()
+                self.message_user(request, f"Фотография {obj} успешно удалена.", level=messages.SUCCESS)
+            except ValidationError as e:
+                self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
 @admin.register(PhotoTheme)
@@ -103,15 +106,18 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
-    list_display = ('photo_line', 'number', 'photo')
+    list_display = ('photo_line', 'number', 'photo_path')
     exclude = ('watermarked_photo',)
     raw_id_fields = ('photo_line',)
-    readonly_fields = ('photo_img',)
+    readonly_fields = ('photo_path',)
 
-    @admin.display(description='Фото')
-    def photo_img(self, obj):
-        if obj:
-            return mark_safe(f'<img src="{obj.photo.url}" width="200" height="200" />')
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            try:
+                obj.delete()
+                self.message_user(request, f"Фотография {obj} успешно удалена.", level=messages.SUCCESS)
+            except ValidationError as e:
+                self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
 class RegionFilter(admin.SimpleListFilter):

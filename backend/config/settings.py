@@ -251,7 +251,7 @@ SIMPLE_JWT = {
 }
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
-#CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
 CORS_ALLOW_CREDENTIALS = True
 
 CART_SESSION_ID = 'cart'
@@ -279,16 +279,22 @@ MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
 AUDITLOG_INCLUDE_ALL_MODELS = True
 LOGO_PATH = os.environ.get('LOGO_PATH')
 
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/google/')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 
-YANDEX_CLIENT_ID = os.getenv('YANDEX_CLIENT_ID')
-YANDEX_CLIENT_SECRET = os.getenv('YANDEX_CLIENT_SECRET')
-YANDEX_REDIRECT_URI = os.getenv('YANDEX_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/yandex/')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/google/')
 
-MAILRU_CLIENT_ID = os.getenv('MAILRU_CLIENT_ID')
-MAILRU_CLIENT_SECRET = os.getenv('MAILRU_CLIENT_SECRET')
-MAILRU_REDIRECT_URI = os.getenv('MAILRU_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/mailru/')
+YANDEX_CLIENT_ID = os.environ.get('YANDEX_CLIENT_ID')
+YANDEX_CLIENT_SECRET = os.environ.get('YANDEX_CLIENT_SECRET')
+YANDEX_REDIRECT_URI = os.environ.get('YANDEX_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/yandex/')
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+MAILRU_CLIENT_ID = os.environ.get('MAILRU_CLIENT_ID')
+MAILRU_CLIENT_SECRET = os.environ.get('MAILRU_CLIENT_SECRET')
+MAILRU_REDIRECT_URI = os.environ.get('MAILRU_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/mailru/')
+
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+YC_BUCKET_NAME = os.environ.get("YC_BUCKET_NAME")
+YC_REGION = os.environ.get("YC_REGION")
+YC_S3_ENDPOINT = os.environ.get("YC_S3_ENDPOINT")
