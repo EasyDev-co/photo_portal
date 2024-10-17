@@ -15,6 +15,9 @@ urlpatterns = [
     path('login/mailru/', mailru.mailru_login, name='oauth_mailru_login'),
     path('callback/mailru/', mailru.mailru_callback, name='oauth_mailru_callback'),
 
+    # Login
+    path('login/oauth_token/', views.oauth_token_login, name='oauth_token_login'),
+
     # Logout
     path('logout/', views.logout_view, name='oauth_logout'),
 ]
