@@ -1,7 +1,6 @@
 import os
 from io import BytesIO
 
-from django.core.files.base import ContentFile
 from django.db import models
 from django.core.exceptions import ValidationError
 import boto3
@@ -103,31 +102,22 @@ class Photo(UUIDMixin):
             try:
                 # Перемещаем указатель файла в начало
                 self.photo_file.seek(0)
-                # Читаем содержимое файла
-                file_content = self.photo_file.read()
-                # Загружаем файл в S3
-                s3_client.put_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name, Body=file_content)
+
+                # Генерация водяного знака перед загрузкой в S3
+                watermarked_photo = add_watermark(photo_path=self.photo_file)
+
+                # Сохраняем изображение с водяным знаком в байтовый поток
+                buffer = BytesIO()
+                watermarked_photo.save(buffer, format='JPEG')
+                buffer.seek(0)
+
+                # Загрузка фотографии с водяным знаком в S3
+                s3_client.put_object(Bucket=settings.YC_BUCKET_NAME, Key=file_name, Body=buffer.read())
+
                 # Сохраняем путь к фотографии в облаке
                 self.photo_path = file_name
 
-                # Генерация водяного знака
-                super().save(*args, **kwargs)
-                if not self.watermarked_photo:
-                    watermarked_photo = add_watermark(
-                        photo_path=self.photo_file,
-                    )
-                    # Сохраняем изображение в байтовый поток
-                    buffer = BytesIO()
-                    watermarked_photo.save(buffer, format='JPEG')
-                    buffer.seek(0)
-
-                    # Сохраняем как объект Django
-                    self.watermarked_photo.save(
-                        f'{str(self.photo_line.photo_theme.name)}_watermarked.jpg',
-                        ContentFile(buffer.read()),
-                    )
-
-                # Удаляем локальный файл после успешной загрузки в облако
+                # Удаляем локальный файл после успешной загрузки в облако (если был сохранен локально)
                 if local_path and os.path.exists(local_path):
                     os.remove(local_path)
                     print(f"Локальный файл {local_path} успешно удален.")
