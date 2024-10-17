@@ -48,7 +48,6 @@ class Photo(UUIDMixin):
         verbose_name='Номер',
         unique=True
     )
-    # Заменяем ImageField на FileField, так как мы не будем сохранять фото локально
     photo_file = models.FileField(
         upload_to='',
         verbose_name='Фотография'
@@ -133,7 +132,6 @@ class Photo(UUIDMixin):
                     os.remove(local_path)
                     print(f"Локальный файл {local_path} успешно удален.")
 
-                # Очищаем поле photo_file, так как файл теперь в облаке
                 self.photo_file = None
 
             except Exception as e:
@@ -144,13 +142,8 @@ class Photo(UUIDMixin):
 
     def delete(self, *args, **kwargs):
         s3_client = get_s3_client()
-
-        # Логирование удаления
-        print(f"Попытка удаления файла: {self.photo_path}")
-
         if self.photo_path:
             try:
-                # Попытка удалить основную фотографию из S3
                 s3_client.delete_object(Bucket=settings.YC_BUCKET_NAME, Key=self.photo_path)
                 print(f"Файл {self.photo_path} успешно удален из S3.")
             except Exception as e:

@@ -36,13 +36,12 @@ class PhotoInline(admin.TabularInline):
     model = Photo
     extra = 0
     ordering = ('number',)
-    exclude = ('watermarked_photo_file',)
+    exclude = ('watermarked_photo',)
 
-    # Переопределяем метод удаления для инлайна
     def delete_queryset(self, request, queryset):
         for obj in queryset:
             try:
-                obj.delete()  # Вызов переопределённого метода delete
+                obj.delete()
                 self.message_user(request, f"Фотография {obj} успешно удалена.", level=messages.SUCCESS)
             except ValidationError as e:
                 self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
@@ -112,11 +111,10 @@ class PhotoAdmin(admin.ModelAdmin):
     raw_id_fields = ('photo_line',)
     readonly_fields = ('photo_path',)
 
-    # Переопределяем метод удаления для PhotoAdmin
     def delete_queryset(self, request, queryset):
         for obj in queryset:
             try:
-                obj.delete()  # Вызов переопределённого метода delete
+                obj.delete()
                 self.message_user(request, f"Фотография {obj} успешно удалена.", level=messages.SUCCESS)
             except ValidationError as e:
                 self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
