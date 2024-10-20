@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from apps_crm.roles.models import (
-    Employee, Role, Department, Region, ClientCard
+    Employee, Role, Department, Region
 )
 
 
@@ -31,10 +31,3 @@ class DepartmentAdmin(admin.ModelAdmin):
 class RegionAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
-
-
-@admin.register(ClientCard)
-class ClientCardAdmin(admin.ModelAdmin):
-    list_display = ('client', 'responsible_manager', 'region')
-    search_fields = ('client',)
-    list_filter = ('responsible_manager',)
