@@ -20,11 +20,8 @@ const InputField = (
         isNone,
         isQuestions,
         setActiveBlur,
-        activeBlur,
         onChangeHandler,
-        inputValue,
         isAuthForm,
-        urlData,
         autocomplete,
         error,
         isBlur,
@@ -54,7 +51,7 @@ const InputField = (
             }
         }
         if (isPencil) {
-            setInputChange(!inputChange)
+            setInputChange(!inputChange);
         }
     }
 
@@ -113,7 +110,6 @@ const InputField = (
                             }
                         </div>
                     }
-
                 </div>
             </div>
 

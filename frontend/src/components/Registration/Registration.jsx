@@ -230,7 +230,7 @@ export const Registration = () => {
                 isNone
                 isAuthForm
                 setActiveBlur={setActiveBlur}
-                value={inputValue.fullName && inputValue.fullName}
+                value={inputValue.fullName}
                 error={errorName.text}
               />
               <InputField
