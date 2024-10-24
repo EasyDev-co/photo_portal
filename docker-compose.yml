@@ -38,16 +38,16 @@ services:
     ports:
       - "8000:8000"
 
-#  celery:
-#    <<: *base_web
-#    build:
-#      context: ./backend
-#      dockerfile: celery.dockerfile
-#    container_name: ${PROJECT_SLUG}_celery
-#    volumes:
-#      - ./backend/:/opt/backend/:rw
-#      - static_dir:/opt/backend/static/
-#      - media_dir:/opt/backend/media/
+  celery:
+    <<: *base_web
+    build:
+      context: ./backend
+      dockerfile: celery.dockerfile
+    container_name: ${PROJECT_SLUG}_celery
+    volumes:
+      - ./backend/:/opt/backend/:rw
+      - static_dir:/opt/backend/static/
+      - media_dir:/opt/backend/media/
 
   frontend:
     build:
