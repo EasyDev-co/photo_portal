@@ -7,6 +7,47 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 User = get_user_model()
 
 
+class UserRole(models.IntegerChoices):
+    ROP = 1, "Руководитель отдела продаж"
+    MANAGER = 2, "Менеджер"
+    CEO = 3, "Исполнительный директор"
+
+
+class Employee(UUIDMixin, TimeStampedMixin):
+    """
+    Модель сотрудника компании. Связывается с пользователем, ролью, отделом и регионом.
+    Содержит статус, который может быть 'active' или 'inactive'.
+    """
+
+    class UserRole(models.IntegerChoices):
+        ROP = 1, "Руководитель отдела продаж"
+        MANAGER = 2, "Менеджер"
+        CEO = 3, "Исполнительный директор"
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    employee_role = models.PositiveSmallIntegerField(
+        choices=UserRole.choices,
+        default=UserRole.MANAGER,
+        verbose_name="Роль пользователя"
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=[("active", "Активный"), ("inactive", "Неактивный")],
+        verbose_name="Статус"
+    )
+
+    class Meta:
+        verbose_name = "Сотрудник"
+        verbose_name_plural = "Сотрудники"
+
+    def __str__(self):
+        return f"user: {self.user}"
+
+
+# !!! Все что ниже пока не актуально !!!
+
 class Department(UUIDMixin, TimeStampedMixin):
     """
     Модель отдела, который может быть назначен сотруднику.
@@ -100,42 +141,3 @@ class Role(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return self.name
-
-
-class UserRole(models.IntegerChoices):
-    ROP = 1, "Руководитель отдела продаж"
-    MANAGER = 2, "Менеджер"
-    CEO = 3, "Исполнительный директор"
-
-
-class Employee(UUIDMixin, TimeStampedMixin):
-    """
-    Модель сотрудника компании. Связывается с пользователем, ролью, отделом и регионом.
-    Содержит статус, который может быть 'active' или 'inactive'.
-    """
-
-    class UserRole(models.IntegerChoices):
-        ROP = 1, "Руководитель отдела продаж"
-        MANAGER = 2, "Менеджер"
-        CEO = 3, "Исполнительный директор"
-
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, verbose_name="Пользователь"
-    )
-    employee_role = models.PositiveSmallIntegerField(
-        choices=UserRole.choices,
-        default=UserRole.MANAGER,
-        verbose_name="Роль пользователя"
-    )
-    status = models.CharField(
-        max_length=50,
-        choices=[("active", "Активный"), ("inactive", "Неактивный")],
-        verbose_name="Статус"
-    )
-
-    class Meta:
-        verbose_name = "Сотрудник"
-        verbose_name_plural = "Сотрудники"
-
-    def __str__(self):
-        return f"user: {self.user}"
