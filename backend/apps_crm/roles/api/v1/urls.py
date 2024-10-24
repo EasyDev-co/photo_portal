@@ -7,12 +7,12 @@ from apps_crm.roles.api.v1.views import (
     PermissionViewSet
 )
 
-router = DefaultRouter()
-router.register('roles', RoleViewSet, basename='roles')
-router.register('regions', RegionViewSet, basename='regions')
-router.register('departments', DepartmentViewSet, basename='departments')
-router.register('permissions', PermissionViewSet, basename='permissions')
+# router = DefaultRouter()
+# router.register('roles', RoleViewSet, basename='roles')
+# router.register('regions', RegionViewSet, basename='regions')
+# router.register('departments', DepartmentViewSet, basename='departments')
+# router.register('permissions', PermissionViewSet, basename='permissions')
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+# urlpatterns = [
+#     path('', include(router.urls)),
+# ]

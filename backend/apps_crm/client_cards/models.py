@@ -1,5 +1,8 @@
 from django.db import models
 
+from apps.kindergarten.models.kindergarten import Kindergarten
+from apps_crm.roles.models import Employee
+
 
 class ClientCardStatus(models.IntegerChoices):
     CALLS = 1, "Звонки"
@@ -11,13 +14,13 @@ class ClientCardStatus(models.IntegerChoices):
 class ClientCard(models.Model):
     """Модель карточки клиента"""
     kindergarten = models.OneToOneField(
-        "apps.Kindergarten",
+        Kindergarten,
         verbose_name="Сад",
         on_delete=models.CASCADE
     )
     children_count = models.PositiveSmallIntegerField(default=0, verbose_name="Кол-во детей")
     responsible_manager = models.ForeignKey(
-        "apps_crm.Employee",
+        Employee,
         on_delete=models.SET_NULL,
         related_name="client_cards",
         null=True,
@@ -42,7 +45,7 @@ class Notes(models.Model):
     text = models.TextField(max_length=1024, verbose_name="Текст заметки")
     priority = models.BooleanField(default=False, verbose_name="Приоритет заметки")
     author = models.ForeignKey(
-        "apps_crm.Employee",
+        Employee,
         verbose_name="Автор заметки",
         on_delete=models.CASCADE,
         related_name="notes"
@@ -81,7 +84,7 @@ class HistoryCall(models.Model):
         verbose_name='Время создания'
     )
     author = models.ForeignKey(
-        "apps_crm.Employee",
+        Employee,
         verbose_name="Автор заметки",
         on_delete=models.CASCADE,
         related_name="history_calls"
@@ -98,13 +101,13 @@ class HistoryCall(models.Model):
         verbose_name_plural = 'История звонков'
 
 
-class TaskStatus(models.PositiveSmallIntegerField):
+class TaskStatus(models.IntegerChoices):
     OPEN = 1, "Открыта"
     IN_WORK = 2, "В работе"
     DONE = 3, "Готово"
 
 
-class TaskType(models.PositiveSmallIntegerField):
+class TaskType(models.IntegerChoices):
     CALL = 1, "Звонок"
     # TODO Уточнить еще статусы задачи
 
@@ -112,7 +115,7 @@ class TaskType(models.PositiveSmallIntegerField):
 class ClientCardTask(models.Model):
     """Задачи к карточке клиентов"""
     author = models.ForeignKey(
-        "apps_crm.Employee",
+        Employee,
         verbose_name="Автор заметки",
         on_delete=models.CASCADE,
         related_name="client_card_tasks"
@@ -133,7 +136,7 @@ class ClientCardTask(models.Model):
         verbose_name="Статус задачи", choices=TaskStatus.choices, default=TaskStatus.OPEN
     )
     task_type = models.PositiveSmallIntegerField(
-        verbose_name="тип задача", choices=TaskType.choices, default=TaskType.CALL
+        verbose_name="Тип задачи", choices=TaskType.choices, default=TaskType.CALL
     )
     date_end = models.DateTimeField(verbose_name="Дата окончания")
 

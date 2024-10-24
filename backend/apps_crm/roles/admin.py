@@ -7,11 +7,8 @@ from apps_crm.roles.models import (
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'role', 'department', 'region', 'status')
-    search_fields = (
-        'user__username', 'role__name', 'department__name', 'region__name'
-    )
-    list_filter = ('role', 'department', 'region', 'status')
+    list_display = ('id', 'user', 'status')
+    list_filter = ('status', )
 
 
 @admin.register(Role)

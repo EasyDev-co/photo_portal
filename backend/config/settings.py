@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'apps_crm.roles',
     'apps_crm.registration',
     'apps_crm.history',
+    'apps_crm.client_cards',
 ]
 
 MIDDLEWARE = [

@@ -18,21 +18,21 @@ class ClientCardPermissionMixin:
         return [permission() for permission in permission_classes]
 
 
-class ClientCardTaskViewSet(ClientCardPermissionMixin, viewsets.ModelViewSet):
+class ClientCardTaskViewSet(viewsets.ModelViewSet):
     queryset = ClientCardTask.objects.all()
     serializer_class = ClientCardTaskSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ClientCardTaskFilter
 
 
-class HistoryCallViewSet(ClientCardPermissionMixin, viewsets.ModelViewSet):
+class HistoryCallViewSet(viewsets.ModelViewSet):
     queryset = HistoryCall.objects.all()
     serializer_class = HistoryCallSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = HistoryCallFilter
 
 
-class NotesViewSet(ClientCardPermissionMixin, viewsets.ModelViewSet):
+class NotesViewSet(viewsets.ModelViewSet):
     queryset = Notes.objects.all()
     serializer_class = NotesSerializer
     filter_backends = [DjangoFilterBackend]
