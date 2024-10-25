@@ -24,7 +24,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8001",
     "http://localhost:8080",
-    "http://77.232.37.60:3000"
+    "http://77.232.37.60:3000",
+    "http://77.232.37.60:8000",
 ]
 
 INSTALLED_APPS = [
@@ -254,6 +255,10 @@ SIMPLE_JWT = {
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+
+CORS_ALLOWED_ORIGINS.append("http://77.232.37.60:8000")
+CORS_ALLOWED_ORIGINS.append("http://77.232.37.60:8000")
+
 CORS_ALLOW_CREDENTIALS = True
 
 CART_SESSION_ID = 'cart'
