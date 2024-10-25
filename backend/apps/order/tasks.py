@@ -288,9 +288,9 @@ class SendClosingReceiptsTask(BaseTask):
                     'Email': str(orders.first().user.email),
                     'Taxation': TAXATION,
                     'FfdVersion': FFD_VERSION,
-                }
-                payment_data['Payments'] = {
-                    'AdvancePayment': int(orders_payment.amount * 100)
+                    'Payments': {
+                        'AdvancePayment': int(orders_payment.amount * 100)
+                    }
                 }
                 payment_data['Token'] = token
                 response = requests.post(
