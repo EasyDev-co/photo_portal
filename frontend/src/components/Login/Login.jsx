@@ -1,19 +1,15 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Login.module.css";
 import InputField from "../InputField/InputField";
-import yandex from '../../assets/images/socials/Я.svg'
-import vk from '../../assets/images/socials/Vkcolor.svg'
-import google from '../../assets/images/socials/G.svg'
-import mail from '../../assets/images/socials/mail-ru-svgrepo-com.svg'
-import apple from '../../assets/images/socials/apple-logo-svgrepo-com.svg'
-import { Link , useNavigate } from "react-router-dom";
+import { localUrl, OAuthItems } from "../../constants/constants";
+import { Link, useNavigate } from "react-router-dom";
 import danger from '../../assets/images/Auth/DangerCircle.svg'
-
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
 import { parentLoginCreate } from "../../http/parent/parentLoginCreate";
+import { OAuth } from "../../http/OAuth/OAuth";
 
 export const Login = () => {
   const initialState = {
@@ -40,21 +36,17 @@ export const Login = () => {
     const newInput = (data) => ({ ...data, [event.target.name]: event.target.value });
     setInputValue(newInput);
   }
-  // function validateLogin(input) {
-  //   // Регулярное выражение для проверки кириллических букв
-  //   const cyrillicPattern = /^[А-ЯЁа-яё]+$/;
 
-  //   if (input.length < 2) {
-  //     setError({
-  //       non_field_errors: ['Длинна этого поля не может быть короче 1 слова.']
-  //     })
-  //     return
-  //   }
+  const createOAuthConnect = (provider) => {
+    try {
+      const url = `${localUrl}/api/oauth/v1/login/${provider}`;
+      localStorage.setItem('pr__r', provider);
+      window.open(url, '_blank');
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  //   setError({
-  //     non_field_errors: []
-  //   })
-  // }
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
@@ -141,26 +133,18 @@ export const Login = () => {
               </form>
               <div className={styles.loginLinkWrap}>
                 <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}> Зарегистрируйтесь!</span> </Link></p>
-                {/* <div className={styles.socialList}>
+                <div className={styles.socialList}>
                   <span>Войти через</span>
                   <div className={styles.socialWrap}>
-                    <div>
-                      <img className={styles.socialIcon} src={vk} alt="" />
-                    </div>
-                    <div>
-                      <img className={styles.socialIcon} src={yandex} alt="" />
-                    </div>
-                    <div>
-                      <img className={styles.socialIcon} src={google} alt="" />
-                    </div>
-                    <div>
-                      <img className={styles.socialIcon} src={apple} alt="" />
-                    </div>
-                    <div>
-                      <img className={styles.socialIcon} src={mail} alt="" />
-                    </div>
+                    {OAuthItems.map(elem => {
+                      return (
+                        <div key={elem.id} onClick={() => { createOAuthConnect(elem.name) }}>
+                          <img className={styles.socialIcon} src={elem.image} alt="" />
+                        </div>
+                      )
+                    })}
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           </div>

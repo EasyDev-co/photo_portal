@@ -2,7 +2,6 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-
 export const getUserData = async (access) => {
     const url = `${localUrl}/api/v1/user/`;
 
