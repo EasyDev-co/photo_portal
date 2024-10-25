@@ -289,9 +289,9 @@ class NotificationFiscalizationAPIView(APIView):
             )
 
             # запускаем задачу для обработки нотификации, передавая id созданного объекта NotificationFiscalization
-            parse_notification_fiscalization.delay(
-                notification_fiscalization.id
-            )
+            # parse_notification_fiscalization.delay(
+            #     notification_fiscalization.id
+            # )
             return Response(status=status.HTTP_200_OK)
 
         except Exception as e:
