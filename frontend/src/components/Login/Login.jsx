@@ -39,9 +39,17 @@ export const Login = () => {
 
   const createOAuthConnect = (provider) => {
     try {
-      const url = `${localUrl}/api/oauth/v1/login/${provider}`;
+      // const url = `${localUrl}/api/oauth/v1/login/${provider}`;
       localStorage.setItem('pr__r', provider);
-      window.open(url, '_blank');
+      OAuth()
+      .then(res=>{
+        if(res.ok){
+          res.json().then(res=>{
+            window.open(res, '_blank');
+          })
+        }
+      })
+      
     } catch (error) {
       console.log(error)
     }
