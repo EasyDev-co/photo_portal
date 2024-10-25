@@ -41,11 +41,12 @@ export const Login = () => {
     try {
       // const url = `${localUrl}/api/oauth/v1/login/${provider}`;
       localStorage.setItem('pr__r', provider);
-      OAuth()
+      OAuth(provider)
       .then(res=>{
         if(res.ok){
           res.json().then(res=>{
             window.open(res, '_blank');
+            console.log(res)
           })
         }
       })
