@@ -132,9 +132,8 @@ const ManagerProfile = () => {
                     </div>
 
                 </div>
-
             </div>
-            {bonus &&
+            {bonus.length !== 0 &&
                 <div className={styles.paymentTimerWrap}>
                     <Swiper
                         effect={'flip'}
