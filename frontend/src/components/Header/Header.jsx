@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable no-extra-semi */
 import styles from "./Header.module.css";
 import React, { useState, useEffect } from "react";
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
