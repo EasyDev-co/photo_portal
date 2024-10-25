@@ -41,7 +41,7 @@ export const Login = () => {
     try {
       const url = `${localUrl}/api/oauth/v1/login/${provider}`;
       localStorage.setItem('pr__r', provider);
-      // window.open(url, '_blank');
+      window.open(url, '_blank');
     } catch (error) {
       console.log(error)
     }
