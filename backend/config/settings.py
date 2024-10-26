@@ -26,6 +26,21 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://77.232.37.60:3000",
     "http://77.232.37.60:8000",
+    "https://7c8a-188-234-12-6.ngrok-free.app",
+    "https://7e9a-109-120-151-148.ngrok-free.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "http://localhost:8001",
+    "http://localhost:8080",
+    "http://77.232.37.60:3000",
+    "http://77.232.37.60:8000",
+    "https://7c8a-188-234-12-6.ngrok-free.app",
+    "https://7e9a-109-120-151-148.ngrok-free.app",
 ]
 
 INSTALLED_APPS = [
@@ -253,11 +268,11 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
-
-CORS_ALLOWED_ORIGINS.append("http://77.232.37.60:8000")
-CORS_ALLOWED_ORIGINS.append("http://77.232.37.60:8000")
+# CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
+# CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+#
+# CORS_ALLOWED_ORIGINS.append("https://7c8a-188-234-12-6.ngrok-free.app")
+# CORS_ALLOWED_ORIGINS.append("https://7c8a-188-234-12-6.ngrok-free.app")
 
 CORS_ALLOW_CREDENTIALS = True
 
