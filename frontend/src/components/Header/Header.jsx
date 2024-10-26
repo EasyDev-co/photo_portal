@@ -1,17 +1,19 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable no-extra-semi */
 import styles from "./Header.module.css";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
 import { NavBar } from "../NavBar/NavBar";
 import { ButtonBurger } from "./ButtonBurger/ButtonBurger";
 import { logo } from "../../constants/constants";
-import { fetchUserDataWithTokenInterceptor, getUserData } from "../../http/user/getUserData";
+import { fetchUserDataWithTokenInterceptor } from "../../http/user/getUserData";
 import { useDispatch, useSelector } from "react-redux";
-import { addUserData } from "../../store/authSlice";
+import { addUserData, setUser } from "../../store/authSlice";
 import { getCookie } from "../../utils/setCookie";
 import { useAuth } from "../../utils/useAuth";
-import { Link , useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { OAuthGetToken } from "../../http/OAuth/OAuth";
 
 export const Header = () => {
   const [cookieData, setCookieData] = useState(getCookie('refresh'));
@@ -21,6 +23,7 @@ export const Header = () => {
   const userData = useSelector(state => state.user.userData);
   const refresh = useSelector(state => state.user.refresh);
   const accessStor = localStorage.getItem('access');
+
   const [localStorageValue, setLocalStorageValue] = useState({
     last_name: localStorage.getItem('last_name'),
     first_name: localStorage.getItem('first_name'),
@@ -61,11 +64,11 @@ export const Header = () => {
         if (res.ok) {
           res.json()
             .then(res => {
-              dispatch(addUserData(res))
-            })
-        }
-      })
-  }, [accessStor, cookieData, dispatch, refresh])
+              dispatch(addUserData(res));
+            });
+        };
+      });
+  }, [accessStor, cookieData, dispatch, refresh]);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -79,6 +82,43 @@ export const Header = () => {
       setNavBarState(false);
     }
   }, [windowWidth]);
+
+  function getTokenFromUrl(url) {
+    if (url.includes('auth/callback')) {
+      const queryString = url.split('?')[1];
+      if (queryString) {
+        const params = queryString.split('&');
+        for (const param of params) {
+          if (param.startsWith('token=')) {
+            return param.split('=')[1];
+          };
+        };
+      };
+    };
+    return null;
+  }
+
+  useEffect(() => {
+    let token = getTokenFromUrl(window.location.href);
+    if (!token) {
+      return;
+    };
+    OAuthGetToken({
+      provider: localStorage.getItem('pr__r'),
+      access_token: token
+    })
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(res => {
+              dispatch(setUser(res));
+            })
+            .then(()=>{
+              navigate('/orders');
+            });
+        }
+      });
+  }, []);
 
   useEffect(() => {
     if (navBarState) {

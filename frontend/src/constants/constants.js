@@ -11,6 +11,9 @@ import telegramIcon from "../assets/images/socials/telegram.svg";
 import aboutUsFirst from "../assets/images/AboutUsPhotos/PhotoG.jpg";
 import aboutUsSecond from "../assets/images/AboutUsPhotos/PhotoM.jpg";
 import quotesIcon from "../assets/images/quotes.svg";
+import yandex from '../assets/images/socials/Я.svg'
+import google from '../assets/images/socials/G.svg'
+import mail from '../assets/images/socials/mail-ru-svgrepo-com.svg'
 
 const userInfo = {
   surname: "Иванова",
@@ -55,6 +58,24 @@ const rulesItems = [
   },
 ];
 
+const OAuthItems = [
+  {
+    id: 1,
+    name: 'google',
+    image: google
+  },
+  {
+    id: 2,
+    name: 'yandex',
+    image: yandex
+  },
+  {
+    id: 3,
+    name: 'mailru',
+    image: mail
+  }
+]
+
 const aboutUsItems = [
   {
     photo: aboutUsFirst,
@@ -71,8 +92,8 @@ const aboutUsItems = [
     infoAltPhoto: "фото ребёнка",
   },
 ];
+// const localUrl = `http://127.0.0.1:8080`;
 const localUrl = `http://77.232.37.60:8000`;
-// const localUrl = `https://photodetstvo.easydev-program.com`;
 export {
   logo,
   bagIcon,
@@ -88,5 +109,6 @@ export {
   rulesItems,
   aboutUsItems,
   userInfoProfile,
-  localUrl
+  localUrl,
+  OAuthItems
 };
