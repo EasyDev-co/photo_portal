@@ -1,5 +1,6 @@
 from urllib.parse import parse_qsl
 
+from django.utils.html import format_html
 from django.contrib import admin
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.safestring import mark_safe
@@ -109,7 +110,21 @@ class PhotoAdmin(admin.ModelAdmin):
     list_display = ('photo_line', 'number', 'photo_path')
     exclude = ('watermarked_photo',)
     raw_id_fields = ('photo_line',)
-    readonly_fields = ('photo_path',)
+    readonly_fields = ('photo_path', 'watermarked_photo_path', 'display_photo', 'display_watermarked_photo')
+
+    def display_photo(self, obj):
+        if obj.photo_path:
+            return format_html('<img src="{}" style="max-height:200px;"/>', obj.photo_path)
+        return "Нет изображения"
+
+    display_photo.short_description = "Оригинальная фотография"
+
+    def display_watermarked_photo(self, obj):
+        if obj.watermarked_photo_path:
+            return format_html('<img src="{}" style="max-height:200px;"/>', obj.watermarked_photo_path)
+        return "Нет изображения"
+
+    display_watermarked_photo.short_description = "Фото с водяным знаком"
 
     def delete_queryset(self, request, queryset):
         for obj in queryset:
