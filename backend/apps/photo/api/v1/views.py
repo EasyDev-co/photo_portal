@@ -122,6 +122,7 @@ class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
     """
     queryset = PhotoTheme.objects.filter(is_active=True)
     serializer_class = PhotoThemeSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class DownloadPhotoAPIView(APIView):

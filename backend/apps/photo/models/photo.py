@@ -33,8 +33,7 @@ class Photo(UUIDMixin):
         verbose_name='Пробник'
     )
     number = models.PositiveIntegerField(
-        verbose_name='Номер',
-        unique=True
+        verbose_name='Номер', default=1,
     )
     photo_file = models.FileField(
         upload_to='',

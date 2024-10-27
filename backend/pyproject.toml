@@ -28,6 +28,7 @@ dependency-injector = "^4.42.0"
 django-auditlog = "^3.0.0"
 requests = "^2.32.3"
 boto3 = "^1.35.39"
+django-file-form = "^3.8.0"
 
 
 [build-system]
