@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <style>
+        .drag-and-drop {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .drag-and-drop-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drag-and-drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            transition: border 0.3s;
+            cursor: pointer;
+        }
+
+        .drag-and-drop-area.dragover {
+            border-color: #66afe9;
+            background-color: #f0f8ff;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            margin-bottom: 10px;
+        }
+
+        .file-item span {
+            display: block;
+        }
+
+        .delete-all-button {
+            background-color: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .delete-all-button:hover {
+            background-color: #ff1a1a;
+        }
+    </style>
+    <title>Загрузка файлов</title>
+</head>
+<body>
+    <div class="drag-and-drop">
+        <input type="file" name="{{ widget.name }}" class="drag-and-drop-input" multiple>
+        <div class="drag-and-drop-area">
+            <p>Перетащите файлы сюда или нажмите, чтобы выбрать</p>
+        </div>
+        <!-- Контейнер для отображения списка файлов -->
+        <div class="file-list"></div>
+    </div>
+    <!-- Кнопка для удаления всех файлов -->
+    <button type="button" class="delete-all-button">Удалить все</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropArea = document.querySelector('.drag-and-drop-area');
+            const input = document.querySelector('.drag-and-drop-input');
+            const fileList = document.querySelector('.file-list');
+            const deleteAllButton = document.querySelector('.delete-all-button');
+            let dataTransfer = new DataTransfer(); // Создаем объект DataTransfer
+
+            // Предотвращаем поведение по умолчанию для событий перетаскивания
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Добавляем визуальную индикацию при перетаскивании файлов
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropArea.classList.add('dragover');
+            }
+
+            function unhighlight(e) {
+                dropArea.classList.remove('dragover');
+            }
+
+            // Обрабатываем событие drop
+            dropArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+
+            // Обрабатываем событие выбора файлов через диалог
+            input.addEventListener('change', function(e) {
+                const files = input.files;
+                handleFiles(files);
+            });
+
+            function handleFiles(files) {
+                // Добавляем файлы в DataTransfer
+                for (let i = 0; i < files.length; i++) {
+                    dataTransfer.items.add(files[i]);
+                }
+                // Обновляем файлы в input
+                input.files = dataTransfer.files;
+                // Обновляем отображение
+                updateFileDisplay();
+            }
+
+            function updateFileDisplay() {
+                // Очищаем текущий список файлов
+                fileList.innerHTML = '';
+
+                const files = dataTransfer.files;
+                const fileCount = files.length;
+
+                if (fileCount > 0) {
+                    if (fileCount < 6) {
+                        // Отображаем каждый файл
+                        for (let i = 0; i < fileCount; i++) {
+                            const file = files[i];
+
+                            const fileItem = document.createElement('div');
+                            fileItem.classList.add('file-item');
+
+                            const fileName = document.createElement('span');
+                            fileName.textContent = file.name;
+
+                            fileItem.appendChild(fileName);
+                            fileList.appendChild(fileItem);
+                        }
+                    } else {
+                        // Отображаем количество файлов
+                        const fileCountText = document.createElement('p');
+                        fileCountText.textContent = `Выбрано файлов: ${fileCount}`;
+                        fileList.appendChild(fileCountText);
+                    }
+                    // Показываем кнопку "Удалить все"
+                    deleteAllButton.style.display = 'inline-block';
+                } else {
+                    // Скрываем кнопку "Удалить все", если нет файлов
+                    deleteAllButton.style.display = 'none';
+                }
+            }
+
+            // Открываем диалог выбора файлов при клике на область
+            dropArea.addEventListener('click', function(e) {
+                input.click();
+            });
+
+            // Обрабатываем нажатие на кнопку "Удалить все"
+            deleteAllButton.addEventListener('click', function(e) {
+                // Очищаем DataTransfer и input
+                dataTransfer = new DataTransfer();
+                input.files = dataTransfer.files;
+                // Обновляем отображение
+                updateFileDisplay();
+            });
+
+            // Изначально скрываем кнопку "Удалить все"
+            deleteAllButton.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

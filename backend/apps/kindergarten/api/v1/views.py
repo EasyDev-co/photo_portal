@@ -2,16 +2,21 @@ from django.db.models import Sum, Count, Avg
 from django.db.models.functions import Round
 from django.utils import timezone as django_timezone
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 from apps.kindergarten.api.v1.permissions import IsManager
 from apps.kindergarten.api.v1.serializers import (
     PhotoPriceSerializer,
     PhotoPriceByRegionSerializer,
-    KindergartenStatsSerializer, RansomSerializer
+    KindergartenStatsSerializer,
+    RansomSerializer,
+    KindergartenSerializer
 )
-from apps.kindergarten.models import PhotoPrice, Ransom
+from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus
 from apps.photo.models import PhotoTheme
@@ -85,3 +90,14 @@ class KindergartenStatsAPIView(APIView):
             'current_stats': current_serializer.data,
             'past_stats': ransom_serializer.data,
         }, status=status.HTTP_200_OK)
+
+
+class KindergartenSearchAPIView(ListAPIView):
+    """Поиск детcкого сада по имени"""
+    permission_classes = [IsManager]
+
+    queryset = Kindergarten.objects.all()
+    serializer_class = KindergartenSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['name']
+    search_fields = ['name']

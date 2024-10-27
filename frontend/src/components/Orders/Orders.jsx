@@ -68,7 +68,6 @@ export const Orders = () => {
           if (isMounted && res.ok) {
             res.json()
               .then(data => {
-
                 dispatch(addPhotos(data));
                 patchPhotoLine(accessStor, { "parent": idP }, data.id)
               })

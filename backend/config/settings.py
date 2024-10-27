@@ -28,6 +28,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://77.232.37.60:8000",
     "https://7c8a-188-234-12-6.ngrok-free.app",
     "https://7e9a-109-120-151-148.ngrok-free.app",
+    "http://0.0.0.0:3000"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -39,6 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
     "http://77.232.37.60:3000",
     "http://77.232.37.60:8000",
+    "http://0.0.0.0:3000",
     "https://7c8a-188-234-12-6.ngrok-free.app",
     "https://7e9a-109-120-151-148.ngrok-free.app",
 ]
@@ -261,12 +263,33 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'apps/kindergarten/kinder_static',
+]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'apps/kindergarten/templates'],
+        'APP_DIRS': True,  # Добавь, если его нет, для автоматического поиска шаблонов в приложениях.
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',  # Требуется для админки
+                'django.contrib.auth.context_processors.auth',  # Требуется для админки
+                'django.contrib.messages.context_processors.messages',  # Требуется для админки
+            ],
+        },
+    },
+]
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+DJANGO_FILE_FORM_TUS_ENDPOINT = '/tus-upload/'
 
 # CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
 # CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
