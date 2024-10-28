@@ -9,6 +9,8 @@ from phonenumber_field.serializerfields import PhoneNumberField
 
 from apps.kindergarten.api.v1.serializers import KindergartenSerializer
 from apps.photo.api.v1.serializers import PhotoThemeSerializer
+from apps.photo.models import PhotoTheme
+from apps.promocode.models import Promocode
 from apps.user.models import User
 from apps.user.models.manager_bonus import ManagerBonus
 from apps.user.validators import validate_cyrillic
@@ -138,3 +140,28 @@ class ManagerBonusSerializer(serializers.ModelSerializer):
             'user',
             'photo_theme'
         )
+
+
+class ManagerSerializer(UserSerializer):
+    promocode = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = UserSerializer.Meta.fields + (
+            'phone_number',
+            'promocode',
+            'birth_date'
+        )
+
+    def get_promocode(self, obj):
+        photo_theme = PhotoTheme.objects.filter(
+            photo_lines__in=obj.managed_kindergarten.photo_lines.all(),
+            is_active=True
+        ).distinct().first()
+        promocode = Promocode.objects.filter(
+            user=obj,
+            is_active=True,
+            photo_theme=photo_theme
+        ).first()
+        if promocode:
+            return promocode.code

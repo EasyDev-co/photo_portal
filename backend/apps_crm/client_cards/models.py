@@ -19,6 +19,10 @@ class ClientCard(models.Model):
         on_delete=models.CASCADE
     )
     children_count = models.PositiveSmallIntegerField(default=0, verbose_name="Кол-во детей")
+    children_for_photoshoot = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name="Кол-во детей на фотосессию"
+    )
     responsible_manager = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
@@ -29,15 +33,38 @@ class ClientCard(models.Model):
     last_photographer = models.CharField(max_length=256, verbose_name="Последний фотограф", null=True)
     garden_details = models.CharField(max_length=256, verbose_name="Реквизиты", null=True)
     city = models.CharField(max_length=128, verbose_name="Город", null=True)
+    address = models.CharField(max_length=256, verbose_name="Адрес", null=True)
     status = models.PositiveSmallIntegerField(
         choices=ClientCardStatus.choices,
         default=ClientCardStatus.CALLS,
         verbose_name="Статус карточки клиента"
     )
+    charges = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='Сбор'
+    )
+    charge_dates = models.DateField(
+        null=True,
+        verbose_name='Дата сбора'
+    )
 
     class Meta:
         verbose_name = 'Карточка клиента'
         verbose_name_plural = 'Карточки клиента'
+
+    @property
+    def manager_bonus(self):
+        try:
+            return self.responsible_manager.user.manager_bonuses.first().bonus_size
+        except AttributeError:
+            return
+
+    @property
+    def promocode_size(self):
+        try:
+            return self.responsible_manager.user.promo_codes.first().discount_services
+        except AttributeError:
+            return
 
 
 class Notes(models.Model):

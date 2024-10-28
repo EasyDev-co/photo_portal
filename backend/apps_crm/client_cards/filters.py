@@ -1,5 +1,5 @@
 import django_filters
-from .models import ClientCardTask, HistoryCall, Notes
+from .models import ClientCardTask, HistoryCall, Notes, ClientCard
 
 
 class ClientCardTaskFilter(django_filters.FilterSet):
@@ -8,6 +8,15 @@ class ClientCardTaskFilter(django_filters.FilterSet):
         fields = {
             'client_card': ['exact'],
             'task_status': ['exact', 'in'],
+        }
+
+
+class ClientCardFilter(django_filters.FilterSet):
+    class Meta:
+        model = ClientCard
+        fields = {
+            'kindergarten': ['exact'],
+            'status': ['exact'],
         }
 
 

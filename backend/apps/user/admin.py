@@ -31,6 +31,7 @@ class UserAdmin(BaseUserAdmin):
                     "first_name",
                     'second_name',
                     "last_name",
+                    'birth_date',
                     'phone_number',
                     'role',
                     'is_verified',
