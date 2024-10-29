@@ -67,6 +67,11 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True
     )
+    birth_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='День рождения'
+    )
 
     objects = UserManager()
 
@@ -78,6 +83,10 @@ class User(UUIDMixin, AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
+        return f"{self.first_name} {self.second_name} {self.last_name}"
+
+    @property
+    def full_name(self):
         return f"{self.first_name} {self.second_name} {self.last_name}"
 
     def clean(self):

@@ -1,10 +1,12 @@
 from rest_framework import viewsets, permissions
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
 
-from apps_crm.client_cards.models import ClientCardTask, HistoryCall, Notes
-from apps_crm.client_cards.api.v1.serializers import ClientCardTaskSerializer, HistoryCallSerializer, NotesSerializer
+from apps_crm.client_cards.models import ClientCardTask, HistoryCall, Notes, ClientCard
+from apps_crm.client_cards.api.v1.serializers import ClientCardTaskSerializer, HistoryCallSerializer, NotesSerializer, \
+    ClientCardSerializer, ClientCardRetrieveSerializer
 from apps_crm.roles.permissions import IsROPorDirector, IsAuthorOrROPorDirector
-from apps_crm.client_cards.filters import ClientCardTaskFilter, HistoryCallFilter, NotesFilter
+from apps_crm.client_cards.filters import ClientCardTaskFilter, HistoryCallFilter, NotesFilter, ClientCardFilter
 
 
 class ClientCardPermissionMixin:
@@ -25,6 +27,19 @@ class ClientCardTaskViewSet(viewsets.ModelViewSet):
     filterset_class = ClientCardTaskFilter
 
 
+class ClientCardViewSet(viewsets.ModelViewSet):
+    """ Вью для карточек клиента. """
+    queryset = ClientCard.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ClientCardFilter
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ClientCardRetrieveSerializer
+        else:
+            return ClientCardSerializer
+
+
 class HistoryCallViewSet(viewsets.ModelViewSet):
     queryset = HistoryCall.objects.all()
     serializer_class = HistoryCallSerializer
@@ -37,4 +52,3 @@ class NotesViewSet(viewsets.ModelViewSet):
     serializer_class = NotesSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = NotesFilter
-
