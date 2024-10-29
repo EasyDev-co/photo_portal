@@ -132,44 +132,46 @@ const ManagerProfile = () => {
                     </div>
 
                 </div>
+            </div>
+            {bonus.length !== 0 &&
+                <div className={styles.paymentTimerWrap}>
+                    <Swiper
+                        effect={'flip'}
+                        grabCursor={true}
+                        navigation={true}
+                        modules={[EffectFlip, Pagination, Navigation]}
+                        className="mySwiper"
+                    >
+                        {bonus?.map(elem => {
+                            return (
+                                <SwiperSlide key={elem.id} style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '80px'
+                                }}>
+                                    <PaymentDiagram
+                                        count={'3 500'}
+                                        label={'Ваш бонус:'}
+                                        bonus={elem.total_bonus}
+                                    />
+                                    <StatisticItem
+                                        timer
+                                        label={'Итого'}
+                                        data={stats.current_stats.total_amount}
+                                    />
+                                    <Timer
+                                        isStats
+                                        date={elem.photo_theme.date_end}
+                                        desc={elem.photo_theme.name}
+                                    />
+                                </SwiperSlide>
+                            )
+                        })}
+                    </Swiper>
+                </div>
+            }
 
-            </div>
-            <div  className={styles.paymentTimerWrap}>
-            <Swiper
-                effect={'flip'}
-                grabCursor={true}
-                navigation={true}
-                modules={[EffectFlip, Pagination, Navigation]}
-                className="mySwiper"
-            >
-                {bonus?.map(elem => {
-                    return (
-                            <SwiperSlide key={elem.id} style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '80px'
-                            }}>
-                                <PaymentDiagram
-                                    count={'3 500'}
-                                    label={'Ваш бонус:'}
-                                    bonus={elem.total_bonus}
-                                />
-                                <StatisticItem
-                                    timer
-                                    label={'Итого'}
-                                    data={stats.current_stats.total_amount}
-                                />
-                                <Timer
-                                    isStats
-                                    date={elem.photo_theme.date_end}
-                                    desc={elem.photo_theme.name}
-                                />
-                            </SwiperSlide>
-                    )
-                })}
-            </Swiper>
-            </div>
         </div>
     );
 }

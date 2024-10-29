@@ -44,4 +44,3 @@ class IsPhotoPurchased(BasePermission):
         ).exists()
 
         return order_exists
-

@@ -3,12 +3,17 @@ from PIL import Image
 from config.settings import LOGO_PATH
 
 
-def add_watermark(photo_path, opacity=192) -> Image:
+def add_watermark(photo, opacity=192) -> Image.Image:
     """
     Накладывает водяной знак на фотографию.
     """
-    # Открываем фотографию и конвертируем в RGBA
-    photo = Image.open(photo_path).convert("RGBA")
+    # Предполагается, что photo уже является объектом Image.Image
+    if not isinstance(photo, Image.Image):
+        raise TypeError("Параметр 'photo' должен быть объектом PIL.Image.Image")
+
+    # Конвертируем изображение в RGBA, если оно еще не в этом формате
+    if photo.mode != "RGBA":
+        photo = photo.convert("RGBA")
 
     width, height = photo.size
 
@@ -17,7 +22,6 @@ def add_watermark(photo_path, opacity=192) -> Image:
     logo = logo.resize((width, height))
 
     # Извлекаем альфа-канал и изменяем прозрачность
-    logo = logo.copy()
     alpha = logo.split()[3]
     alpha = alpha.point(lambda p: p * opacity / 255)
 
@@ -25,8 +29,10 @@ def add_watermark(photo_path, opacity=192) -> Image:
     logo.putalpha(alpha)
 
     # Накладываем водяной знак на фотографию
-    photo.paste(logo, (0, 0), logo)
+    watermarked_photo = photo.copy()
+    watermarked_photo.paste(logo, (0, 0), logo)
 
-    photo = photo.convert("RGB")
+    # Конвертируем обратно в RGB перед сохранением
+    watermarked_photo = watermarked_photo.convert("RGB")
 
-    return photo
+    return watermarked_photo

@@ -2,8 +2,12 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from apps.kindergarten.models.region import Region
-from apps.kindergarten.models.kindergarten import Kindergarten
 from apps.kindergarten.models.photo_price import PhotoPrice
+from apps.kindergarten.form import KindergartenForm
+
+from apps.kindergarten.models.kindergarten import Kindergarten
+
+from itertools import zip_longest
 
 
 class KindergartenInline(admin.TabularInline):
@@ -22,7 +26,7 @@ class KindergartenAdmin(admin.ModelAdmin):
     list_display = ('name', 'region', 'code', 'has_photobook', 'locality')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
-    readonly_fields = ('qr_image', 'qr_code')
+    readonly_fields = ('qr_image', 'qr_code', 'file_upload')
     raw_id_fields = ('region',)
     ordering = ('name',)
 
@@ -32,8 +36,33 @@ class KindergartenAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if obj:
-            return ('region', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code')
-        return ('region', 'name', 'code', 'has_photobook')
+            return 'region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload'
+        return 'region', 'locality', 'name', 'code', 'has_photobook', 'file_upload'
+
+    def file_upload(self, obj):
+        form = KindergartenForm()
+        return mark_safe(f"""
+            <form method="post" enctype="multipart/form-data">
+                {form.as_p()}
+                <button type="submit" style="
+                    background-color: #205067;
+                    border: none;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    font-size: 16px;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                ">Загрузить файлы</button>
+            </form>
+        """)
+
+    @staticmethod
+    def _grouper(iterable, n, fillvalue=None):
+        """Группировка по n элементов с заполнением отсутствующих значений."""
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
 
 
 @admin.register(Region)
@@ -58,8 +87,21 @@ class PhotoPriceAdmin(admin.ModelAdmin):
     get_price_display.short_description = 'Цены для регионов'
 
     def save_model(self, request, obj, form, change):
-        if not obj.region and PhotoPrice.objects.filter(region__isnull=True, photo_type=obj.photo_type).exists():
-            raise ValueError('Общая цена для данного типа фотографий уже существует.')
         if obj.region and obj.region.name in ['Москва', 'Санкт-Петербург'] and obj.price == 0:
             raise ValueError(f'Необходимо указать цену для региона {obj.region.name}.')
+
+        if not obj.region:
+            regions = Region.objects.exclude(name__in=['Москва', 'Санкт-Петербург'])
+            for region in regions:
+                if not PhotoPrice.objects.filter(region=region, photo_type=obj.photo_type).exists():
+                    PhotoPrice.objects.create(
+                        price=obj.price,
+                        region=region,
+                        photo_type=obj.photo_type
+                    )
+            self.message_user(
+                request,
+                'Цены успешно добавлены для всех регионов, кроме Москвы и Санкт-Петербурга.'
+            )
+            return
         super().save_model(request, obj, form, change)

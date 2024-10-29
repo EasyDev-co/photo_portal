@@ -1,9 +1,3 @@
-import logging
-import uuid
-
-from auditlog.models import LogEntry
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response

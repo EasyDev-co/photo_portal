@@ -1,20 +1,13 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ClientCardTaskViewSet, NotesViewSet, HistoryCallViewSet, ClientCardViewSet
 
-from apps_crm.client_cards.api.v1.views import (
-    ClientCardDetailView,
-    ClientCardListView
-)
+router = DefaultRouter()
+router.register(r'client-card-tasks', ClientCardTaskViewSet, basename='clientcardtask')
+router.register(r'client-cards', ClientCardViewSet, basename='clientcard')
+router.register(r'notes', NotesViewSet, basename='notes')
+router.register(r'history-calls', HistoryCallViewSet, basename='historycall')
 
 urlpatterns = [
-    path(
-        '',
-        ClientCardListView.as_view(),
-        name='object_history'
-    ),
-    path(
-        '<uuid:id>/',
-        ClientCardDetailView.as_view(),
-        name='user_history'
-    ),
-
+    path('', include(router.urls)),
 ]

@@ -24,7 +24,25 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8001",
     "http://localhost:8080",
-    "http://77.232.37.60:3000"
+    "http://77.232.37.60:3000",
+    "http://77.232.37.60:8000",
+    "https://7c8a-188-234-12-6.ngrok-free.app",
+    "https://7e9a-109-120-151-148.ngrok-free.app",
+    "http://0.0.0.0:3000"
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "http://localhost:8001",
+    "http://localhost:8080",
+    "http://77.232.37.60:3000",
+    "http://77.232.37.60:8000",
+    "http://0.0.0.0:3000",
+    "https://7c8a-188-234-12-6.ngrok-free.app",
+    "https://7e9a-109-120-151-148.ngrok-free.app",
 ]
 
 INSTALLED_APPS = [
@@ -60,6 +78,7 @@ INSTALLED_APPS = [
     'apps_crm.roles',
     'apps_crm.registration',
     'apps_crm.history',
+    'apps_crm.client_cards',
 ]
 
 MIDDLEWARE = [
@@ -182,7 +201,8 @@ AUTH_USER_MODEL = 'user.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    ' DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend'),
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -243,6 +263,25 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'apps/kindergarten/kinder_static',
+]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'apps/kindergarten/templates'],
+        'APP_DIRS': True,  # Добавь, если его нет, для автоматического поиска шаблонов в приложениях.
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',  # Требуется для админки
+                'django.contrib.auth.context_processors.auth',  # Требуется для админки
+                'django.contrib.messages.context_processors.messages',  # Требуется для админки
+            ],
+        },
+    },
+]
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
@@ -250,8 +289,14 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
-#CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+DJANGO_FILE_FORM_TUS_ENDPOINT = '/tus-upload/'
+
+# CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
+# CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
+#
+# CORS_ALLOWED_ORIGINS.append("https://7c8a-188-234-12-6.ngrok-free.app")
+# CORS_ALLOWED_ORIGINS.append("https://7c8a-188-234-12-6.ngrok-free.app")
+
 CORS_ALLOW_CREDENTIALS = True
 
 CART_SESSION_ID = 'cart'
@@ -279,16 +324,22 @@ MEASUREMENT_UNIT = os.environ.get('MEASUREMENT_UNIT')
 AUDITLOG_INCLUDE_ALL_MODELS = True
 LOGO_PATH = os.environ.get('LOGO_PATH')
 
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/google/')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 
-YANDEX_CLIENT_ID = os.getenv('YANDEX_CLIENT_ID')
-YANDEX_CLIENT_SECRET = os.getenv('YANDEX_CLIENT_SECRET')
-YANDEX_REDIRECT_URI = os.getenv('YANDEX_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/yandex/')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/google/')
 
-MAILRU_CLIENT_ID = os.getenv('MAILRU_CLIENT_ID')
-MAILRU_CLIENT_SECRET = os.getenv('MAILRU_CLIENT_SECRET')
-MAILRU_REDIRECT_URI = os.getenv('MAILRU_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/mailru/')
+YANDEX_CLIENT_ID = os.environ.get('YANDEX_CLIENT_ID')
+YANDEX_CLIENT_SECRET = os.environ.get('YANDEX_CLIENT_SECRET')
+YANDEX_REDIRECT_URI = os.environ.get('YANDEX_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/yandex/')
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+MAILRU_CLIENT_ID = os.environ.get('MAILRU_CLIENT_ID')
+MAILRU_CLIENT_SECRET = os.environ.get('MAILRU_CLIENT_SECRET')
+MAILRU_REDIRECT_URI = os.environ.get('MAILRU_REDIRECT_URI', 'http://localhost:8000/api/oauth/v1/callback/mailru/')
+
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+YC_BUCKET_NAME = os.environ.get("YC_BUCKET_NAME")
+YC_REGION = os.environ.get("YC_REGION")
+YC_S3_ENDPOINT = os.environ.get("YC_S3_ENDPOINT")

@@ -12,7 +12,7 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ('id', 'number', 'photo', 'watermarked_photo')
+        fields = ('id', 'number', 'photo_file', 'watermarked_photo', 'watermarked_photo_path', 'photo_path')
 
 
 class PhotoThemeSerializer(serializers.ModelSerializer):

@@ -7,6 +7,47 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 User = get_user_model()
 
 
+class UserRole(models.IntegerChoices):
+    ROP = 1, "Руководитель отдела продаж"
+    MANAGER = 2, "Менеджер"
+    CEO = 3, "Исполнительный директор"
+
+
+class Employee(UUIDMixin, TimeStampedMixin):
+    """
+    Модель сотрудника компании. Связывается с пользователем, ролью, отделом и регионом.
+    Содержит статус, который может быть 'active' или 'inactive'.
+    """
+
+    class UserRole(models.IntegerChoices):
+        ROP = 1, "Руководитель отдела продаж"
+        MANAGER = 2, "Менеджер"
+        CEO = 3, "Исполнительный директор"
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    employee_role = models.PositiveSmallIntegerField(
+        choices=UserRole.choices,
+        default=UserRole.MANAGER,
+        verbose_name="Роль пользователя"
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=[("active", "Активный"), ("inactive", "Неактивный")],
+        verbose_name="Статус"
+    )
+
+    class Meta:
+        verbose_name = "Сотрудник"
+        verbose_name_plural = "Сотрудники"
+
+    def __str__(self):
+        return f"user: {self.user}"
+
+
+# !!! Все что ниже пока не актуально !!!
+
 class Department(UUIDMixin, TimeStampedMixin):
     """
     Модель отдела, который может быть назначен сотруднику.
@@ -100,64 +141,3 @@ class Role(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return self.name
-
-
-class Employee(UUIDMixin, TimeStampedMixin):
-    """
-    Модель сотрудника компании. Связывается с пользователем, ролью, отделом и регионом.
-    Содержит статус, который может быть 'active' или 'inactive'.
-    """
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, verbose_name="Пользователь"
-    )
-    role = models.ForeignKey(
-        Role, on_delete=models.SET_NULL, null=True, verbose_name="Роль"
-    )
-    department = models.ForeignKey(
-        Department, on_delete=models.SET_NULL, null=True, verbose_name="Отдел"
-    )
-    region = models.ForeignKey(
-        Region, on_delete=models.SET_NULL, null=True, verbose_name="Регион"
-    )
-    status = models.CharField(
-        max_length=50,
-        choices=[("active", "Активный"), ("inactive", "Неактивный")],
-        verbose_name="Статус"
-    )
-
-    class Meta:
-        verbose_name = "Сотрудник"
-        verbose_name_plural = "Сотрудники"
-
-    def __str__(self):
-        return f"{self.user.first_name} {self.user.second_name} {self.user.last_name} - {self.role.name}"
-
-
-class ClientCard(UUIDMixin, TimeStampedMixin):
-    """
-    Модель карточки клиента. Связывается с ответственным менеджером (сотрудником).
-    Содержит имя клиента.
-    """
-
-    client = models.OneToOneField(
-        User, on_delete=models.CASCADE, verbose_name="Клиент"
-    )
-    responsible_manager = models.ForeignKey(
-        Employee,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name="Ответственный менеджер"
-    )
-    region = models.ForeignKey(
-        Region,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name="Регион"
-    )
-
-    class Meta:
-        verbose_name = "Карточка клиента"
-        verbose_name_plural = "Карточки клиентов"
-
-    def __str__(self):
-        return f"{self.client.first_name} {self.client.last_name}"

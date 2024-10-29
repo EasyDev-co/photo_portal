@@ -79,7 +79,7 @@ def google_callback(request):
         # Редирект на фронтенд с токеном
         frontend_url = settings.FRONTEND_URL
         redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
-        return redirect(redirect_url)
+        return Response({"url": redirect_url}, status=status.HTTP_200_OK)
 
     except RequestException as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
