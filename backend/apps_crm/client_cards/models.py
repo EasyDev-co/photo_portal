@@ -112,7 +112,7 @@ class HistoryCall(models.Model):
     )
     author = models.ForeignKey(
         Employee,
-        verbose_name="Автор заметки",
+        verbose_name="Автор звонка",
         on_delete=models.CASCADE,
         related_name="history_calls"
     )
@@ -143,7 +143,7 @@ class ClientCardTask(models.Model):
     """Задачи к карточке клиентов"""
     author = models.ForeignKey(
         Employee,
-        verbose_name="Автор заметки",
+        verbose_name="Автор задачи",
         on_delete=models.CASCADE,
         related_name="client_card_tasks"
     )

@@ -35,7 +35,7 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         PhotoTheme,
         on_delete=models.CASCADE,
         related_name="promo_codes",
-        verbose_name="Фототема"
+        verbose_name="Фотосессия"
     )
     user = models.ForeignKey(
         User,
@@ -64,7 +64,7 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         ordering = ("-created",)
 
     def __str__(self):
-        return f"Промокод: {self.code}, Фототема: {self.photo_theme}, Пользователь: {self.user}"
+        return f"Промокод: {self.code}, Фотосессия: {self.photo_theme}, Пользователь: {self.user}"
 
     def save(self, *args, **kwargs):
         if not self.code:

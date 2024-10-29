@@ -74,7 +74,7 @@ class ManagerBonusAPIView(APIView):
     def get(self, request):
         manager = request.user
 
-        # извлекаем бонус заведующей за активные фототемы в детском саду
+        # извлекаем бонус заведующей за активные фотосессии в детском саду
         manager_bonus_for_active_photo_themes = ManagerBonus.objects.filter(
             user=manager,
             photo_theme__is_active=True,
@@ -83,7 +83,7 @@ class ManagerBonusAPIView(APIView):
 
         if not manager_bonus_for_active_photo_themes.exists():
             return Response(
-                'У данного заведующего нет бонусов за активные фототемы.',
+                'У данного заведующего нет бонусов за активные фотосессии.',
                 status=status.HTTP_404_NOT_FOUND
             )
 
