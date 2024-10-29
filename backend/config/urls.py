@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/', include('apps.photo.api.urls')),
     path('api/', include('apps.kindergarten.api.urls')),
     path('api/', include('apps.cart.api.urls')),
+    path('api/', include('apps.promocode.urls')),
     path('api/crm/', include('apps_crm.notifications.api.urls')),
     path('api/crm/', include('apps_crm.registration.api.urls')),
     path('api/crm/', include('apps_crm.history.api.urls')),
