@@ -17,7 +17,7 @@ class UserPhotoCount(models.Model):
     photo_theme = models.ForeignKey(
         "PhotoTheme",
         on_delete=models.CASCADE,
-        verbose_name="тема фотосессии"
+        verbose_name="фотосесиия"
     )
     count = models.PositiveIntegerField(default=3, verbose_name="количество")
 

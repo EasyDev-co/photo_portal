@@ -33,5 +33,5 @@ class PhotoPriceDoesNotExist(APIException):
 
 class PhotoThemeDoesNotExist(APIException):
     status_code = 400
-    default_detail = 'Такая фототема не найдена.'
+    default_detail = 'Такая фотосессия не найдена.'
     default_code = 'photo_theme_not_found'

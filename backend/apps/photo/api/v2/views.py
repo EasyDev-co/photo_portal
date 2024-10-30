@@ -307,7 +307,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
 
         if user_photo_count.count == 0:
             return Response(
-                {'message': 'Вы достигли лимита прикреплений для этой фототемы.'},
+                {'message': 'Вы достигли лимита прикреплений для этой фотосессии.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 

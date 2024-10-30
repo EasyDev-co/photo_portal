@@ -11,7 +11,7 @@ from config.settings import TIME_ZONE, PHOTO_LINE_MEDIA_PATH
 
 
 def remove_qr_code():
-    """Функция для удаления директорий, содержащих изображения qr кодов одной фототемы."""
+    """Функция для удаления директорий, содержащих изображения qr кодов одной фотосессии."""
 
     # получаем текущее время
     current_time = datetime.now().astimezone(tz=timezone(TIME_ZONE))
