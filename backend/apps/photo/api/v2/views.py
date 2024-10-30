@@ -1,4 +1,6 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,15 +17,18 @@ from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 
-from .serializers import PhotoUploadSerializer
-from apps.photo.models import Photo, PhotoLine, UserPhotoCount
+from .serializers import PhotoUploadSerializer, PhotoThemeSerializer
+from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 from apps.user.models.user import User
+from apps.photo.filters import PhotoThemeFilter
+from apps.kindergarten.models import Kindergarten
+from apps_crm.roles.models import UserRole
 
 
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
-    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -315,3 +320,35 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         user_photo_count.count -= 1
         user_photo_count.save()
         return None
+
+
+class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
+    """
+    Получение фотосессий для календаря.
+    """
+    queryset = PhotoTheme.objects.all()
+    serializer_class = PhotoThemeSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PhotoThemeFilter
+
+    def get_queryset(self):
+        user = self.request.user
+        employee = getattr(user, 'employee', None)
+        queryset = super().get_queryset()
+
+        if employee and employee.employee_role == UserRole.MANAGER:
+            kindergartens = Kindergarten.objects.filter(
+                clientcard__responsible_manager=employee
+            )
+
+            # Получаем все PhotoLine, связанные с этими детскими садами
+            photo_lines = PhotoLine.objects.filter(kindergarten__in=kindergartens)
+
+            # Извлекаем ID фотосессий
+            photo_theme_ids = photo_lines.values_list('photo_theme_id', flat=True).distinct()
+
+            # Фильтруем фотосессии по ID
+            queryset = queryset.filter(id__in=photo_theme_ids)
+
+        return queryset
