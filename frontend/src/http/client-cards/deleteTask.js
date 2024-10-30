@@ -3,11 +3,11 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const clientCardPatch = async (access, clientCardId, data) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-cards/${clientCardId}/`;
+export const deleteTask = async (access, taskID) => {
+    const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/${taskID}/`;
 
     const response = await fetch(url, {
-        method: 'PATCH', 
+        method: 'DELETE', 
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
@@ -18,9 +18,9 @@ export const clientCardPatch = async (access, clientCardId, data) => {
     return response;
 }
 
-export const patchClientCardWithToken = async (access, clientCardId, data) => {
+export const deleteTaskWithToken = async (access, taskID) => {
     try {
-        let response = await clientCardPatch(access, clientCardId, data)
+        let response = await deleteTask(access, taskID)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -29,7 +29,7 @@ export const patchClientCardWithToken = async (access, clientCardId, data) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = clientCardPatch(res.access, clientCardId, data);
+                            response = deleteTask(res.access, taskID);
                         }
                     })
             }

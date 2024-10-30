@@ -3,11 +3,11 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const clientCardPatch = async (access, clientCardId, data) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-cards/${clientCardId}/`;
+export const deleteNote = async (access, noteID) => {
+    const url = `${localUrl}/api/crm/v1/client_cards/notes/${noteID}/`;
 
     const response = await fetch(url, {
-        method: 'PATCH', 
+        method: 'DELETE', 
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
@@ -18,9 +18,9 @@ export const clientCardPatch = async (access, clientCardId, data) => {
     return response;
 }
 
-export const patchClientCardWithToken = async (access, clientCardId, data) => {
+export const deleteNoteWithToken = async (access, noteID) => {
     try {
-        let response = await clientCardPatch(access, clientCardId, data)
+        let response = await deleteNote(access, noteID)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -29,7 +29,7 @@ export const patchClientCardWithToken = async (access, clientCardId, data) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = clientCardPatch(res.access, clientCardId, data);
+                            response = deleteNote(res.access, noteID);
                         }
                     })
             }

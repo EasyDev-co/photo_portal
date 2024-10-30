@@ -4,6 +4,14 @@ import './styles/Notes.scss';
 
 
 const Notes = ({notes}) => {
+    
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return date.toLocaleDateString('ru-RU', options);
+    };
+    
     return (
         <Tabs
             defaultActiveKey="home"
@@ -13,11 +21,12 @@ const Notes = ({notes}) => {
         >
             <Tab eventKey="home" className="shadow-none border-0 d-flex flex-column gap-2" title="Важные">
 
-                {notes.map((item, i)=>{
+                {notes&&notes.map((item, i)=>{
+                    const date = formatDate(item.created_at)
                     return <Card className="" key={i}>
                     <Card.Header className="border-0">
                         <div>
-                            08.08.2024
+                            {date}
                         </div>
                         <div style={{
                             color: '#0a58ca'
@@ -30,7 +39,7 @@ const Notes = ({notes}) => {
                         fontSize: '15px'
                     }}>
                         <div className="truncate text-secondary">
-                            Lorem ipsum dolor sit amet consectetur. Vel commodo nullam eu gravida porttitor ut. Faucibus sodales viverra arcu quis dignissim at tellus at posuere.
+                           {item.text}
                         </div>
                     </Card.Body>
                 </Card>

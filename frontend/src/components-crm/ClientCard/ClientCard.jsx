@@ -8,6 +8,8 @@ import trash from '../../assets/icons/trash.svg'
 import { useNavigate } from "react-router-dom";
 
 const ClientCard = ({data}) => {
+    console.log(data);
+    
     const navigate = useNavigate();
     return ( 
         <Card onClick={()=>navigate(`/crm/kindergartens/${data.id}`)} className="card-shadow" style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px' }}>

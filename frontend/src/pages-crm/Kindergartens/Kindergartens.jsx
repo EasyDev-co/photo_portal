@@ -14,6 +14,9 @@ const Kindergartens = () => {
   const [kindergartens, setKindergartens] = useState([])
   const access = localStorage.getItem('access') // Get the access token from local storage
 
+  console.log(clientCards);
+  
+
   useEffect(() => {
     const fetchClientCards = async () => {
       try {
@@ -44,11 +47,15 @@ const Kindergartens = () => {
       }
     }
 
+    const postClientCard = async ()=>{
+        
+    }
+
     fetchClientCards()
     fetchKindergartens()
   }, [access]) // Fetch when the component mounts or when the access token changes
 
-  console.log(clientCards)
+  console.log(kindergartens)
 
   // Function for pagination
   const paginate = (array, page_number, page_size) => {

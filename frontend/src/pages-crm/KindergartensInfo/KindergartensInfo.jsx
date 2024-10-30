@@ -23,6 +23,12 @@ const KindergartensInfo = () => {
 
   const access = localStorage.getItem('access') // Get access token
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return date.toLocaleDateString('ru-RU', options);
+};
+
   useEffect(() => {
     const fetchClientCard = async () => {
       try {
@@ -95,10 +101,7 @@ const KindergartensInfo = () => {
     fetchNotes()
     fetchhistoryCalls()
   }, [access])
-
-  console.log(clientCardData);
   
-
   if (clientCardData) {
     return (
       <div className="page-crm">
@@ -194,7 +197,7 @@ const KindergartensInfo = () => {
                             }}
                             className="border-0 fw-500 p-0"
                           >
-                            Название задачи
+                            {elem.text}
                           </CardHeader>
                           <Card.Body
                             className="p-0"
@@ -203,7 +206,7 @@ const KindergartensInfo = () => {
                               fontSize: '15px',
                             }}
                           >
-                            До 08.08.2024
+                            До {formatDate(elem.date_end)}
                           </Card.Body>
                         </div>
                         <div>
@@ -240,7 +243,7 @@ const KindergartensInfo = () => {
                     <Form.Group className="w-50">
                       <DatePicker
                         label={'Дата начала'}
-                        placeholder={'Не указано'}
+                        placeholder={formatDate(clientCardData.photo_themes.current_photo_theme.date_start)}
                         setIsActive={setIsActive}
                         img={calendar}
                         isActive={isActive}
@@ -257,6 +260,7 @@ const KindergartensInfo = () => {
                       <Form.Control
                         className="shadow-none ps-3"
                         placeholder="Не указано"
+                        value={formatDate(clientCardData.photo_themes.current_photo_theme.date_end)}
                       />
                     </Form.Group>
                   </Form>
@@ -265,10 +269,16 @@ const KindergartensInfo = () => {
             </div>
             <div className="card-shadow">
               <OrderCard
+              garden_details={clientCardData.garden_details}
+              city={clientCardData.city}
+              children_for_photoshoot={clientCardData.children_for_photoshoot}
+              children_count={clientCardData.children_count}
+              address={clientCardData.address}
+                photoThemes={clientCardData.photo_themes}
+                managerInfo={clientCardData.kindergarten_manager_info}
                 previous_managers={clientCardData.previous_managers}
                 historyCalls={historyCalls}
                 region={clientCardData.kindergarten.region.country}
-                city={clientCardData.kindergarten.region.name}
                 id={clientCardData.id}
                 itemName={clientCardData.name}
               />
@@ -293,7 +303,7 @@ const KindergartensInfo = () => {
                     className="border-0 fw-600 p-0 justify-content-center"
                     style={{ fontSize: '17px' }}
                   >
-                    Марк Ифанасьев
+                    <p style={{textTransform: 'capitalize'}}>{clientCardData.kindergarten_manager_info.first_name } {clientCardData.kindergarten_manager_info.last_name}</p>
                   </Card.Header>
                   <Card.Title className="fs-6 text-secondary">
                     Директор
@@ -329,7 +339,7 @@ const KindergartensInfo = () => {
                 Заметки
               </Card.Header>
               <Notes notes={notes} />
-              <Button className="btn-filter-reset text-center">Сбросить</Button>
+              {notes&&notes.length>0?<Button className="btn-filter-reset text-center">Сбросить</Button>:<p>Заметок нет</p>}
             </Card>
             <Card
               className="border-0 d-flex flex-column gap-2 card-shadow "
@@ -376,7 +386,7 @@ const KindergartensInfo = () => {
                 )
               })}
 
-              <Button className="btn-filter-reset text-center">Сбросить</Button>
+              {clientCardData.orders_history.length>0?<Button className="btn-filter-reset text-center">Сбросить</Button>:<p>История заказов пуста</p>}
             </Card>
             <Card
               className="border-0 d-flex flex-column gap-2 card-shadow "
@@ -397,7 +407,7 @@ const KindergartensInfo = () => {
                 return (
                   <Card className="" key={i}>
                     <Card.Header className="border-0">
-                      <div>08.08.2024</div>
+                      <div>{formatDate(item[1])}</div>
                       <div
                         style={{
                           color: '#0a58ca',
@@ -414,9 +424,7 @@ const KindergartensInfo = () => {
                       }}
                     >
                       <div className="truncate text-secondary">
-                        Lorem ipsum dolor sit amet consectetur. Vel commodo
-                        nullam eu gravida porttitor ut. Faucibus sodales viverra
-                        arcu quis dignissim at tellus at posuere.
+                        {Object.keys(item[0]).map((name, i)=> <p key={i}>{name}</p>)}
                       </div>
                     </Card.Body>
                   </Card>

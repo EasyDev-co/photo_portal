@@ -3,8 +3,8 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const clientCardPatch = async (access, clientCardId, data) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-cards/${clientCardId}/`;
+export const patchNote = async (access, noteId, data) => {
+    const url = `${localUrl}/api/crm/v1/client_cards/notes/${noteId}/`;
 
     const response = await fetch(url, {
         method: 'PATCH', 
@@ -18,9 +18,9 @@ export const clientCardPatch = async (access, clientCardId, data) => {
     return response;
 }
 
-export const patchClientCardWithToken = async (access, clientCardId, data) => {
+export const patchNoteWithToken = async (access, noteId, data) => {
     try {
-        let response = await clientCardPatch(access, clientCardId, data)
+        let response = await patchNote(access, noteId, data)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -29,7 +29,7 @@ export const patchClientCardWithToken = async (access, clientCardId, data) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = clientCardPatch(res.access, clientCardId, data);
+                            response = patchNote(res.access, noteId, data);
                         }
                     })
             }

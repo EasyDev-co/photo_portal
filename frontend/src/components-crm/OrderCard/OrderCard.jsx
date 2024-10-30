@@ -7,17 +7,42 @@ import './styles/OrderCard.scss'
 import LocationMap from '../YMap/LocationMap'
 import { patchClientCardWithToken } from '../../http/client-cards/patchClientCard'
 
-const OrderCard = ({ region, city, itemName, id, historyCalls, }) => {
+const OrderCard = ({
+  region,
+  city,
+  itemName,
+  id,
+  historyCalls,
+  managerInfo,
+  photoThemes,
+  address,
+  children_count,
+  children_for_photoshoot,
+  garden_details
+}) => {
   const [isActive, setIsActive] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const [showMap, setShowMap] = useState(false)
-  const access = localStorage.getItem('access');
+  const access = localStorage.getItem('access')
 
   const [regionData, setRegionData] = useState({
-    id: id||null,
-    name: itemName||null,
-    region: { country: region||'', name: city||'' },
+    id: id || null,
+    name: itemName || null,
+    region: { country: region || '', name: city || '', address: address || '' },
   })
+
+  const [managerData, setManagerData] = useState(managerInfo || {})
+  const [childrenData, setChildrenData] = useState({
+    children_count: children_count || '',
+    children_for_photoshoot: children_for_photoshoot || '',
+    garden_details: garden_details || ''
+  })
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' }
+    return date.toLocaleDateString('ru-RU', options)
+  }
 
   const handleInfoShow = () => {
     setShowInfo((prev) => !prev)
@@ -28,23 +53,41 @@ const OrderCard = ({ region, city, itemName, id, historyCalls, }) => {
   }
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
     setRegionData((prevData) => ({
-        ...prevData,
-        region: {
-            ...prevData.region,
-            [name]: value
-        },
-    }));
-};
+      ...prevData,
+      region: {
+        ...prevData.region,
+        [name]: value,
+      },
+    }))
+  }
 
-console.log(regionData.region);
+  const handleManagerChange = (e) => {
+    const { name, value } = e.target
+    setManagerData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
+  }
 
+  const handleChildrenChange = (e) => {
+    const { name, value } = e.target
+    setChildrenData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
+  }
 
   const handlePatchClientCard = () => {
-
-    const data = regionData
+    const data = {
+      address: regionData.region.address,
+      city: regionData.region.name,
+      children_count: childrenData.children_count,
+      children_for_photoshoot: childrenData.children_for_photoshoot,
+      garden_details:childrenData.garden_details
+    }
     const patchClientCard = async () => {
       try {
         const response = await patchClientCardWithToken(access, id, data)
@@ -140,8 +183,16 @@ console.log(regionData.region);
                 <Form.Control
                   className="shadow-none ps-3"
                   placeholder="Не указано"
+                  name="address"
+                  value={regionData.region.address}
+                  onChange={handleInputChange}
                 />
               </Form.Group>
+            </div>
+            <div>
+              <Button className="create-btn" onClick={handlePatchClientCard}>
+                Обновить
+              </Button>
             </div>
           </Card.Body>
         )}
@@ -181,7 +232,9 @@ console.log(regionData.region);
                       className="border-0 fw-600 p-0"
                       style={{ fontSize: '17px' }}
                     >
-                      Марк Ифанасьев
+                      <p style={{ textTransform: 'capitalize' }}>
+                        {managerInfo.first_name} {managerInfo.last_name}
+                      </p>
                     </Card.Header>
                     <Card.Title className="fs-6 text-secondary">
                       Директор
@@ -197,7 +250,10 @@ console.log(regionData.region);
                       </Form.Label>
                       <Form.Control
                         className="shadow-none ps-3"
+                        name="email"
                         placeholder="Не указано"
+                        value={managerData.email || ''}
+                        onChange={handleManagerChange}
                       />
                     </Form.Group>
                   </Card>
@@ -214,6 +270,9 @@ console.log(regionData.region);
                       <Form.Control
                         className="shadow-none ps-3"
                         placeholder="Не указано"
+                        name="phone_number"
+                        value={managerData.phone_number || ''}
+                        onChange={handleManagerChange}
                       />
                     </Form.Group>
                   </Card>
@@ -241,35 +300,7 @@ console.log(regionData.region);
                     style={{
                       fontSize: '15px',
                     }}
-                  >
-                    Логин заведующего
-                  </div>
-                  <div className="d-flex gap-3">
-                    <Form.Group className="flex-grow-1">
-                      <Form.Label
-                        className="text-secondary"
-                        style={{ fontSize: '15px' }}
-                      >
-                        Логин
-                      </Form.Label>
-                      <Form.Control
-                        className="shadow-none ps-3"
-                        placeholder="Не указано"
-                      />
-                    </Form.Group>
-                    <Form.Group className="flex-grow-1">
-                      <Form.Label
-                        className="text-secondary"
-                        style={{ fontSize: '15px' }}
-                      >
-                        Пароль
-                      </Form.Label>
-                      <Form.Control
-                        className="shadow-none ps-3"
-                        placeholder="Не указано"
-                      />
-                    </Form.Group>
-                  </div>
+                  ></div>
                   <Form.Group className="flex-grow-1">
                     <Form.Label
                       className="text-secondary"
@@ -280,6 +311,9 @@ console.log(regionData.region);
                     <Form.Control
                       className="shadow-none ps-3"
                       placeholder="Не указано"
+                      name="promocode"
+                      value={managerData.promocode || ''}
+                      onChange={handleManagerChange}
                     />
                   </Form.Group>
                 </Card>
@@ -363,18 +397,21 @@ console.log(regionData.region);
             height: '230px',
           }}
         >
-          <div className="call-item pe-5" style={{ fontSize: '15px' }}>
-            26.07.2024
-          </div>
-          <div className="call-item pe-5" style={{ fontSize: '15px' }}>
-            26.07.2024
-          </div>
-          <div className="call-item pe-5" style={{ fontSize: '15px' }}>
-            26.07.2024
-          </div>
-          <div className="call-item pe-5" style={{ fontSize: '15px' }}>
-            26.07.2024
-          </div>
+          {photoThemes.all_photo_themes.length > 0 ? (
+            photoThemes.all_photo_themes.map((item, i) => {
+              return (
+                <div
+                  key={i}
+                  className="call-item pe-5"
+                  style={{ fontSize: '15px' }}
+                >
+                  {formatDate(item.date_start)}
+                </div>
+              )
+            })
+          ) : (
+            <p>Фотосессий нет</p>
+          )}
         </Card.Body>
       </Card>
       <Card
@@ -408,16 +445,22 @@ console.log(regionData.region);
             height: '230px',
           }}
         >
+          {historyCalls &&
+            historyCalls.map((item, i) => {
+              return (
+                <div
+                  key={i}
+                  className="call-item pe-5"
+                  style={{ fontSize: '15px' }}
+                >
+                  {formatDate(item.created_at)}
+                  <div>
+                    <Badge bg="success text-black">Записан на фотосессию</Badge>
+                  </div>
+                </div>
+              )
+            })}
 
-          {historyCalls.map((item, i)=>{
-            return  <div key={i} className="call-item pe-5" style={{ fontSize: '15px' }}>
-            26.07.2024
-            <div>
-              <Badge bg="success text-black">Записан на фотосессию</Badge>
-            </div>
-          </div>
-          })}
-         
           <div className="call-item pe-5" style={{ fontSize: '15px' }}>
             26.07.2024
             <div>
@@ -461,6 +504,9 @@ console.log(regionData.region);
               <Form.Control
                 className="shadow-none ps-3"
                 placeholder="Не указано"
+                name="children_count"
+                onChange={handleChildrenChange}
+                value={childrenData.children_count}
               />
             </Form.Group>
             <Form.Group className="flex-grow-1">
@@ -473,6 +519,9 @@ console.log(regionData.region);
               <Form.Control
                 className="shadow-none ps-3"
                 placeholder="Не указано"
+                value={childrenData.children_for_photoshoot}
+                onChange={handleChildrenChange}
+                name="children_for_photoshoot"
               />
             </Form.Group>
           </div>
@@ -483,9 +532,17 @@ console.log(regionData.region);
             <Form.Control
               className="shadow-none ps-3"
               placeholder="Не указано"
+              name="garden_details"
+              value={childrenData.garden_details}
+              onChange={handleChildrenChange}
             />
           </Form.Group>
         </Card.Body>
+        <div>
+              <Button className="create-btn" onClick={handlePatchClientCard}>
+                Обновить
+              </Button>
+            </div>
       </Card>
     </Card>
   )
