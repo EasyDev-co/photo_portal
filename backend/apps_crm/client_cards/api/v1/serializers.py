@@ -11,6 +11,7 @@ from apps.photo.models import PhotoTheme
 from apps.user.api.v1.serializers import ManagerSerializer
 from apps_crm.client_cards.models import ClientCard, ClientCardTask, HistoryCall, Notes
 from apps_crm.history.models import ManagerChangeLog
+from apps_crm.roles.api.v1.serializers import EmployeeSerializer
 from apps_crm.roles.models import Employee
 
 User = get_user_model()
@@ -29,27 +30,38 @@ class BaseClientCardSerializer(serializers.ModelSerializer):
 
 
 class ClientCardTaskSerializer(BaseClientCardSerializer):
+    author = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = ClientCardTask
         fields = '__all__'
+        read_only_fields = ['author']
 
 
 class ClientCardSerializer(BaseClientCardSerializer):
+    responsible_manager = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = ClientCard
         fields = '__all__'
 
 
 class HistoryCallSerializer(BaseClientCardSerializer):
+    author = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = HistoryCall
         fields = '__all__'
+        read_only_fields = ['author']
 
 
 class NotesSerializer(BaseClientCardSerializer):
+    author = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = Notes
         fields = '__all__'
+        read_only_fields = ['author']
 
 
 class ClientCardRetrieveSerializer(BaseClientCardSerializer):
@@ -59,7 +71,7 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
     change_history = serializers.SerializerMethodField()
     kindergarten_manager_info = ManagerSerializer(source='kindergarten.manager', read_only=True)
     photo_themes = serializers.SerializerMethodField()
-    responsible_manager = serializers.SerializerMethodField()
+    responsible_manager = EmployeeSerializer(read_only=True)
 
     class Meta:
         model = ClientCard
@@ -120,8 +132,3 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
             object_id=obj.id,
             content_type=content_type
         ).values_list('changes', 'timestamp')
-
-    def get_responsible_manager(self, obj):
-        if obj.responsible_manager:
-            return obj.responsible_manager.user.full_name
-        return
