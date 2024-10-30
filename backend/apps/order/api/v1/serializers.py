@@ -121,3 +121,10 @@ class OrdersPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrdersPayment
         fields = ['id', 'amount', 'orders']
+
+
+class OrdersPaymentBriefSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrdersPayment
+        fields = ['id', 'amount', 'created']
