@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/crm/', include('apps_crm.registration.api.urls')),
     path('api/crm/', include('apps_crm.history.api.urls')),
     path('api/crm/', include('apps_crm.client_cards.api.urls')),
+    path('api/crm/', include('apps_crm.roles.api.urls')),
     path('api/oauth/', include('apps.oauth.api.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

@@ -1,6 +1,7 @@
 from django.db import models
 
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
+from apps.kindergarten.models import Kindergarten
 
 
 class Season(models.IntegerChoices):
@@ -15,6 +16,13 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     name = models.CharField(
         max_length=255,
         verbose_name='Название'
+    )
+    kindergarten = models.ManyToManyField(
+        Kindergarten,
+        verbose_name="Детский сад",
+        related_name="kindergartens",
+        blank=True,
+        null=True,
     )
     is_active = models.BooleanField(
         verbose_name='Активно'

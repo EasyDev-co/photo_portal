@@ -326,7 +326,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
     """
     Получение фотосессий для календаря.
     """
-    queryset = PhotoTheme.objects.all()
+    queryset = PhotoTheme.objects.filter(is_active=True)
     serializer_class = PhotoThemeSerializerV2
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -337,18 +337,31 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
         employee = getattr(user, 'employee', None)
         queryset = super().get_queryset()
 
+        # Фильтрация для менеджеров
         if employee and employee.employee_role == UserRole.MANAGER:
+            # Получаем детские сады, за которые отвечает менеджер
             kindergartens = Kindergarten.objects.filter(
                 clientcard__responsible_manager=employee
             )
 
-            # Получаем все PhotoLine, связанные с этими детскими садами
-            photo_lines = PhotoLine.objects.filter(kindergarten__in=kindergartens)
+            # Фильтруем фотосессии, связанные с этими детскими садами
+            queryset = queryset.filter(kindergarten__in=kindergartens)
 
-            # Извлекаем ID фотосессий
-            photo_theme_ids = photo_lines.values_list('photo_theme_id', flat=True).distinct()
+            # Проверка на указанный регион
+            region_id = self.request.query_params.get('region')
+            if region_id:
+                queryset = queryset.filter(kindergarten__region_id=region_id)
 
-            # Фильтруем фотосессии по ID
-            queryset = queryset.filter(id__in=photo_theme_ids)
+        # Фильтрация для директоров и РОП
+        elif employee and employee.employee_role in {UserRole.DIRECTOR, UserRole.ROP}:
+            # Проверка на указанный регион
+            region_id = self.request.query_params.get('region')
+            if region_id:
+                queryset = queryset.filter(kindergarten__region_id=region_id)
+
+            # Проверка на указанного менеджера
+            manager_id = self.request.query_params.get('manager')
+            if manager_id:
+                queryset = queryset.filter(kindergarten__clientcard__responsible_manager_id=manager_id)
 
         return queryset
