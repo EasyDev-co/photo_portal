@@ -29,6 +29,21 @@ const KindergartensInfo = () => {
     return date.toLocaleDateString('ru-RU', options);
 };
 
+const addNote =(note)=>{
+  setNotes([note, ...notes])
+}
+
+const editNote = (noteId, text) => {
+  const updatedNotes = notes.map(note => 
+    note.id === noteId ? { ...note, text } : note
+  );
+  setNotes(updatedNotes); 
+}
+const deleteNote = (noteId)=>{
+  const updatedNotes = notes.filter(note => note.id !== noteId);
+  setNotes(updatedNotes);
+}
+
   useEffect(() => {
     const fetchClientCard = async () => {
       try {
@@ -72,7 +87,7 @@ const KindergartensInfo = () => {
         if (response.ok) {
           const data = await response.json() // Parse the response JSON
 
-          setNotes(data) // Store the data in state
+          setNotes(data.reverse()) // Store the data in state
         } else {
           console.error('Failed to fetch notes')
         }
@@ -330,15 +345,7 @@ const KindergartensInfo = () => {
                 height: 'auto',
               }}
             >
-              <Card.Header
-                style={{
-                  fontSize: '17px',
-                }}
-                className="border-0 fw-600 p-0"
-              >
-                Заметки
-              </Card.Header>
-              <Notes notes={notes} />
+              <Notes notes={notes} addNote={addNote} deleteNote={deleteNote} editNote={editNote} />
               {notes&&notes.length>0?<Button className="btn-filter-reset text-center">Сбросить</Button>:<p>Заметок нет</p>}
             </Card>
             <Card

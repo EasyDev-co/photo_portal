@@ -3,9 +3,9 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const postNote = async (access, data) => {
+export const postNote = async ({access, data}) => {
     const url = `${localUrl}/api/crm/v1/client_cards/notes/`;
-
+    
     const response = await fetch(url, {
         method: 'POST', 
         headers: {
@@ -15,6 +15,7 @@ export const postNote = async (access, data) => {
         body: JSON.stringify(data)
 
     });
+    
     return response;
 }
 
