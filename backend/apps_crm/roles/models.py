@@ -19,11 +19,6 @@ class Employee(UUIDMixin, TimeStampedMixin):
     Содержит статус, который может быть 'active' или 'inactive'.
     """
 
-    class UserRole(models.IntegerChoices):
-        ROP = 1, "Руководитель отдела продаж"
-        MANAGER = 2, "Менеджер"
-        CEO = 3, "Исполнительный директор"
-
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
     )
