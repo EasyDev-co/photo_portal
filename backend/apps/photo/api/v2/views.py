@@ -17,7 +17,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 
-from .serializers import PhotoUploadSerializer, PhotoThemeSerializer
+from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2
 from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 from apps.user.models.user import User
@@ -327,7 +327,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
     Получение фотосессий для календаря.
     """
     queryset = PhotoTheme.objects.all()
-    serializer_class = PhotoThemeSerializer
+    serializer_class = PhotoThemeSerializerV2
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_class = PhotoThemeFilter
