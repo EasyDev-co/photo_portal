@@ -22,7 +22,7 @@ class CalculateRansomOfPastPhotoThemes(BaseTask):
             photo_line__photo_theme__ransom_counted=False
         ).select_related('photo_line__photo_theme')
 
-        # Группируем заказы по фототемам и суммируем цены заказов для каждой фототемы
+        # Группируем заказы по фотосессиям и суммируем цены заказов для каждой фототемы
         order_sums = orders.values(
             'photo_line__photo_theme',
             'photo_line__kindergarten'

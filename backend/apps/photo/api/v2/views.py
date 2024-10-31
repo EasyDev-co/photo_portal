@@ -1,4 +1,6 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,15 +17,18 @@ from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 
-from .serializers import PhotoUploadSerializer
-from apps.photo.models import Photo, PhotoLine, UserPhotoCount
+from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2
+from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 from apps.user.models.user import User
+from apps.photo.filters import PhotoThemeFilter
+from apps.kindergarten.models import Kindergarten
+from apps_crm.roles.models import UserRole
 
 
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
-    permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -307,7 +312,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
 
         if user_photo_count.count == 0:
             return Response(
-                {'message': 'Вы достигли лимита прикреплений для этой фототемы.'},
+                {'message': 'Вы достигли лимита прикреплений для этой фотосессии.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -315,3 +320,48 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         user_photo_count.count -= 1
         user_photo_count.save()
         return None
+
+
+class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
+    """
+    Получение фотосессий для календаря.
+    """
+    queryset = PhotoTheme.objects.filter(is_active=True)
+    serializer_class = PhotoThemeSerializerV2
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PhotoThemeFilter
+
+    def get_queryset(self):
+        user = self.request.user
+        employee = getattr(user, 'employee', None)
+        queryset = super().get_queryset()
+
+        # Фильтрация для менеджеров
+        if employee and employee.employee_role == UserRole.MANAGER:
+            # Получаем детские сады, за которые отвечает менеджер
+            kindergartens = Kindergarten.objects.filter(
+                clientcard__responsible_manager=employee
+            )
+
+            # Фильтруем фотосессии, связанные с этими детскими садами
+            queryset = queryset.filter(kindergarten__in=kindergartens)
+
+            # Проверка на указанный регион
+            region_id = self.request.query_params.get('region')
+            if region_id:
+                queryset = queryset.filter(kindergarten__region_id=region_id)
+
+        # Фильтрация для директоров и РОП
+        elif employee and employee.employee_role in {UserRole.DIRECTOR, UserRole.ROP}:
+            # Проверка на указанный регион
+            region_id = self.request.query_params.get('region')
+            if region_id:
+                queryset = queryset.filter(kindergarten__region_id=region_id)
+
+            # Проверка на указанного менеджера
+            manager_id = self.request.query_params.get('manager')
+            if manager_id:
+                queryset = queryset.filter(kindergarten__clientcard__responsible_manager_id=manager_id)
+
+        return queryset

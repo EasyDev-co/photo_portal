@@ -16,3 +16,9 @@ class PhotoUploadSerializer(serializers.Serializer):
         child=serializers.FileField(),
         write_only=True
     )
+
+
+class PhotoThemeSerializerV2(serializers.ModelSerializer):
+    class Meta:
+        model = PhotoTheme
+        fields = '__all__'

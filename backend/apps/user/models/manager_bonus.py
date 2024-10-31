@@ -24,7 +24,7 @@ class ManagerBonus(UUIDMixin, TimeStampedMixin):
         PhotoTheme,
         on_delete=models.SET_NULL,
         related_name="manager_bonuses",
-        verbose_name="Фототема",
+        verbose_name="Фотосессия",
         null=True,
     )
     bonus_size = models.DecimalField(
@@ -50,7 +50,7 @@ class ManagerBonus(UUIDMixin, TimeStampedMixin):
         verbose_name_plural = "Бонусы заведующих с продаж"
 
     def __str__(self):
-        return f"Бонус с продаж {self.user} за фототему {self.photo_theme}"
+        return f"Бонус с продаж {self.user} за фотосессию {self.photo_theme}"
 
     @property
     def percentage(self):

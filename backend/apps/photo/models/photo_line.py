@@ -19,7 +19,7 @@ class PhotoLine(UUIDMixin):
     photo_theme = models.ForeignKey(
         PhotoTheme,
         on_delete=models.PROTECT,
-        verbose_name='Тема фотосессии',
+        verbose_name='Фотосессия',
         related_name='photo_lines',
     )
     kindergarten = models.ForeignKey(
@@ -55,4 +55,4 @@ class PhotoLine(UUIDMixin):
         super().clean()
         current_time = datetime.now().astimezone(tz=timezone(TIME_ZONE))
         if self.photo_theme.date_end <= current_time:
-            raise ValidationError('Срок указанной фототемы вышел.')
+            raise ValidationError('Срок указанной фотосессии вышел.')

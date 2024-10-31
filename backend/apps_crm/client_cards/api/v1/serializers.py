@@ -9,8 +9,9 @@ from apps.order.models import OrdersPayment
 from apps.photo.api.v1.serializers import PhotoThemeSerializer
 from apps.photo.models import PhotoTheme
 from apps.user.api.v1.serializers import ManagerSerializer
-from apps_crm.client_cards.models import ClientCard, ClientCardTask, HistoryCall, Notes
+from apps_crm.client_cards.models import ClientCard, ClientCardTask, HistoryCall, Notes, ClientCardStatus
 from apps_crm.history.models import ManagerChangeLog
+from apps_crm.roles.api.v1.serializers import EmployeeSerializer
 from apps_crm.roles.models import Employee
 
 User = get_user_model()
@@ -29,27 +30,38 @@ class BaseClientCardSerializer(serializers.ModelSerializer):
 
 
 class ClientCardTaskSerializer(BaseClientCardSerializer):
+    author = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = ClientCardTask
         fields = '__all__'
+        read_only_fields = ['author']
 
 
 class ClientCardSerializer(BaseClientCardSerializer):
+    responsible_manager = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = ClientCard
         fields = '__all__'
 
 
 class HistoryCallSerializer(BaseClientCardSerializer):
+    author = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = HistoryCall
         fields = '__all__'
+        read_only_fields = ['author']
 
 
 class NotesSerializer(BaseClientCardSerializer):
+    author = EmployeeSerializer(read_only=True)
+
     class Meta:
         model = Notes
         fields = '__all__'
+        read_only_fields = ['author']
 
 
 class ClientCardRetrieveSerializer(BaseClientCardSerializer):
@@ -59,7 +71,8 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
     change_history = serializers.SerializerMethodField()
     kindergarten_manager_info = ManagerSerializer(source='kindergarten.manager', read_only=True)
     photo_themes = serializers.SerializerMethodField()
-    responsible_manager = serializers.SerializerMethodField()
+    responsible_manager = EmployeeSerializer(read_only=True)
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = ClientCard
@@ -84,7 +97,8 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
             'children_for_photoshoot'
         ]
 
-    def get_previous_managers(self, obj):
+    @staticmethod
+    def get_previous_managers(obj):
         # Получаем id последних двух предыдущих менеджеров для карточки клиента
         previous_managers_list = ManagerChangeLog.objects.filter(
             client_card=obj,
@@ -98,7 +112,8 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
 
         return managers_names
 
-    def get_photo_themes(self, obj):
+    @staticmethod
+    def get_photo_themes(obj):
         all_photo_themes = PhotoTheme.objects.filter(
             photo_lines__in=obj.kindergarten.photo_lines.all()
         ).distinct()
@@ -110,18 +125,21 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
             'current_photo_theme': PhotoThemeSerializer(current_photo_theme).data
         }
 
-    def get_orders_history(self, obj):
+    @staticmethod
+    def get_orders_history(obj):
         orders = OrdersPayment.objects.filter(orders__photo_line__kindergarten=obj.kindergarten)
         return OrdersPaymentBriefSerializer(orders, many=True).data
 
-    def get_change_history(self, obj):
+    @staticmethod
+    def get_change_history(obj):
         content_type = ContentType.objects.get_for_model(obj.__class__)
         return LogEntry.objects.filter(
             object_id=obj.id,
             content_type=content_type
         ).values_list('changes', 'timestamp')
 
-    def get_responsible_manager(self, obj):
-        if obj.responsible_manager:
-            return obj.responsible_manager.user.full_name
-        return
+    @staticmethod
+    def get_status(obj):
+        """Метод для получения названия статуса."""
+        print(ClientCardStatus(obj.status).label)
+        return ClientCardStatus(obj.status).label

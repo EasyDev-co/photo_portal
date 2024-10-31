@@ -1,12 +1,28 @@
 from django.db import models
 
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
+from apps.kindergarten.models import Kindergarten
+
+
+class Season(models.IntegerChoices):
+    """ Сезоны """
+    WINTER = 1, 'Зима'
+    SPRING = 2, 'Весна'
+    SUMMER = 3, 'Лето'
+    AUTUMN = 4, 'Осень'
 
 
 class PhotoTheme(UUIDMixin, TimeStampedMixin):
     name = models.CharField(
         max_length=255,
         verbose_name='Название'
+    )
+    kindergarten = models.ManyToManyField(
+        Kindergarten,
+        verbose_name="Детский сад",
+        related_name="kindergartens",
+        blank=True,
+        null=True,
     )
     is_active = models.BooleanField(
         verbose_name='Активно'
@@ -25,13 +41,18 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name='Выкуп подсчитан',
         default=False
     )
+    season = models.PositiveSmallIntegerField(
+        choices=Season.choices,
+        default=Season.WINTER,
+        verbose_name='Сезон'
+    )
 
     def __str__(self):
         return f'{self.name}'
 
     class Meta:
-        verbose_name = 'Тема фотосессии'
-        verbose_name_plural = 'Темы фотосессий'
+        verbose_name = 'Фотосессия'
+        verbose_name_plural = 'Фотосессии'
         ordering = ("-created",)
 
 

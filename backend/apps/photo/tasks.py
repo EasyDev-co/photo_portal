@@ -53,7 +53,7 @@ def generate_promocodes_for_photo_theme(photo_theme_id):
 
 class UpdatePhotoThemeActivityTask(BaseTask):
     """
-    Поиск и деактивация фототем, у которых прошел дедлайн.
+    Поиск и деактивация фотосессий, у которых прошел дедлайн.
     """
     def run(self, *args, **kwargs):
         # деактивируем прошедшие фототемы
