@@ -16,7 +16,7 @@ class ClientCard(models.Model):
     kindergarten = models.OneToOneField(
         Kindergarten,
         verbose_name="Сад",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     children_count = models.PositiveSmallIntegerField(default=0, verbose_name="Кол-во детей")
     children_for_photoshoot = models.PositiveSmallIntegerField(
