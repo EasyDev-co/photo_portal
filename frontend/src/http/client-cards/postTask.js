@@ -3,7 +3,7 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const postTask = async (access, data) => {
+export const postTask = async ({access, data}) => {
     const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/`;
 
     const response = await fetch(url, {
@@ -15,6 +15,7 @@ export const postTask = async (access, data) => {
         body: JSON.stringify(data)
 
     });
+    
     return response;
 }
 

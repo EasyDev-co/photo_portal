@@ -3,7 +3,7 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const patchTask = async (access, taskId, data) => {
+export const patchTask = async (access, data, taskId) => {
     const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/${taskId}/`;
 
     const response = await fetch(url, {
@@ -15,12 +15,13 @@ export const patchTask = async (access, taskId, data) => {
         body: JSON.stringify(data)
 
     });
+    
     return response;
 }
 
-export const patchTaskWithToken = async (access, taskId, data) => {
+export const patchTaskWithToken = async (access, data, taskId) => {
     try {
-        let response = await patchTask(access, taskId, data)
+        let response = await patchTask(access, data, taskId)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {

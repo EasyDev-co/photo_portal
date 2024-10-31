@@ -3,23 +3,21 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const deleteTask = async (access, taskID) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/${taskID}/`;
+export const singleTask = async ({access, taskId}) => {
+    const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/${taskId}/`;
 
     const response = await fetch(url, {
-        method: 'DELETE', 
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         }
-
     });
     return response;
 }
 
-export const deleteTaskWithToken = async (access, taskID) => {
+export const fetchsingleTaskWithTokenInterceptor = async (access, taskId) => {
     try {
-        let response = await deleteTask(access, taskID)
+        let response = await singleTask(access, taskId)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -28,7 +26,7 @@ export const deleteTaskWithToken = async (access, taskID) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = deleteTask(res.access, taskID);
+                            response = singleTask(res.access, taskId);
                         }
                     })
             }

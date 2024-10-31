@@ -1,7 +1,5 @@
 import { Card, CardHeader, Form, Button } from 'react-bootstrap'
 import './styles/KindergartensInfo.scss'
-import { arrayOfObjects } from '../../constants/mockData'
-import addButton from '../../assets/icons/icon_button-add.svg'
 import DatePicker from '../../components-crm/DatePicker/DatePicker'
 import calendar from '../../assets/icons/calendar-event.svg'
 import { useState, useEffect } from 'react'
@@ -12,6 +10,7 @@ import { fetchSingleClientCardTasksWithTokenInterceptor } from '../../http/clien
 import { fetchNotesWithTokenInterceptor } from '../../http/client-cards/getNotes'
 import { fetchHistoryCallsWithTokenInterceptor } from '../../http/client-cards/getHistoryCalls'
 import { useParams } from 'react-router-dom'
+import CurrentTasks from './CurrentTasks'
 
 const KindergartensInfo = () => {
   const { id } = useParams()
@@ -32,7 +31,6 @@ const KindergartensInfo = () => {
 const addNote =(note)=>{
   setNotes([note, ...notes])
 }
-
 const editNote = (noteId, text) => {
   const updatedNotes = notes.map(note => 
     note.id === noteId ? { ...note, text } : note
@@ -42,6 +40,20 @@ const editNote = (noteId, text) => {
 const deleteNote = (noteId)=>{
   const updatedNotes = notes.filter(note => note.id !== noteId);
   setNotes(updatedNotes);
+}
+
+const addTask =(item)=>{
+  setTasks([item, ...tasks])
+}
+const editTask = (task)=>{
+  const updatedTasks = tasks.map(item => 
+    item.id === task.id ? task : item
+  );
+  setTasks(updatedTasks); 
+}
+const deleteTask = (taskId)=>{
+  const updatedTasks = tasks.filter(item => item.id !== taskId);
+  setTasks(updatedTasks)
 }
 
   useEffect(() => {
@@ -72,7 +84,7 @@ const deleteNote = (noteId)=>{
         if (response.ok) {
           const data = await response.json() // Parse the response JSON
 
-          setTasks(data) // Store the data in state
+          setTasks(data.reverse()) // Store the data in state
         } else {
           console.error('Failed to fetch tasks')
         }
@@ -170,73 +182,7 @@ const deleteNote = (noteId)=>{
                 </CardHeader>
               </Card>
             </div>
-            <div className="card-shadow">
-              <Card
-                className="border-0"
-                style={{
-                  padding: '24px',
-                  gap: '24px',
-                }}
-              >
-                <CardHeader
-                  style={{
-                    fontSize: '17px',
-                  }}
-                  className="border-0 fw-600 p-0"
-                >
-                  Текущие задачи
-                  <div className="cursor-pointer">
-                  <button>
-                    {' '}
-                    <img src={addButton} alt="" />
-                  </button>
-                </div>
-                </CardHeader>
-
-                <Card.Body
-                  className="p-0 gap-2 d-flex flex-column scroll-body"
-                  style={{
-                    height: '240px',
-                  }}
-                >
-                  {tasks? tasks.map((elem) => {
-                    return (
-                      <Card
-                        key={elem.id}
-                        className="d-flex flex-row align-items-center justify-content-between p-3 "
-                      >
-                        <div>
-                          <CardHeader
-                            style={{
-                              fontSize: '15px',
-                            }}
-                            className="border-0 fw-500 p-0"
-                          >
-                            {elem.text}
-                          </CardHeader>
-                          <Card.Body
-                            className="p-0"
-                            style={{
-                              color: '#0a58ca',
-                              fontSize: '15px',
-                            }}
-                          >
-                            До {formatDate(elem.date_end)}
-                          </Card.Body>
-                        </div>
-                        <div>
-                          <Form.Check
-                            type="checkbox"
-                            id="1"
-                            className="form-check-custom-task shadow-none"
-                          />
-                        </div>
-                      </Card>
-                    )
-                  }):""}
-                </Card.Body>
-              </Card>
-            </div>
+            <CurrentTasks tasks={tasks} formatDate={formatDate} addTask={addTask} editTask={editTask} deleteTask={deleteTask}/>
             <div className="card-shadow">
               <Card
                 className="border-0"
