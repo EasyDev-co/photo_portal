@@ -6,6 +6,8 @@ import ClientCard from '../../components-crm/ClientCard/ClientCard'
 import { Pagination } from 'react-bootstrap'
 import { fetchClientCardsWithTokenInterceptor } from '../../http/client-cards/getClientCards'
 import { fetchKindergartensWithTokenInterceptor } from '../../http/client-cards/getKindergartens'
+import ClientModal from '../../components-crm/ClientCardModal/ClientModal'
+import ClientCardForm from '../../components-crm/ClientCardModal/Forms/ClientCardForm'
 
 const Kindergartens = () => {
   const itemsPerPage = 12 // Number of cards per page
@@ -14,8 +16,18 @@ const Kindergartens = () => {
   const [kindergartens, setKindergartens] = useState([])
   const access = localStorage.getItem('access') // Get the access token from local storage
 
-  console.log(clientCards);
-  
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleShowModal = () => {
+    setIsOpen(true)
+  }
+  const handleCloseModal = () => {
+    setIsOpen(false)
+  }
+
+  const handleAddClientCard = (card)=>{
+    setClientCards([card,...clientCards])
+  }
 
   useEffect(() => {
     const fetchClientCards = async () => {
@@ -23,7 +35,7 @@ const Kindergartens = () => {
         const response = await fetchClientCardsWithTokenInterceptor(access)
         if (response.ok) {
           const data = await response.json() // Parse the JSON response
-          setClientCards(data) // Update state with fetched data
+          setClientCards(data.reverse()) // Update state with fetched data
         } else {
           console.error('Failed to fetch client cards')
         }
@@ -38,7 +50,6 @@ const Kindergartens = () => {
         if (response.ok) {
           const data = await response.json() // Parse the JSON response
           setKindergartens(data) // Update state with fetched data
-          console.log(data)
         } else {
           console.error('Failed to fetch kindergartens')
         }
@@ -47,15 +58,11 @@ const Kindergartens = () => {
       }
     }
 
-    const postClientCard = async ()=>{
-        
-    }
+    const postClientCard = async () => {}
 
     fetchClientCards()
     fetchKindergartens()
   }, [access]) // Fetch when the component mounts or when the access token changes
-
-  console.log(kindergartens)
 
   // Function for pagination
   const paginate = (array, page_number, page_size) => {
@@ -72,12 +79,20 @@ const Kindergartens = () => {
 
   return (
     <div className="page-crm">
-      <div>
-      </div>
+      <ClientModal
+        title="Добавить задачу"
+        show={isOpen}
+        handleClose={handleCloseModal}
+      >
+        <ClientCardForm closeModal={handleCloseModal} handleAddClientCard={handleAddClientCard}/>
+      </ClientModal>
+      <div></div>
       <div className="header-title">
         <h1 className="">Клиенты</h1>
         <div>
-          <Button className="create-btn">Создать</Button>
+          <Button className="create-btn" onClick={handleShowModal}>
+            Создать
+          </Button>
         </div>
       </div>
       <div className="">

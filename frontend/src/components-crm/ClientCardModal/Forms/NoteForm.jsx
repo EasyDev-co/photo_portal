@@ -7,6 +7,8 @@ const NoteForm = ({ cardId, closeModal, addNote }) => {
   const [noteText, setNoteText] = useState('')
   const maxCharacters = 100
 
+  const [errors, setErrors] = useState({})
+
   const handleChange = (e) => {
     const { value } = e.target
     // Limit the input to a maximum of 100 characters
@@ -18,22 +20,23 @@ const NoteForm = ({ cardId, closeModal, addNote }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     const postNote = async () => {
-        try {
           const response = await postNoteWithToken(
             {access,
-            data:{client_card:cardId, text:noteText, author:"b007b705-4f91-41ed-bbe8-90599d181ae4"}}
+            data:{client_card:cardId, text:noteText,}}
           ) 
           if (response.ok) {
             const data = await response.json() 
+            console.log(data);
+            
             addNote(data)
             setNoteText('')
             closeModal()
           } else {
+            const err = await response.json()
+            setErrors(err)
             console.error('Failed to post note')
           }
-        } catch (error) {
-          console.error('Error posting note:', error)
-        }
+
       }
 
       if(noteText.length>0){
@@ -55,6 +58,7 @@ const NoteForm = ({ cardId, closeModal, addNote }) => {
         <Form.Text className="text-muted">
           {noteText.length} / {maxCharacters}
         </Form.Text>
+        {errors.text && <div className="text-danger">{errors.text[0]}</div>}
       </Form.Group>
       <ModalFooter style={{ padding: '5px' }}>
         <Button className="btn-filter-reset text-center" onClick={closeModal}>Отмена</Button>

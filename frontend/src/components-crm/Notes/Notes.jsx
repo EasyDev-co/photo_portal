@@ -92,7 +92,7 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
                   <Card className="cursor-pointer" key={i} onClick={()=>handleShowEdit(item.id)}>
                     <Card.Header className="border-0">
                       <div>{date}</div>
-                      <div style={{ color: '#0a58ca' }}>Имя Фамилия</div>
+                      <div style={{ color: '#0a58ca' }}>{item.author.full_name}</div>
                     </Card.Header>
                     <Card.Body
                       className="py-2"
@@ -120,7 +120,7 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
                 <Card className="cursor-pointer" key={i} onClick={()=>handleShowEdit(item.id)}>
                   <Card.Header className="border-0">
                     <div>{date}</div>
-                    <div style={{ color: '#0a58ca' }}>Имя Фамилия</div>
+                    <div style={{ color: '#0a58ca' }}>{item.author.full_name}</div>
                   </Card.Header>
                   <Card.Body
                     className="py-2"

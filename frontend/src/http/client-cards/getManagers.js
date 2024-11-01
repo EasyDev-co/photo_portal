@@ -3,25 +3,25 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const clientCardCreate = async (access, data) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-cards/`;
+export const getManagers = async ({access, name}) => {
+    const url = `${localUrl}/api/crm/v1/roles/employees/search/?full_name=${name}`;
+
+    console.log(name);
+    
 
     const response = await fetch(url, {
-        method: 'POST', 
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        },
-        body: JSON.stringify(data)
-
+        }
     });
-    
+
     return response;
 }
 
-export const postClientCardWithToken = async (access, data) => {
+export const fetchManagersWithToken = async (access, name) => {
     try {
-        let response = await clientCardCreate(access, data)
+        let response = await getManagers(access, name)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -30,7 +30,7 @@ export const postClientCardWithToken = async (access, data) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = clientCardCreate(res.access, data);
+                            response = getManagers(res.access, name);
                         }
                     })
             }

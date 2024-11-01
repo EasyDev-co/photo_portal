@@ -16,6 +16,8 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
     manager: '',
   });
 
+  const [errors, setErrors] = useState({})
+
 
   function reformatDate(dateStr) {
     const [day, month, year] = dateStr.split('.');
@@ -60,12 +62,10 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
 
     const data = {
         date_end: reformatDate(formState.date_end),
-        author:"b007b705-4f91-41ed-bbe8-90599d181ae4",
         text: formState.text
     }
 
     const postTask = async () => {        
-        try {
           const response = await patchTaskWithToken(access, data, taskId) 
           if (response.ok) {
 
@@ -74,11 +74,11 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
             closeModal()
             
           } else {
+            const err = await response.json()
+            setErrors(err)
             console.error('Failed to post note')
           }
-        } catch (error) {
-          console.error('Error posting note:', error)
-        }
+
       }
 
       postTask()
@@ -126,6 +126,7 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
         <option value="2">В работе</option>
         <option value="3">Готова</option>
       </Form.Select>
+      {errors.task_type && <div className="text-danger">{errors.task_type[0]}</div>}
     </Form.Group>
 
 
@@ -143,6 +144,7 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
           <img src={calendar} alt="" />
         </div>
       </div>
+      {errors.date_end && <div className="text-danger">{errors.date_end[0]}</div>}
     </Form.Group>
 
     <Form.Group controlId="noteText" className="mb-3">
@@ -155,22 +157,7 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
         onChange={handleChange}
         placeholder="Write a message"
       />
-    </Form.Group>
-
-    <Form.Group className="mb-3">
-      <div className="form-control-wrap">
-        <Form.Label className="text-secondary">Менеджер</Form.Label>
-        <Form.Control
-          name="manager"
-          className="shadow-none"
-          placeholder="Не указано"
-          value={formState.manager}
-          onChange={handleChange}
-        />
-        <div className="control-img">
-          <img src={people} alt="" />
-        </div>
-      </div>
+      {errors.text && <div className="text-danger">{errors.text[0]}</div>}
     </Form.Group>
 
 
