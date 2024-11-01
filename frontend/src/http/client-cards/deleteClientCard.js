@@ -12,7 +12,6 @@ export const deleteCard = async (access, cardID) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        body: JSON.stringify(data)
 
     });
     return response;

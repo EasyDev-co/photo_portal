@@ -82,8 +82,8 @@ const OrderCard = ({
 
   const handlePatchClientCard = () => {
     const data = {
-      address: regionData.region.address,
-      city: regionData.region.name,
+      address: regionData.region.address || "Не указано ",
+      city: regionData.region.name || "Не указано ",
       children_count: childrenData.children_count,
       children_for_photoshoot: childrenData.children_for_photoshoot,
       garden_details:childrenData.garden_details

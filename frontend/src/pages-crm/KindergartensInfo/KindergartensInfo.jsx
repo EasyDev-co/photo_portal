@@ -9,11 +9,13 @@ import { fetchSingleClientCardsWithTokenInterceptor } from '../../http/client-ca
 import { fetchSingleClientCardTasksWithTokenInterceptor } from '../../http/client-cards/getClientCardTasks'
 import { fetchNotesWithTokenInterceptor } from '../../http/client-cards/getNotes'
 import { fetchHistoryCallsWithTokenInterceptor } from '../../http/client-cards/getHistoryCalls'
-import { useParams } from 'react-router-dom'
+import { deleteCardWithToken } from '../../http/client-cards/deleteClientCard'
+import { useParams, useNavigate } from 'react-router-dom'
 import CurrentTasks from './CurrentTasks'
 
 const KindergartensInfo = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [isActive, setIsActive] = useState(false)
   const [clientCardData, setClientCardData] = useState(null) // State to store fetched client card data
   const [tasks, setTasks] = useState(null)
@@ -54,6 +56,26 @@ const editTask = (task)=>{
 const deleteTask = (taskId)=>{
   const updatedTasks = tasks.filter(item => item.id !== taskId);
   setTasks(updatedTasks)
+}
+
+const deleteCard = ()=>{
+  const deleteItem = async() =>{
+    try {
+      const response = await deleteCardWithToken(
+        access,
+        id
+      ) // Use the function to fetch data
+      if (response.ok) {
+        navigate('/crm/kindergartens/')
+      } else {
+        console.error('Failed to fetch single client card')
+      }
+    } catch (error) {
+      console.error('Error fetching single client card:', error)
+    }
+  }
+
+  deleteItem()
 }
 
   useEffect(() => {
@@ -269,6 +291,8 @@ const deleteTask = (taskId)=>{
                   <Card.Title className="fs-6 text-secondary">
                     Директор
                   </Card.Title>
+
+                  <Button variant="outline-danger mt-3" onClick={deleteCard}>Удалить карточку</Button>
                 </Card>
               </div>
               {clientCardData.previous_managers.map((item, i) => {

@@ -13,6 +13,10 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
 
   const maxCharacters = 100
 
+  const formatDate = (date) => {
+    const [day, month, year] = date.split(".");
+    return `${year}-${month}-${day}`;
+  };
   const [formState, setFormState] = useState({
     garden_details: '',
     charge_dates: '', // Will store the selected date
@@ -43,6 +47,25 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
     }))
   }
 
+  const handleDateChange = (e) => {
+    let value = e.target.value;
+  
+    // Remove any non-digit characters
+    value = value.replace(/\D/g, '');
+  
+    // Apply the xx.xx.xxxx format
+    if (value.length > 2 && value.length <= 4) {
+      value = `${value.slice(0, 2)}.${value.slice(2)}`;
+    } else if (value.length > 4) {
+      value = `${value.slice(0, 2)}.${value.slice(2, 4)}.${value.slice(4, 8)}`;
+    }
+  
+    setFormState((prevState) => ({
+      ...prevState,
+      charge_dates: value,
+    }));
+  };
+
   const handleKindergarden = (e) => {
     const { value } = e.target
     setKindergarten(value)
@@ -56,8 +79,22 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
+    setErrors({});
+
+    const datePattern = /^\d{2}\.\d{2}\.\d{4}$/; // Regex pattern for xx.xx.xxxx format
+    const isDateValid = datePattern.test(formState.charge_dates);
+  
+    // Check if date is valid
+    if (!isDateValid) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        charge_dates: ['Пожалуйста, ввидите дату в корректном формате.'],
+      }));
+      return; // Prevent form submission if date is invalid
+    }
+
     const data = {
-      charge_dates: '2024-12-12',
+      charge_dates: formatDate(formState.charge_dates),
       garden_details: formState.garden_details || "Реквизитов нет",
       kindergarten: formState.kindergarden.id,
       status: formState.status || 1,
@@ -65,6 +102,9 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
       children_for_photoshoot: formState.children_for_photoshoot || 0,
       responsible_manager: formState.manager.id
     }
+
+    console.log(formState.charge_dates);
+    
 
     const postCard = async () => {
 
@@ -167,7 +207,7 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
             className="shadow-none"
             placeholder="Не указано"
             value={formState.charge_dates}
-            onChange={handleChange}
+            onChange={handleDateChange}
           />
           <div className="control-img">
             <img src={calendar} alt="" />
@@ -189,7 +229,7 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
          {errors.garden_details && <div className="text-danger">{errors.garden_details[0]}</div>}
       </Form.Group>
 
-      <Form.Group className="mb-3">
+      <Form.Group className="mb-3"  style={{ position: 'relative' }}>
         <div className="form-control-wrap">
           <Form.Label className="text-secondary">Менеджер</Form.Label>
           <Form.Control
@@ -205,7 +245,18 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
         </div>
         {errors.manager && <div className="text-danger">{errors.manager[0]}</div>} 
         {managerResults.length > 0 && (
-          <ul className="kindergarten-suggestions">
+          <ul className="kindergarten-suggestions"           style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            width: '100%',
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            zIndex: 1000,
+            maxHeight: '200px',
+            overflowY: 'auto',
+          }}>
             {managerResults.map((item, index) => (
 
               <li key={index}>
@@ -273,7 +324,7 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
         {errors.children_for_photoshoot && <div className="text-danger">{errors.children_for_photoshoot[0]}</div>} 
       </Form.Group>
 
-      <Form.Group className="mb-3">
+      <Form.Group className="mb-3" style={{ position: 'relative' }}>
         <div className="form-control-wrap">
           <Form.Label className="text-secondary">Сад</Form.Label>
           <Form.Control
@@ -289,7 +340,19 @@ const ClientCardForm = ({ handleAddClientCard, closeModal }) => {
         </div>
         {errors.kindergarten && <div className="text-danger">{errors.kindergarten[0]}</div>}
         {kindergartenResults.length > 0 && (
-          <ul className="kindergarten-suggestions">
+          <ul className="kindergarten-suggestions"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            width: '100%',
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            zIndex: 1000,
+            maxHeight: '200px',
+            overflowY: 'auto',
+          }}>
             {kindergartenResults.map((item, index) => (
               <li key={index}>
                 <button
