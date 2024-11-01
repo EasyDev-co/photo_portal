@@ -1,3 +1,4 @@
+from rest_framework.authentication import SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework import viewsets
@@ -29,6 +30,7 @@ from apps_crm.roles.models import UserRole
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
     permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
 
     @swagger_auto_schema(
         request_body=openapi.Schema(

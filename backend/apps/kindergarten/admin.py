@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from apps.kindergarten.models.region import Region
@@ -8,6 +9,8 @@ from apps.kindergarten.form import KindergartenForm
 from apps.kindergarten.models.kindergarten import Kindergarten
 
 from itertools import zip_longest
+
+from config.settings import UPLOAD_URL, JQUERY_CDN
 
 
 class KindergartenInline(admin.TabularInline):
@@ -40,23 +43,15 @@ class KindergartenAdmin(admin.ModelAdmin):
         return 'region', 'locality', 'name', 'code', 'has_photobook', 'file_upload'
 
     def file_upload(self, obj):
-        form = KindergartenForm()
-        return mark_safe(f"""
-            <form method="post" enctype="multipart/form-data">
-                {form.as_p()}
-                <button type="submit" style="
-                    background-color: #205067;
-                    border: none;
-                    color: white;
-                    padding: 10px 20px;
-                    text-align: center;
-                    font-size: 16px;
-                    cursor: pointer;
-                    border-radius: 5px;
-                    margin-top: 10px;
-                ">Загрузить файлы</button>
-            </form>
-        """)
+        form = KindergartenForm(initial={'kindergarten_id': obj.id})
+        context = {
+            'form': form,
+            'upload_url': UPLOAD_URL,
+            'object': obj,
+            'jquery_cdn': JQUERY_CDN
+        }
+        html = render_to_string('admin/widgets/drag_and_drop.html', context)
+        return mark_safe(html)
 
     @staticmethod
     def _grouper(iterable, n, fillvalue=None):

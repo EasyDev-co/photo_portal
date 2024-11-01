@@ -31,7 +31,6 @@ class PhotoLine(UUIDMixin):
     qr_code = NullImageField(
         upload_to='photo_line/',
         verbose_name="QR код",
-        unique=True,
         null=True,
         blank=True
     )
