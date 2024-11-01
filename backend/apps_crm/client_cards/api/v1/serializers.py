@@ -39,7 +39,14 @@ class ClientCardTaskSerializer(BaseClientCardSerializer):
 
 
 class ClientCardSerializer(BaseClientCardSerializer):
-    responsible_manager = EmployeeSerializer(read_only=True)
+    responsible_manager = EmployeeSerializer()
+
+    class Meta:
+        model = ClientCard
+        fields = '__all__'
+
+
+class ClientCardUpdateSerializer(BaseClientCardSerializer):
 
     class Meta:
         model = ClientCard

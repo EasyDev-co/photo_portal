@@ -5,9 +5,9 @@ from rest_framework.response import Response
 
 from apps_crm.client_cards.models import ClientCardTask, HistoryCall, Notes, ClientCard
 from apps_crm.client_cards.api.v1.serializers import ClientCardTaskSerializer, HistoryCallSerializer, NotesSerializer, \
-    ClientCardSerializer, ClientCardRetrieveSerializer
+    ClientCardSerializer, ClientCardRetrieveSerializer, ClientCardUpdateSerializer
 from apps_crm.roles.models import Employee
-from apps_crm.roles.permissions import IsROPorDirector, IsAuthorOrROPorDirector
+from apps_crm.roles.permissions import IsROPorDirector, IsAuthorOrROPorDirector, IsEmployee
 from apps_crm.client_cards.filters import ClientCardTaskFilter, HistoryCallFilter, NotesFilter, ClientCardFilter
 
 
@@ -40,6 +40,8 @@ class ClientCardViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ClientCardRetrieveSerializer
+        elif self.action in ['update', 'partial_update']:
+            return ClientCardUpdateSerializer
         else:
             return ClientCardSerializer
 
