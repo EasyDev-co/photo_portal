@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <script src="{{ jquery_cdn }}"></script>
     <style>
         .drag-and-drop {
             position: relative;
@@ -63,16 +64,32 @@
     <title>Загрузка файлов</title>
 </head>
 <body>
-    <div class="drag-and-drop">
-        <input type="file" name="{{ widget.name }}" class="drag-and-drop-input" multiple>
-        <div class="drag-and-drop-area">
-            <p>Перетащите файлы сюда или нажмите, чтобы выбрать</p>
+    <form id="file-upload-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="drag-and-drop">
+            <input type="file" name="{{ widget.name }}" class="drag-and-drop-input" multiple>
+            <input type="hidden" id="kindergarten-id" value="{{ form.initial.kindergarten_id }}">
+            <div class="drag-and-drop-area">
+                <p>Перетащите файлы сюда или нажмите, чтобы выбрать</p>
+            </div>
+            <!-- Контейнер для отображения списка файлов -->
+            <div class="file-list"></div>
         </div>
-        <!-- Контейнер для отображения списка файлов -->
-        <div class="file-list"></div>
-    </div>
-    <!-- Кнопка для удаления всех файлов -->
-    <button type="button" class="delete-all-button">Удалить все</button>
+        <!-- Кнопка для удаления всех файлов -->
+        <button type="button" class="delete-all-button">Удалить все</button>
+        <button type="button" class="upload-button" style="
+                    background-color: #205067;
+                    border: none;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    font-size: 16px;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                ">Загрузить файлы</button>
+    </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -80,6 +97,9 @@
             const input = document.querySelector('.drag-and-drop-input');
             const fileList = document.querySelector('.file-list');
             const deleteAllButton = document.querySelector('.delete-all-button');
+            const uploadButton = document.querySelector('.upload-button');
+            const uploadUrl = "{{ upload_url }}";
+
             let dataTransfer = new DataTransfer(); // Создаем объект DataTransfer
 
             // Предотвращаем поведение по умолчанию для событий перетаскивания
@@ -175,6 +195,22 @@
             dropArea.addEventListener('click', function(e) {
                 input.click();
             });
+            
+            // Функция для получения CSRF-токена из куки
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    let cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        cookie = cookie.trim();
+                        if (cookie.startsWith(name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
 
             // Обрабатываем нажатие на кнопку "Удалить все"
             deleteAllButton.addEventListener('click', function(e) {
@@ -187,6 +223,57 @@
 
             // Изначально скрываем кнопку "Удалить все"
             deleteAllButton.style.display = 'none';
+        
+            uploadButton.addEventListener('click', function(e) {
+                sendRequest();
+            });
+             
+            // Функция для загрузки файлов
+            function sendRequest() {
+                if (input.files.length === 0) {
+                    alert('Выберите файлы для загрузки.');
+                    return;
+                }
+        
+                var formData = new FormData(); // Создаем новый объект FormData
+        
+                // Добавляем файлы
+                for (var i = 0; i < input.files.length; i++) {
+                    formData.append('photos', input.files[i]);
+                }
+        
+                // Получаем дополнительные параметры
+                var kindergartenId = document.getElementById('kindergarten-id').value;
+                var photoTheme = document.getElementById('id_photo_theme').value;
+        
+                // Добавляем параметры
+                formData.append('kindergarten_id', kindergartenId);
+                formData.append('photo_theme', photoTheme);
+                
+                // Отправляем AJAX запрос
+                $.ajax({
+                    url: uploadUrl,
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    credentials: 'same-origin',
+                    success: function(response) {
+                        alert('Файлы успешно загружены.');
+                        
+                        // Очищаем выбранные файлы после успешной загрузки
+                        dataTransfer = new DataTransfer();
+                        input.files = dataTransfer.files;
+                        updateFileDisplay();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('Ошибка при загрузке файлов: ');
+                    }
+                });
+            }
         });
     </script>
 </body>

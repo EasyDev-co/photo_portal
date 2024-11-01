@@ -202,7 +202,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    ' DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend'),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend'),
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -343,3 +343,6 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 YC_BUCKET_NAME = os.environ.get("YC_BUCKET_NAME")
 YC_REGION = os.environ.get("YC_REGION")
 YC_S3_ENDPOINT = os.environ.get("YC_S3_ENDPOINT")
+
+UPLOAD_URL = os.getenv('UPLOAD_URL')
+JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js')
