@@ -3,7 +3,8 @@ import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 export const clientCards = async (access) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/`;
+    const url = `${localUrl}/api/crm/v1/client_cards/client-cards/`;
+    
 
     const response = await fetch(url, {
         headers: {
@@ -12,6 +13,7 @@ export const clientCards = async (access) => {
         }
 
     });
+    
     return response;
 }
 
@@ -32,6 +34,7 @@ export const fetchClientCardsWithTokenInterceptor = async (access) => {
             }
 
         }
+        
         return response;
     } catch (error) {
         console.error('Ошибка при выполнении запроса:', error);

@@ -3,8 +3,8 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const clientCard = async (access, clientCardId) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-cards/${clientCardId}/`;
+export const kindergartens = async (access) => {
+    const url = `${localUrl}/api/v1/kindergartens_search/`;
 
     const response = await fetch(url, {
         headers: {
@@ -16,9 +16,9 @@ export const clientCard = async (access, clientCardId) => {
     return response;
 }
 
-export const fetchSingleClientCardsWithTokenInterceptor = async (access, clientCardId) => {
+export const fetchKindergartensWithTokenInterceptor = async (access) => {
     try {
-        let response = await clientCard(access, clientCardId)
+        let response = await kindergartens(access)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -27,7 +27,7 @@ export const fetchSingleClientCardsWithTokenInterceptor = async (access, clientC
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = clientCard(res.access, clientCardId);
+                            response = kindergartens(res.access);
                         }
                     })
             }
