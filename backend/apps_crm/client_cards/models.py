@@ -56,6 +56,7 @@ class ClientCard(models.Model):
     def kindergarten_name(self) -> str:
         if self.kindergarten:
             return self.kindergarten.name
+        return "Ошибка имени"
 
     @property
     def manager_bonus(self):

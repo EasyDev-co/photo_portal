@@ -15,7 +15,7 @@ const ClientCard = ({data}) => {
         <Card onClick={()=>navigate(`/crm/kindergartens/${data.id}`)} className="card-shadow" style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px' }}>
             <Card.Header className="card-header" style={{ border: 'none' }}>
                 <div className="card-header-title">
-                    Название садика: {data.name}
+                    Название садика: {data.kindergarten_name}
                 </div>
                 <OverlayTrigger
                     trigger="click"
