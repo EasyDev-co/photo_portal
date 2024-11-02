@@ -15,7 +15,7 @@ const ClientCard = ({data}) => {
         <Card onClick={()=>navigate(`/crm/kindergartens/${data.id}`)} className="card-shadow" style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px' }}>
             <Card.Header className="card-header" style={{ border: 'none' }}>
                 <div className="card-header-title">
-                    Название садика {data.name}
+                    Название садика: {data.name}
                 </div>
                 <OverlayTrigger
                     trigger="click"
@@ -51,12 +51,8 @@ const ClientCard = ({data}) => {
             <Card.Body >
                 <Card.Text className="d-flex flex-column gap-3">
                     <div className="d-flex gap-1">
-                        <div className="fw-400 text-secondary">Инфо: </div>
-                        <div className="fw-400"> asdasda</div>
-                    </div>
-                    <div className="d-flex gap-1">
-                        <div className="fw-400 text-secondary">Инфо: </div>
-                        <div className="fw-400"> asdasda</div>
+                        <div className="fw-400 text-secondary">Город: </div>
+                        <div className="fw-400"> { data.city }</div>
                     </div>
                     <div className="d-flex gap-1">
                         <div className="fw-400 text-secondary">Инфо: </div>
@@ -67,7 +63,7 @@ const ClientCard = ({data}) => {
             <Card.Footer className="card-footer" style={{ border: 'none' }}>
                 <div className="d-flex gap-1">
                     <div className="fw-400 fs-13 text-secondary">Менеджер:</div>
-                    <div className="fw-400 fs-13 text-primary"> asdasda</div>
+                    <div className="fw-400 fs-13 text-primary">{ data.responsible_manager.full_name }</div>
                 </div>
             </Card.Footer>
         </Card>
