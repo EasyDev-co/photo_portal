@@ -11,17 +11,20 @@ class EmployeeSearchView(generics.ListAPIView):
     API для поиска сотрудников по имени и фамилии.
     """
     serializer_class = EmployeeSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Employee.objects.select_related('user')
         first_name = self.request.query_params.get('first_name')
         last_name = self.request.query_params.get('last_name')
 
-        if first_name or last_name:
-            queryset = queryset.filter(
-                Q(user__first_name__icontains=first_name) if first_name else Q(),
-                Q(user__last_name__icontains=last_name) if last_name else Q()
-            )
+        query = Q()
+        if first_name:
+            query &= Q(user__first_name__icontains=first_name)
+        if last_name:
+            query &= Q(user__last_name__icontains=last_name)
+
+        if query:
+            queryset = queryset.filter(query)
 
         return queryset

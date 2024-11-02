@@ -94,7 +94,7 @@ class KindergartenStatsAPIView(APIView):
 
 class KindergartenSearchAPIView(ListAPIView):
     """Поиск детcкого сада по имени"""
-    permission_classes = [IsManager]
+    # permission_classes = []
 
     queryset = Kindergarten.objects.all()
     serializer_class = KindergartenSerializer
