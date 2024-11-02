@@ -15,7 +15,7 @@ class ClientCardAdmin(admin.ModelAdmin):
             'fields': ('garden_details', 'city', 'address')
         }),
         ('Статус и сборы', {
-            'fields': ('status', 'charges', 'charge_dates', 'manager_bonus', 'promocode_size')
+            'fields': ('status', 'charges', 'charge_dates',)
         }),
     )
 
