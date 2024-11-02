@@ -43,7 +43,28 @@ class ClientCardSerializer(BaseClientCardSerializer):
 
     class Meta:
         model = ClientCard
-        fields = '__all__'
+        fields = [
+            'kindergarten',
+            'children_count',
+            'children_for_photoshoot',
+            'responsible_manager',
+            'last_photographer',
+            'garden_details',
+            'city',
+            'address',
+            'status',
+            'charges',
+            'charge_dates',
+        ]
+
+    def get_kindergarten_name(self, obj):
+        return obj.kindergarten_name
+
+    def manager_bonus(self, obj):
+        return obj.manager_bonus
+
+    def promocode_size(self, obj):
+        return obj.promocode_size
 
 
 class ClientCardUpdateSerializer(BaseClientCardSerializer):

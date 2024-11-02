@@ -53,6 +53,11 @@ class ClientCard(models.Model):
         verbose_name_plural = 'Карточки клиента'
 
     @property
+    def kindergarten_name(self) -> str:
+        if self.kindergarten:
+            return self.kindergarten.name
+
+    @property
     def manager_bonus(self):
         try:
             return self.responsible_manager.user.manager_bonuses.first().bonus_size
