@@ -331,7 +331,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
     queryset = PhotoTheme.objects.filter(is_active=True)
     serializer_class = PhotoThemeSerializerV2
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
+    ilter_backends = [DjangoFilterBackend]
     filterset_class = PhotoThemeFilter
 
     def get_queryset(self):

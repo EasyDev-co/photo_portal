@@ -11,19 +11,8 @@ from apps_crm.roles.permissions import IsROPorDirector, IsAuthorOrROPorDirector
 from apps_crm.client_cards.filters import ClientCardTaskFilter, HistoryCallFilter, NotesFilter, ClientCardFilter
 
 
-class ClientCardPermissionMixin:
-    def get_permissions(self):
-        if self.action == 'create':
-            permission_classes = [permissions.IsAuthenticated, IsROPorDirector]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAuthenticated, IsAuthorOrROPorDirector]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
-
-
 class AuthorCreateMixin:
-    """ Миксин для присваивания сотрудника автором """
+    """Миксин для присваивания сотрудника автором """
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):

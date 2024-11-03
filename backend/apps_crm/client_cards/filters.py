@@ -17,6 +17,7 @@ class ClientCardFilter(django_filters.FilterSet):
         fields = {
             'kindergarten': ['exact'],
             'status': ['exact'],
+            'modified': ['exact', 'date', 'date__range'],
         }
 
 

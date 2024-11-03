@@ -9,7 +9,7 @@ class RegionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Region
-        fields = ('country', 'name')
+        fields = ('id', 'country', 'name')
 
 
 class KindergartenSerializer(serializers.ModelSerializer):

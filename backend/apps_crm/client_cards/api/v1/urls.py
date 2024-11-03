@@ -8,6 +8,7 @@ router.register(r'client-cards', ClientCardViewSet, basename='clientcard')
 router.register(r'notes', NotesViewSet, basename='notes')
 router.register(r'history-calls', HistoryCallViewSet, basename='historycall')
 
+
 urlpatterns = [
     path('', include(router.urls)),
 ]

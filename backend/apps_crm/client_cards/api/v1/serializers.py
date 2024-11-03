@@ -40,6 +40,7 @@ class ClientCardTaskSerializer(BaseClientCardSerializer):
 
 class ClientCardSerializer(BaseClientCardSerializer):
     responsible_manager = EmployeeSerializer()
+    kindergarten_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ClientCard
@@ -55,16 +56,11 @@ class ClientCardSerializer(BaseClientCardSerializer):
             'status',
             'charges',
             'charge_dates',
+            "kindergarten_name",
         ]
 
     def get_kindergarten_name(self, obj):
         return obj.kindergarten_name
-
-    def manager_bonus(self, obj):
-        return obj.manager_bonus
-
-    def promocode_size(self, obj):
-        return obj.promocode_size
 
 
 class ClientCardUpdateSerializer(BaseClientCardSerializer):

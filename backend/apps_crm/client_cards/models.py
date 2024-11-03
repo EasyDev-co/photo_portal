@@ -47,6 +47,7 @@ class ClientCard(models.Model):
         null=True,
         verbose_name='Дата сбора'
     )
+    modified = models.DateTimeField(auto_now=True, verbose_name="Изменен")
 
     class Meta:
         verbose_name = 'Карточка клиента'
