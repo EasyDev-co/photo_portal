@@ -9,10 +9,12 @@ import filterBtn from '../../assets/icons/filter_button.svg'
 import filterBtnA from '../../assets/icons/filter-btn-a.svg'
 import { Accordion } from 'react-bootstrap';
 import calendar from '../../assets/icons/calendar-event.svg'
+import { localUrl } from '../../constants/constants';
 
 const ClientFilter = () => {
     const [isActive, setIsActive] = useState(false);
     const [filterActive, setFilterActive] = useState(false);
+
 
 
     return (
@@ -31,6 +33,7 @@ const ClientFilter = () => {
                         <Form.Label className="text-secondary">Регион</Form.Label>
                         <Form.Select className='shadow-none'>
                             <option hidden >Регион</option>
+                            
                             <option className='select-option'>Default select</option>
                         </Form.Select>
                     </Form.Group>
@@ -55,12 +58,12 @@ const ClientFilter = () => {
                             </div>
                         </div>
                     </Form.Group>
-                    <div onClick={() => setFilterActive(!filterActive)} className='filter-btn'>
+                    {/* <div onClick={() => setFilterActive(!filterActive)} className='filter-btn'>
                     {!filterActive ? <img src={filterBtn} alt="" /> : <img src={filterBtnA} alt="" />}
-                </div>
+                </div> */}
                 </Form>
             </div>
-            <div>
+            {/* <div>
                 <Accordion>
                     <Accordion.Collapse className={filterActive ? 'show' : ''} eventKey="0">
                         <div>
@@ -116,7 +119,7 @@ const ClientFilter = () => {
                         </div>
                     </Accordion.Collapse>
                 </Accordion>
-            </div>
+            </div> */}
         </div>
 
     );
