@@ -37,7 +37,9 @@ class Photo(UUIDMixin):
     )
     photo_file = models.FileField(
         upload_to='',
-        verbose_name='Фотография'
+        verbose_name='Фотография',
+        blank=True,
+        null=True
     )
     watermarked_photo = models.ImageField(
         upload_to='watermarked_photo/',
