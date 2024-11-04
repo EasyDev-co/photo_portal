@@ -9,6 +9,7 @@ from apps.order.models import OrdersPayment
 from apps.photo.api.v1.serializers import PhotoThemeSerializer
 from apps.photo.models import PhotoTheme
 from apps.user.api.v1.serializers import ManagerSerializer
+from apps.user.models.user import UserRole
 from apps_crm.client_cards.models import ClientCard, ClientCardTask, HistoryCall, Notes, ClientCardStatus
 from apps_crm.history.models import ManagerChangeLog
 from apps_crm.roles.api.v1.serializers import EmployeeSerializer
@@ -26,6 +27,11 @@ class BaseClientCardSerializer(serializers.ModelSerializer):
     def validate_client_card(self, value):
         if not ClientCard.objects.filter(id=value.id).exists():
             raise serializers.ValidationError("Указанная карточка клиента не существует.")
+        # Проверка роли пользователя
+        employee = self.context['request'].user.employee
+        if employee.employee_role == UserRole.manager:
+            if value.responsible_manager != employee:
+                raise serializers.ValidationError("Вы не можете создавать записи для этой карточки клиента.")
         return value
 
 
