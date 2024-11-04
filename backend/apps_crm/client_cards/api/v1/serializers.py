@@ -45,6 +45,7 @@ class ClientCardSerializer(BaseClientCardSerializer):
     class Meta:
         model = ClientCard
         fields = [
+            'id',
             'kindergarten',
             'children_count',
             'children_for_photoshoot',
