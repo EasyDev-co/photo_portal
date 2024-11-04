@@ -59,6 +59,7 @@ class ClientCard(models.Model):
             return self.kindergarten.name
         return "Ошибка имени"
 
+    # TODO переделать, получается не то
     @property
     def manager_bonus(self):
         try:

@@ -239,13 +239,16 @@ const KindergartensInfo = () => {
                                             />
                                         </Form.Group>
                                         <Form.Group className="w-50">
-                                            <Form.Label className="text-secondary">
-                                                Дедлайн
-                                            </Form.Label>
-                                            <Form.Control
-                                                className="shadow-none ps-3"
-                                                placeholder="Не указано"
-                                                value={formatDate(clientCardData.photo_themes.current_photo_theme.date_end)}
+                                            <DatePicker
+                                                label={'Дедлайн'}
+                                                placeholder={formatDate(clientCardData.photo_themes.current_photo_theme.date_end)}
+                                                setIsActive={setIsActive}
+                                                img={calendar}
+                                                isActive={isActive}
+                                                navTitles={{
+                                                    days: 'MMMM <i>yyyy</i>',
+                                                    months: 'yyyy',
+                                                }}
                                             />
                                         </Form.Group>
                                     </Form>
@@ -285,34 +288,44 @@ const KindergartensInfo = () => {
                             >
                                 <Card className="border-0 p-2 text-center">
                                     <Card.Header
-                                        className="border-0 fw-600 p-0 justify-content-center"
+                                        className="border-0 fw-600 p-0 d-flex flex-column align-items-center"
                                         style={{fontSize: '17px'}}
                                     >
-                                        {clientCardData.kindergarten_manager_info?.first_name &&
-                                        clientCardData.kindergarten_manager_info?.last_name ? (
-                                            <p style={{textTransform: 'capitalize'}}>
-                                                {clientCardData.kindergarten_manager_info.first_name}{' '}
-                                                {clientCardData.kindergarten_manager_info.last_name}
-                                            </p>
+                                        {clientCardData.responsible_manager?.full_name ? (
+                                            <>
+                                                <p style={{textTransform: 'capitalize', margin: 0}}>
+                                                    {clientCardData.responsible_manager.full_name}
+                                                </p>
+                                                <p style={{opacity: 0.5, fontSize: '15px', margin: 0}}>
+                                                    {clientCardData.responsible_manager.employee_role === 1 && 'Руководитель отдела продаж'}
+                                                    {clientCardData.responsible_manager.employee_role === 2 && 'Менеджер'}
+                                                    {clientCardData.responsible_manager.employee_role === 3 && 'Исполнительный директор'}
+                                                </p>
+                                            </>
                                         ) : (
-                                            <p>Информация не доступна</p>
+                                            <p>Менеджер не прикреплен</p>
                                         )}
                                     </Card.Header>
                                 </Card>
-
                             </div>
-                            {clientCardData.previous_managers.map((item, i) => {
-                                return (
+                            {clientCardData.previous_managers.length > 0 ? (
+                                clientCardData.previous_managers.map((item, i) => (
                                     <Card.Body className="p-0" key={i}>
                                         <div className="d-flex gap-1">
                                             <div className="fw-400 text-secondary">
                                                 Прошлый менеджер:{' '}
                                             </div>
-                                            <div className="fw-400"> asdasda</div>
+                                            <div className="fw-400">{item.full_name || 'Имя не указано'}</div>
                                         </div>
                                     </Card.Body>
-                                )
-                            })}
+                                ))
+                            ) : (
+                                <Card.Body className="p-0 text-center">
+                                    <div className="text-secondary">
+                                        История менеджеров пуста
+                                    </div>
+                                </Card.Body>
+                            )}
                         </Card>
                         <Card
                             className="border-0 d-flex flex-column gap-2 card-shadow "

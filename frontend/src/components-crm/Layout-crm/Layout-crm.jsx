@@ -13,10 +13,7 @@ import building from '../../assets/icons/building.svg';
 import employees from '../../assets/icons/employees.svg';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
-import { othersLinks, usersLinks, settingsLinks } from '../../constants/path';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Search from '../Search/Search';
-import write from '../../assets/icons/icon-button.svg';
+import { useSelector } from 'react-redux'
 import bell from '../../assets/icons/bell.svg';
 import person from '../../assets/icons/person.jpg';
 
@@ -27,7 +24,8 @@ const LayoutCrm = () => {
 
     const location = useLocation();
     const navigate = useNavigate();
-    
+
+    const user = useSelector((state) => state.user)
     
     const [clientRadioValue, setСlientRadioValue] = useState('1');
     const [employeesRadioValue, setEmployeesRadioValue] = useState('3');
@@ -110,7 +108,7 @@ const LayoutCrm = () => {
                                             <img src={person} alt="" />
                                         </div>
                                         <div>
-                                            <div>Марк Ифанасьев</div>
+                                            <div>{ user.email }</div>
                                             <div className='fs-13 text-black-50'>Директор</div>
                                         </div>
                                     </div>
