@@ -95,11 +95,11 @@ const LayoutCrm = () => {
                         :
                         <div className='search-container d-flex justify-content-between align-items-center gap-4' >
                             <div className='search-wrap'>
-                                <Search />
+                                {/* <Search /> */}
                             </div>
                             <div className='d-flex align-items-center'>
                                 <div className='cursor-pointer'>
-                                    <img src={write} alt="" />
+                                    {/* <img src={write} alt="" /> */}
                                 </div>
                                 <div className='d-flex align-items-center'>
                                     <div className='px-3 cursor-pointer'>
@@ -126,7 +126,7 @@ const LayoutCrm = () => {
                             <img src={logo} alt="" />
                         </Link>
                     </div>
-                    <div className="continer d-flex flex-column py-2 px-3 gap-2 w-100">
+                    {/* <div className="continer d-flex flex-column py-2 px-3 gap-2 w-100">
                         <Dropdown>
                             <Dropdown.Toggle id="dropdown-region" className="w-100 border border-primary-900 layout-bg">
                                 Все регионы
@@ -159,7 +159,7 @@ const LayoutCrm = () => {
                                 <Dropdown.Item>Something else</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
-                    </div>
+                    </div> */}
                     <div className="container flex-column py-2 px-3 align-items-start gap-2">
                         <div className="row py-2 px-4">
                             <span className='color-grey text-uppercase fs-13 fw-600'>Пользователи</span>
@@ -223,7 +223,7 @@ const LayoutCrm = () => {
                                 </Accordion.Collapse>
                             </Accordion>
                         </div>
-                        <div className='d-flex flex-column gap-2'>
+                        {/* <div className='d-flex flex-column gap-2'>
                             {usersLinks.map((elem, i) => {
                                 return (
                                     <Link key={i} to={elem.to} className={location.pathname === elem.to ? 'layout-link-active' : 'layout-link'}>
@@ -237,8 +237,8 @@ const LayoutCrm = () => {
                                     </Link>
                                 )
                             })}
-                        </div>
-                        <div className='d-flex flex-column border-top border-grey w-100 gap-2'>
+                        </div> */}
+                        {/* <div className='d-flex flex-column border-top border-grey w-100 gap-2'>
                             <div className="row py-2 px-4 ">
                                 <span className='color-grey text-uppercase fs-13 fw-600'>Другое</span>
                             </div>
@@ -254,8 +254,8 @@ const LayoutCrm = () => {
                                     </Link>
                                 )
                             })}
-                        </div>
-                        <div className='d-flex flex-column gap-2'>
+                        </div> */}
+                        {/* <div className='d-flex flex-column gap-2'>
                             <div className="row py-2 px-4">
                                 <span className='color-grey text-uppercase fs-13 fw-600'>Настройки</span>
                             </div>
@@ -271,7 +271,7 @@ const LayoutCrm = () => {
                                     </Link>
                                 )
                             })}
-                        </div>
+                        </div> */}
                     </div>
                 </nav>
             </header>
