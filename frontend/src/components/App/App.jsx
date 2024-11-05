@@ -24,6 +24,9 @@ import Kindergartens from '../../pages-crm/Kindergartens/Kindergartens'
 import Calendar from '../../pages-crm/Calendar/Calendar'
 import MainCrm from '../../pages-crm/KindergartensInfo/KindergartensInfo'
 import KindergartensInfo from '../../pages-crm/KindergartensInfo/KindergartensInfo'
+import Employees from '../../components-crm/Employees/Employees'
+import CreateEmployee from '../../components-crm/CreateEmployee/CreateEmployee'
+import EditEmployee from '../../components-crm/EditEmployee/EditEmployee'
 
 export const App = () => {
   const location = useLocation()
@@ -54,6 +57,9 @@ export const App = () => {
               element={<KindergartensInfo />}
             />
             <Route path="/crm/calendar" element={<Calendar />} />
+            <Route path="/crm/employees" element={<Employees/>}/>
+            <Route path="/crm/employees/create" element={<CreateEmployee/>}/>
+            <Route path="/crm/employees/edit/:employeeId" element={<EditEmployee/>}/>
             <Route path="/*" element={<>qwdqwdqwdqw</>} />
           </Route>
         )}
