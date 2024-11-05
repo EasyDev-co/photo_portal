@@ -75,6 +75,7 @@ class UserGetSerializer(serializers.ModelSerializer):
     Сериализатор для просмотра модели пользователя.
     """
     kindergarten = KindergartenSerializer(read_only=True, many=True)
+    managed_kindergarten = KindergartenSerializer(read_only=True, required=False)
 
     class Meta:
         model = User
@@ -87,7 +88,8 @@ class UserGetSerializer(serializers.ModelSerializer):
             'phone_number',
             'role',
             'kindergarten',
-            'is_verified'
+            'is_verified',
+            'managed_kindergarten',
         )
 
 
