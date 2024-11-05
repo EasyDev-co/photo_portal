@@ -78,12 +78,15 @@ class ClientCardUpdateSerializer(BaseClientCardSerializer):
 
 
 class HistoryCallSerializer(BaseClientCardSerializer):
-    author = EmployeeSerializer(read_only=True)
 
     class Meta:
         model = HistoryCall
-        fields = '__all__'
-        read_only_fields = ['author']
+        fields = [
+            'call_status',
+            'created_at',
+            'author',
+            'client_card',
+        ]
 
 
 class NotesSerializer(BaseClientCardSerializer):
