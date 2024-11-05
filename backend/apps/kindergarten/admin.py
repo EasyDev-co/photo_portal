@@ -16,7 +16,12 @@ from config.settings import UPLOAD_URL, JQUERY_CDN
 class KindergartenInline(admin.TabularInline):
     model = Kindergarten
     extra = 0
-    fields = ('name', 'code', 'has_photobook')
+    readonly_fields = ['name', 'locality', 'code', 'has_photobook']
+    exclude = ['qr_code', ]
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 class PhotoPriceInline(admin.TabularInline):
