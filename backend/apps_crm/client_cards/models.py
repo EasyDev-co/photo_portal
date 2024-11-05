@@ -114,7 +114,6 @@ class HistoryCall(models.Model):
         default=CallHistory.SENT_KP
     )
     created_at = models.DateTimeField(
-        auto_now_add=True,
         verbose_name='Время создания'
     )
     author = models.ForeignKey(
