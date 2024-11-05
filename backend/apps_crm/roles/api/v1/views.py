@@ -10,24 +10,29 @@ from apps_crm.roles.api.v1.serializers import EmployeeSerializer, EmployeeAndUse
 
 class EmployeeSearchView(generics.ListAPIView):
     """
-    API для поиска сотрудников по имени и фамилии.
+    API для поиска сотрудников по полному имени.
     """
     serializer_class = EmployeeSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Employee.objects.select_related('user')
-        first_name = self.request.query_params.get('first_name', None)
-        last_name = self.request.query_params.get('last_name', None)
+        full_name = self.request.query_params.get('full_name', None)
 
-        query = Q()
-        if first_name:
-            query &= Q(user__first_name__icontains=first_name)
-        if last_name:
-            query &= Q(user__last_name__icontains=last_name)
-
-        if query:
-            queryset = queryset.filter(query)
+        if full_name:
+            name_parts = full_name.split()
+            if len(name_parts) == 2:
+                first_name, last_name = name_parts
+                queryset = queryset.filter(
+                    Q(user__first_name__icontains=first_name) &
+                    Q(user__last_name__icontains=last_name)
+                )
+            elif len(name_parts) == 1:
+                first_name = name_parts[0]
+                queryset = queryset.filter(
+                    Q(user__first_name__icontains=first_name) |
+                    Q(user__last_name__icontains=first_name)
+                )
 
         return queryset
 

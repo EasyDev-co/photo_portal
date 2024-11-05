@@ -51,12 +51,16 @@ const ClientCard = ({data}) => {
             <Card.Body >
                 <Card.Text className="d-flex flex-column gap-3">
                     <div className="d-flex gap-1">
-                        <div className="fw-400 text-secondary">Город: </div>
-                        <div className="fw-400"> { data.city }</div>
+                        <div className="fw-400 text-secondary">Адрес: </div>
+                        <div className="fw-400"> { data.city }, { data.address }</div>
                     </div>
                     <div className="d-flex gap-1">
-                        <div className="fw-400 text-secondary">Инфо: </div>
-                        <div className="fw-400"> asdasda</div>
+                        <div className="fw-400 text-secondary">Количество детей: </div>
+                        <div className="fw-400">{data.children_count}</div>
+                    </div>
+                    <div className="d-flex gap-1">
+                        <div className="fw-400 text-secondary">Детей на фотосессию: </div>
+                        <div className="fw-400">{data.children_for_photoshoot}</div>
                     </div>
                 </Card.Text>
             </Card.Body>
