@@ -239,14 +239,25 @@ const KindergartensInfo = () => {
                                             />
                                         </Form.Group>
                                         <Form.Group className="w-50">
-                                            <Form.Label className="text-secondary">
+                                            <DatePicker
+                                                label={'Дедлайн'}
+                                                placeholder={formatDate(clientCardData.photo_themes.current_photo_theme.date_end)}
+                                                setIsActive={setIsActive}
+                                                img={calendar}
+                                                isActive={isActive}
+                                                navTitles={{
+                                                    days: 'MMMM <i>yyyy</i>',
+                                                    months: 'yyyy',
+                                                }}
+                                            />
+                                            {/* <Form.Label className="text-secondary">
                                                 Дедлайн
                                             </Form.Label>
                                             <Form.Control
                                                 className="shadow-none ps-3"
                                                 placeholder="Не указано"
                                                 value={formatDate(clientCardData.photo_themes.current_photo_theme.date_end)}
-                                            />
+                                            /> */}
                                         </Form.Group>
                                     </Form>
                                 </Card.Body>

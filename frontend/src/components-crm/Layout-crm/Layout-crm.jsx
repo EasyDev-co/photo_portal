@@ -40,7 +40,7 @@ const LayoutCrm = () => {
     { name: 'Сотрудник 2', value: '4', path: '/crm/kindergartens' },
   ]
 
-  function ContextAwareToggle({ children, eventKey, callback, icon }) {
+  function ContextAwareToggle({ children, eventKey, callback, icon, isArrow}) {
     const { activeEventKey } = useContext(AccordionContext)
 
     const decoratedOnClick = useAccordionButton(
@@ -71,9 +71,11 @@ const LayoutCrm = () => {
           </div>
           {children}
         </button>
-        <div className={isCurrentEventKey ? 'arrow_active' : 'arrow'}>
+        {isArrow && (
+          <div className={isCurrentEventKey ? 'arrow_active' : 'arrow'}>
           <img src={arrow} alt="" />
-        </div>
+        </div>)
+        }
       </div>
     )
   }
@@ -178,7 +180,7 @@ const LayoutCrm = () => {
                   width: '100%',
                 }}
               >
-                <ContextAwareToggle icon={building} eventKey="0">
+                <ContextAwareToggle icon={building} eventKey="0" isArrow = {true}>
                   Клиенты
                 </ContextAwareToggle>
                 <Accordion.Collapse eventKey="0">
@@ -236,7 +238,7 @@ const LayoutCrm = () => {
                 >
                   Сотрудники
                 </ContextAwareToggle>
-                <Accordion.Collapse eventKey="1">
+                {/* <Accordion.Collapse eventKey="1">
                   <Card.Body>
                     <ButtonGroup
                       style={{
@@ -280,7 +282,7 @@ const LayoutCrm = () => {
                       ))}
                     </ButtonGroup>
                   </Card.Body>
-                </Accordion.Collapse>
+                </Accordion.Collapse> */}
               </Accordion>
             </div>
             {/* <div className='d-flex flex-column gap-2'>
