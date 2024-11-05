@@ -270,8 +270,15 @@ class OrdersPaymentAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
-        self.get_object(pk).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = self.get_object(pk)
+        orders_statuses = set(instance.orders.all().values_list('status', flat=True))
+        # Все заказы в статусе "создан"
+        if len(orders_statuses) == 1 and OrderStatus.created in orders_statuses:
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        # Все/некоторые заказы имеют статус отличный от "создан"
+        return Response('Невозможно удалить заказ', status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class NotificationFiscalizationAPIView(APIView):
