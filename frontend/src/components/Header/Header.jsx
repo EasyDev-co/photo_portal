@@ -21,6 +21,7 @@ export const Header = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const dispatch = useDispatch();
   const userData = useSelector(state => state.user.userData);
+  const [managedKindergarten, setManagedKindergarten] = useState(null);
   const refresh = useSelector(state => state.user.refresh);
   const accessStor = localStorage.getItem('access');
 
@@ -64,11 +65,14 @@ export const Header = () => {
         if (res.ok) {
           res.json()
             .then(res => {
+              console.log(res);
               dispatch(addUserData(res));
+              setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
             });
-        };
+        }
       });
   }, [accessStor, cookieData, dispatch, refresh]);
+
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -157,20 +161,30 @@ export const Header = () => {
           </div>
           {isAuth ?
             <div className={styles.rightBlock}>
-              <ul className={styles.userInfoList}>
+            <ul className={styles.userInfoList}>
+              <HeaderUserInfoItem
+                top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
+                ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
+                ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
+                bottom={localStorage.getItem('phone')}
+              />
+
+              {[2, 3].includes(parseInt(localStorage.getItem('role'))) && managedKindergarten ? (
                 <HeaderUserInfoItem
-                  top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
-                  ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
-                  ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
-                  bottom={localStorage.getItem('phone')}
+                  isKindergarten
+                  top={`${managedKindergarten.region.country}, ${managedKindergarten.region.name}`}
+                  bottom={managedKindergarten.name}
                 />
+              ) : (
                 <HeaderUserInfoItem
                   isKindergarten
                   top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
-                  ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
+                        ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
                   bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
                 />
-              </ul>
+              )}
+            </ul>
+
             </div> :
             <div className={styles.linkToAuth}>
               <Link to={'/sign-in'}>Войти</Link>

@@ -4,7 +4,7 @@ import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 export const getKindergartens = async ({access, name}) => {
-    const url = `${localUrl}/api/v1/kindergartens_search/?search=${name}`;
+    const url = `${localUrl}/api/v1/kindergartens/search/?search=${name}`;
 
     const response = await fetch(url, {
         headers: {
