@@ -27,7 +27,7 @@ class PhotoPrice(UUIDMixin):
     )
     region = models.ForeignKey(
         Region,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='photo_prices',
         verbose_name='Регион',
         null=True,

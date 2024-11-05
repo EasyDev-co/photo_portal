@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from apps.kindergarten.models.region import Region
-from apps.kindergarten.models.photo_price import PhotoPrice
+from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
 from apps.kindergarten.form import KindergartenForm
 
 from apps.kindergarten.models.kindergarten import Kindergarten
@@ -22,6 +22,11 @@ class KindergartenInline(admin.TabularInline):
 class PhotoPriceInline(admin.TabularInline):
     model = PhotoPrice
     extra = 0
+    readonly_fields = ['price', 'photo_type']
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Kindergarten)
@@ -100,3 +105,13 @@ class PhotoPriceAdmin(admin.ModelAdmin):
             )
             return
         super().save_model(request, obj, form, change)
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Исключение подарочных типов продукции из выбора"""
+        form = super().get_form(request, obj, **kwargs)
+        restricted_photo_types = [PhotoType.free_calendar, PhotoType.digital]
+        form.base_fields['photo_type'].choices = [
+            (choice_value, choice_display) for choice_value, choice_display in form.base_fields['photo_type'].choices
+            if choice_value not in restricted_photo_types
+        ]
+        return form
