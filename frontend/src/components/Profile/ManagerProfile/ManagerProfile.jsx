@@ -115,16 +115,17 @@ const ManagerProfile = () => {
                         data={stats.current_stats.average_order_value}
                     />
                 </div>
+                <div className={styles.profileWidget}>
+                    <StatisticItem
+                        label={'Итого руб.'}
+                        data={`${stats.current_stats.completed_orders} из ${stats.current_stats.total_orders}`}
+                    />
+                    <StatisticItem
+                        label={'Средний чек руб.'}
+                        data={'0.0'}
+                    />
+                </div>
                 <div className={styles.checkWrap}>
-                    <form className={styles.checkForm}>
-                        <Dropdown />
-                        <div>
-                            <MainButton
-                                value={'Скачать все чеки'}
-                            />
-                        </div>
-
-                    </form>
                     <div onClick={() => navigate('/orders_manager')}>
                         <MainButton
                             value={'Заказ для себя'}

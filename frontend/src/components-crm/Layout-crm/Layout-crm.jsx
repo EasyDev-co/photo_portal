@@ -91,7 +91,7 @@ const LayoutCrm = () => {
                 }}
                 onClick={() => navigate(-1)}
               >
-                Название садика
+                Назад
               </div>
             </>
           ) : (
