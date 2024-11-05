@@ -40,3 +40,15 @@ video{
 #qr-shaded-region{
   border-width: 50px !important;
 }
+
+.centered-button {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  max-width: 350px; /* or any width you prefer */
+  width: 100%;
+  min-width: 100px;
+  min-height: 50px;
+  max-height: 30px;
+  padding: 0 !important;
+}
