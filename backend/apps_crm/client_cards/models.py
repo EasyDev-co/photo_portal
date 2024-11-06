@@ -61,18 +61,17 @@ class ClientCard(models.Model):
 
     @property
     def manager_bonus(self):
-        try:
-            return self.responsible_manager.user.manager_bonuses.first().bonus_size
-        except AttributeError:
-            return
+        manager = getattr(self.kindergarten, 'manager', None)
+        if manager:
+            return getattr(manager, 'manager_percent', "Процент не указан")
+        return "Процент не указан"
 
     @property
     def promocode_size(self):
-        try:
-            return self.responsible_manager.user.promo_codes.first().discount_services
-        except AttributeError:
-            return
-
+        manager = getattr(self.kindergarten, 'manager', None)
+        if manager:
+            return getattr(manager, 'manager_discount', "Скидка не указана")
+        return "Скидка не указана"
 
 class Notes(models.Model):
     """Заметки"""

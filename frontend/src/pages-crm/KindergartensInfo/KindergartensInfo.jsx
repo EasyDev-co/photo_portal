@@ -150,7 +150,6 @@ const KindergartensInfo = () => {
                 console.error('Error fetching notes:', error)
             }
         }
-
         fetchClientCard()
         fetchClientCardTasks()
         fetchNotes()
@@ -199,7 +198,7 @@ const KindergartensInfo = () => {
                                     }}
                                     className="border-0 fw-600 p-0"
                                 >
-                                    Процент заведующих:
+                                    Процент заведующих: { clientCardData.manager_bonus }
                                 </CardHeader>
                                 <CardHeader
                                     style={{
@@ -207,7 +206,7 @@ const KindergartensInfo = () => {
                                     }}
                                     className="border-0 fw-600 p-0"
                                 >
-                                    Скидка:
+                                    Скидка: { clientCardData.promocode_size }
                                 </CardHeader>
                             </Card>
                         </div>
