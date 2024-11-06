@@ -29,19 +29,24 @@ const GalleryItem = ({orders}) => {
     };
 
     const handleDownload = () => {
-        activePhotos.forEach(photo => {
-            const a = document.createElement('a');
-            a.href = photo.photo_path;
-            console.log(photo.photo_path)
-            a.download = `${photo.photo_theme_name}_${photo.photo_theme_date}_${photo.number}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+        activePhotos.forEach((photo, index) => {
+            setTimeout(() => {
+                const a = document.createElement('a');
+                a.href = photo.photo_path;
+                a.download = `${photo.photo_theme_name}_${photo.photo_theme_date}_${photo.number}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                // Очистка выбранных фото после завершения скачивания последнего файла
+                if (index === activePhotos.length - 1) {
+                    setActivePhotos([]);
+                    setActiveIds([]);
+                }
+            }, index * 200); // Задержка в 200 мс между скачиваниями
         });
-        // Очистка выбранных фото после загрузки
-        setActivePhotos([]);
-        setActiveIds([]);
     };
+
 
     return (
         <>
