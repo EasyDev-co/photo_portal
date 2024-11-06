@@ -12,7 +12,6 @@ export const deleteCall = async (access, callID) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
         },
-        body: JSON.stringify(data)
 
     });
     return response;
