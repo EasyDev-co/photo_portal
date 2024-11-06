@@ -4,7 +4,7 @@ import calendar from '../../../assets/icons/calendar-event.svg'
 import people from '../../../assets/icons/people.svg'
 import { postCallWithToken } from '../../../http/client-cards/postCalls'
 
-const CallForm = ({ cardId, closeModal, responsible_manager, addTask }) => {
+const CallForm = ({ cardId, closeModal, responsible_manager, addCall }) => {
     const access = localStorage.getItem('access') // Get access token
 
   const [formState, setFormState] = useState({
@@ -49,7 +49,7 @@ const CallForm = ({ cardId, closeModal, responsible_manager, addTask }) => {
             const res = await response.json()
             console.log(res);
             
-            addTask(res)
+            addCall(res)
             closeModal()
             
           } else {
@@ -61,7 +61,6 @@ const CallForm = ({ cardId, closeModal, responsible_manager, addTask }) => {
       }
 
       postCall()
-      console.log(responsible_manager)
   }
   return (
     <Form>

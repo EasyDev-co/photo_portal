@@ -47,6 +47,9 @@ const KindergartensInfo = () => {
     const addTask = (item) => {
         setTasks([item, ...tasks])
     }
+    const addCall = (item) => {
+        setHistoryCalls([item, ...historyCalls])
+    }
     const editTask = (task) => {
         const updatedTasks = tasks.map(item =>
             item.id === task.id ? task : item
@@ -57,7 +60,10 @@ const KindergartensInfo = () => {
         const updatedTasks = tasks.filter(item => item.id !== taskId);
         setTasks(updatedTasks)
     }
-
+    const deleteItemCall = (callId) => {
+        const updatedCalls = historyCalls.filter(item => item.id !== callId);
+        setHistoryCalls(updatedCalls)
+    }
     const deleteCard = () => {
         const deleteItem = async () => {
             try {
@@ -104,7 +110,6 @@ const KindergartensInfo = () => {
                 ) // Use the function to fetch data
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
-                    console.log(data)
 
                     setTasks(data.reverse()) // Store the data in state
                 } else {
@@ -136,9 +141,8 @@ const KindergartensInfo = () => {
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
 
-                    console.log(data);
-
-                    setHistoryCalls(data) // Store the data in state
+                    setHistoryCalls(data)
+                    // setHistoryCalls([data, ...historyCalls])
                 } else {
                     console.error('Failed to fetch notes')
                 }
@@ -272,7 +276,8 @@ const KindergartensInfo = () => {
                                 id={clientCardData.id}
                                 itemName={clientCardData.name}
                                 responsible_manager={clientCardData.responsible_manager.id}
-                                addTask={addTask}
+                                addCall={addCall}
+                                deleteItemCall = {deleteItemCall}
                             />
                         </div>
                     </div>
