@@ -426,20 +426,20 @@ const OrderCard = ({
           >
             Фотосессии
           </Card.Header>
-          <div className="d-flex justify-content-between px-4">
-            <div className="text-secondary fw-600" style={{ fontSize: '15px' }}>
-              Дата
-            </div>
-          </div>
+
           <Card.Body
             className="p-0 gap-2 d-flex flex-column scroll-body"
-            style={{
-              height: '230px',
-            }}
+
           >
             {photoThemes.all_photo_themes.length > 0 ? (
               photoThemes.all_photo_themes.map((item, i) => {
                 return (
+                  <>
+                  <div className="d-flex justify-content-between px-4">
+                    <div className="text-secondary fw-600" style={{ fontSize: '15px' }}>
+                      Дата
+                    </div>
+                  </div>
                   <div
                     key={i}
                     className="call-item pe-5"
@@ -447,6 +447,7 @@ const OrderCard = ({
                   >
                     {formatDate(item.date_start)}
                   </div>
+                  </>
                 )
               })
             ) : (
@@ -487,9 +488,6 @@ const OrderCard = ({
           </div>
           <Card.Body
             className="p-0 gap-2 d-flex flex-column scroll-body"
-            style={{
-              height: '230px',
-            }}
           >
             {historyCalls &&
               historyCalls.map((item, i) => {

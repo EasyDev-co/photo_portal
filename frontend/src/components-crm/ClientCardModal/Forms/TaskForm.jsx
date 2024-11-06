@@ -3,9 +3,11 @@ import { Form, Button, ModalFooter } from 'react-bootstrap'
 import calendar from '../../../assets/icons/calendar-event.svg'
 import people from '../../../assets/icons/people.svg'
 import { postTaskWithToken } from '../../../http/client-cards/postTask'
+import DatePicker from '../../DatePicker/DatePicker'
 
 const TaskForm = ({ cardId, closeModal, addTask }) => {
     const access = localStorage.getItem('access') // Get access token
+    const [isActive, setIsActive] = useState(false)
 
   const [formState, setFormState] = useState({
     text: '',
@@ -82,6 +84,17 @@ const TaskForm = ({ cardId, closeModal, addTask }) => {
 
 
     <Form.Group className="mb-3">
+        {/* <DatePicker
+                label={'Выберите дату'}
+                placeholder={'Не указано'}
+                setIsActive={setIsActive}
+                img={calendar}
+                isActive={isActive}
+                navTitles={{
+                  days: 'MMMM <i>yyyy</i>',
+                  months: 'yyyy',
+                }}
+              /> */}
       <div className="form-control-wrap">
         <Form.Label className="text-secondary">Выберите дату</Form.Label>
         <Form.Control
