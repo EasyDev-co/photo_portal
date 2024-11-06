@@ -12,8 +12,6 @@ const Employees = () => {
 
     const [employeeList, setEmployeeList] = useState([])
 
-    console.log(employeeList);
-
     const itemsPerPage = 12; // Количество карточек на странице
     const [currentPage, setCurrentPage] = useState(1);
 
