@@ -50,7 +50,7 @@ class KindergartenAdmin(admin.ModelAdmin):
     def get_fields(self, request, obj=None):
         if obj:
             return 'region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload'
-        return 'region', 'locality', 'name', 'code', 'has_photobook', 'file_upload'
+        return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
         form = KindergartenForm(initial={'kindergarten_id': obj.id})

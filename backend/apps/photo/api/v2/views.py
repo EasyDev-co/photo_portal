@@ -141,8 +141,9 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             return limit_response
 
         # Сохранение родителя для пробника
-        photo_line.parent = user
-        photo_line.save()
+        if photo_line.parent is None:
+            photo_line.parent = user
+            photo_line.save()
 
         # Сериализация и возврат данных
         serializer = PhotoLineSerializer(photo_line)
