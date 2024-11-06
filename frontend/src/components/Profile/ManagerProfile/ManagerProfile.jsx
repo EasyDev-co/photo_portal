@@ -3,20 +3,20 @@
 import styles from "./ManagerProfile.module.css";
 // import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import StatisticItem from "./StatisticItem";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import PaymentDiagram from "../../Payment/PaymentDiagram/PaymentDiagram";
 import Timer from "../../Payment/PaymentTimer/Timer";
 import MainButton from "../../Buttons/MainButton";
 import Dropdown from "./Dropdown/Dropdown";
-import { fetchGetStatsWithTokenInterceptor, getStats } from "../../../http/gallerey/getStats";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import {fetchGetStatsWithTokenInterceptor, getStats} from "../../../http/gallerey/getStats";
+import {useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
 
-import { getNearestDate } from "../../Orders/utils/utils";
-import { fetchPhotoLineListWithTokenInterceptor } from "../../../http/photo/photoLineList";
-import { managerBonus } from "../../../http/gallerey/managerBonus";
+import {getNearestDate} from "../../Orders/utils/utils";
+import {fetchPhotoLineListWithTokenInterceptor} from "../../../http/photo/photoLineList";
+import {managerBonus} from "../../../http/gallerey/managerBonus";
 // Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react';
+import {Swiper, SwiperSlide} from 'swiper/react';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -25,9 +25,8 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 
-
 // import required modules
-import { EffectFlip, Pagination, Navigation } from 'swiper/modules';
+import {EffectFlip, Pagination, Navigation} from 'swiper/modules';
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
@@ -35,13 +34,35 @@ const ManagerProfile = () => {
     const navigate = useNavigate()
     const [bonus, setBonus] = useState([])
     const [stats, setStats] = useState({
-        current_stats: {
-            total_orders: 0,
-            completed_orders: 0,
-            average_order_value: "0.00",
-            total_amount: "0.00"
+            current_stats: {
+                total_orders: 0,
+                completed_orders: 0,
+                average_order_value: "0.00",
+                total_amount: "0.00"
+            },
+            past_stats: [
+                {
+                    kindergarten: {
+                        id: "",
+                        region: {
+                            id: "",
+                            country: "",
+                            name: ""
+                        },
+                        name: ""
+                    },
+                    photo_theme: {
+                        id: "",
+                        name: "",
+                        date_start: "",
+                        date_end: ""
+                    },
+                    ransom_amount: 0
+                }
+            ],
+            total_ransom_amount: 0,
+            average_ransom_amount: 0.0
         }
-    }
     );
 
     useEffect(() => {
@@ -115,25 +136,36 @@ const ManagerProfile = () => {
                         data={stats.current_stats.average_order_value}
                     />
                 </div>
+                {stats.past_stats && Array.isArray(stats.past_stats) && stats.past_stats.length > 0 && (
+                    <div className={styles.profileWidget}>
+                        {stats.past_stats.map((item, index) => (
+                            <>
+                            <StatisticItem
+                                key={index}
+                                label={`Тема фотосессии`}
+                                data={item.photo_theme.name}
+                            />
+                            <StatisticItem
+                                key={index}
+                                label={`Сумма выкупа`}
+                                data={item.ransom_amount}
+                            />
+                            </>
+                        ))}
+                    </div>
+                )}
                 <div className={styles.profileWidget}>
                     <StatisticItem
                         label={'Итого руб.'}
-                        data={`${stats.current_stats.completed_orders} из ${stats.current_stats.total_orders}`}
+                        data={`${stats.total_ransom_amount}`}
                     />
                     <StatisticItem
-                        label={'Средний чек руб.'}
-                        data={'0.0'}
+                        label={'Средняя выручка за фотосессию'}
+                        data={`${stats.average_ransom_amount}`}
                     />
                 </div>
-                <div className={styles.checkWrap}>
-                    <div onClick={() => navigate('/orders_manager')}>
-                        <MainButton
-                            value={'Заказ для себя'}
-                        />
-                    </div>
-
-                </div>
             </div>
+
             {bonus.length !== 0 &&
                 <div className={styles.paymentTimerWrap}>
                     <Swiper

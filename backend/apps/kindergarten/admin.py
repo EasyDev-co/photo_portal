@@ -5,6 +5,8 @@ from django.utils.safestring import mark_safe
 from apps.kindergarten.models.region import Region
 from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
 from apps.kindergarten.form import KindergartenForm
+from .models import Ransom
+
 
 from apps.kindergarten.models.kindergarten import Kindergarten
 
@@ -120,3 +122,15 @@ class PhotoPriceAdmin(admin.ModelAdmin):
             if choice_value not in restricted_photo_types
         ]
         return form
+
+
+@admin.register(Ransom)
+class RansomAdmin(admin.ModelAdmin):
+    list_display = ('kindergarten', 'photo_theme', 'ransom_amount')
+    list_filter = ('kindergarten', 'photo_theme')
+    list_per_page = 20  # Устанавливает количество записей на странице
+
+    # Настройка отображения связанных полей
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.select_related('kindergarten', 'photo_theme')
