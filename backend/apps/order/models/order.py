@@ -29,7 +29,7 @@ class Order(TimeStampedMixin):
         related_name="orders",
         verbose_name="Пользователь",
     )
-    photo_line = models.OneToOneField(
+    photo_line = models.ForeignKey(
         PhotoLine,
         on_delete=models.PROTECT,
         related_name="orders",
