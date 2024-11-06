@@ -72,6 +72,18 @@ class User(UUIDMixin, AbstractUser):
         blank=True,
         verbose_name='День рождения'
     )
+    manager_discount = models.DecimalField(
+        verbose_name="Скидка заведующей",
+        decimal_places=2,
+        max_digits=3,
+        default=0,
+    )
+    manager_percent = models.DecimalField(
+        verbose_name="Процент заведующей",
+        decimal_places=2,
+        max_digits=3,
+        default=0,
+    )
 
     objects = UserManager()
 
