@@ -17,7 +17,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
             <PhotoCard
               blocksId={blocksId}
               photoId={photo.id}
-              photo={photo.photo}
+              photo={photo.watermarked_photo_path}
               number={photo.number}
               onChangeHandler={onChangeHandler}
               inputValue={inputValue}
