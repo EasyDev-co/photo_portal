@@ -24,7 +24,8 @@ const OrderCard = ({
   children_for_photoshoot,
   garden_details,
   responsible_manager,
-  addTask
+  addCall,
+  deleteItemCall
 }) => {
   const [isActive, setIsActive] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
@@ -57,28 +58,24 @@ const OrderCard = ({
     setShowModalCall(false)
   }
 
-  // const handleDeleteCall  =()=>{
-  //   const deleteCall = async () => {
-  //       try {
-  //         const response = await deleteCallWithToken(access, taskId) // Use the function to fetch data
-  //         if (response.ok) {
-  //           // setFormState(({
-  //           //     text: '',
-  //           //     date_end: '',
-  //           //     task_type: '',
-  //           //     manager: '',
-  //           //   }))
-  //           deleteItem(taskId)
-  //         } else {
-  //           console.error('Failed to delete task')
-  //         }
-  //       } catch (error) {
-  //         console.error('Error deleting task:', error)
-  //       }
-  //     }
+  const handleDeleteCall = (callId)=>{
+    const deleteCall = async () => {
+        try {
+          const response = await deleteCallWithToken(access, callId) // Use the function to fetch data
+          if (response.ok) {
+
+            deleteItemCall(callId);
+          } else {
+            console.error('Failed to delete task')
+          }
+        } catch (error) {
+          console.error('Error deleting task:', error)
+        }
+      }
   
-  //     deleteCall()
-  // }
+      deleteCall()
+  }
+
 
   const handleInfoShow = () => {
     setShowInfo((prev) => !prev)
@@ -129,7 +126,6 @@ const OrderCard = ({
         const response = await patchClientCardWithToken(access, id, data)
         if (response.ok) {
           const data = await response.json()
-          console.log(data)
         } else {
           console.error('Failed to patch single client card')
         }
@@ -147,7 +143,7 @@ const OrderCard = ({
         show={showModalCall}
         handleClose={handleCloseCall}
       >
-        <CallForm responsible_manager={responsible_manager} closeModal={handleCloseCall} cardId={id} addTask={addTask} />
+        <CallForm responsible_manager={responsible_manager} closeModal={handleCloseCall} cardId={id} addCall={addCall} />
       </ClientModal>
       <Card
         className="border-0 d-flex flex-column"
@@ -511,11 +507,13 @@ const OrderCard = ({
                         : item.call_status==2 ? (<Badge bg="success text-black">Записан на фотосессию</Badge>) 
                         : (<Badge bg="warning text-black">Отправлено коммерческое предложение</Badge>)}
                       </div>
-                      <img 
-                      className='delete-icon_call' 
-                      src={deleteIcon} 
-                      alt='Мусорная корзина'
-                      ></img>
+                      <button onClick={() => handleDeleteCall(item.id)}>
+                        <img 
+                        className='delete-icon_call' 
+                        src={deleteIcon} 
+                        alt='Мусорная корзина'
+                        ></img>
+                      </button>
                     </div>
                   </div>
                 )
