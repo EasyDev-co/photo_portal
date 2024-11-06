@@ -1,12 +1,17 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Card, Button, Form } from 'react-bootstrap'
+
+import { fetchsingleEmployeeWithTokenInterceptor } from '../../http/employees/getSingleEmployee'
 
 const EditEmployee = () => {
   const navigate = useNavigate()
 
+  const {employeeId} = useParams()
+  const access = localStorage.getItem('access') 
+
   const [personalInfo, setPersonalInfo] = useState({
-    name: '',
+    first_name: '',
     employee_role: '',
     last_name: '',
     email: '',
@@ -33,6 +38,28 @@ const EditEmployee = () => {
       [name]: value,
     }))
   }
+
+  useEffect(()=>{
+    const fetchEmployee = async () => {
+      try {
+          const response = await fetchsingleEmployeeWithTokenInterceptor(
+              {access,
+              employeeId}
+          ) 
+          if (response.ok) {
+              const data = await response.json() 
+              setPersonalInfo(data.user)
+              setSecurityInfo({...securityInfo, login:data.user.email})
+          } else {
+              console.error('Failed to fetch employee')
+          }
+      } catch (error) {
+          console.error('Error fetching single employee:', error)
+      }
+  }
+
+  fetchEmployee()
+  },[access, employeeId])
 
   return (
     <div className="page-crm">
@@ -65,8 +92,8 @@ const EditEmployee = () => {
                     <Form.Control
                       className="shadow-none ps-3"
                       placeholder="Не указано"
-                      name="name"
-                      value={personalInfo.name}
+                      name="first_name"
+                      value={personalInfo.first_name}
                       onChange={handlePersonalInfoChange}
                     />
                   </Form.Group>
