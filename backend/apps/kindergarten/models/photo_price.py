@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 from apps.kindergarten.models.region import Region
@@ -45,6 +46,13 @@ class PhotoPrice(UUIDMixin):
     class Meta:
         verbose_name = 'Цена фото'
         verbose_name_plural = 'Цены фото'
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and PhotoPrice.objects.filter(region=self.region, photo_type=self.photo_type).exists():
+            raise ValidationError(
+                f"Запись с типом фото '{self.get_photo_type_display()}' и регионом '{self.region}' уже существует."
+            )
+        super().save(*args, **kwargs)
 
     def get_price_for_region(self, region_name):
         """Возвращает цену для указанного региона или общую цену, если регион не Москва/СПБ."""

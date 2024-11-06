@@ -53,7 +53,7 @@ const ManagerProfile = () => {
                     },
                     photo_theme: {
                         id: "",
-                        name: "",
+                        name: "У детского сада не было фотосессий",
                         date_start: "",
                         date_end: ""
                     },
