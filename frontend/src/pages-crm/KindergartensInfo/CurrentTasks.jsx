@@ -72,9 +72,6 @@ const CurrentTasks = ({ tasks, formatDate, addTask, editTask, deleteTask  }) => 
 
         <Card.Body
           className="p-0 gap-2 d-flex flex-column scroll-body"
-          style={{
-            height: '240px',
-          }}
         >
           {tasks
             ? tasks.map((elem) => {
