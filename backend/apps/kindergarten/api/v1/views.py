@@ -51,26 +51,23 @@ class KindergartenStatsAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # достаем текущую фототему
+        # Получаем текущую фототему
         current_photo_theme = PhotoTheme.objects.filter(
             date_end__gte=django_timezone.now()
         )
 
-        # достаем все заказы для текущей фототемы
+        # Получаем все заказы для текущей фототемы
         orders = Order.objects.filter(
             photo_line__kindergarten=kindergarten,
             photo_line__photo_theme__in=current_photo_theme
         )
 
+        # Статистика текущих заказов
         current_stats: dict = (
-            # получаем общее количество заказов в данном д/с
                 orders.aggregate(
                     total_orders=Count('id')
                 )
-                # объединяем словари
                 |
-                # получаем все завершенные/оплаченные заказы в данном д/с,
-                # общую сумму этих заказов и среднюю сумму чека
                 orders.filter(
                     status__in=(OrderStatus.completed, OrderStatus.paid_for)
                 ).aggregate(
@@ -80,17 +77,23 @@ class KindergartenStatsAPIView(APIView):
                 )
         )
 
-        # извлекаем суммы выкупа прошедших фототем для данного д/с
-        ransom_objects = Ransom.objects.filter(
-            kindergarten=kindergarten,
-        )
-
+        # Статистика выкупов
+        ransom_objects = Ransom.objects.filter(kindergarten=kindergarten)
         ransom_serializer = RansomSerializer(ransom_objects, many=True)
+
+        # Получаем значения общей и средней суммы выкупа
+        total_ransom_amount = ransom_objects.aggregate(Sum('ransom_amount'))['ransom_amount__sum'] or 0
+        average_ransom_amount = ransom_objects.aggregate(Avg('ransom_amount'))['ransom_amount__avg'] or 0
+
+        # Сериализуем данные
         current_serializer = KindergartenStatsSerializer(data=current_stats)
         current_serializer.is_valid(raise_exception=True)
+
         return Response({
             'current_stats': current_serializer.data,
             'past_stats': ransom_serializer.data,
+            'total_ransom_amount': total_ransom_amount,
+            'average_ransom_amount': round(average_ransom_amount, 2),
         }, status=status.HTTP_200_OK)
 
 

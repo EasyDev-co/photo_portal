@@ -82,6 +82,7 @@ class HistoryCallSerializer(BaseClientCardSerializer):
     class Meta:
         model = HistoryCall
         fields = [
+            'id',
             'call_status',
             'created_at',
             'author',
