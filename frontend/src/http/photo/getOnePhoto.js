@@ -1,7 +1,7 @@
 import { localUrl } from "../../constants/constants";
 
 export const getOnePhoto = async (num,access) => {
-    const url = `${localUrl}/api/v1/photo/photo_line_by_numbers/`;
+    const url = `${localUrl}/api/v2/photo/photo_line_by_numbers/`;
     
     const sendData = {
         numbers: num

@@ -138,10 +138,10 @@ export const Registration = () => {
       text: []
     })
   }
-  
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const regex = /^\d+(-\d+){5}$/;
+    const regex = /^(\d+|(\d+(([-,\s]| и? )\d+){5}))$/;
 
     if (inputValue.password !== inputValue.repeatPassword) {
       setError({ repeatPass: ['Пароли не совпадают!'] })
@@ -164,7 +164,7 @@ export const Registration = () => {
           )
           setResponseData(data);
           dispatch(setPhotoNumbers(
-            inputValue.pictureNumbers.split('-').map(elem => {
+            inputValue.pictureNumbers.split(/[-,\sи]+/).map(elem => {
               return Number(elem)
             })
           ))
@@ -179,7 +179,8 @@ export const Registration = () => {
         console.log(error)
       }
     } else {
-      setError({ pictureNumbers: ['Неправильный формат ввода. Введите 6 номеров фото через дефис.'] })
+      setError({ pictureNumbers: ['Неправильный формат ввода.' +
+          ' Введите 1 или 6 номеров фото через дефис, запятую, пробел или "и".'] })
     }
   }
 
