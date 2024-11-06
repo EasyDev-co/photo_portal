@@ -2,15 +2,20 @@
 import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
+// author, call_status, created_at, client_card
 
-export const postCall = async (access, data) => {
+export const postCall = async ({access, data}) => {
     const url = `${localUrl}/api/crm/v1/client_cards/history-calls/`;
 
     const response = await fetch(url, {
         method: 'POST', 
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${access}`
+            'Authorization': `Bearer ${access}`,
+            // "call_status": {call_status},
+            // "created_at": {created_at},
+            // "author": {author},
+            // "client_card": {client_card}
         },
         body: JSON.stringify(data)
 

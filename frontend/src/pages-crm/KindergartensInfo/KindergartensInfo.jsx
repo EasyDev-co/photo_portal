@@ -88,7 +88,6 @@ const KindergartensInfo = () => {
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
                     setClientCardData(data) // Store the data in state
-                    console.log(data)
                 } else {
                     console.error('Failed to fetch single client card')
                 }
@@ -105,6 +104,7 @@ const KindergartensInfo = () => {
                 ) // Use the function to fetch data
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
+                    console.log(data)
 
                     setTasks(data.reverse()) // Store the data in state
                 } else {
@@ -135,6 +135,8 @@ const KindergartensInfo = () => {
                 const response = await fetchHistoryCallsWithTokenInterceptor(access, id) // Use the function to fetch data
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
+
+                    console.log(data);
 
                     setHistoryCalls(data) // Store the data in state
                 } else {
@@ -250,14 +252,6 @@ const KindergartensInfo = () => {
                                                     months: 'yyyy',
                                                 }}
                                             />
-                                            {/* <Form.Label className="text-secondary">
-                                                Дедлайн
-                                            </Form.Label>
-                                            <Form.Control
-                                                className="shadow-none ps-3"
-                                                placeholder="Не указано"
-                                                value={formatDate(clientCardData.photo_themes.current_photo_theme.date_end)}
-                                            /> */}
                                         </Form.Group>
                                     </Form>
                                 </Card.Body>
@@ -277,6 +271,8 @@ const KindergartensInfo = () => {
                                 region={clientCardData.kindergarten.region.country}
                                 id={clientCardData.id}
                                 itemName={clientCardData.name}
+                                responsible_manager={clientCardData.responsible_manager.id}
+                                addTask={addTask}
                             />
                         </div>
                     </div>
