@@ -17,10 +17,10 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         max_length=255,
         verbose_name='Название'
     )
-    kindergarten = models.ManyToManyField(
+    kindergartens = models.ManyToManyField(
         Kindergarten,
         verbose_name="Детский сад",
-        related_name="kindergartens",
+        related_name="photo_themes",
         blank=True,
         null=True,
     )

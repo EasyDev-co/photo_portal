@@ -1,5 +1,6 @@
 from rest_framework.authentication import SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -38,7 +39,7 @@ class PhotoUploadView(APIView):
             properties={
                 'numbers': openapi.Schema(
                     type=openapi.TYPE_STRING,
-                    description="Номера кадров, разделенные знаком '-', например, '10-11-12-13-14-15'"
+                    description="Список номеров кадров."
                 )
             },
             required=['numbers']
@@ -60,8 +61,9 @@ class PhotoUploadView(APIView):
     def save_photos(self, instance, photos, photo_theme):
         with transaction.atomic():
             last_photo_number = Photo.objects.filter(
-                photo_line__kindergarten=instance
-            ).aggregate(Max('number'))['number__max'] or 0
+                photo_line__kindergarten=instance,
+                photo_line__photo_theme=photo_theme
+            ).aggregate(Max('number'))['number__max'] or 6
             next_photo_number = last_photo_number + 1
 
             groups = self._grouper(photos, 6)
@@ -98,19 +100,31 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         """Получение фото-линии по номерам фотографий"""
 
         user = request.user
-        numbers_str = request.data.get('numbers', '')
+        numbers_list = request.data.get('numbers', '')  # список из 1 или 6 элементов
+        kindergarten = user.kindergarten.all().first()
 
         # Валидация номеров фотографий
-        validation_response = self.validate_numbers(numbers_str)
+        validation_response = self.validate_numbers(numbers_list)
         if isinstance(validation_response, Response):
             return validation_response
         photo_numbers = validation_response
 
+        # Проверка существования д/с
+        active_photo_theme_response = self.get_active_photo_theme(kindergarten)
+        if isinstance(active_photo_theme_response, Response):
+            return active_photo_theme_response
+        active_photo_theme = active_photo_theme_response
+
         # Получение фотографий и проверка их целостности
-        photos_response = self.get_photos(photo_numbers)
+        photos_response = self.get_photos(photo_numbers, active_photo_theme)
         if isinstance(photos_response, Response):
             return photos_response
-        photos, photo_line = photos_response
+        photo_line = photos_response
+
+        # Проверка наличия связи пробника с д/с и активной фотосессией
+        photo_line_response = self.validate_photo_line(kindergarten, active_photo_theme, photo_line)
+        if isinstance(photo_line_response, Response):
+            return photo_line_response
 
         # Проверка прав доступа пользователя к фото линии
         permission_response = self.check_photo_line_permissions(photo_line, user)
@@ -127,24 +141,28 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if isinstance(limit_response, Response):
             return limit_response
 
+        # Сохранение родителя для пробника
+        if photo_line.parent is None:
+            photo_line.parent = user
+            photo_line.save()
+
         # Сериализация и возврат данных
         serializer = PhotoLineSerializer(photo_line)
         return Response(serializer.data)
 
     @staticmethod
-    def validate_numbers(numbers_str):
+    def validate_numbers(photo_numbers):
         """Валидация строки с номерами фотографий"""
-        if not numbers_str:
+        if not photo_numbers:
             return Response(
                 {'message': 'Необходимо указать номера фотографий.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        photo_numbers = numbers_str.strip().split('-')
 
         # Проверка, что указано ровно 6 номеров
-        if len(photo_numbers) != 6:
+        if len(photo_numbers) != 6 and len(photo_numbers) != 1:
             return Response(
-                {'message': 'Должно быть ровно 6 номеров фотографий.'},
+                {'message': 'Необходимо указать 1 или 6 номеров фотографий.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -174,9 +192,19 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         return photo_numbers
 
     @staticmethod
-    def get_photos(photo_numbers):
-        """Получение фотографий и проверка их принадлежности к одной фотолинии"""
-        photos = Photo.objects.filter(number__in=photo_numbers)
+    def get_photos(photo_numbers, active_photo_theme):
+        """Получение фотографий и проверка их принадлежности к одному пробнику"""
+        if len(photo_numbers) == 1:
+            photo_line = Photo.objects.get(
+                number=photo_numbers[0],
+                photo_line__photo_theme=active_photo_theme
+            ).photo_line
+            return photo_line
+
+        photos = Photo.objects.filter(
+            number__in=photo_numbers,
+            photo_line__photo_theme=active_photo_theme
+        )
 
         # Проверка, что найдены все 6 фотографий
         if photos.count() != 6:
@@ -185,30 +213,33 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Проверка, что все фотографии принадлежат одной фотолинии
+        # Проверка, что все фотографии принадлежат одному пробнику
         photo_line_ids = photos.values_list('photo_line', flat=True).distinct()
         if photo_line_ids.count() != 1:
             return Response(
-                {'message': 'Фотографии не принадлежат одной фотолинии.'},
+                {'message': 'Фотографии не принадлежат одному пробнику.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         photo_line = get_object_or_404(PhotoLine, pk=photo_line_ids.first())
-        return photos, photo_line
+        return photo_line
 
     @staticmethod
     def check_photo_line_permissions(photo_line, user):
-        """Проверка, что пользователь имеет доступ к фотолинии"""
+        """Проверка, что пользователь имеет доступ к пробнику"""
         if photo_line.kindergarten not in user.kindergarten.all():
             return Response(
-                {'message': 'Фотолиния не относится к вашему детскому саду'},
+                {'message': 'Пробник не относится к вашему детскому саду'},
                 status=status.HTTP_403_FORBIDDEN,
             )
         return None
 
     @staticmethod
     def check_photo_numbers_in_line(photo_numbers, photo_line):
-        """Проверка, что номера фотографий соответствуют номерам в фотолинии"""
+        """Проверка, что номера фотографий соответствуют номерам в пробнике"""
+        if len(photo_numbers) == 1:
+            return None
+
         numbers_in_photo_line = list(
             photo_line.photos.values_list('number', flat=True)
         )
@@ -237,6 +268,30 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         # Уменьшаем счетчик и сохраняем
         user_photo_count.count -= 1
         user_photo_count.save()
+        return None
+
+    @staticmethod
+    def get_active_photo_theme(kindergarten):
+        active_photo_themes = kindergarten.photo_themes.filter(is_active=True)
+        if active_photo_themes.count() != 1:
+            raise ValidationError('У д/с более одной активной фототемы')
+
+        return active_photo_themes[0]
+
+    @staticmethod
+    def validate_photo_line(kindergarten, active_photo_theme, photo_line):
+        if kindergarten != photo_line.kindergarten:
+            return Response(
+                {'message': 'Пробник не относится к вашему детскому саду'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if photo_line.photo_theme != active_photo_theme:
+            return Response(
+                {'message': 'Пробник не относится к текущей фотосессии.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         return None
 
 
@@ -276,7 +331,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         # Проверка, что родитель принадлежит тому же детскому саду
         if parent.kindergarten != kindergarten:
             return Response(
-                {'message': 'Родитель и фотолиния принадлежат разным детским садам.'},
+                {'message': 'Родитель и пробник принадлежат разным детским садам.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
