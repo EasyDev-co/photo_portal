@@ -135,14 +135,24 @@ class HistoryCall(models.Model):
 
 class TaskStatus(models.IntegerChoices):
     OPEN = 1, "Открыта"
-    IN_WORK = 2, "В работе"
-    DONE = 3, "Готово"
+    DONE = 2, "Выполнена"
 
 
 class TaskType(models.IntegerChoices):
     CALL = 1, "Звонок"
-    # TODO Уточнить еще статусы задачи
+    COLLECTING_PAYMENT_SEND_LINK = 2, "Сбор оплаты+ отправка ссылок"
+    ACCEPT_ORDER = 3, "Принять заказ",
+    CALL_COLD_LISTS = 4, "Позвонить холодный/списки"
+    CHECK_SENDING_SAMPLE = 5, "Проверить отправку образцов, Готовые фото."
+    WARM_KINDERGARTENS = 6, "Теплые сады"
+    REMIND_ABOUT_APPOINTMENT = 7, "Напомнить о записи"
+    CALL_KP_CHECK_WATS_APP = 8, "Позвонить по КП, Проверить смс по Вотсапп"
 
+
+class TaskManagerReview(models.IntegerChoices):
+    ACCEPT = 1, "Принять"
+    FAIL = 2, "Провалить"
+    TO_BE_FINALIZED = 3, "Доработать"
 
 class ClientCardTask(models.Model):
     """Задачи к карточке клиентов"""
@@ -150,7 +160,15 @@ class ClientCardTask(models.Model):
         Employee,
         verbose_name="Автор задачи",
         on_delete=models.CASCADE,
-        related_name="client_card_tasks"
+        related_name="authored_client_card_tasks"
+    )
+    executor = models.ForeignKey(
+        Employee,
+        verbose_name="Исполнитель",
+        on_delete=models.CASCADE,
+        related_name="executed_client_card_tasks",
+        null=True,
+        blank=True
     )
     client_card = models.ForeignKey(
         ClientCard,
@@ -158,8 +176,10 @@ class ClientCardTask(models.Model):
         verbose_name="Карточка клиента",
         related_name="client_card_task",
         null=True,
+        blank=True,
     )
-    text = models.TextField(max_length=1024, verbose_name="Описание")
+    text = models.TextField(max_length=2048, verbose_name="Описание", null=True, blank=True)
+    revision_comment = models.TextField(max_length=2048, verbose_name="", null=True, blank=True)
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Время создания'
@@ -171,6 +191,34 @@ class ClientCardTask(models.Model):
         verbose_name="Тип задачи", choices=TaskType.choices, default=TaskType.CALL
     )
     date_end = models.DateTimeField(verbose_name="Дата окончания")
+
+    @property
+    def author_fi(self) -> str:
+        """Возвращает имя и фамилию автора задачи, если они существуют."""
+        if self.author and self.author.user:
+            first_name = self.author.user.first_name or "Без имени"
+            last_name = self.author.user.last_name or "Без фамилии"
+            return f"{first_name} {last_name}"
+        return "Автор не указан"
+
+    @property
+    def executor_fi(self) -> str:
+        """Возвращает имя и фамилию исполнителя задачи, если они существуют."""
+        if self.executor and self.executor.user:
+            first_name = self.executor.user.first_name or "Без имени"
+            last_name = self.executor.user.last_name or "Без фамилии"
+            return f"{first_name} {last_name}"
+        return "Исполнитель не указан"
+
+    @property
+    def task_status_name(self) -> str:
+        """Возвращает название текущего статуса задачи."""
+        return self.get_task_status_display()
+
+    @property
+    def task_type_name(self) -> str:
+        """Возвращает название текущего типа задачи."""
+        return self.get_task_type_display()
 
     class Meta:
         verbose_name = 'Задача'

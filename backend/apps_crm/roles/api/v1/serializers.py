@@ -33,3 +33,15 @@ class EmployeeAndUserSerializer(serializers.ModelSerializer):
         user = User.objects.create(**user_data)
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
+
+
+class EmployeeWithoutSinorManagerSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name', 'status', 'employee_role']
+
+    def get_full_name(self, obj):
+        """Возвращает полное имя, объединяя first_name и last_name пользователя"""
+        return f"{obj.user.first_name} {obj.user.last_name}"

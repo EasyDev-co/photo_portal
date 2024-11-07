@@ -47,4 +47,3 @@ class Notification(UUIDMixin, TimeStampedMixin):
 
     def __str__(self):
         return f"Уведомление для {self.user} по {self.content_object}"
-
