@@ -5,18 +5,32 @@ import { Button, Pagination } from "react-bootstrap";
 
 import { fetchEmployeeskWithTokenInterceptor } from "../../http/employees/getEmployeeList";
 import EmployeeCard from "../../components-crm/EmployeeCard/EmployeeCard";
+import { fetchAllTaskWithTokenInterceptor } from "../../http/client-cards/getAllTasks";
+import TaskCard from "../../components-crm/TaskCard/TaskCard";
+import ClientModal from "../../components-crm/ClientCardModal/ClientModal";
+import ClientCardForm from "../../components-crm/ClientCardModal/Forms/ClientCardForm";
+import BasicTaskForm from "../../components-crm/ClientCardModal/Forms/BasicTaskForm";
 
 const Tasks = () => {
     const navigate = useNavigate()
     const access = localStorage.getItem('access')
-
     const [tasksList, setTasksList] = useState([])
-
     const itemsPerPage = 12; // Количество карточек на странице
     const [currentPage, setCurrentPage] = useState(1);
-
     const totalItems = tasksList.length; // Общее количество карточек
     const totalPages = Math.ceil(totalItems / itemsPerPage); // Общее количество страниц
+    const [isOpen, setIsOpen] = useState(false)
+
+    const handleShowModal = () => {
+      setIsOpen(true)
+    }
+    const handleCloseModal = () => {
+      setIsOpen(false)
+    }
+
+    const handleAddTaskCard = (card)=>{
+        setTasksList([tasksList,...tasksList])
+      }
 
     // Функция для получения карточек на текущей странице
     const paginate = (array, page_number, page_size) => {
@@ -29,40 +43,49 @@ const Tasks = () => {
         setCurrentPage(pageNumber);
     };
 
-    useEffect(()=>{
-        const fetchList = async () => {
-            try {
-              const response = await fetchEmployeeskWithTokenInterceptor({access})
-              if (response.ok) {
-                const data = await response.json() // Parse the JSON response
-                setTasksList(data.reverse()) // Update state with fetched data
-              } else {
-                console.error('Failed to fetch client cards')
-              }
-            } catch (error) {
-              console.error('Error fetching client cards:', error)
+
+    useEffect(() => {
+        const fetchAllTasks = async () => {
+          try {
+            const response = await fetchAllTaskWithTokenInterceptor(access)
+            if (response.ok) {
+              const data = await response.json() // Parse the JSON response
+              console.log(data.reverse())
+              setTasksList(data.reverse()) // Update state with fetched data
+            } else {
+              console.error('Failed to fetch client cards')
             }
+          } catch (error) {
+            console.error('Error fetching client cards:', error)
           }
+        }
 
-
-          fetchList()
-    }, [access])
+    
+        fetchAllTasks()
+      }, [access]) 
 
     return (
         <div className="page-crm"  style={{
             height: '100vh'
         }}>
+            <ClientModal
+                title="Добавить задачу"
+                show={isOpen}
+                handleClose={handleCloseModal}
+            >
+                <BasicTaskForm closeModal={handleCloseModal} handleAddTaskCard={handleAddTaskCard}/>
+            </ClientModal>
             <div className="header-title">
                 <h1 className="">Задачи</h1>
                 <div>
-                    <Button onClick={()=>navigate('/crm/employees/create')} className="create-btn">Создать</Button>
+                    <Button onClick={handleShowModal} className="create-btn">Создать</Button>
                 </div>
                
             </div>
             <div className="d-flex flex-column justify-content-between"  style={{ height: '100%' }}>
             <div className="d-flex flex-wrap gap-3 align-items-stretch">
     {tasksList.map(item => (
-        <EmployeeCard key={item.id} data={item}/>
+        <TaskCard key={item.id} data={item}/>
     ))}
 </div>
                 <Pagination className="justify-content-center py-3 gap-1">
