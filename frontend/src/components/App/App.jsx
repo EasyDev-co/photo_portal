@@ -27,6 +27,7 @@ import KindergartensInfo from '../../pages-crm/KindergartensInfo/KindergartensIn
 import Employees from '../../components-crm/Employees/Employees'
 import CreateEmployee from '../../components-crm/CreateEmployee/CreateEmployee'
 import EditEmployee from '../../components-crm/EditEmployee/EditEmployee'
+import Tasks from '../../pages-crm/Tasks/Tasks'
 
 export const App = () => {
   const location = useLocation()
@@ -60,6 +61,7 @@ export const App = () => {
             <Route path="/crm/employees" element={<Employees/>}/>
             <Route path="/crm/employees/create" element={<CreateEmployee/>}/>
             <Route path="/crm/employees/edit/:employeeId" element={<EditEmployee/>}/>
+            <Route path='/crm/tasks' element={<Tasks/>}></Route>
             <Route path="/*" element={<>qwdqwdqwdqw</>} />
           </Route>
         )}
