@@ -80,7 +80,7 @@ const Kindergartens = () => {
   return (
     <div className="page-crm">
       <ClientModal
-        title="Добавить задачу"
+        title="Добавить карточку клиента"
         show={isOpen}
         handleClose={handleCloseModal}
       >

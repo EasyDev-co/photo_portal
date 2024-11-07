@@ -16,7 +16,7 @@ import ToggleButton from 'react-bootstrap/ToggleButton'
 import {othersLinks, usersLinks, settingsLinks} from '../../constants/path'
 import Dropdown from 'react-bootstrap/Dropdown'
 import Search from '../Search/Search'
-import write from '../../assets/icons/icon-button.svg'
+import tasks from '../../assets/icons/list-task.svg'
 import bell from '../../assets/icons/bell.svg'
 import person from '../../assets/icons/person.jpg'
 import Notification from "../Notification/Notification";
@@ -185,87 +185,87 @@ const LayoutCrm = () => {
               <span className="color-grey text-uppercase fs-13 fw-600">
                 Пользователи
               </span>
-                        </div>
-                        <div className="w-100">
-                            <Accordion
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '12px',
-                                    padding: '0',
-                                    width: '100%',
-                                }}
-                            >
-                                <ContextAwareToggle icon={building} eventKey="0" isArrow={true}>
-                                    Клиенты
-                                </ContextAwareToggle>
-                                <Accordion.Collapse eventKey="0">
-                                    <Card.Body>
-                                        <ButtonGroup
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'end',
-                                                gap: '8px',
-                                            }}
-                                        >
-                                            {clientRadios.map((radio) => (
-                                                <ToggleButton
-                                                    key={radio.value}
-                                                    id={`radio-${radio.value}`}
-                                                    type="radio"
-                                                    name="radio"
-                                                    onClick={() => navigate(radio.path)}
-                                                    className={
-                                                        clientRadioValue === radio.value
-                                                            ? 'toggle-btn'
-                                                            : 'toggle-btn-checked'
-                                                    }
-                                                    value={radio.value}
-                                                    checked={clientRadioValue === radio.value}
-                                                    onChange={(e) => setСlientRadioValue(e.target.value)}
-                                                >
-                                                    <svg
-                                                        width="8"
-                                                        height="9"
-                                                        viewBox="0 0 8 9"
-                                                        fill="none"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            d="M4 8.05469C6.20914 8.05469 8 6.26383 8 4.05469C8 1.84555 6.20914 0.0546875 4 0.0546875C1.79086 0.0546875 0 1.84555 0 4.05469C0 6.26383 1.79086 8.05469 4 8.05469Z"
-                                                            fill="white"
-                                                        />
-                                                    </svg>
-                                                    {radio.name}
-                                                </ToggleButton>
-                                            ))}
-                                        </ButtonGroup>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                                <ContextAwareToggle
-                                    icon={employees}
-                                    eventKey="1"
-                                    callback={(eventKey) => {
-                                        if (eventKey === '1') {
-                                            navigate('/crm/employees') // Navigate only when this section is active
-                                        }
-                                    }}
-                                >
-                                    Сотрудники
-                                </ContextAwareToggle>
-                                <ContextAwareToggle
-                                    icon={employees}
-                                    eventKey="2"  //????????????????????????????????????????????????????????????????????????????????????????????????????????
-                                    callback={(eventKey) => {
-                                        if (eventKey === '2') {
-                                            navigate('/crm/tasks') // Navigate only when this section is active
-                                        }
-                                    }}
-                                >
-                                    Задачи
-                                </ContextAwareToggle>
-                                {/* <Accordion.Collapse eventKey="1">
+            </div>
+            <div className="w-100">
+              <Accordion
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  padding: '0',
+                  width: '100%',
+                }}
+              >
+                <ContextAwareToggle icon={building} eventKey="0" isArrow = {true}>
+                  Клиенты
+                </ContextAwareToggle>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>
+                    <ButtonGroup
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'end',
+                        gap: '8px',
+                      }}
+                    >
+                      {clientRadios.map((radio) => (
+                        <ToggleButton
+                          key={radio.value}
+                          id={`radio-${radio.value}`}
+                          type="radio"
+                          name="radio"
+                          onClick={() => navigate(radio.path)}
+                          className={
+                            clientRadioValue === radio.value
+                              ? 'toggle-btn'
+                              : 'toggle-btn-checked'
+                          }
+                          value={radio.value}
+                          checked={clientRadioValue === radio.value}
+                          onChange={(e) => setСlientRadioValue(e.target.value)}
+                        >
+                          <svg
+                            width="8"
+                            height="9"
+                            viewBox="0 0 8 9"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M4 8.05469C6.20914 8.05469 8 6.26383 8 4.05469C8 1.84555 6.20914 0.0546875 4 0.0546875C1.79086 0.0546875 0 1.84555 0 4.05469C0 6.26383 1.79086 8.05469 4 8.05469Z"
+                              fill="white"
+                            />
+                          </svg>
+                          {radio.name}
+                        </ToggleButton>
+                      ))}
+                    </ButtonGroup>
+                  </Card.Body>
+                </Accordion.Collapse>
+                <ContextAwareToggle
+                  icon={employees}
+                  eventKey="1"
+                  callback={(eventKey) => {
+                    if (eventKey === '1') {
+                      navigate('/crm/employees') // Navigate only when this section is active
+                    }
+                  }}
+                >
+                  Сотрудники
+                </ContextAwareToggle>
+                <ContextAwareToggle
+                  icon={tasks}
+                  eventKey="2"  //??????????????????????????????????????????????????????????????????????????????????????????
+                  callback={(eventKey) => {
+                    if (eventKey === '2') {
+                      navigate('/crm/tasks') // Navigate only when this section is active
+                    }
+                  }}
+                >
+                  Задачи
+                </ContextAwareToggle>
+                {/* <Accordion.Collapse eventKey="1">
                   <Card.Body>
                     <ButtonGroup
                       style={{

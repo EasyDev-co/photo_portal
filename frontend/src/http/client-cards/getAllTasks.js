@@ -3,8 +3,8 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const getManagers = async ({access}) => {
-    const url = `${localUrl}/api/crm/v1/roles/employees/search/`;    
+export const getAllTasks = async (access) => {
+    const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/`;
 
     const response = await fetch(url, {
         headers: {
@@ -12,13 +12,12 @@ export const getManagers = async ({access}) => {
             'Authorization': `Bearer ${access}`
         }
     });
-
     return response;
 }
 
-export const fetchManagersWithToken = async (access) => {
+export const fetchAllTaskWithTokenInterceptor = async (access) => {
     try {
-        let response = await getManagers(access, name)
+        let response = await getAllTasks(access)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -27,7 +26,7 @@ export const fetchManagersWithToken = async (access) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getManagers(res.access);
+                            response = getAllTasks(res.access);
                         }
                     })
             }
