@@ -38,7 +38,7 @@ class PhotoUploadView(APIView):
             properties={
                 'numbers': openapi.Schema(
                     type=openapi.TYPE_STRING,
-                    description="Номера кадров, разделенные знаком '-', например, '10-11-12-13-14-15'"
+                    description="Список номеров кадров."
                 )
             },
             required=['numbers']
@@ -60,8 +60,9 @@ class PhotoUploadView(APIView):
     def save_photos(self, instance, photos, photo_theme):
         with transaction.atomic():
             last_photo_number = Photo.objects.filter(
-                photo_line__kindergarten=instance
-            ).aggregate(Max('number'))['number__max'] or 0
+                photo_line__kindergarten=instance,
+                photo_line__photo_theme=photo_theme
+            ).aggregate(Max('number'))['number__max'] or 6
             next_photo_number = last_photo_number + 1
 
             groups = self._grouper(photos, 6)
