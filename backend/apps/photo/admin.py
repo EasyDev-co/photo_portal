@@ -11,7 +11,7 @@ from apps.kindergarten.models import Region
 from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine,
-                               Coefficient)
+                               Coefficient, UserPhotoCount)
 from apps.photo.models.photo_theme import PhotoPopularityStat
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
@@ -199,4 +199,13 @@ class CoefficientAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(UserPhotoCount)
+class UserPhotoCountAdmin(admin.ModelAdmin):
+    list_display = ('user', 'photo_theme', 'count')
+    readonly_fields = ('user', 'photo_theme')
+
+    def has_add_permission(self, request):
         return False

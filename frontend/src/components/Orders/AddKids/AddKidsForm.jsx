@@ -42,9 +42,9 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, 
     }
 
     const onSubmitHandler = async (e) => {
-        const arr = inputValue.addKids.split('-').map(Number);
+        const arr = inputValue.addKids.split(/[-,\sи]+/).map(Number);
         e.preventDefault();
-        const regex = /^\d+(-\d+){5}$/;
+        const regex = /^(\d+|(\d+(([-,\s]| и? )\d+){5}))$/;
         // Проверяем соответствие значения регулярному выражению
         if (regex.test(inputValue.addKids)) {
             setError("");
@@ -100,7 +100,8 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, 
             });
             setIsActiveForm(false)
         } else {
-            setError("Неправильный формат ввода. Введите 6 номеров фото через дефис.")
+            setError("Неправильный формат ввода. " +
+                "Введите 1 или 6 номеров фото через дефис, пробел, запятую или ' и '.")
         }
 
     }

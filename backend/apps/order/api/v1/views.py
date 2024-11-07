@@ -280,7 +280,6 @@ class OrdersPaymentAPIView(APIView):
         return Response('Невозможно удалить заказ', status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class NotificationFiscalizationAPIView(APIView):
     """Вью для получения нотификации о фискализации от т-банка."""
 
