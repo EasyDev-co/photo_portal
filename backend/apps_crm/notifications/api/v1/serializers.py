@@ -29,3 +29,10 @@ class MarkNotificationAsReadSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'is_read']
         read_only_fields = ['id']
+
+
+class NotificationReadOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'user', 'sender', 'message', 'url', 'is_read', 'created']
+        read_only_fields = ['id', 'user', 'sender', 'message', 'url', 'is_read', 'created']

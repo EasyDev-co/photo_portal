@@ -2,10 +2,10 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import './styles/Layout.scss'
 import logo from '../../assets/logos/PP_Logo.png'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'
 import Accordion from 'react-bootstrap/Accordion'
-import { useAccordionButton } from 'react-bootstrap/AccordionButton'
-import { useContext, useState } from 'react'
+import {useAccordionButton} from 'react-bootstrap/AccordionButton'
+import {useContext, useState} from 'react'
 import AccordionContext from 'react-bootstrap/AccordionContext'
 import Card from 'react-bootstrap/Card'
 import arrow from '../../assets/icons/arrow.svg'
@@ -13,124 +13,140 @@ import building from '../../assets/icons/building.svg'
 import employees from '../../assets/icons/employees.svg'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
-import { othersLinks, usersLinks, settingsLinks } from '../../constants/path'
+import {othersLinks, usersLinks, settingsLinks} from '../../constants/path'
 import Dropdown from 'react-bootstrap/Dropdown'
 import Search from '../Search/Search'
 import tasks from '../../assets/icons/list-task.svg'
 import bell from '../../assets/icons/bell.svg'
 import person from '../../assets/icons/person.jpg'
+import Notification from "../Notification/Notification";
 
 const LayoutCrm = () => {
-  const BASE = '#25243D'
-  const BLUE = '#4F46E5'
+    const BASE = '#25243D'
+    const BLUE = '#4F46E5'
 
-  const location = useLocation()
-  const navigate = useNavigate()
+    const location = useLocation()
+    const navigate = useNavigate()
 
-  const [clientRadioValue, setСlientRadioValue] = useState('1')
-  const [employeesRadioValue, setEmployeesRadioValue] = useState('3')
+    const [clientRadioValue, setСlientRadioValue] = useState('1')
+    const [employeesRadioValue, setEmployeesRadioValue] = useState('3')
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const toggleNotification = () => {
+        setIsNotificationOpen((prev) => !prev);
+    };
+    const [unreadCount, setUnreadCount] = useState(0);
+    const updateUnreadCount = (count) => {
+        setUnreadCount(count);
+    };
+    const clientRadios = [
+        {name: 'Детские сады', value: '1', path: '/crm/kindergartens'},
+        {name: 'Календарь', value: '2', path: '/crm/calendar'},
+    ]
 
-  const clientRadios = [
-    { name: 'Детские сады', value: '1', path: '/crm/kindergartens' },
-    { name: 'Календарь', value: '2', path: '/crm/calendar' },
-  ]
+    const employeesRadios = [
+        {name: 'Сотрудник 1', value: '3', path: '/crm/kindergartens'},
+        {name: 'Сотрудник 2', value: '4', path: '/crm/kindergartens'},
+    ]
 
-  const employeesRadios = [
-    { name: 'Сотрудник 1', value: '3', path: '/crm/kindergartens' },
-    { name: 'Сотрудник 2', value: '4', path: '/crm/kindergartens' },
-  ]
+    function ContextAwareToggle({children, eventKey, callback, icon, isArrow}) {
+        const {activeEventKey} = useContext(AccordionContext)
 
-  function ContextAwareToggle({ children, eventKey, callback, icon, isArrow}) {
-    const { activeEventKey } = useContext(AccordionContext)
+        const decoratedOnClick = useAccordionButton(
+            eventKey,
+            () => callback && callback(eventKey)
+        )
 
-    const decoratedOnClick = useAccordionButton(
-      eventKey,
-      () => callback && callback(eventKey)
-    )
+        const isCurrentEventKey = activeEventKey === eventKey
 
-    const isCurrentEventKey = activeEventKey === eventKey
+        return (
+            <div className="layout_btn-wrap">
+                <button
+                    type="button"
+                    style={{
+                        backgroundColor: isCurrentEventKey ? BLUE : BASE,
+                        width: '100%',
+                        padding: '8px 26px',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        fontWeight: '600',
+                        display: 'flex',
+                        gap: '10px',
+                    }}
+                    onClick={decoratedOnClick}
+                >
+                    <div>
+                        <img src={icon} alt=""/>
+                    </div>
+                    {children}
+                </button>
+                {isArrow && (
+                    <div className={isCurrentEventKey ? 'arrow_active' : 'arrow'}>
+                        <img src={arrow} alt=""/>
+                    </div>)
+                }
+            </div>
+        )
+    }
 
     return (
-      <div className="layout_btn-wrap">
-        <button
-          type="button"
-          style={{
-            backgroundColor: isCurrentEventKey ? BLUE : BASE,
-            width: '100%',
-            padding: '8px 26px',
-            borderRadius: '8px',
-            color: '#fff',
-            fontWeight: '600',
-            display: 'flex',
-            gap: '10px',
-          }}
-          onClick={decoratedOnClick}
-        >
-          <div>
-            <img src={icon} alt="" />
-          </div>
-          {children}
-        </button>
-        {isArrow && (
-          <div className={isCurrentEventKey ? 'arrow_active' : 'arrow'}>
-          <img src={arrow} alt="" />
-        </div>)
-        }
-      </div>
-    )
-  }
-
-  return (
-    <>
-      <header>
-        <div className="position-fixed header bg-white z-3">
-          {location.pathname.split('/').length - 1 >= 3 ? (
-            <>
-              <div
-                className="search-container go-back-header d-flex justify-content-center align-items-center gap-4 fw-600"
-                style={{
-                  fontSize: '20px',
-                }}
-                onClick={() => navigate(-1)}
-              >
-                Назад
-              </div>
-            </>
-          ) : (
-            <div className="search-container d-flex justify-content-between align-items-center gap-4">
-              <div className="search-wrap">{/* <Search /> */}</div>
-              <div className="d-flex align-items-center">
-                <div className="cursor-pointer">
-                  {/* <img src={write} alt="" /> */}
+        <>
+            <header>
+                <div className="position-fixed header bg-white z-3">
+                    {location.pathname.split('/').length - 1 >= 3 ? (
+                        <>
+                            <div
+                                className="search-container go-back-header d-flex justify-content-center align-items-center gap-4 fw-600"
+                                style={{
+                                    fontSize: '20px',
+                                }}
+                                onClick={() => navigate(-1)}
+                            >
+                                Назад
+                            </div>
+                        </>
+                    ) : (
+                        <div className="search-container d-flex justify-content-between align-items-center gap-4">
+                            <div className="search-wrap">{/* <Search /> */}</div>
+                            <div className="d-flex align-items-center">
+                                <div className="cursor-pointer">
+                                    {/* <img src={write} alt="" /> */}
+                                </div>
+                                <div className="d-flex align-items-center">
+                                    <div className="px-3 cursor-pointer" onClick={toggleNotification}>
+                                        <img src={bell} alt=""/>
+                                        {unreadCount > 0 && (<span>{unreadCount}</span>)}
+                                    </div>
+                                    {isNotificationOpen && (
+                                        <Notification
+                                            onClose={toggleNotification}
+                                            updateUnreadCount={updateUnreadCount}
+                                        />
+                                    )}
+                                    <div className="d-flex align-items-center ">
+                                        <div className="pe-2 cursor-pointer">
+                                            <img src={person} alt=""/>
+                                        </div>
+                                        <div>
+                                            <div>Марк Ифанасьев</div>
+                                            <div className="fs-13 text-black-50">Директор</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <div className="d-flex align-items-center">
-                  <div className="px-3 cursor-pointer">
-                    <img src={bell} alt="" />
-                  </div>
-                  <div className="d-flex align-items-center ">
-                    <div className="pe-2 cursor-pointer">
-                      <img src={person} alt="" />
+                <nav
+                    className="navbar position-fixed top-0 start-0 layout-bg text-white d-flex flex-column justify-content-start flex-nowrap"
+                    style={{width: '257px', height: '100vh'}}
+                >
+                    <div
+                        className="container justify-content-center cursor-pointer border-bottom border-grey py-2 px-3 ">
+                        <Link to={'/'}>
+                            <img src={logo} alt=""/>
+                        </Link>
                     </div>
-                    <div>
-                      <div>Марк Ифанасьев</div>
-                      <div className="fs-13 text-black-50">Директор</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        <nav
-          className="navbar position-fixed top-0 start-0 layout-bg text-white d-flex flex-column justify-content-start flex-nowrap"
-          style={{ width: '257px', height: '100vh' }}
-        >
-          <div className="container justify-content-center cursor-pointer border-bottom border-grey py-2 px-3 ">
-            <Link to={'/'}>
-              <img src={logo} alt="" />
-            </Link>
-          </div>
-          {/* <div className="continer d-flex flex-column py-2 px-3 gap-2 w-100">
+                    {/* <div className="continer d-flex flex-column py-2 px-3 gap-2 w-100">
                         <Dropdown>
                             <Dropdown.Toggle id="dropdown-region" className="w-100 border border-primary-900 layout-bg">
                                 Все регионы
@@ -164,8 +180,8 @@ const LayoutCrm = () => {
                             </Dropdown.Menu>
                         </Dropdown>
                     </div> */}
-          <div className="container flex-column py-2 px-3 align-items-start gap-2">
-            <div className="row py-2 px-4">
+                    <div className="container flex-column py-2 px-3 align-items-start gap-2">
+                        <div className="row py-2 px-4">
               <span className="color-grey text-uppercase fs-13 fw-600">
                 Пользователи
               </span>
@@ -294,9 +310,9 @@ const LayoutCrm = () => {
                     </ButtonGroup>
                   </Card.Body>
                 </Accordion.Collapse> */}
-              </Accordion>
-            </div>
-            {/* <div className='d-flex flex-column gap-2'>
+                            </Accordion>
+                        </div>
+                        {/* <div className='d-flex flex-column gap-2'>
                             {usersLinks.map((elem, i) => {
                                 return (
                                     <Link key={i} to={elem.to} className={location.pathname === elem.to ? 'layout-link-active' : 'layout-link'}>
@@ -311,7 +327,7 @@ const LayoutCrm = () => {
                                 )
                             })}
                         </div> */}
-            {/* <div className='d-flex flex-column border-top border-grey w-100 gap-2'>
+                        {/* <div className='d-flex flex-column border-top border-grey w-100 gap-2'>
                             <div className="row py-2 px-4 ">
                                 <span className='color-grey text-uppercase fs-13 fw-600'>Другое</span>
                             </div>
@@ -328,7 +344,7 @@ const LayoutCrm = () => {
                                 )
                             })}
                         </div> */}
-            {/* <div className='d-flex flex-column gap-2'>
+                        {/* <div className='d-flex flex-column gap-2'>
                             <div className="row py-2 px-4">
                                 <span className='color-grey text-uppercase fs-13 fw-600'>Настройки</span>
                             </div>
@@ -345,12 +361,12 @@ const LayoutCrm = () => {
                                 )
                             })}
                         </div> */}
-          </div>
-        </nav>
-      </header>
-      <Outlet />
-    </>
-  )
+                    </div>
+                </nav>
+            </header>
+            <Outlet/>
+        </>
+    )
 }
 
 export default LayoutCrm
