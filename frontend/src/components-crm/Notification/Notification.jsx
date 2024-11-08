@@ -1,43 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./styles/notification.scss";
+import {localUrl} from "../../constants/constants";
 
-const Notification = ({ onClose, updateUnreadCount }) => {
-  const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const fetchNotifications = async () => {
-    try {
-      // Имитируем загрузку уведомлений с сервера
-      const testData = [
-        { id: 1, author: "Иван Иванов", message: "Новое сообщение", read: false },
-        { id: 2, author: "Мария Петрова", message: "Задача завершена", read: false },
-        { id: 3, author: "Петр Сидоров", message: "Скоро встреча", read: true },
-      ];
-      setNotifications(testData);
-
-      // Обновляем количество непрочитанных уведомлений в родительском компоненте
-      const unreadCount = testData.filter((notification) => !notification.read).length;
-      updateUnreadCount(unreadCount);
-    } catch (error) {
-      console.error("Ошибка при загрузке уведомлений:", error);
-    }
-  };
-
+const Notification = ({ notifications, onClose, fetchNotifications }) => {
+  const accessToken = localStorage.getItem("access");
   const markAsRead = async (id) => {
     try {
-      // Имитируем запрос на сервер для отметки уведомления как прочитанного
-      setNotifications((prevNotifications) =>
-        prevNotifications.map((notification) =>
-          notification.id === id ? { ...notification, read: true } : notification
-        )
+      const response = await fetch(
+        `${localUrl}/api/crm/v1/notifications/${id}/read/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
-      // Обновляем количество непрочитанных уведомлений
-      const updatedUnreadCount = notifications.filter((notif) => !notif.read).length - 1;
-      updateUnreadCount(updatedUnreadCount);
+      if (!response.ok) {
+        throw new Error("Ошибка при отметке уведомления как прочитанного");
+      }
+      await fetchNotifications();
     } catch (error) {
       console.error("Ошибка при отметке уведомления как прочитанного:", error);
     }
@@ -46,7 +29,7 @@ const Notification = ({ onClose, updateUnreadCount }) => {
   return (
     <div className="notification-popup">
       <div className="notification-popup__header">
-        <h3>Уведомления</h3>
+        <h3 className="notification-popup__header-title">Уведомления</h3>
         <button onClick={onClose} className="notification-popup__close">
           ✕
         </button>
@@ -67,12 +50,12 @@ const Notification = ({ onClose, updateUnreadCount }) => {
             <div className="notification-item__message">
               {notification.message}
             </div>
-            {!notification.read && (
+            {!notification.is_read && (
               <button
                 className="notification-item__mark-read"
                 onClick={() => markAsRead(notification.id)}
               >
-                Отметить как прочитанное
+                Удалить
               </button>
             )}
           </div>
