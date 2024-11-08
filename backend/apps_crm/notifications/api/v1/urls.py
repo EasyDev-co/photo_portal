@@ -3,7 +3,8 @@ from django.urls import path
 from apps_crm.notifications.api.v1.views import (
     NotificationListAPIView,
     MarkNotificationAsReadAPIView,
-    AllNotificationsAPIView
+    AllNotificationsAPIView,
+    UnreadNotificationsAPIView,
 )
 
 urlpatterns = [
@@ -22,4 +23,5 @@ urlpatterns = [
         MarkNotificationAsReadAPIView.as_view(),
         name='mark_notification_as_read'
     ),
+    path('unread-notifications/', UnreadNotificationsAPIView.as_view(), name='unread-notifications'),
 ]

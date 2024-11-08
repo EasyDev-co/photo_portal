@@ -89,7 +89,8 @@ class Photo(UUIDMixin):
             s3_client = get_s3_client()
 
             # Подготовка путей и имен файлов
-            base_folder = f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
+            base_folder = (f'{self.photo_line.kindergarten.region.name}/{self.photo_line.kindergarten.name}/'
+                           f'{self.photo_line.photo_theme}/')
             original_file_name = f'{base_folder}{self.number}.jpg'
             watermarked_folder = f'{base_folder}watermark/'
             watermarked_file_name = f'{watermarked_folder}{self.number}.jpg'

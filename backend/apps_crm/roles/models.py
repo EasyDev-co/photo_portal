@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
@@ -11,6 +12,7 @@ class UserRole(models.IntegerChoices):
     ROP = 1, "Руководитель отдела продаж"
     MANAGER = 2, "Менеджер"
     CEO = 3, "Исполнительный директор"
+    SENIOR_MANAGER = 4, "Старший менеджер"
 
 
 class Employee(UUIDMixin, TimeStampedMixin):
@@ -18,7 +20,6 @@ class Employee(UUIDMixin, TimeStampedMixin):
     Модель сотрудника компании. Связывается с пользователем, ролью, отделом и регионом.
     Содержит статус, который может быть 'active' или 'inactive'.
     """
-
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
     )
@@ -32,13 +33,39 @@ class Employee(UUIDMixin, TimeStampedMixin):
         choices=[("active", "Активный"), ("inactive", "Неактивный")],
         verbose_name="Статус"
     )
+    manager = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'employee_role': UserRole.SENIOR_MANAGER},
+        verbose_name="Руководитель"
+    )
+    can_edit_task = models.BooleanField(default=False, verbose_name="Может редактировать задачу")
 
     class Meta:
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['manager', 'user'],
+                name='unique_manager_assignment'
+            )
+        ]
 
     def __str__(self):
         return f"user: {self.user}"
+
+    def clean(self):
+        if self.employee_role == UserRole.MANAGER and not self.manager:
+            raise ValidationError("Менеджер должен быть привязан к руководителю.")
+        if self.manager and self.manager.employee_role != UserRole.SENIOR_MANAGER:
+            raise ValidationError("Руководитель должен иметь роль 'SENIOR_MANAGER'.")
+        if (
+            self.manager and
+            Employee.objects.filter(manager=self.manager, employee_role=UserRole.MANAGER).exclude(pk=self.pk).exists()
+        ):
+            raise ValidationError("Менеджер уже привязан к другому SENIOR_MANAGER.")
 
 
 # !!! Все что ниже пока не актуально !!!
