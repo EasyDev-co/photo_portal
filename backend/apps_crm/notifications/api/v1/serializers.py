@@ -32,7 +32,12 @@ class MarkNotificationAsReadSerializer(serializers.ModelSerializer):
 
 
 class NotificationReadOnlySerializer(serializers.ModelSerializer):
+    sender_full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Notification
-        fields = ['id', 'user', 'sender', 'message', 'url', 'is_read', 'created']
+        fields = ['id', 'user', 'sender_full_name', 'sender', 'message', 'url', 'is_read', 'created']
         read_only_fields = ['id', 'user', 'sender', 'message', 'url', 'is_read', 'created']
+
+    def get_sender_full_name(self, obj):
+        return f"{obj.sender.first_name} {obj.sender.last_name}"
