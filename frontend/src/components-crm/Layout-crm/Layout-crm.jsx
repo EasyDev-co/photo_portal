@@ -13,13 +13,12 @@ import building from '../../assets/icons/building.svg'
 import employees from '../../assets/icons/employees.svg'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
-import {othersLinks, usersLinks, settingsLinks} from '../../constants/path'
-import Dropdown from 'react-bootstrap/Dropdown'
-import Search from '../Search/Search'
 import tasks from '../../assets/icons/list-task.svg'
 import bell from '../../assets/icons/bell.svg'
 import person from '../../assets/icons/person.jpg'
+import React, {useEffect} from "react";
 import Notification from "../Notification/Notification";
+import {localUrl} from "../../constants/constants";
 
 const LayoutCrm = () => {
     const BASE = '#25243D'
@@ -29,24 +28,64 @@ const LayoutCrm = () => {
     const navigate = useNavigate()
 
     const [clientRadioValue, setСlientRadioValue] = useState('1')
-    const [employeesRadioValue, setEmployeesRadioValue] = useState('3')
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-    const toggleNotification = () => {
-        setIsNotificationOpen((prev) => !prev);
-    };
     const [unreadCount, setUnreadCount] = useState(0);
-    const updateUnreadCount = (count) => {
-        setUnreadCount(count);
-    };
     const clientRadios = [
         {name: 'Детские сады', value: '1', path: '/crm/kindergartens'},
         {name: 'Календарь', value: '2', path: '/crm/calendar'},
     ]
 
-    const employeesRadios = [
-        {name: 'Сотрудник 1', value: '3', path: '/crm/kindergartens'},
-        {name: 'Сотрудник 2', value: '4', path: '/crm/kindergartens'},
-    ]
+    const [notifications, setNotifications] = useState([]);
+    const fetchNotifications = async () => {
+        try {
+            const accessToken = localStorage.getItem("access");
+
+            const response = await fetch(
+                `${localUrl}/api/crm/v1/notifications/unread-notifications/`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Ошибка при загрузке уведомлений");
+            }
+
+            const data = await response.json();
+
+            const notifications = data.map((item) => ({
+                id: item.id,
+                author: item.sender_full_name,
+                message: item.message,
+                url: item.url || null,
+                is_read: item.is_read,
+            }));
+            console.log(notifications)
+            setNotifications(notifications);
+
+            const unreadCount = notifications.filter((notification) => !notification.read).length;
+            setUnreadCount(unreadCount);
+        } catch (error) {
+            console.error("Ошибка при загрузке уведомлений:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const toggleNotification = () => {
+        setIsNotificationOpen((prev) => !prev);
+    };
+
+    const updateUnreadCount = (count) => {
+        setUnreadCount(count);
+    };
 
     function ContextAwareToggle({children, eventKey, callback, icon, isArrow}) {
         const {activeEventKey} = useContext(AccordionContext)
@@ -112,16 +151,21 @@ const LayoutCrm = () => {
                                     {/* <img src={write} alt="" /> */}
                                 </div>
                                 <div className="d-flex align-items-center">
-                                    <div className="px-3 cursor-pointer" onClick={toggleNotification}>
-                                        <img src={bell} alt=""/>
-                                        {unreadCount > 0 && (<span>{unreadCount}</span>)}
+                                    <div className="px-3 cursor-pointer position-relative" onClick={toggleNotification}>
+                                        <img src={bell} alt="Уведомления"/>
+                                        {unreadCount > 0 && (
+                                            <span className="notification-count">{unreadCount}</span>
+                                        )}
                                     </div>
+
                                     {isNotificationOpen && (
                                         <Notification
+                                            notifications={notifications}
                                             onClose={toggleNotification}
-                                            updateUnreadCount={updateUnreadCount}
+                                            fetchNotifications={fetchNotifications}
                                         />
                                     )}
+
                                     <div className="d-flex align-items-center ">
                                         <div className="pe-2 cursor-pointer">
                                             <img src={person} alt=""/>
@@ -185,87 +229,87 @@ const LayoutCrm = () => {
               <span className="color-grey text-uppercase fs-13 fw-600">
                 Пользователи
               </span>
-            </div>
-            <div className="w-100">
-              <Accordion
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                  padding: '0',
-                  width: '100%',
-                }}
-              >
-                <ContextAwareToggle icon={building} eventKey="0" isArrow = {true}>
-                  Клиенты
-                </ContextAwareToggle>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    <ButtonGroup
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'end',
-                        gap: '8px',
-                      }}
-                    >
-                      {clientRadios.map((radio) => (
-                        <ToggleButton
-                          key={radio.value}
-                          id={`radio-${radio.value}`}
-                          type="radio"
-                          name="radio"
-                          onClick={() => navigate(radio.path)}
-                          className={
-                            clientRadioValue === radio.value
-                              ? 'toggle-btn'
-                              : 'toggle-btn-checked'
-                          }
-                          value={radio.value}
-                          checked={clientRadioValue === radio.value}
-                          onChange={(e) => setСlientRadioValue(e.target.value)}
-                        >
-                          <svg
-                            width="8"
-                            height="9"
-                            viewBox="0 0 8 9"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M4 8.05469C6.20914 8.05469 8 6.26383 8 4.05469C8 1.84555 6.20914 0.0546875 4 0.0546875C1.79086 0.0546875 0 1.84555 0 4.05469C0 6.26383 1.79086 8.05469 4 8.05469Z"
-                              fill="white"
-                            />
-                          </svg>
-                          {radio.name}
-                        </ToggleButton>
-                      ))}
-                    </ButtonGroup>
-                  </Card.Body>
-                </Accordion.Collapse>
-                <ContextAwareToggle
-                  icon={employees}
-                  eventKey="1"
-                  callback={(eventKey) => {
-                    if (eventKey === '1') {
-                      navigate('/crm/employees') // Navigate only when this section is active
-                    }
-                  }}
-                >
-                  Сотрудники
-                </ContextAwareToggle>
-                <ContextAwareToggle
-                  icon={tasks}
-                  eventKey="2"  //??????????????????????????????????????????????????????????????????????????????????????????
-                  callback={(eventKey) => {
-                    if (eventKey === '2') {
-                      navigate('/crm/tasks') // Navigate only when this section is active
-                    }
-                  }}
-                >
-                  Задачи
-                </ContextAwareToggle>
-                {/* <Accordion.Collapse eventKey="1">
+                        </div>
+                        <div className="w-100">
+                            <Accordion
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '12px',
+                                    padding: '0',
+                                    width: '100%',
+                                }}
+                            >
+                                <ContextAwareToggle icon={building} eventKey="0" isArrow={true}>
+                                    Клиенты
+                                </ContextAwareToggle>
+                                <Accordion.Collapse eventKey="0">
+                                    <Card.Body>
+                                        <ButtonGroup
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'end',
+                                                gap: '8px',
+                                            }}
+                                        >
+                                            {clientRadios.map((radio) => (
+                                                <ToggleButton
+                                                    key={radio.value}
+                                                    id={`radio-${radio.value}`}
+                                                    type="radio"
+                                                    name="radio"
+                                                    onClick={() => navigate(radio.path)}
+                                                    className={
+                                                        clientRadioValue === radio.value
+                                                            ? 'toggle-btn'
+                                                            : 'toggle-btn-checked'
+                                                    }
+                                                    value={radio.value}
+                                                    checked={clientRadioValue === radio.value}
+                                                    onChange={(e) => setСlientRadioValue(e.target.value)}
+                                                >
+                                                    <svg
+                                                        width="8"
+                                                        height="9"
+                                                        viewBox="0 0 8 9"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            d="M4 8.05469C6.20914 8.05469 8 6.26383 8 4.05469C8 1.84555 6.20914 0.0546875 4 0.0546875C1.79086 0.0546875 0 1.84555 0 4.05469C0 6.26383 1.79086 8.05469 4 8.05469Z"
+                                                            fill="white"
+                                                        />
+                                                    </svg>
+                                                    {radio.name}
+                                                </ToggleButton>
+                                            ))}
+                                        </ButtonGroup>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                                <ContextAwareToggle
+                                    icon={employees}
+                                    eventKey="1"
+                                    callback={(eventKey) => {
+                                        if (eventKey === '1') {
+                                            navigate('/crm/employees') // Navigate only when this section is active
+                                        }
+                                    }}
+                                >
+                                    Сотрудники
+                                </ContextAwareToggle>
+                                <ContextAwareToggle
+                                    icon={tasks}
+                                    eventKey="2"  //??????????????????????????????????????????????????????????????????????????????????????????
+                                    callback={(eventKey) => {
+                                        if (eventKey === '2') {
+                                            navigate('/crm/tasks') // Navigate only when this section is active
+                                        }
+                                    }}
+                                >
+                                    Задачи
+                                </ContextAwareToggle>
+                                {/* <Accordion.Collapse eventKey="1">
                   <Card.Body>
                     <ButtonGroup
                       style={{
