@@ -8,7 +8,7 @@ import styles from './TaskCard.style.css'
 
 import { useNavigate } from 'react-router-dom'
 
-const TaskCard = ({ data }) => {
+const TaskCard = ({ data, handleShowEdit }) => {
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -33,11 +33,11 @@ const TaskCard = ({ data }) => {
         height: '100%',
         maxHeight: '270px'
       }}
+      onClick={()=>handleShowEdit(data.id)}
     >
       <Card.Header
         className="card-header"
         style={{ border: 'none' }}
-        // onClick={() => navigate(`/crm/employees/edit/${data.id}`)}
       >
         <div className="card-header-title cursor-pointer">
             Созвон
