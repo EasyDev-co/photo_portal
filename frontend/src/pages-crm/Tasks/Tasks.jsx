@@ -10,6 +10,7 @@ import TaskCard from "../../components-crm/TaskCard/TaskCard";
 import ClientModal from "../../components-crm/ClientCardModal/ClientModal";
 import ClientCardForm from "../../components-crm/ClientCardModal/Forms/ClientCardForm";
 import BasicTaskForm from "../../components-crm/ClientCardModal/Forms/BasicTaskForm";
+import EditBasicTaskForm from "../../components-crm/ClientCardModal/Forms/EditBasicTaskForm";
 
 const Tasks = () => {
     const navigate = useNavigate()
@@ -20,12 +21,23 @@ const Tasks = () => {
     const totalItems = tasksList.length; // Общее количество карточек
     const totalPages = Math.ceil(totalItems / itemsPerPage); // Общее количество страниц
     const [isOpen, setIsOpen] = useState(false)
+    const [showEdit, setShowEdit] = useState(false)
+    const [editId, setEditId] = useState("")
 
     const handleShowModal = () => {
       setIsOpen(true)
     }
     const handleCloseModal = () => {
       setIsOpen(false)
+    }
+
+    const handleShowEdit = (id) => {
+      console.log('open')
+      setEditId(id)
+      setShowEdit(true)
+    }
+    const handleCloseEdit = () => {
+      setShowEdit(false)
     }
 
     const handleAddTaskCard = (card)=>{
@@ -42,7 +54,6 @@ const Tasks = () => {
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
-
 
     useEffect(() => {
         const fetchAllTasks = async () => {
@@ -75,6 +86,13 @@ const Tasks = () => {
             >
                 <BasicTaskForm closeModal={handleCloseModal} handleAddTaskCard={handleAddTaskCard}/>
             </ClientModal>
+            <ClientModal
+                title="Редактировать задачу"
+                show={showEdit}
+                handleClose={handleCloseEdit}
+            >
+                <EditBasicTaskForm closeModal={handleCloseEdit} taskId={editId} />
+            </ClientModal>
             <div className="header-title">
                 <h1 className="">Задачи</h1>
                 <div>
@@ -84,10 +102,11 @@ const Tasks = () => {
             </div>
             <div className="d-flex flex-column justify-content-between"  style={{ height: '100%' }}>
             <div className="d-flex flex-wrap gap-3 align-items-stretch">
-    {tasksList.map(item => (
-        <TaskCard key={item.id} data={item}/>
-    ))}
-</div>
+                {tasksList.map(item => (
+                    <TaskCard handleShowEdit={handleShowEdit} key={item.id} data={item}/>
+                ))}
+
+            </div>
                 <Pagination className="justify-content-center py-3 gap-1">
                     <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
                     {[...Array(totalPages)].map((_, index) => (
