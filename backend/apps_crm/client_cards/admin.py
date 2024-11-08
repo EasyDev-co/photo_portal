@@ -45,7 +45,7 @@ class ClientCardTaskAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     fieldsets = (
         (None, {
-            'fields': ('author', 'client_card', 'text', 'task_type')
+            'fields': ('author', 'executor', 'client_card', 'text', 'task_type')
         }),
         ('Статус и срок выполнения', {
             'fields': ('task_status', 'date_end')
