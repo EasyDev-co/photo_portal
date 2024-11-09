@@ -17,7 +17,8 @@ const EditEmployee = () => {
         email: '',
         phone_number: '',
     });
-
+    const [updatedPersonalInfo, setUpdatedPersonalInfo] = useState({user: {}})
+    const [status, setStatus] = useState("Не указано")
     const [securityInfo, setSecurityInfo] = useState({
         login: '',
         password: '',
@@ -25,6 +26,13 @@ const EditEmployee = () => {
 
     const handlePersonalInfoChange = (e) => {
         const {name, value} = e.target;
+        setUpdatedPersonalInfo((prevState) => ({
+            ...prevState,
+            [name]: value,
+            user: {
+                [name]: value,
+            }
+        }));
         setPersonalInfo((prevState) => ({
             ...prevState,
             [name]: value,
@@ -33,6 +41,13 @@ const EditEmployee = () => {
 
     const handleSecurityInfoChange = (e) => {
         const {name, value} = e.target;
+        setUpdatedPersonalInfo((prevState) => ({
+            ...prevState,
+            [name]: value,
+            user: {
+                [name]: value,
+            }
+        }));
         setSecurityInfo((prevState) => ({
             ...prevState,
             [name]: value,
@@ -47,6 +62,7 @@ const EditEmployee = () => {
             });
             if (response.ok) {
                 const data = await response.json();
+                setStatus(data.employee_role_display);
                 setPersonalInfo(data.user);
                 setSecurityInfo({...securityInfo, login: data.user.email});
             } else {
@@ -59,8 +75,17 @@ const EditEmployee = () => {
 
     const handleSavePersonalInfo = async () => {
         try {
-
-            await updateEmployeeData(employeeId, personalInfo, access);
+            const data = {
+                user: {
+                    email: personalInfo.email,
+                    first_name: personalInfo.first_name,
+                    last_name: personalInfo.last_name,
+                    phone_number: personalInfo.phone_number,
+                    is_active: personalInfo.is_active,
+                },
+                employee_role: personalInfo.employee_role,
+            };
+            await updateEmployeeData(employeeId, updatedPersonalInfo, access);
             await fetchEmployee();
             alert('Персональная информация обновлена успешно');
         } catch (error) {
@@ -130,7 +155,7 @@ const EditEmployee = () => {
                                             value={personalInfo.employee_role}
                                             onChange={handlePersonalInfoChange}
                                         >
-                                            <option value="">Не указано</option>
+                                            <option value="">Выберите статус</option>
                                             <option value="1">РОП</option>
                                             <option value="2">Менеджер</option>
                                             <option value="4">Старший менеджер</option>
