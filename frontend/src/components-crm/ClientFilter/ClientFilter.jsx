@@ -8,10 +8,19 @@ import people from '../../assets/icons/people.svg'
 import { Accordion } from 'react-bootstrap'
 import calendar from '../../assets/icons/calendar-event.svg'
 import { localUrl } from '../../constants/constants'
+import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchManagerField'
 
 const ClientFilter = () => {
   const [isActive, setIsActive] = useState(false)
   const [regions, setRegions] = useState([]);
+  const [managers, setManagers] = useState([]);
+  const [errors, setErrors] = useState({})
+
+  const access = localStorage.getItem('access')
+
+  const handleManagerSelect = (selectedManager) => {
+    setManagers(selectedManager);
+};
 
   useEffect(() => {
     getRegions().then(regions => {
@@ -81,15 +90,29 @@ const ClientFilter = () => {
               }}
             />
           </Form.Group>
-          <Form.Group>
+          <ManagerSelectInput
+                access={access}
+                multiplyObject={true}
+                onSelect={handleManagerSelect}
+                errors={errors}
+                name='Менеджер'
+              />
+          {/* <Form.Group>
             <div className="form-control-wrap">
               <Form.Label className="text-secondary">Менеджер</Form.Label>
-              <Form.Control className="shadow-none" placeholder="Не указано" />
-              <div className="control-img">
+              <Form.Control className="shadow-none" placeholder="Не указано" /> */}
+
+              {/* <ManagerSelectInput
+                access={access}
+                multiplyObject={true}
+                onSelect={handleManagerSelect}
+                errors={errors}
+              /> */}
+              {/* <div className="control-img">
                 <img src={people} alt="" />
-              </div>
-            </div>
-          </Form.Group>
+              </div> */}
+            {/* </div>
+          </Form.Group> */}
           {/* <div onClick={() => setFilterActive(!filterActive)} className='filter-btn'>
                     {!filterActive ? <img src={filterBtn} alt="" /> : <img src={filterBtnA} alt="" />}
                 </div> */}
