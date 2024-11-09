@@ -261,6 +261,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.order.tasks.SendClosingReceiptsTask",
         "schedule": crontab(minute='0', hour='*/1'),
     },
+    "send_notify": {
+        "task": "apps_crm.notifications.tasks.SendNotifyTask",
+        "schedule": crontab(minute='0', hour='*/1'),
+    }
 }
 
 STATICFILES_DIRS = [

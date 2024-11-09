@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from apps_crm.client_cards.models import ClientCardTask
 from apps_crm.notifications.models import Notification
 
+
 @receiver(post_save, sender=ClientCardTask)
 def create_or_update_notification(sender, instance: ClientCardTask, created: bool, **kwargs):
     """
@@ -11,7 +12,14 @@ def create_or_update_notification(sender, instance: ClientCardTask, created: boo
     # Проверка на наличие исполнителя
     if instance.executor and instance.executor.user:
         # Формируем текст уведомления
-        message = "На вас была поставлена задача: "
+
+        if instance.client_card:
+            message = f"Задача по КК: http://http://0.0.0.0:3000/crm/kindergartens/{instance.client_card.id}/"
+        else:
+            message = f"""
+                      {instance.get_task_type_display()}
+                      {instance.text}
+                      """
 
         # Если запись создана
         if created:
