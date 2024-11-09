@@ -7,6 +7,7 @@ import search from '../../../assets/icons/search.svg'
 import {postClientCardWithToken} from '../../../http/client-cards/postClientCard'
 import {fetchKindergartensWithToken} from '../../../http/client-cards/getKinderGartenSearch'
 import {fetchManagersWithToken} from '../../../http/client-cards/getManagers'
+import ExecutorInput from './Inputs/ExecutorInput'
 
 
 const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
@@ -209,6 +210,8 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 </Form.Select>
                 {errors.status && <div className="text-danger">{errors.status[0]}</div>}
             </Form.Group>
+
+            <ExecutorInput />
 
             <Form.Group className="mb-3" style={{position: 'relative'}}>
                 <div className="form-control-wrap">
