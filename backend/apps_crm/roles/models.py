@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 class UserRole(models.IntegerChoices):
-    ROP = 1, "Руководитель отдела продаж"
+    ROP = 1, "РОП"
     MANAGER = 2, "Менеджер"
     CEO = 3, "Исполнительный директор"
     SENIOR_MANAGER = 4, "Старший менеджер"
