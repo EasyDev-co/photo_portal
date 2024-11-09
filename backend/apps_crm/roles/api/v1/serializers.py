@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from apps_crm.roles.models import Employee
@@ -18,7 +19,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class UserSerializerCRM(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'second_name', 'last_name', 'role', 'phone_number', 'birth_date']
+        fields = [
+            'id', 'email', 'first_name', 'second_name', 'last_name', 'role', 'phone_number', 'birth_date', 'password'
+        ]
 
 
 class EmployeeAndUserSerializer(serializers.ModelSerializer):
@@ -31,6 +34,9 @@ class EmployeeAndUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = User.objects.create(**user_data)
+        password = user_data.pop('password', None)
+        if password:
+            user_data['password'] = make_password(password)
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
 
