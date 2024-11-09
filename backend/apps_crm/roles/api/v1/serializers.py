@@ -86,19 +86,20 @@ class EmployeeAndUserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
         user = instance.user
-
         if user_data:
             password = user_data.pop('password', None)
-            if password:
+            if password and user.password != make_password(password):
                 user.password = make_password(password)
 
             for attr, value in user_data.items():
-                setattr(user, attr, value)
+                if getattr(user, attr) != value:
+                    setattr(user, attr, value)
 
             user.save()
 
         for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+            if getattr(instance, attr) != value:
+                setattr(instance, attr, value)
 
         instance.save()
         return instance
