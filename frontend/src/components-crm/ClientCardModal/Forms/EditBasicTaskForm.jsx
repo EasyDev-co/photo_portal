@@ -25,6 +25,7 @@ const EditBasicTaskForm = ({
 
   const [errors, setErrors] = useState({})
 
+
   const handleManagerSelect = (selectedManager) => {
     setFormState((prevState) => ({
         ...prevState,
@@ -123,7 +124,9 @@ const EditBasicTaskForm = ({
   return (
     <Form>
       <Form.Group className="mb-3">
+
         <Form.Label className="text-secondary">Тип задачиХЕР</Form.Label>
+
         <Form.Select
           name="task_type"
           className="shadow-none"
@@ -131,7 +134,9 @@ const EditBasicTaskForm = ({
           value={formState.task_type}
           onChange={handleChange}
         >
+
           <option hidden>Выберите тип задачи</option>
+
           <option value="1">Открыта</option>
           <option value="2">В работе</option>
           <option value="3">Готова</option>
@@ -143,6 +148,7 @@ const EditBasicTaskForm = ({
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
+
           <Form.Label className="text-secondary">Выберите дату</Form.Label>
           <Form.Control
             name="date_end"
@@ -180,6 +186,7 @@ const EditBasicTaskForm = ({
         />
         {errors.text && <div className="text-danger">{errors.text[0]}</div>}
       </Form.Group>
+
 
       <ModalFooter style={{ padding: '5px' }}>
         <Button className="btn-filter-reset text-center" onClick={handleDelete}>
