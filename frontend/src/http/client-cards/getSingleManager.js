@@ -3,7 +3,7 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const getSingleManager = async ({access, name}) => {
+export const getSingleManager = async (access, name) => {
     const url = `${localUrl}/api/crm/v1/roles/employees/search/?full_name=${name}`;
 
     console.log(name);
@@ -21,6 +21,7 @@ export const getSingleManager = async ({access, name}) => {
 
 export const fetchSingleManagerWithToken = async (access, name) => {
     try {
+        console.log("Name in fetchSingleManagerWithToken", name)
         let response = await getSingleManager(access, name)
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()

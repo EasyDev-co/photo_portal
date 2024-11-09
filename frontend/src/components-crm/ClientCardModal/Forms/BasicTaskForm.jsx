@@ -7,7 +7,7 @@ import search from '../../../assets/icons/search.svg'
 import {postClientCardWithToken} from '../../../http/client-cards/postClientCard'
 import {fetchKindergartensWithToken} from '../../../http/client-cards/getKinderGartenSearch'
 import {fetchManagersWithToken} from '../../../http/client-cards/getManagers'
-import ExecutorInput from './Inputs/ExecutorInput'
+import ManagerSelectInput from "./InputsField/SearchManagerField";
 
 
 const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
@@ -29,6 +29,20 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         children_for_photoshoot: '',
     })
 
+    const [selectedManager, setSelectedManager] = useState(null);
+    const [selectedManagersList, setSelectedManagersList] = useState([]);
+
+    // Обработчик для одиночного выбора
+    const handleSingleSelect = (manager) => {
+        setSelectedManager(manager);
+        console.log('Выбранный менеджер:', manager);
+    };
+
+    // Обработчик для множественного выбора
+    const handleMultipleSelect = (managers) => {
+        setSelectedManagersList(managers);
+        console.log('Список выбранных менеджеров:', managers);
+    };
     const [errors, setErrors] = useState({})
 
     const [kindergarten, setKindergarten] = useState('')
@@ -271,7 +285,21 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                     </ul>
                 )}
             </Form.Group>
+            <div>
+                <h2>Выбор менеджера (Одиночный выбор)</h2>
+                <ManagerSelectInput
+                    access={access}
+                    multiplyObject={false}
+                    onSelect={handleSingleSelect}
+                />
 
+                <h2>Выбор менеджера (Множественный выбор)</h2>
+                <ManagerSelectInput
+                    access={access}
+                    multiplyObject={true}
+                    onSelect={handleMultipleSelect}
+                />
+            </div>
             <Form.Group className="mb-3">
                 <div className="form-control-wrap">
                     <DatePicker
@@ -373,8 +401,8 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                                     }}
                                 >
                                     {item.name}{' '} */}
-                                    {/* Adjust according to your response structure */}
-                                {/* </button>
+            {/* Adjust according to your response structure */}
+            {/* </button>
                             </li>
                         ))}
                     </ul>

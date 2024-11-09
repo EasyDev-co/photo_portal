@@ -57,6 +57,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
+    def perform_update(self, serializer):
+        serializer.save()
+
 
 class UnassignedManagersAPIView(APIView):
     permission_classes = [IsAuthenticated, IsROPorDirector]
