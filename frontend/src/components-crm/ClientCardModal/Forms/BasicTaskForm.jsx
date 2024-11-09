@@ -29,20 +29,7 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         children_for_photoshoot: '',
     })
 
-    const [selectedManager, setSelectedManager] = useState(null);
-    const [selectedManagersList, setSelectedManagersList] = useState([]);
 
-    // Обработчик для одиночного выбора
-    const handleSingleSelect = (manager) => {
-        setSelectedManager(manager);
-        console.log('Выбранный менеджер:', manager);
-    };
-
-    // Обработчик для множественного выбора
-    const handleMultipleSelect = (managers) => {
-        setSelectedManagersList(managers);
-        console.log('Список выбранных менеджеров:', managers);
-    };
     const [errors, setErrors] = useState({})
 
     const [kindergarten, setKindergarten] = useState('')
@@ -50,6 +37,13 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
 
     const [manager, setManager] = useState('')
     const [managerResults, setManagerResults] = useState([])
+
+    const handleManagerSelect = (selectedManager) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            manager: selectedManager,
+        }));
+    };
 
     const handleChange = (e) => {
         const {name, value} = e.target
@@ -87,10 +81,6 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         setKindergarten(value)
     }
 
-    const handleManager = (e) => {
-        const {value} = e.target
-        setManager(value)
-    }
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -108,7 +98,6 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
             }));
             return; // Prevent form submission if date is invalid
         }
-
         const data = {
             charge_dates: formatDate(formState.charge_dates),
             garden_details: formState.garden_details || "Реквизитов нет",
@@ -167,34 +156,6 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         }
     }, [kindergarten])
 
-
-    useEffect(() => {
-        const fetchManagers = async () => {
-            try {
-                const response = await fetchManagersWithToken({
-                    access,
-                    name: manager,
-                })
-                if (response.ok) {
-                    const data = await response.json()
-                    console.log(data)
-                    setManagerResults(data.slice(0, 5))
-                } else {
-                    console.error('Failed to fetch managers')
-                }
-            } catch (error) {
-                console.error('Error posting managers:', error)
-            }
-        }
-
-        if (manager && manager !== formState.manager.full_name) {
-            fetchManagers()
-
-        } else {
-            setManagerResults([])
-        }
-    }, [manager])
-
     return (
         <Form>
             <Form.Group className="mb-3">
@@ -225,80 +186,23 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 {errors.status && <div className="text-danger">{errors.status[0]}</div>}
             </Form.Group>
 
-            <ExecutorInput />
-
-            <Form.Group className="mb-3" style={{position: 'relative'}}>
-                <div className="form-control-wrap">
-                    <Form.Label className="text-secondary">Исполнитель</Form.Label>
-                    <Form.Control
-                        name="manager"
-                        className="shadow-none"
-                        placeholder="Не указано"
-                        value={manager}
-                        onChange={handleManager}
-                    />
-                    <div className="control-img">
-                        <img src={people} alt=""/>
-                    </div>
-                </div>
-                {errors.manager && <div className="text-danger">{errors.manager[0]}</div>}
-                {managerResults.length > 0 && (
-                    <ul className="kindergarten-suggestions" style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        width: '100%',
-                        backgroundColor: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        zIndex: 1000,
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                    }}>
-                        {managerResults.map((item, index) => (
-
-                            <li key={index}>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setManagerResults([])
-                                        setFormState((prev) => ({...prev, manager: item}))
-                                        setManager(item.full_name)
-
-                                    }}
-                                    style={{
-                                        cursor: 'pointer',
-                                        background: 'none',
-                                        border: 'none',
-                                        padding: '10px',
-                                        textAlign: 'left',
-                                        width: '100%',
-                                        display: 'block', // Ensures the button takes the full width
-                                        color: 'black',
-                                    }}
-                                >
-                                    {item.full_name}{' '}
-                                    {/* Adjust according to your response structure */}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </Form.Group>
             <div>
-                <h2>Выбор менеджера (Одиночный выбор)</h2>
+                {/* <h2>Выбор менеджера (Одиночный выбор)</h2> */}
                 <ManagerSelectInput
                     access={access}
                     multiplyObject={false}
-                    onSelect={handleSingleSelect}
+                    onSelect={handleManagerSelect}
+                    errors={errors}
+                    name='Исполнитель'
                 />
 
-                <h2>Выбор менеджера (Множественный выбор)</h2>
-                <ManagerSelectInput
+                {/* <h2>Выбор менеджера (Множественный выбор)</h2> */}
+                {/* <ManagerSelectInput
                     access={access}
                     multiplyObject={true}
-                    onSelect={handleMultipleSelect}
-                />
+                    onSelect={handleManagerSelect}
+                    errors={errors}
+                /> */}
             </div>
             <Form.Group className="mb-3">
                 <div className="form-control-wrap">
@@ -350,64 +254,6 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 {errors.children_for_photoshoot &&
                     <div className="text-danger">{errors.children_for_photoshoot[0]}</div>}
             </Form.Group>
-
-            {/* <Form.Group className="mb-3" style={{position: 'relative'}}>
-                <div className="form-control-wrap">
-                    <Form.Label className="text-secondary">Сад</Form.Label>
-                    <Form.Control
-                        name="garden"
-                        className="shadow-none"
-                        placeholder="Не указано"
-                        value={kindergarten}
-                        onChange={handleKindergarden}
-                    />
-                    <div className="control-img">
-                        <img src={search} alt=""/>
-                    </div>
-                </div>
-                {errors.kindergarten && <div className="text-danger">{errors.kindergarten[0]}</div>}
-                {kindergartenResults.length > 0 && (
-                    <ul className="kindergarten-suggestions"
-                        style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            width: '100%',
-                            backgroundColor: 'white',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                            zIndex: 1000,
-                            maxHeight: '200px',
-                            overflowY: 'auto',
-                        }}>
-                        {kindergartenResults.map((item, index) => (
-                            <li key={index}>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setFormState((prev) => ({...prev, kindergarden: item}))
-                                        setKindergarten(item.name)
-                                        setKindergartenResults([])
-                                    }}
-                                    style={{
-                                        cursor: 'pointer',
-                                        background: 'none',
-                                        border: 'none',
-                                        padding: '10px',
-                                        textAlign: 'left',
-                                        width: '100%',
-                                        display: 'block', // Ensures the button takes the full width
-                                        color: 'black',
-                                    }}
-                                >
-                                    {item.name}{' '} */}
-            {/* Adjust according to your response structure */}
-            {/* </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </Form.Group> */}
 
             <ModalFooter style={{padding: '5px'}}>
                 <Button className="btn-filter-reset text-center" onClick={closeModal}>

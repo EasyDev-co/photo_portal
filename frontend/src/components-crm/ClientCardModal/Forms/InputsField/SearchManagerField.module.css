@@ -1,0 +1,18 @@
+.selected_manager {
+    display: inline-block;
+    background-color: rgb(224, 223, 223);
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.text {
+    display: inline;
+    margin-left: 4px;
+}
+.close {
+    width: 10px;
+}
+.block {
+    max-width: 350px;
+}

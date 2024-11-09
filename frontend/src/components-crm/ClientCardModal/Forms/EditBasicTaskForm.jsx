@@ -5,7 +5,7 @@ import people from '../../../assets/icons/people.svg'
 import { patchTaskWithToken } from '../../../http/client-cards/patchTasks'
 import { fetchsingleTaskWithTokenInterceptor } from '../../../http/client-cards/getSingleTask'
 import { deleteTaskWithToken } from '../../../http/client-cards/deleteTask'
-import DatePicker from '../../DatePicker/DatePicker'
+import ManagerSelectInput from './InputsField/SearchManagerField'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -24,7 +24,14 @@ const EditBasicTaskForm = ({
   })
 
   const [errors, setErrors] = useState({})
-  const [isActive, setIsActive] = useState(false)
+
+
+  const handleManagerSelect = (selectedManager) => {
+    setFormState((prevState) => ({
+        ...prevState,
+        manager: selectedManager,
+    }));
+};
 
   function reformatDate(dateStr) {
     const [day, month, year] = dateStr.split('.')
@@ -117,32 +124,9 @@ const EditBasicTaskForm = ({
   return (
     <Form>
       <Form.Group className="mb-3">
-        <Form.Label className="text-secondary">Тип задачи</Form.Label>
-        <Form.Select
-          name="status"
-          className="shadow-none"
-          style={{ width: '100%' }}
-          value={formState.status || '1'}
-          onChange={(e) => {
-            const newValue = e.target.value
-            if (newValue !== formState.status) {
-              handleChange(newValue)
-            }
-          }}
-        >
-          <option value="1">Звонок</option>
-          <option value="2">Сбор оплаты + отправка ссылок</option>
-          <option value="3">Принять заказ</option>
-          <option value="4">Позвонить холодный/списки</option>
-          <option value="5">Проверить отправку образцов, Готовые фото</option>
-          <option value="6">Теплые сады</option>
-          <option value="7">Напомнить о записи</option>
-          <option value="8">Позвонить по КП, Проверить смс по Вотсапп</option>
-        </Form.Select>
-        {errors.status && <div className="text-danger">{errors.status[0]}</div>}
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label className="text-secondary">Статус задачи</Form.Label>
+
+        <Form.Label className="text-secondary">Тип задачиХЕР</Form.Label>
+
         <Form.Select
           name="task_type"
           className="shadow-none"
@@ -150,7 +134,9 @@ const EditBasicTaskForm = ({
           value={formState.task_type}
           onChange={handleChange}
         >
-          <option hidden>Выберите статус задачи</option>
+
+          <option hidden>Выберите тип задачи</option>
+
           <option value="1">Открыта</option>
           <option value="2">В работе</option>
           <option value="3">Готова</option>
@@ -162,22 +148,31 @@ const EditBasicTaskForm = ({
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
-          <DatePicker
-            label={'Дедлайн'}
-            placeholder={'Не указно'}
-            img={calendar}
-            isActive={isActive}
-            setIsActive={setIsActive}
-            navTitles={{
-              days: 'MMMM <i>yyyy</i>',
-              months: 'yyyy',
-            }}
+
+          <Form.Label className="text-secondary">Выберите дату</Form.Label>
+          <Form.Control
+            name="date_end"
+            className="shadow-none"
+            placeholder="Не указано"
+            value={formState.date_end}
+            onChange={handleChange}
           />
+          <div className="control-img">
+            <img src={calendar} alt="" />
+          </div>
         </div>
-        {errors.charge_dates && (
-          <div className="text-danger">{errors.charge_dates[0]}</div>
+        {errors.date_end && (
+          <div className="text-danger">{errors.date_end[0]}</div>
         )}
       </Form.Group>
+
+      <ManagerSelectInput
+        access={access}
+        multiplyObject={false}
+        onSelect={handleManagerSelect}
+        errors={errors}
+        name='Исполнитель'
+      />
 
       <Form.Group controlId="noteText" className="mb-3">
         <Form.Control
@@ -192,25 +187,6 @@ const EditBasicTaskForm = ({
         {errors.text && <div className="text-danger">{errors.text[0]}</div>}
       </Form.Group>
 
-      <Form.Group className="mb-3">
-                <div className="form-control-wrap">
-                    <Form.Label className="text-secondary">
-                        Карточка клиента
-                    </Form.Label>
-                    <Form.Control
-                        name="children_for_photoshoot"
-                        className="shadow-none"
-                        placeholder="Не указано"
-                        value={formState.children_for_photoshoot}
-                        onChange={handleChange}
-                    />
-                    <div className="control-img">
-                        <img src={people} alt=""/>
-                    </div>
-                </div>
-                {errors.children_for_photoshoot &&
-                    <div className="text-danger">{errors.children_for_photoshoot[0]}</div>}
-            </Form.Group>
 
       <ModalFooter style={{ padding: '5px' }}>
         <Button className="btn-filter-reset text-center" onClick={handleDelete}>
