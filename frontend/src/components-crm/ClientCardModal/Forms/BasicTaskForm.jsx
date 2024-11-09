@@ -225,6 +225,8 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 {errors.status && <div className="text-danger">{errors.status[0]}</div>}
             </Form.Group>
 
+            <ExecutorInput />
+
             <Form.Group className="mb-3" style={{position: 'relative'}}>
                 <div className="form-control-wrap">
                     <Form.Label className="text-secondary">Исполнитель</Form.Label>
