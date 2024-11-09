@@ -2,7 +2,7 @@ import { localUrl } from "../../constants/constants";
 
 export const updateEmployeeData = async (employeeId, data, access) => {
     const url = `${localUrl}/api/crm/v1/roles/employees/${employeeId}/`;
-
+    console.log(data)
     try {
         const response = await fetch(url, {
             method: 'PATCH',

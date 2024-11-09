@@ -1,218 +1,199 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Card, Button, Form } from 'react-bootstrap'
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Card, Button, Form} from 'react-bootstrap';
+import {createEmployee} from "../../http/employees/createEmployee"; // Импортируем функцию создания сотрудника
 
 const CreateEmployee = () => {
-  const navigate = useNavigate()
+    const navigate = useNavigate();
 
-  const [personalInfo, setPersonalInfo] = useState({
-    name: '',
-    employee_role: '',
-    last_name: '',
-    email: '',
-    phone_number: '',
-  })
+    // Состояние для личной информации
+    const [personalInfo, setPersonalInfo] = useState({
+        first_name: '',
+        employee_role: 2,
+        last_name: '',
+        phone_number: null,
+    });
 
-  const [securityInfo, setSecurityInfo] = useState({
-    login: '',
-    password: '',
-  })
+    // Состояние для безопасности
+    const [securityInfo, setSecurityInfo] = useState({
+        email: '',
+        password: '',
+    });
 
-  const handlePersonalInfoChange = (e) => {
-    const { name, value } = e.target
-    setPersonalInfo((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }))
-  }
+    // Функция изменения личной информации
+    const handlePersonalInfoChange = (e) => {
+        const {name, value} = e.target;
+        setPersonalInfo((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
-  const handleSecurityInfoChange = (e) => {
-    const { name, value } = e.target
-    setSecurityInfo((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }))
-  }
+    // Функция изменения информации безопасности
+    const handleSecurityInfoChange = (e) => {
+        const {name, value} = e.target;
+        setSecurityInfo((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
-  return (
-    <div className="page-crm">
-      <div className="header-title">
-        <h1>Создать профиль сотрудника</h1>
-      </div>
-      <div className="d-flex flex-column gap-3">
-        {/* First Card */}
-        <Card className="border-0 p-3 ">
-          <Card.Header
-            className="border-0 fw-600 p-0"
-            style={{ fontSize: '17px' }}
-          >
-            Личная информация
-          </Card.Header>
-          <Card.Body>
-            <Form>
-              {/* Row of inputs using Bootstrap grid */}
-              <div className="row">
-                <div className="col-12 col-md-6 mb-3">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Имя
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="name"
-                      value={personalInfo.name}
-                      onChange={handlePersonalInfoChange}
-                    />
-                  </Form.Group>
-                </div>
-                <div className="col-12 col-md-6 mb-3">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Должность
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="employee_role"
-                      value={personalInfo.employee_role}
-                      onChange={handlePersonalInfoChange}
-                    />
-                  </Form.Group>
-                </div>
-              </div>
+    // Функция обработки сохранения
+    const handleSubmit = async () => {
+        const data = {
+            user: {
+                ...personalInfo,
+                ...securityInfo,
+            }, employee_role: personalInfo.employee_role, status: "active"
 
-              <div className="row">
-                <div className="col-12 col-md-6 mb-3">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Фамилия
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="last_name"
-                      value={personalInfo.last_name}
-                      onChange={handlePersonalInfoChange}
-                    />
-                  </Form.Group>
-                </div>
-                <div className="col-12 col-md-6 mb-3">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Email
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="email"
-                      value={personalInfo.email}
-                      onChange={handlePersonalInfoChange}
-                    />
-                  </Form.Group>
-                </div>
-              </div>
+        };
 
-              <div className="row mb-3">
-                <div className="col-12 col-md-6">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Номер телефона
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="phone_number"
-                      value={personalInfo.phone_number}
-                      onChange={handlePersonalInfoChange}
-                    />
-                  </Form.Group>
-                </div>
-                <div
-                  style={{ flex: 1, marginTop: '30px' }}
-                  className="justify-content-end d-flex"
-                >
-                  {' '}
-                </div>
-              </div>
-            </Form>
-          </Card.Body>
-        </Card>
+        try {
+            const accessToken = localStorage.getItem('access');
+            const createdEmployee = await createEmployee(data, accessToken);
 
-        {/* Second Card */}
-        <Card className="border-0 p-3 ">
-          <Card.Header
-            className="border-0 fw-600 p-0"
-            style={{ fontSize: '17px' }}
-          >
-            Пароли и безопасность
-          </Card.Header>
-          <Card.Body>
-            <Form>
-              <div className="row">
-                <div className="col-12 col-md-6 mb-3">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Логин
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="login"
-                      value={securityInfo.login}
-                      onChange={handleSecurityInfoChange}
-                    />
-                  </Form.Group>
+            navigate(`/crm/employees/edit/${createdEmployee.id}`);
+        } catch (error) {
+            console.error('Ошибка при создании сотрудника:', error);
+            alert('Не удалось создать сотрудника. Попробуйте снова.');
+        }
+    };
+
+    return (
+        <div className="page-crm">
+            <div className="header-title">
+                <h1>Создать профиль сотрудника</h1>
+            </div>
+            <div className="d-flex flex-column gap-3">
+                {/* Карточка с личной информацией */}
+                <Card className="border-0 p-3 ">
+                    <Card.Header className="border-0 fw-600 p-0" style={{fontSize: '17px'}}>
+                        Личная информация
+                    </Card.Header>
+                    <Card.Body>
+                        <Form>
+                            <div className="row">
+                                <div className="col-12 col-md-6 mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="text-secondary" style={{fontSize: '15px'}}>
+                                            Имя
+                                        </Form.Label>
+                                        <Form.Control
+                                            className="shadow-none ps-3"
+                                            placeholder="Не указано"
+                                            name="first_name"
+                                            value={personalInfo.first_name}
+                                            onChange={handlePersonalInfoChange}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="col-12 col-md-6 mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="text-secondary" style={{fontSize: '15px'}}>
+                                            Должность
+                                        </Form.Label>
+                                        <Form.Select
+                                            className="shadow-none ps-3"
+                                            name="employee_role"
+                                            value={personalInfo.employee_role}
+                                            onChange={handlePersonalInfoChange}
+                                        >
+                                            <option value="">Выберите статус</option>
+                                            <option value="1">РОП</option>
+                                            <option value="2">Менеджер</option>
+                                            <option value="4">Старший менеджер</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-12 col-md-6 mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="text-secondary" style={{fontSize: '15px'}}>
+                                            Фамилия
+                                        </Form.Label>
+                                        <Form.Control
+                                            className="shadow-none ps-3"
+                                            placeholder="Не указано"
+                                            name="last_name"
+                                            value={personalInfo.last_name}
+                                            onChange={handlePersonalInfoChange}
+                                        />
+                                    </Form.Group>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-12 col-md-6">
+                                    <Form.Group>
+                                        <Form.Label className="text-secondary" style={{fontSize: '15px'}}>
+                                            Номер телефона
+                                        </Form.Label>
+                                        <Form.Control
+                                            className="shadow-none ps-3"
+                                            placeholder="Не указано"
+                                            name="phone_number"
+                                            value={personalInfo.phone_number}
+                                            onChange={handlePersonalInfoChange}
+                                        />
+                                    </Form.Group>
+                                </div>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </Card>
+
+                {/* Карточка с информацией безопасности */}
+                <Card className="border-0 p-3 ">
+                    <Card.Header className="border-0 fw-600 p-0" style={{fontSize: '17px'}}>
+                        Пароли и безопасность
+                    </Card.Header>
+                    <Card.Body>
+                        <Form>
+                            <div className="row">
+                                <div className="col-12 col-md-6 mb-3">
+                                    <Form.Group>
+                                        <Form.Label className="text-secondary" style={{fontSize: '15px'}}>
+                                            Email
+                                        </Form.Label>
+                                        <Form.Control
+                                            className="shadow-none ps-3"
+                                            placeholder="Не указано"
+                                            name="email"
+                                            value={securityInfo.email}
+                                            onChange={handleSecurityInfoChange}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Form.Group>
+                                        <Form.Label className="text-secondary" style={{fontSize: '15px'}}>
+                                            Пароль
+                                        </Form.Label>
+                                        <Form.Control
+                                            className="shadow-none ps-3"
+                                            placeholder="Не указано"
+                                            name="password"
+                                            value={securityInfo.password}
+                                            onChange={handleSecurityInfoChange}
+                                        />
+                                    </Form.Group>
+                                </div>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </Card>
+
+                {/* Кнопка Сохранить */}
+                <div className="justify-content-end d-flex" style={{marginTop: '30px'}}>
+                    <Button className="create-btn centered-button" onClick={handleSubmit}>
+                        Сохранить
+                    </Button>
                 </div>
-                <div className="col-12 col-md-6">
-                  <Form.Group>
-                    <Form.Label
-                      className="text-secondary"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Пароль
-                    </Form.Label>
-                    <Form.Control
-                      className="shadow-none ps-3"
-                      placeholder="Не указано"
-                      name="password"
-                      value={securityInfo.password}
-                      onChange={handleSecurityInfoChange}
-                    />
-                  </Form.Group>
-                </div>
-              </div>
-            </Form>
-          </Card.Body>
-        </Card>
-        <div
-          style={{ marginTop: '30px' }}
-          className="justify-content-end d-flex"
-        >
-          {' '}
-          <Button className="create-btn centered-button">Сохранить</Button>
+            </div>
         </div>
-      </div>
-    </div>
-  )
-}
+    );
+};
 
-export default CreateEmployee
+export default CreateEmployee;
