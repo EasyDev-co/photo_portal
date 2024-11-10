@@ -1,11 +1,21 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions
 from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+
 
 from apps_crm.client_cards.models import ClientCardTask, HistoryCall, Notes, ClientCard
-from apps_crm.client_cards.api.v1.serializers import ClientCardTaskSerializer, HistoryCallSerializer, NotesSerializer, \
-    ClientCardSerializer, ClientCardRetrieveSerializer, ClientCardUpdateSerializer
+from apps_crm.client_cards.api.v1.serializers import (
+    ClientCardTaskSerializer,
+    HistoryCallSerializer,
+    NotesSerializer,
+    ClientCardSerializer,
+    ClientCardRetrieveSerializer,
+    ClientCardUpdateSerializer
+)
 from apps_crm.roles.models import Employee, UserRole
 from apps_crm.roles.permissions import IsROPorDirector, IsAuthorOrROPorDirector, IsEmployee
 from apps_crm.client_cards.filters import ClientCardTaskFilter, HistoryCallFilter, NotesFilter, ClientCardFilter
@@ -101,3 +111,27 @@ class NotesViewSet(
     serializer_class = NotesSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = NotesFilter
+
+
+class ClientCardSearchView(APIView):
+    """
+    APIView для поиска карточек клиента по названию детского сада
+    """
+
+    def get(self, request):
+        kindergarten_name = request.query_params.get("kindergarten_name")
+        if not kindergarten_name:
+            return Response(
+                {"error": "Параметр 'kindergarten_name' обязателен"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        client_cards = ClientCard.objects.filter(kindergarten__name__icontains=kindergarten_name)
+        if not client_cards.exists():
+            return Response(
+                {"message": "Карточки клиента не найдены"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+
+        serializer = ClientCardSerializer(client_cards, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
