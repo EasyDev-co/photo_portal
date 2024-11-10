@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from apps.photo.models import Photo, PhotoLine, PhotoTheme
 from apps.order.models import OrderItem
-from apps.order.models.order import OrderStatus
+from apps.order.models.order import OrderStatus, Order
 
 class PhotoRetrieveSerializer(serializers.ModelSerializer):
     """
@@ -15,7 +15,6 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
         model = Photo
         fields = ('id', 'number', 'photo_file', 'watermarked_photo', 'watermarked_photo_path', 'photo_path')
 
-
 class OrderItemSerializer(serializers.ModelSerializer):
     photo_name = serializers.CharField(source='photo.name', read_only=True)
     photo_type = serializers.CharField(source='get_photo_type_display', read_only=True)
@@ -23,6 +22,18 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ('id', 'photo_name', 'photo_type', 'amount', 'price')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ('id', 'is_digital', 'is_free_calendar', 'is_photobook', 'order_items')
+
+    def get_order_items(self, obj):
+        items = obj.order_items.all()
+        return OrderItemSerializer(items, many=True).data
 
 
 class PhotoThemeSerializer(serializers.ModelSerializer):
@@ -72,13 +83,13 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
     photos = serializers.SerializerMethodField()
-    order_items = serializers.SerializerMethodField()
+    orders = serializers.SerializerMethodField()
 
     class Meta:
         model = PhotoLine
         fields = (
             'id', 'photos', 'region', 'photo_theme_name',
-            'photo_theme_date', 'order_items'
+            'photo_theme_date', 'orders'
         )
 
     def get_photo_theme_name(self, obj):
@@ -95,10 +106,6 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
             return PhotoRetrieveSerializer(obj.photos.all(), many=True).data
         return []
 
-    def get_order_items(self, obj):
-        order_items = []
-        for order in obj.orders.filter(status__in=(OrderStatus.paid_for, OrderStatus.completed)):
-            items = order.order_items.all()
-            order_items += OrderItemSerializer(items, many=True).data
-        return order_items
-
+    def get_orders(self, obj):
+        orders = obj.orders.filter(status__in=(OrderStatus.paid_for, OrderStatus.completed))
+        return OrderSerializer(orders, many=True).data
