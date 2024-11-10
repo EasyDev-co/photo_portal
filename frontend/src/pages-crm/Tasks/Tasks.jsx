@@ -78,9 +78,11 @@ const Tasks = () => {
       }, [access]) 
 
     return (
-        <div className="page-crm"  style={{
-            height: '100vh'
-        }}>
+        <div className="page-crm"  
+        // style={{
+        //     height: '100vh'
+        // }}
+        >
             <ClientModal
                 title="Добавить задачу"
                 show={isOpen}
