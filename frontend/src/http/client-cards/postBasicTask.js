@@ -3,22 +3,25 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const getAllTasks = async (access) => {
-    // const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/`;
-    const url = `${localUrl}/api/crm/v2/client_cards/tasks/`
+export const postBasicTask = async ({access, data}) => {
+    const url = `${localUrl}/api/crm/v2/client_cards/tasks/`;
 
     const response = await fetch(url, {
+        method: 'POST', 
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
-        }
+        },
+        body: JSON.stringify(data)
+
     });
+    
     return response;
 }
 
-export const fetchAllTaskWithTokenInterceptor = async (access) => {
+export const postBasicTaskWithToken = async (access, data) => {
     try {
-        let response = await getAllTasks(access)
+        let response = await postBasicTask({access, data})
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {
@@ -27,7 +30,7 @@ export const fetchAllTaskWithTokenInterceptor = async (access) => {
                         if (res.refresh !== undefined) {
                             setCookie('refresh', res.refresh);
                             localStorage.setItem('access', res.access);
-                            response = getAllTasks(res.access);
+                            response = postBasicTask(res.access, data);
                         }
                     })
             }

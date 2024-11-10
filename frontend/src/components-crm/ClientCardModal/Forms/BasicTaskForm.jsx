@@ -7,6 +7,7 @@ import ManagerSelectInput from "./InputsField/SearchManagerField";
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import { postTaskWithToken } from '../../../http/client-cards/postTask'
+import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
 
 
 const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
@@ -102,7 +103,7 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
 
         const postTask = async () => {
 
-            const response = await postTaskWithToken(
+            const response = await postBasicTaskWithToken(
                 access,
                 data)
             if (response.ok) {
