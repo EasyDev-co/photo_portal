@@ -48,7 +48,7 @@ from config.settings import (
 User = get_user_model()
 
 
-class PhotoLineAPIView(APIView):
+class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
