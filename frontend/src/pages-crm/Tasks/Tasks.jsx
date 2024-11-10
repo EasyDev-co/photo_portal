@@ -11,6 +11,7 @@ import ClientModal from "../../components-crm/ClientCardModal/ClientModal";
 import ClientCardForm from "../../components-crm/ClientCardModal/Forms/ClientCardForm";
 import BasicTaskForm from "../../components-crm/ClientCardModal/Forms/BasicTaskForm";
 import EditBasicTaskForm from "../../components-crm/ClientCardModal/Forms/EditBasicTaskForm";
+import TasksFilter from "../../components-crm/ClientFilter/TasksFilter";
 
 const Tasks = () => {
     const navigate = useNavigate()
@@ -98,8 +99,8 @@ const Tasks = () => {
                 <div>
                     <Button onClick={handleShowModal} className="create-btn">Создать</Button>
                 </div>
-               
             </div>
+            <TasksFilter />
             <div className="d-flex flex-column justify-content-between"  style={{ height: '100%' }}>
             <div className="d-flex flex-wrap gap-3 align-items-stretch">
                 {tasksList.map(item => (

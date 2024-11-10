@@ -2,12 +2,11 @@ import React, {useState, useEffect} from 'react'
 import {Form, Button, ModalFooter} from 'react-bootstrap'
 import DatePicker from '../../DatePicker/DatePicker'
 import calendar from '../../../assets/icons/calendar-event.svg'
-import people from '../../../assets/icons/people.svg'
-import search from '../../../assets/icons/search.svg'
 import {postClientCardWithToken} from '../../../http/client-cards/postClientCard'
-import {fetchKindergartensWithToken} from '../../../http/client-cards/getKinderGartenSearch'
-import {fetchManagersWithToken} from '../../../http/client-cards/getManagers'
 import ManagerSelectInput from "./InputsField/SearchManagerField";
+import TypeTask from './InputsField/TypeTask'
+import CardSelectInput from './InputsField/SearchClientCardField'
+import { postTaskWithToken } from '../../../http/client-cards/postTask'
 
 
 const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
@@ -20,28 +19,37 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         return `${year}-${month}-${day}`;
     };
     const [formState, setFormState] = useState({
-        garden_details: '',
+        details: '',
         charge_dates: '', // Will store the selected date
-        status: '',
         manager: '',
-        kindergarden: '',
+        clientCard: '',
         children_count: '',
         children_for_photoshoot: '',
+        task_type: '',
     })
 
+    useEffect(() => {
+        console.log(formState)
+    }, [formState])
 
     const [errors, setErrors] = useState({})
-
-    const [kindergarten, setKindergarten] = useState('')
-    const [kindergartenResults, setKindergartenResults] = useState([])
-
-    const [manager, setManager] = useState('')
-    const [managerResults, setManagerResults] = useState([])
 
     const handleManagerSelect = (selectedManager) => {
         setFormState((prevState) => ({
             ...prevState,
             manager: selectedManager,
+        }));
+    };
+    const handleCardSelect = (selectedCard) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            clientCard: selectedCard,
+        }));
+    };
+    const handleTypeSelect = (selectedType) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            task_type: selectedType,
         }));
     };
 
@@ -57,30 +65,12 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         }))
     }
 
-    const handleDateChange = (e) => {
-        let value = e.target.value;
-
-        // Remove any non-digit characters
-        value = value.replace(/\D/g, '');
-
-        // Apply the xx.xx.xxxx format
-        if (value.length > 2 && value.length <= 4) {
-            value = `${value.slice(0, 2)}.${value.slice(2)}`;
-        } else if (value.length > 4) {
-            value = `${value.slice(0, 2)}.${value.slice(2, 4)}.${value.slice(4, 8)}`;
-        }
-
+    const handleDateChange = (formattedDate) => {
         setFormState((prevState) => ({
             ...prevState,
-            charge_dates: value,
+            charge_dates: formattedDate,
         }));
     };
-
-    const handleKindergarden = (e) => {
-        const {value} = e.target
-        setKindergarten(value)
-    }
-
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -100,20 +90,19 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
         }
         const data = {
             charge_dates: formatDate(formState.charge_dates),
-            garden_details: formState.garden_details || "Реквизитов нет",
-            kindergarten: formState.kindergarden.id,
-            status: formState.status || 1,
-            children_count: formState.children_count || 0,
-            children_for_photoshoot: formState.children_for_photoshoot || 0,
-            responsible_manager: formState.manager.id
+            details: formState.details || "Реквизитов нет",
+            clientCard: formState.clientCard.id,
+            task_type: formState.task_type || 1,
+            responsible_manager: formState.manager.id,
+            task_status: 1
         }
 
         console.log(formState.charge_dates);
 
 
-        const postCard = async () => {
+        const postTask = async () => {
 
-            const response = await postClientCardWithToken(
+            const response = await postTaskWithToken(
                 access,
                 data)
             if (response.ok) {
@@ -128,82 +117,13 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
             }
         }
 
-        postCard()
+        postTask()
     }
-
-    useEffect(() => {
-        const fetchKindergartens = async () => {
-            try {
-                const response = await fetchKindergartensWithToken({
-                    access,
-                    name: kindergarten,
-                })
-                if (response.ok) {
-                    const data = await response.json()
-                    setKindergartenResults(data.slice(0, 5))
-                } else {
-                    const err = await response.json()
-                }
-            } catch (error) {
-                console.error('Error posting note:', error)
-            }
-        }
-
-        if (kindergarten && kindergarten !== formState.kindergarden.name) {
-            fetchKindergartens()
-        } else {
-            setKindergartenResults([])
-        }
-    }, [kindergarten])
 
     return (
         <Form>
-            <Form.Group className="mb-3">
-                <Form.Label className="text-secondary">
-                    Тип задачи
-                </Form.Label>
-                <Form.Select
-                    name="status"
-                    className="shadow-none"
-                    style={{width: '100%'}}
-                    value={formState.status || '1'}
-                    onChange={(e) => {
-                        const newValue = e.target.value;
-                        if (newValue !== formState.status) {
-                            handleChange(newValue);
-                        }
-                    }}
-                >
-                    <option value="1">Звонок</option>
-                    <option value="2">Сбор оплаты + отправка ссылок</option>
-                    <option value="3">Принять заказ</option>
-                    <option value="4">Позвонить холодный/списки</option>
-                    <option value="5">Проверить отправку образцов, Готовые фото</option>
-                    <option value="6">Теплые сады</option>
-                    <option value="7">Напомнить о записи</option>
-                    <option value="8">Позвонить по КП, Проверить смс по Вотсапп</option>
-                </Form.Select>
-                {errors.status && <div className="text-danger">{errors.status[0]}</div>}
-            </Form.Group>
+            <TypeTask onSelect={handleTypeSelect} />
 
-            <div>
-                {/* <h2>Выбор менеджера (Одиночный выбор)</h2> */}
-                <ManagerSelectInput
-                    access={access}
-                    multiplyObject={false}
-                    onSelect={handleManagerSelect}
-                    errors={errors}
-                    name='Исполнитель'
-                />
-
-                {/* <h2>Выбор менеджера (Множественный выбор)</h2> */}
-                {/* <ManagerSelectInput
-                    access={access}
-                    multiplyObject={true}
-                    onSelect={handleManagerSelect}
-                    errors={errors}
-                /> */}
-            </div>
             <Form.Group className="mb-3">
                 <div className="form-control-wrap">
                     <DatePicker
@@ -212,6 +132,8 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                         img={calendar}
                         isActive={isActive}
                         setIsActive={setIsActive}
+                        onDateChange={handleDateChange}
+                        value={formState.charge_dates}
                         navTitles={{
                             days: 'MMMM <i>yyyy</i>',
                             months: 'yyyy',
@@ -220,6 +142,16 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 </div>
                 {errors.charge_dates && <div className="text-danger">{errors.charge_dates[0]}</div>}
             </Form.Group>
+
+            <div>
+                <ManagerSelectInput
+                    access={access}
+                    multiplyObject={false}
+                    onSelect={handleManagerSelect}
+                    errors={errors}
+                    name='Исполнитель'
+                />
+            </div>
 
             <Form.Group controlId="noteText" className="mb-3">
                 <Form.Label className="text-secondary">Описание задачи</Form.Label>
@@ -234,26 +166,15 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 />
                 {errors.garden_details && <div className="text-danger">{errors.garden_details[0]}</div>}
             </Form.Group>
-
-            <Form.Group className="mb-3">
-                <div className="form-control-wrap">
-                    <Form.Label className="text-secondary">
-                        Карточка клиента
-                    </Form.Label>
-                    <Form.Control
-                        name="children_for_photoshoot"
-                        className="shadow-none"
-                        placeholder="Не указано"
-                        value={formState.children_for_photoshoot}
-                        onChange={handleChange}
-                    />
-                    <div className="control-img">
-                        <img src={people} alt=""/>
-                    </div>
-                </div>
-                {errors.children_for_photoshoot &&
-                    <div className="text-danger">{errors.children_for_photoshoot[0]}</div>}
-            </Form.Group>
+            <div>
+                <CardSelectInput 
+                    access={access}
+                    multiplyObject={false}
+                    onSelect={handleCardSelect}
+                    errors={errors}
+                    name='Карточка клиента'
+                />
+            </div>
 
             <ModalFooter style={{padding: '5px'}}>
                 <Button className="btn-filter-reset text-center" onClick={closeModal}>

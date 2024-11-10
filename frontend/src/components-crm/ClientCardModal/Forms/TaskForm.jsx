@@ -4,6 +4,7 @@ import calendar from '../../../assets/icons/calendar-event.svg'
 import people from '../../../assets/icons/people.svg'
 import { postTaskWithToken } from '../../../http/client-cards/postTask'
 import DatePicker from '../../DatePicker/DatePicker'
+import TasksFilter from '../../ClientFilter/TasksFilter'
 
 const TaskForm = ({ cardId, closeModal, addTask }) => {
     const access = localStorage.getItem('access') // Get access token
@@ -17,7 +18,18 @@ const TaskForm = ({ cardId, closeModal, addTask }) => {
     garden: ''
   });
 
+  useEffect(() => {
+    console.log(formState)
+  }, [formState])
+
   const [errors, setErrors] = useState({})
+
+  const handleTypeSelect = (selectedType) => {
+    setFormState((prevState) => ({
+        ...prevState,
+        task_type: selectedType,
+    }));
+};
 
   function reformatDate(dateStr) {
     const [day, month, year] = dateStr.split('.');
@@ -65,22 +77,7 @@ const TaskForm = ({ cardId, closeModal, addTask }) => {
   }
   return (
     <Form>
-    <Form.Group className="mb-3">
-      <Form.Label className="text-secondary">Тип задачи</Form.Label>
-      <Form.Select
-        name="task_type"
-        className="shadow-none"
-        style={{ width: '100%' }}
-        value={formState.task_type}
-        onChange={handleChange}
-      >
-        <option hidden>Выберите тип задачи</option>
-        <option value="1">Открыта</option>
-        <option value="2">В работе</option>
-        <option value="3">Готова</option>
-      </Form.Select>
-      {errors.task_type && <div className="text-danger">{errors.task_type[0]}</div>}
-    </Form.Group>
+    <TasksFilter onSelect={handleTypeSelect} />
 
 
     <Form.Group className="mb-3">

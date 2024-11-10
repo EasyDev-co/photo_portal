@@ -5,6 +5,7 @@ import { Button, Pagination } from "react-bootstrap";
 import { fetchEmployeeskWithTokenInterceptor } from "../../http/employees/getEmployeeList";
 
 import EmployeeCard from "../EmployeeCard/EmployeeCard";
+import EmployeeFilter from "../ClientFilter/EmployeeFilter";
 
 const Employees = () => {
     const navigate = useNavigate()
@@ -59,6 +60,7 @@ const Employees = () => {
                 </div>
                
             </div>
+            <EmployeeFilter />
             <div className="d-flex flex-column justify-content-between"  style={{ height: '100%' }}>
             <div className="d-flex flex-wrap gap-3 align-items-stretch">
     {employeeList.map(item => (
