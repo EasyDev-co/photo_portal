@@ -12,6 +12,7 @@ class ClientCardTaskFilter(django_filters.FilterSet):
         }
 
 
+# TODO Фильтр по региону, исполнителю, детский сад А-Я, Я-А
 class ClientCardFilter(django_filters.FilterSet):
     class Meta:
         model = ClientCard
@@ -39,7 +40,7 @@ class NotesFilter(django_filters.FilterSet):
             'priority': ['exact'],
         }
 
-
+# TODO сделать множественный фильтр
 class ClientCardTaskFilterV2(django_filters.FilterSet):
     executor = django_filters.NumberFilter(field_name='executor__id', lookup_expr='exact')
     date_end = django_filters.DateFilter(field_name='date_end', lookup_expr='exact')
