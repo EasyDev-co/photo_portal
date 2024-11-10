@@ -6,6 +6,9 @@ import { patchTaskWithToken } from '../../../http/client-cards/patchTasks'
 import { fetchsingleTaskWithTokenInterceptor } from '../../../http/client-cards/getSingleTask'
 import { deleteTaskWithToken } from '../../../http/client-cards/deleteTask'
 import ManagerSelectInput from './InputsField/SearchManagerField'
+import TypeTask from './InputsField/TypeTask'
+import CardSelectInput from './InputsField/SearchClientCardField'
+import DatePicker from '../../DatePicker/DatePicker'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -21,17 +24,25 @@ const EditBasicTaskForm = ({
     date_end: '',
     task_type: '',
     manager: '',
+    status: '',
+    clientCard: '',
   })
 
   const [errors, setErrors] = useState({})
-
+  const [isActive, setIsActive] = useState(false)
 
   const handleManagerSelect = (selectedManager) => {
     setFormState((prevState) => ({
-        ...prevState,
-        manager: selectedManager,
-    }));
-};
+      ...prevState,
+      manager: selectedManager,
+    }))
+  }
+  const handleCardSelect = (selectedCard) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      clientCard: selectedCard,
+    }))
+  }
 
   function reformatDate(dateStr) {
     const [day, month, year] = dateStr.split('.')
@@ -57,6 +68,7 @@ const EditBasicTaskForm = ({
             date_end: '',
             task_type: '',
             manager: '',
+            status: '',
           })
           closeModal()
           deleteItem(taskId)
@@ -77,6 +89,10 @@ const EditBasicTaskForm = ({
     const data = {
       date_end: reformatDate(formState.date_end),
       text: formState.text,
+      task_type: formState.task_type,
+      manager: formState.manager,
+      status: formState.status,
+      clientCard: formState.clientCard,
     }
 
     const postTask = async () => {
@@ -121,48 +137,37 @@ const EditBasicTaskForm = ({
       fetchTask()
     }
   }, [access, taskId])
+
+  const handleTypeSelect = (selectedType) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      task_type: selectedType,
+    }))
+  }
+  useEffect(() => {
+    console.log(formState)
+  }, [formState])
+
   return (
     <Form>
-      <Form.Group className="mb-3">
-
-        <Form.Label className="text-secondary">Тип задачиХЕР</Form.Label>
-
-        <Form.Select
-          name="task_type"
-          className="shadow-none"
-          style={{ width: '100%' }}
-          value={formState.task_type}
-          onChange={handleChange}
-        >
-
-          <option hidden>Выберите тип задачи</option>
-
-          <option value="1">Открыта</option>
-          <option value="2">В работе</option>
-          <option value="3">Готова</option>
-        </Form.Select>
-        {errors.task_type && (
-          <div className="text-danger">{errors.task_type[0]}</div>
-        )}
-      </Form.Group>
+      <TypeTask onSelect={handleTypeSelect} />
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
-
-          <Form.Label className="text-secondary">Выберите дату</Form.Label>
-          <Form.Control
-            name="date_end"
-            className="shadow-none"
-            placeholder="Не указано"
-            value={formState.date_end}
-            onChange={handleChange}
+          <DatePicker
+            label={'Дедлайн'}
+            placeholder={'Не указно'}
+            img={calendar}
+            isActive={isActive}
+            setIsActive={setIsActive}
+            navTitles={{
+              days: 'MMMM <i>yyyy</i>',
+              months: 'yyyy',
+            }}
           />
-          <div className="control-img">
-            <img src={calendar} alt="" />
-          </div>
         </div>
-        {errors.date_end && (
-          <div className="text-danger">{errors.date_end[0]}</div>
+        {errors.charge_dates && (
+          <div className="text-danger">{errors.charge_dates[0]}</div>
         )}
       </Form.Group>
 
@@ -171,8 +176,27 @@ const EditBasicTaskForm = ({
         multiplyObject={false}
         onSelect={handleManagerSelect}
         errors={errors}
-        name='Исполнитель'
+        name="Исполнитель"
       />
+
+      <Form.Group className="mb-3">
+        <Form.Label className="text-secondary">Статус задачи</Form.Label>
+        <Form.Select
+          name="status"
+          className="shadow-none"
+          style={{ width: '100%' }}
+          value={formState.status || '1'}
+          onChange={(e) => {
+            if (e.target.value !== formState.status) {
+              handleChange(e) // Передаем событие e, а не значение
+            }
+          }}
+        >
+          <option value="1">Открыта</option>
+          <option value="2">Выполнена</option>
+        </Form.Select>
+        {errors.status && <div className="text-danger">{errors.status[0]}</div>}
+      </Form.Group>
 
       <Form.Group controlId="noteText" className="mb-3">
         <Form.Control
@@ -187,6 +211,15 @@ const EditBasicTaskForm = ({
         {errors.text && <div className="text-danger">{errors.text[0]}</div>}
       </Form.Group>
 
+      <div>
+        <CardSelectInput
+          access={access}
+          multiplyObject={false}
+          onSelect={handleCardSelect}
+          errors={errors}
+          name="Карточка клиента"
+        />
+      </div>
 
       <ModalFooter style={{ padding: '5px' }}>
         <Button className="btn-filter-reset text-center" onClick={handleDelete}>
