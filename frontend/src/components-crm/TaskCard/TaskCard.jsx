@@ -10,6 +10,17 @@ import { useNavigate } from 'react-router-dom'
 
 const TaskCard = ({ data, handleShowEdit }) => {
 
+  const types = {
+    "1": "Звонок",
+    "2": "Сбор оплаты + отправка ссылок",
+    "3": "Принять заказ",
+    "4": "Позвонить холодный/списки",
+    "5": "Проверить отправку образцов, Готовые фото.",
+    "6": "Теплые сады",
+    "7": "Напомнить о записи",
+    "8": "Позвонить по КП, Проверить смс по Вотсапп",
+  }
+
     function formatDate(dateString) {
         const date = new Date(dateString);
         const year = date.getFullYear();
@@ -40,8 +51,7 @@ const TaskCard = ({ data, handleShowEdit }) => {
         style={{ border: 'none' }}
       >
         <div className="card-header-title cursor-pointer">
-            Созвон
-          {/* {data.user.first_name} {data.user.last_name} */}
+          {types[data.task_type]} 
         </div>
         <OverlayTrigger
           trigger="click"

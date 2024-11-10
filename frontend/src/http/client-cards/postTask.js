@@ -19,9 +19,9 @@ export const postTask = async ({access, data}) => {
     return response;
 }
 
-export const postTaskWithToken = async ({access, data}) => {
+export const postTaskWithToken = async (access, data) => {
     try {
-        let response = await postTask(access, data)
+        let response = await postTask({access, data})
         if (!response.ok) {
             let createToken = await tokenRefreshCreate()
             if (createToken.ok) {

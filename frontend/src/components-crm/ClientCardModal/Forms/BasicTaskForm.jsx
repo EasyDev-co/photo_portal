@@ -89,11 +89,11 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
             return; // Prevent form submission if date is invalid
         }
         const data = {
-            charge_dates: formatDate(formState.charge_dates),
-            details: formState.details || "Реквизитов нет",
-            clientCard: formState.clientCard.id,
+            date_end: formatDate(formState.charge_dates),
+            text: formState.details || "Реквизитов нет",
+            client_card: formState.clientCard.id,
             task_type: formState.task_type || 1,
-            responsible_manager: formState.manager.id,
+            executor: formState.manager.id,
             task_status: 1
         }
 
@@ -108,7 +108,7 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
             if (response.ok) {
                 const data = await response.json()
 
-                handleAddClientCard(data)
+                // handleAddClientCard(data)
                 closeModal()
             } else {
                 const err = await response.json()
