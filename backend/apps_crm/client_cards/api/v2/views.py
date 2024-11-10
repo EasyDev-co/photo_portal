@@ -62,7 +62,6 @@ class ClientCardTaskViewSet(viewsets.ModelViewSet):
         employee = get_object_or_404(Employee, user=user)
         task = self.get_object()
 
-        # Проверка на права редактирования
         if employee.employee_role == UserRole.MANAGER:
             if task.executor != employee:
                 raise PermissionDenied("Вы можете редактировать только свои задачи.")
