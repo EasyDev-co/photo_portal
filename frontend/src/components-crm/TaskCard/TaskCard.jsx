@@ -51,7 +51,7 @@ const TaskCard = ({ data, handleShowEdit }) => {
         style={{ border: 'none' }}
       >
         <div className="card-header-title cursor-pointer">
-          {types[data.task_type]} 
+          {data.task_type_name} 
         </div>
         <OverlayTrigger
           trigger="click"
@@ -91,7 +91,7 @@ const TaskCard = ({ data, handleShowEdit }) => {
           <div className="d-flex gap-1">
             <div className="fw-400 text-secondary">Исполнитель: </div>
             <div className="fw-400">
-                {data.author.full_name}
+                {data.executor_fi}
               {/* {data.author.employee_role && data.author.employee_role === 1
                 ? 'Руководитель отдела продаж'
                 : data.author.employee_role === 2
@@ -106,7 +106,7 @@ const TaskCard = ({ data, handleShowEdit }) => {
           <div className="d-flex gap-1">
             <div className="fw-400 text-secondary">Статус задачи: </div>
             <div className="fw-400">
-                Выполнено
+                {data.task_status_name}
             </div>
           </div>
         </Card.Text>
