@@ -51,6 +51,9 @@ const GalleryItem = ({orders}) => {
     return (
         <>
             {orders.map((elem, i) => {
+                if (elem.photos.length === 0) {
+                    return null;
+                }
                 return (
                     <div key={i} className={styles.galleryItemWrap}>
                         <div className={styles.titleWrap}>

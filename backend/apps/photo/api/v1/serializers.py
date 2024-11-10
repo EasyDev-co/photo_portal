@@ -83,7 +83,6 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
     photos = serializers.SerializerMethodField()
-    orders = serializers.SerializerMethodField()
 
     class Meta:
         model = PhotoLine
@@ -105,7 +104,3 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
         if obj.is_digital:
             return PhotoRetrieveSerializer(obj.photos.all(), many=True).data
         return []
-
-    def get_orders(self, obj):
-        orders = obj.orders.filter(status__in=(OrderStatus.paid_for, OrderStatus.completed))
-        return OrderSerializer(orders, many=True).data

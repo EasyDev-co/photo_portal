@@ -3,10 +3,8 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {Button, Card, Form} from 'react-bootstrap';
 import {fetchsingleEmployeeWithTokenInterceptor} from '../../http/employees/getSingleEmployee';
 import {updateEmployeeData} from "../../http/employees/updateEmployee";
-import styles from "./EditEmployee.module.css"
 
 const EditEmployee = () => {
-    const navigate = useNavigate();
     const {employeeId} = useParams();
     const access = localStorage.getItem('access');
 

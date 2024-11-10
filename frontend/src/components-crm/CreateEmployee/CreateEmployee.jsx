@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Card, Button, Form} from 'react-bootstrap';
-import {createEmployee} from "../../http/employees/createEmployee"; // Импортируем функцию создания сотрудника
+import {createEmployee} from "../../http/employees/createEmployee";
 
 const CreateEmployee = () => {
     const navigate = useNavigate();
