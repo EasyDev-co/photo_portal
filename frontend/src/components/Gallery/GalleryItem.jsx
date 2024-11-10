@@ -37,13 +37,11 @@ const GalleryItem = ({orders}) => {
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-
-                // Очистка выбранных фото после завершения скачивания последнего файла
                 if (index === activePhotos.length - 1) {
                     setActivePhotos([]);
                     setActiveIds([]);
                 }
-            }, index * 200); // Задержка в 200 мс между скачиваниями
+            }, index * 200);
         });
     };
 
@@ -51,6 +49,9 @@ const GalleryItem = ({orders}) => {
     return (
         <>
             {orders.map((elem, i) => {
+                if (elem.photos.length === 0) {
+                    return null;
+                }
                 return (
                     <div key={i} className={styles.galleryItemWrap}>
                         <div className={styles.titleWrap}>

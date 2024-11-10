@@ -54,21 +54,17 @@ class OrderAPIView(APIView):
     def get(self, request):
         user = request.user
 
+        # Получаем фотолинии, привязанные к пользователю
         photo_lines = PhotoLine.objects.filter(
             kindergarten__in=user.kindergarten.all(),
-            parent=user,
-            orders__status__in=(OrderStatus.paid_for, OrderStatus.completed)
-        ).prefetch_related(
-            'orders__order_items', 'orders__order_items__photo'
-        ).annotate(
-            is_digital=F('orders__is_digital')
-        ).order_by('photo_theme__date_end')
+            parent=user
+        ).annotate(is_digital=F('orders__is_digital')).order_by('photo_theme__date_end')
 
+        # Проверяем наличие фотолиний
         if not photo_lines.exists():
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
-
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):

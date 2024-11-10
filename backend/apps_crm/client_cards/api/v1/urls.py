@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ClientCardTaskViewSet, NotesViewSet, HistoryCallViewSet, ClientCardViewSet
+from .views import ClientCardTaskViewSet, NotesViewSet, HistoryCallViewSet, ClientCardViewSet, ClientCardSearchView
 
 router = DefaultRouter()
 router.register(r'client-card-tasks', ClientCardTaskViewSet, basename='clientcardtask')
@@ -11,4 +11,5 @@ router.register(r'history-calls', HistoryCallViewSet, basename='historycall')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("search/", ClientCardSearchView.as_view(), name="client-card-search"),
 ]
