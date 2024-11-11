@@ -140,16 +140,16 @@ const ManagerProfile = () => {
                     <div className={styles.profileWidget}>
                         {stats.past_stats.map((item, index) => (
                             <>
-                            <StatisticItem
-                                key={index}
-                                label={`Тема фотосессии`}
-                                data={item.photo_theme.name}
-                            />
-                            <StatisticItem
-                                key={index}
-                                label={`Сумма выкупа`}
-                                data={item.ransom_amount}
-                            />
+                                <StatisticItem
+                                    key={index}
+                                    label={`Тема фотосессии`}
+                                    data={item.photo_theme.name}
+                                />
+                                <StatisticItem
+                                    key={index}
+                                    label={`Сумма выкупа`}
+                                    data={item.ransom_amount}
+                                />
                             </>
                         ))}
                     </div>
@@ -204,8 +204,8 @@ const ManagerProfile = () => {
                     </Swiper>
                 </div>
             }
-
         </div>
+
     );
 }
 
