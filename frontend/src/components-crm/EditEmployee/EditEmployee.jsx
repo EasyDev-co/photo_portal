@@ -3,8 +3,12 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {Button, Card, Form} from 'react-bootstrap';
 import {fetchsingleEmployeeWithTokenInterceptor} from '../../http/employees/getSingleEmployee';
 import {updateEmployeeData} from "../../http/employees/updateEmployee";
+import {deleteEmployeeWithTokenInterceptor} from "../../http/employees/deleteEmployee";
+
 
 const EditEmployee = () => {
+    const navigate = useNavigate();
+
     const {employeeId} = useParams();
     const access = localStorage.getItem('access');
 
@@ -103,6 +107,18 @@ const EditEmployee = () => {
                 alert('Логин и пароль обновлены успешно');
             } else {
                 alert('Введите пароль для обновления');
+            }
+        } catch (error) {
+            console.error('Failed to update login and password:', error);
+            alert('Ошибка при обновлении логина и пароля');
+        }
+    };
+
+    const handleDeleteEmployee = async () => {
+        try {
+            if (employeeId) {
+                await deleteEmployeeWithTokenInterceptor(access, employeeId);
+                navigate(`/crm/employees/`);
             }
         } catch (error) {
             console.error('Failed to update login and password:', error);
@@ -260,9 +276,14 @@ const EditEmployee = () => {
                                     </Form.Group>
                                 </div>
                             </div>
-                            <div className="d-flex justify-content-end">
+                            <div className="d-flex justify-content-end mb-3">
                                 <Button className="create-btn" onClick={handleUpdateSecurityInfo}>
                                     Обновить пароль и логин
+                                </Button>
+                            </div>
+                            <div className="d-flex justify-content-end">
+                                <Button className="create-btn" onClick={handleDeleteEmployee}>
+                                    Удалить сотрудника
                                 </Button>
                             </div>
                         </Form>

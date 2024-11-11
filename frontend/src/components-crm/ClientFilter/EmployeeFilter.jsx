@@ -3,37 +3,39 @@
 import Form from 'react-bootstrap/Form'
 import './styles/ClientFilter.scss'
 import DatePicker from '../DatePicker/DatePicker'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import calendar from '../../assets/icons/calendar-event.svg'
-import { localUrl } from '../../constants/constants'
+import {localUrl} from '../../constants/constants'
 import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchManagerField'
 
-const EmployeeFilter = () => {
-  const [managers, setManagers] = useState([]);
-  const [errors, setErrors] = useState({});
+const EmployeeFilter = ({onManagerSelect}) => {
+    const [managers, setManagers] = useState([]);
+    const [errors, setErrors] = useState({});
 
 
-  const access = localStorage.getItem('access')
+    const access = localStorage.getItem('access')
 
-  const handleManagerSelect = (selectedManager) => {
-    setManagers(selectedManager);
-};
+    const handleManagerSelect = (selectedManager) => {
+        console.log(selectedManager)
+        setManagers(selectedManager);
+        onManagerSelect(selectedManager);
+    };
 
-  return (
-    <div>
-      <div className="d-flex align-items-center gap-3">
-        <Form className="d-flex column-gap-3 flex-wrap mb-3">
-          <ManagerSelectInput
-                access={access}
-                multiplyObject={true}
-                onSelect={handleManagerSelect}
-                errors={errors}
-                name='Менеджер'
-              />
-        </Form>
-      </div>
-    </div>
-  )
+    return (
+        <div>
+            <div className="d-flex align-items-center gap-3">
+                <Form className="d-flex column-gap-3 flex-wrap mb-3">
+                    <ManagerSelectInput
+                        access={access}
+                        multiplyObject={true}
+                        onSelect={handleManagerSelect}
+                        errors={errors}
+                        name='Менеджер'
+                    />
+                </Form>
+            </div>
+        </div>
+    )
 }
 
 export default EmployeeFilter
