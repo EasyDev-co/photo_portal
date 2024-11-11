@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, ModalFooter } from 'react-bootstrap'
 
-const TypeTask = ({onSelect}) => {
+const TypeTask = ({onSelect, initialType}) => {
   const access = localStorage.getItem('access') // Get access token
 
-  const [type, setType] = useState('1')
+  const init = {
+    "Звонок": "1",
+    "Сбор оплаты+ отправка ссылок": "2",
+    "Принять заказ": "3",
+    "Позвонить холодный/списки": "4",
+    "Проверить отправку образцов, Готовые фото.": "5",
+    "Теплые сады": "6",
+    "Напомнить о записи": "7",
+    "Позвонить по КП, Проверить смс по Вотсапп": "8"
+  }
+
+  const [type, setType] = useState(init[initialType] || '1')
 
   const [errors, setErrors] = useState({})
 
@@ -24,7 +35,7 @@ const TypeTask = ({onSelect}) => {
         name="status"
         className="shadow-none"
         style={{ width: '100%' }}
-        value={type || '1'}
+        value={type || init[initialType] || '1'}
         onChange={(e) => {
           if (e.target.value !== type) {
             handleChange(e) // Передаем событие e, а не значение

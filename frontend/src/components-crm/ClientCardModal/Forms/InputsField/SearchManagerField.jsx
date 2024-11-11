@@ -5,11 +5,23 @@ import people from '../../../../assets/icons/people.svg'
 import styles from './SearchManagerField.module.css';
 import close_button from '../../../../assets/icons/close_button.svg'
 
-const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, name }) => {
+const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, name, initialManager }) => {
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedManagers, setSelectedManagers] = useState(multiplyObject ? [] : null);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (initialManager) {
+            const managerData = { full_name: initialManager }; // Независимо от формата, создаем объект с ключом `full_name`
+            setSelectedManagers(multiplyObject ? [managerData] : managerData);
+        }
+        setIsLoading(false);
+    }, [initialManager, multiplyObject]);
+
+    if (isLoading) {
+        return <div>Загрузка...</div>;  // Компонент загрузки
+    }
 
     // Функция для поиска менеджеров
     const handleSearch = async (value) => {

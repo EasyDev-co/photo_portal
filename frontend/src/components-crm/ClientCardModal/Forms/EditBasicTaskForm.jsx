@@ -10,27 +10,45 @@ import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import DatePicker from '../../DatePicker/DatePicker'
 import { deleteBasicTaskWithToken } from '../../../http/client-cards/deleteBasicTask'
+import { fetchBasicSingleTaskWithTokenInterceptor } from '../../../http/client-cards/getBasicSingleTask'
 
 const EditBasicTaskForm = ({
   taskId,
   closeModal,
-  formatDate,
   editTask,
   deleteItem,
 }) => {
   const access = localStorage.getItem('access') // Get access token
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' }
+    return date.toLocaleDateString('ru-RU', options)
+  }
+
+  const statusMap = {
+    "Открыта": "1",
+    "Выполнена": "2"
+  }
+
   const [formState, setFormState] = useState({
-    text: '',
-    date_end: '',
-    task_type: '',
-    manager: '',
-    status: '',
-    clientCard: '',
+    author_fi:"",
+    client_card: "",
+    created_at: "",
+    date_end: "",
+    executor_fi: "",
+    id: "",
+    revision_comment: null,
+    task_status_name: "",
+    task_type_name: "",
+    text: "",
   })
+
+  
 
   const [errors, setErrors] = useState({})
   const [isActive, setIsActive] = useState(false)
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const handleManagerSelect = (selectedManager) => {
     setFormState((prevState) => ({
@@ -59,17 +77,29 @@ const EditBasicTaskForm = ({
     }))
   }
 
+  const handleDateChange = (formattedDate) => {
+    setFormState((prevState) => ({
+        ...prevState,
+        date_end: formattedDate,
+    }));
+};
+
   const handleDelete = () => {
     const deleteTask = async () => {
       try {
         const response = await deleteBasicTaskWithToken(access, taskId) // Use the function to fetch data
         if (response.ok) {
           setFormState({
-            text: '',
-            date_end: '',
-            task_type: '',
-            manager: '',
-            status: '',
+            author_fi:"",
+            client_card: "",
+            created_at: "",
+            date_end: "",
+            executor_fi: "",
+            id: "",
+            revision_comment: null,
+            task_status_name: "",
+            task_type_name: "",
+            text: "",
           })
           closeModal()
           deleteTask(taskId)
@@ -85,7 +115,18 @@ const EditBasicTaskForm = ({
     deleteTask()
   }
 
+  const handleStatusChange = (e) => {
+    const selectedValue = e.target.value;
+    const statusText = selectedValue === "1" ? "Открыта" : "Выполнена";
+    setFormState((prevState) => ({
+      ...prevState,
+      task_status_name: statusText
+    }));
+  }
+
   const handleSubmit = (e) => {
+
+    //СДЕЛАТЬ ОБРАБОТЧИК СТАТУСОВ И ТИПОВ ДЛЯ ОТПРАВКИ НА БЭК
     e.preventDefault()
 
     const data = {
@@ -93,11 +134,12 @@ const EditBasicTaskForm = ({
       text: formState.text,
       task_type: formState.task_type,
       manager: formState.manager,
-      status: formState.status,
+      status: statusMap[formState.task_status_name],
+      // status: formState.status,
       clientCard: formState.clientCard,
     }
 
-    const postTask = async () => {
+    const patchTask = async () => {
       const response = await patchTaskWithToken(access, data, taskId)
       if (response.ok) {
         const res = await response.json()
@@ -110,25 +152,34 @@ const EditBasicTaskForm = ({
       }
     }
 
-    postTask()
+    patchTask()
   }
+
 
   useEffect(() => {
     if (taskId) {
       const fetchTask = async () => {
         try {
-          const response = await fetchsingleTaskWithTokenInterceptor({
+          const response = await fetchBasicSingleTaskWithTokenInterceptor({
             access,
             taskId,
           }) // Use the function to fetch data
           if (response.ok) {
             const data = await response.json() // Parse the response JSON
+            console.log(data)
             setFormState({
-              text: data.text || '',
+              author_fi: data.author_fi || '',
+              client_card: data.client_card || '',
+              created_at: formatDate(data.created_at) || '',
               date_end: formatDate(data.date_end) || '',
-              task_type: data.task_type || '',
-              manager: '',
+              executor_fi: data.executor_fi || '',
+              id: data.id || '',
+              revision_comment: data.revision_comment || '',
+              task_status_name: data.task_status_name || '',
+              task_type_name: data.task_type_name || '',
+              text: data.text || '',
             })
+            setIsDataLoaded(true)
           } else {
             console.error('Failed to fetch task')
           }
@@ -143,16 +194,15 @@ const EditBasicTaskForm = ({
   const handleTypeSelect = (selectedType) => {
     setFormState((prevState) => ({
       ...prevState,
-      task_type: selectedType,
+      task_type_name: selectedType,
     }))
   }
-  useEffect(() => {
-    console.log(formState)
-  }, [formState])
+
+  if (!isDataLoaded) return <div>Загрузка...</div>;
 
   return (
     <Form>
-      <TypeTask onSelect={handleTypeSelect} />
+      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} />
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
@@ -166,10 +216,12 @@ const EditBasicTaskForm = ({
               days: 'MMMM <i>yyyy</i>',
               months: 'yyyy',
             }}
+            onDateChange={handleDateChange}
+            value={formState.date_end}
           />
         </div>
-        {errors.charge_dates && (
-          <div className="text-danger">{errors.charge_dates[0]}</div>
+        {errors.date_end && (
+          <div className="text-danger">{errors.date_end[0]}</div>
         )}
       </Form.Group>
 
@@ -179,6 +231,7 @@ const EditBasicTaskForm = ({
         onSelect={handleManagerSelect}
         errors={errors}
         name="Исполнитель"
+        initialManager={formState.executor_fi}
       />
 
       <Form.Group className="mb-3">
@@ -187,12 +240,14 @@ const EditBasicTaskForm = ({
           name="status"
           className="shadow-none"
           style={{ width: '100%' }}
-          value={formState.status || '1'}
-          onChange={(e) => {
-            if (e.target.value !== formState.status) {
-              handleChange(e) // Передаем событие e, а не значение
-            }
-          }}
+          // value={formState.status || '1'}
+          value={statusMap[formState.task_status_name] || "1"}
+          onChange={handleStatusChange}
+          // onChange={(e) => {
+          //   if (e.target.value !== formState.status) {
+          //     handleChange(e)
+          //   }
+          // }}
         >
           <option value="1">Открыта</option>
           <option value="2">Выполнена</option>
@@ -220,6 +275,7 @@ const EditBasicTaskForm = ({
           onSelect={handleCardSelect}
           errors={errors}
           name="Карточка клиента"
+          initialCard={formState.client_card}
         />
       </div>
 

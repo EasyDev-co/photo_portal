@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Pagination } from "react-bootstrap";
-
-import EmployeeCard from "../../components-crm/EmployeeCard/EmployeeCard";
 import { fetchAllTaskWithTokenInterceptor } from "../../http/client-cards/getAllTasks";
 import TaskCard from "../../components-crm/TaskCard/TaskCard";
 import ClientModal from "../../components-crm/ClientCardModal/ClientModal";
-import ClientCardForm from "../../components-crm/ClientCardModal/Forms/ClientCardForm";
 import BasicTaskForm from "../../components-crm/ClientCardModal/Forms/BasicTaskForm";
 import EditBasicTaskForm from "../../components-crm/ClientCardModal/Forms/EditBasicTaskForm";
 import TasksFilter from "../../components-crm/ClientFilter/TasksFilter";
