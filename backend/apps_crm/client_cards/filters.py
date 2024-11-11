@@ -14,6 +14,7 @@ class ClientCardTaskFilter(django_filters.FilterSet):
         }
 
 
+# TODO переделать фильтры от А-Я, Я-А
 class ClientCardFilter(django_filters.FilterSet):
     responsible_manager = UUIDInFilter(field_name='responsible_manager__id', lookup_expr='in')
     region = UUIDInFilter(field_name='kindergarten__region__id', lookup_expr='in')
