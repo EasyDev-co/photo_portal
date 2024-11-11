@@ -2,6 +2,7 @@ from datetime import datetime
 
 from rest_framework import serializers
 
+from apps.kindergarten.models import Ransom
 from apps.photo.models import Photo, PhotoLine, PhotoTheme
 from apps.order.models import OrderItem
 from apps.order.models.order import OrderStatus, Order
@@ -36,14 +37,31 @@ class OrderSerializer(serializers.ModelSerializer):
         return OrderItemSerializer(items, many=True).data
 
 
+class RansomSerializerForPhotoThem(serializers.ModelSerializer):
+    class Meta:
+        model = Ransom
+        fields = ('id', 'ransom_amount')
+
+
 class PhotoThemeSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для получения темы фотосессии.
-    """
+    ransom = serializers.SerializerMethodField()
 
     class Meta:
         model = PhotoTheme
-        fields = ('id', 'name', 'date_start', 'date_end')
+        fields = ('id', 'name', 'date_start', 'date_end', 'ransom')
+
+    def get_ransom(self, obj):
+        # Получаем детский сад из контекста
+        kindergarten = self.context.get('kindergarten')
+
+        # Находим единственный объект Ransom для детского сада и темы
+        if kindergarten:
+            ransom = Ransom.objects.filter(
+                kindergarten=kindergarten,
+                photo_theme=obj
+            ).first()
+            return RansomSerializerForPhotoThem(ransom).data if ransom else None
+        return None
 
 
 class PhotoLineSerializer(serializers.ModelSerializer):

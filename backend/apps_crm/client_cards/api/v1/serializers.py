@@ -155,9 +155,11 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
         current_photo_theme = all_photo_themes.filter(
             is_active=True
         ).first()
+        context = {'kindergarten': obj.kindergarten}
+
         return {
-            'all_photo_themes': PhotoThemeSerializer(all_photo_themes, many=True).data,
-            'current_photo_theme': PhotoThemeSerializer(current_photo_theme).data
+            'all_photo_themes': PhotoThemeSerializer(all_photo_themes, many=True, context=context).data,
+            'current_photo_theme': PhotoThemeSerializer(current_photo_theme, context=context).data
         }
 
     @staticmethod
