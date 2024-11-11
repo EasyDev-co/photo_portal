@@ -17,6 +17,7 @@ from apps.order.models.const import OrderStatus, PaymentStatus, PaymentMethod
 from apps.order.models.receipt import Receipt
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.parse_notification_to_get_receipt import ParseNotificationToGetReceipt
+from apps.utils.services.ya_disk import create_file_dtos_from_order, get_yadisk_service
 from config.celery import BaseTask, app
 from config.settings import (
     EMAIL_HOST_USER,
@@ -188,6 +189,10 @@ class CheckIfOrdersPaid(BaseTask):
                     einfo=traceback.format_exc(),
                 )
         Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+
+        # Вызов задачи для загрузки файлов на Яндекс Диск
+        upload_files_to_yadisk.delay(successful_payment_order_ids)
+
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
 
@@ -313,6 +318,31 @@ class SendClosingReceiptsTask(BaseTask):
             )
 
 
+yadisk_service = get_yadisk_service()
+
+
+class UploadFilesToYaDiskTask(BaseTask):
+    """ Задача для загрузки файлов на Яндекс Диск """
+
+    def run(self, paid_order_ids, *args, **kwargs):
+        if paid_order_ids:
+            paid_orders = Order.objects.filter(id__in=paid_order_ids)
+            files = []
+            for paid_order in paid_orders:
+                files.extend(create_file_dtos_from_order(paid_order))
+
+            try:
+                yadisk_service.upload(files)
+            except Exception as e:
+                self.on_failure(
+                    exc=e,
+                    task_id=self.request.id,
+                    args=(),
+                    kwargs={'paid_orders': paid_orders, 'files': files},
+                    einfo=traceback.format_exc(),
+                )
+
+
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
@@ -320,3 +350,4 @@ app.register_task(CheckIfOrdersPaid)
 app.register_task(DeleteExpiredOrders)
 parse_notification_fiscalization = app.register_task(ParseNotificationFiscalization)
 app.register_task(SendClosingReceiptsTask)
+upload_files_to_yadisk = app.register_task(UploadFilesToYaDiskTask)
