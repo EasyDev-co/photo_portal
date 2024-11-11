@@ -9,6 +9,7 @@ import ManagerSelectInput from './InputsField/SearchManagerField'
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import DatePicker from '../../DatePicker/DatePicker'
+import { deleteBasicTaskWithToken } from '../../../http/client-cards/deleteBasicTask'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -61,7 +62,7 @@ const EditBasicTaskForm = ({
   const handleDelete = () => {
     const deleteTask = async () => {
       try {
-        const response = await deleteTaskWithToken(access, taskId) // Use the function to fetch data
+        const response = await deleteBasicTaskWithToken(access, taskId) // Use the function to fetch data
         if (response.ok) {
           setFormState({
             text: '',
@@ -71,7 +72,7 @@ const EditBasicTaskForm = ({
             status: '',
           })
           closeModal()
-          deleteItem(taskId)
+          deleteTask(taskId)
         } else {
           console.error('Failed to delete task')
         }

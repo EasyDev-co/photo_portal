@@ -2,15 +2,13 @@ import React, {useState, useEffect} from 'react'
 import {Form, Button, ModalFooter} from 'react-bootstrap'
 import DatePicker from '../../DatePicker/DatePicker'
 import calendar from '../../../assets/icons/calendar-event.svg'
-import {postClientCardWithToken} from '../../../http/client-cards/postClientCard'
 import ManagerSelectInput from "./InputsField/SearchManagerField";
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
-import { postTaskWithToken } from '../../../http/client-cards/postTask'
 import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
 
 
-const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
+const BasicTaskForm = ({handleAddTaskCard, closeModal}) => {
     const access = localStorage.getItem('access') // Get access token
 
     const maxCharacters = 100
@@ -108,9 +106,12 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
                 data)
             if (response.ok) {
                 const data = await response.json()
-
-                // handleAddClientCard(data)
-                closeModal()
+                if (data) {
+                    handleAddTaskCard(data);
+                    closeModal();
+                }
+                // handleAddTaskCard(data)
+                // closeModal()
             } else {
                 const err = await response.json()
                 setErrors(err)
