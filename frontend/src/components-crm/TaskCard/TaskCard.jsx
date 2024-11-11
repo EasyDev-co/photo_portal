@@ -6,8 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
 const TaskCard = ({ data, handleShowEdit }) => {
-  const [isDataReady, setIsDataReady] = useState(false);
-
   function formatDate(dateString) {
     const date = new Date(dateString)
     const year = date.getFullYear()
@@ -73,8 +71,8 @@ const TaskCard = ({ data, handleShowEdit }) => {
           <div className="d-flex gap-1">
             <div className="fw-400 text-secondary">Дата создания: </div>
             <div className="fw-400">
-              {formatDate(data.created_at.slice(0, 10))}
-              {/* {data.created_at ? formatDate(data.created_at.slice(0, 10)) : 'Дата не указана'} */}
+              {/* {formatDate(data.created_at.slice(0, 10))} */}
+              {data.created_at ? formatDate(data.created_at.slice(0, 10)) : 'Дата не указана'}
             </div>
           </div>
         </Card.Text>

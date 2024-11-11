@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Pagination } from "react-bootstrap";
 
-
-import { fetchEmployeeskWithTokenInterceptor } from "../../http/employees/getEmployeeList";
 import EmployeeCard from "../../components-crm/EmployeeCard/EmployeeCard";
 import { fetchAllTaskWithTokenInterceptor } from "../../http/client-cards/getAllTasks";
 import TaskCard from "../../components-crm/TaskCard/TaskCard";
@@ -41,11 +39,6 @@ const Tasks = () => {
       setShowEdit(false)
     }
 
-    const handleAddTaskCard = (card)=>{
-      setTasksList((prevTasksList) => [card, ...prevTasksList]);
-        // setTasksList([card, ...tasksList])
-      }
-
       const deleteTask = (taskId) => {
         const updatedTasks = tasksList.filter(item => item.id !== taskId);
         setTasksList(updatedTasks)
@@ -81,7 +74,7 @@ const Tasks = () => {
 
         
         fetchAllTasks()
-      }, [access, tasksList]) 
+      }, [access]) 
 
     return (
         <div className="page-crm"  
@@ -91,7 +84,7 @@ const Tasks = () => {
                 show={isOpen}
                 handleClose={handleCloseModal}
             >
-                <BasicTaskForm closeModal={handleCloseModal} handleAddTaskCard={handleAddTaskCard}/>
+                <BasicTaskForm closeModal={handleCloseModal} setTasksList={setTasksList}/>
             </ClientModal>
             <ClientModal
                 title="Редактировать задачу"

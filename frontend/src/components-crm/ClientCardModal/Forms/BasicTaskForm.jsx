@@ -6,9 +6,10 @@ import ManagerSelectInput from "./InputsField/SearchManagerField";
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
+import { fetchAllTaskWithTokenInterceptor } from '../../../http/client-cards/getAllTasks';
 
 
-const BasicTaskForm = ({handleAddTaskCard, closeModal}) => {
+const BasicTaskForm = ({closeModal, setTasksList}) => {
     const access = localStorage.getItem('access') // Get access token
 
     const maxCharacters = 100
@@ -104,15 +105,24 @@ const BasicTaskForm = ({handleAddTaskCard, closeModal}) => {
             const response = await postBasicTaskWithToken(
                 access,
                 data)
+
+                
             if (response.ok) {
-                const data = await response.json()
-                if (data) {
-                    handleAddTaskCard(data);
-                    closeModal();
+                const newTask = await response.json(); // Получаем новую задачу из ответа
+                if (newTask) {
+                    // Получаем все задачи после добавления новой
+                    const allTasksResponse = await fetchAllTaskWithTokenInterceptor(access);
+                    if (allTasksResponse.ok) {
+                        const allTasks = await allTasksResponse.json();
+                        setTasksList(allTasks.reverse()); // Обновляем список всех задач
+                        closeModal(); // Закрываем модальное окно
+                    } else {
+                        console.error('Не удалось получить обновленный список задач');
+                    }
                 }
-                // handleAddTaskCard(data)
-                // closeModal()
-            } else {
+            } 
+            
+            else {
                 const err = await response.json()
                 setErrors(err)
                 console.error(err)
