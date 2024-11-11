@@ -6,11 +6,23 @@ import styles from './SearchManagerField.module.css';
 import close_button from '../../../../assets/icons/close_button.svg'
 import { fetchSingleClientCardWithToken } from '../../../../http/client-cards/getSearchClientCard';
 
-const CardSelectInput = ({ access, multiplyObject = false, onSelect, errors, name }) => {
+const CardSelectInput = ({ access, multiplyObject = false, onSelect, errors, name, initialCard }) => {
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedCard, setSelectedCard] = useState(multiplyObject ? [] : null);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (initialCard) {
+            const managerData = { kindergarten_name: initialCard }; // Независимо от формата, создаем объект с ключом `full_name`
+            setSelectedCard(multiplyObject ? [managerData] : managerData);
+        }
+        setIsLoading(false);
+    }, [initialCard, multiplyObject]);
+
+    if (isLoading) {
+        return <div>Загрузка...</div>;  // Компонент загрузки
+    }
 
     const handleSearch = async (value) => {
         if (!value) {
