@@ -18,7 +18,7 @@ services:
     volumes:
       - static_dir:/opt/backend/static/
       - media_dir:/opt/backend/media/
-      - ./certbot/conf:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # Монтируем сертификаты
       - ./certbot/www:/var/www/certbot
     ports:
       - "8080:8080"
