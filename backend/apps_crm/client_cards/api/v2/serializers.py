@@ -7,13 +7,14 @@ class ClientCardTaskReadSerializer(serializers.ModelSerializer):
     executor_fi = serializers.ReadOnlyField()
     task_status_name = serializers.ReadOnlyField()
     task_type_name = serializers.ReadOnlyField()
+    review_task_status_name = serializers.ReadOnlyField()
 
     class Meta:
         model = ClientCardTask
         fields = [
             'id', 'author_fi', 'executor_fi', 'client_card', 'text',
             'revision_comment', 'created_at', 'task_status_name',
-            'task_type_name', 'date_end'
+            'task_type_name', 'review_task_status_name',  'date_end'
         ]
 
 class ClientCardTaskWriteSerializer(serializers.ModelSerializer):
