@@ -42,8 +42,14 @@ const Tasks = () => {
     }
 
     const handleAddTaskCard = (card)=>{
-        setTasksList([tasksList,...tasksList])
+      setTasksList((prevTasksList) => [card, ...prevTasksList]);
+        // setTasksList([card, ...tasksList])
       }
+
+      const deleteTask = (taskId) => {
+        const updatedTasks = tasksList.filter(item => item.id !== taskId);
+        setTasksList(updatedTasks)
+    }
 
     // Функция для получения карточек на текущей странице
     const paginate = (array, page_number, page_size) => {
@@ -75,13 +81,10 @@ const Tasks = () => {
 
         
         fetchAllTasks()
-      }, [access]) 
+      }, [access, tasksList]) 
 
     return (
         <div className="page-crm"  
-        // style={{
-        //     height: '100vh'
-        // }}
         >
             <ClientModal
                 title="Добавить задачу"
@@ -95,7 +98,7 @@ const Tasks = () => {
                 show={showEdit}
                 handleClose={handleCloseEdit}
             >
-                <EditBasicTaskForm closeModal={handleCloseEdit} taskId={editId} />
+                <EditBasicTaskForm closeModal={handleCloseEdit} deleteItem={deleteTask} taskId={editId} />
             </ClientModal>
             <div className="header-title">
                 <h1 className="">Задачи</h1>
