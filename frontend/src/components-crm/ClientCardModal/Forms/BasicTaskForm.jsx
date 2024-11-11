@@ -7,6 +7,7 @@ import ManagerSelectInput from "./InputsField/SearchManagerField";
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import { postTaskWithToken } from '../../../http/client-cards/postTask'
+import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
 
 
 const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
@@ -89,11 +90,11 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
             return; // Prevent form submission if date is invalid
         }
         const data = {
-            charge_dates: formatDate(formState.charge_dates),
-            details: formState.details || "Реквизитов нет",
-            clientCard: formState.clientCard.id,
+            date_end: formatDate(formState.charge_dates),
+            text: formState.details || "Реквизитов нет",
+            client_card: formState.clientCard.id,
             task_type: formState.task_type || 1,
-            responsible_manager: formState.manager.id,
+            executor: formState.manager.id,
             task_status: 1
         }
 
@@ -102,13 +103,13 @@ const BasicTaskForm = ({handleAddClientCard, closeModal}) => {
 
         const postTask = async () => {
 
-            const response = await postTaskWithToken(
+            const response = await postBasicTaskWithToken(
                 access,
                 data)
             if (response.ok) {
                 const data = await response.json()
 
-                handleAddClientCard(data)
+                // handleAddClientCard(data)
                 closeModal()
             } else {
                 const err = await response.json()

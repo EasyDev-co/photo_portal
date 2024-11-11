@@ -2,13 +2,11 @@ import { localUrl } from "../../constants/constants";
 import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
-export const employees = async ({ access, ids }) => {
-    // Проверяем, передан ли список ID, и формируем URL с параметром фильтрации
-    const url = ids && ids.length > 0
-        ? `${localUrl}/api/crm/v1/roles/employees/?ids=${ids.join(',')}`
-        : `${localUrl}/api/crm/v1/roles/employees/`;
+export const deleteEmployee = async ({ access, employeeId }) => {
+    const url = `${localUrl}/api/crm/v1/roles/employees/${employeeId}/`;
 
     const response = await fetch(url, {
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`
@@ -17,10 +15,9 @@ export const employees = async ({ access, ids }) => {
     return response;
 };
 
-
-export const fetchEmployeesWithTokenInterceptor = async ({ access, ids }) => {
+export const deleteEmployeeWithTokenInterceptor = async (access, employeeId) => {
     try {
-        let response = await employees({ access, ids });
+        let response = await deleteEmployee({ access, employeeId });
         if (!response.ok) {
             const createToken = await tokenRefreshCreate();
             if (createToken.ok) {
@@ -28,13 +25,13 @@ export const fetchEmployeesWithTokenInterceptor = async ({ access, ids }) => {
                 if (res.refresh !== undefined) {
                     setCookie('refresh', res.refresh);
                     localStorage.setItem('access', res.access);
-                    response = await employees({ access: res.access, ids });
+                    response = await deleteEmployee({ access: res.access, employeeId });
                 }
             }
         }
         return response;
     } catch (error) {
-        console.error('Ошибка при выполнении запроса:', error);
+        console.error('Ошибка при выполнении DELETE запроса:', error);
         throw error;
     }
 };

@@ -62,6 +62,7 @@ const Tasks = () => {
             const response = await fetchAllTaskWithTokenInterceptor(access)
             if (response.ok) {
               const data = await response.json() // Parse the JSON response
+              console.log(data)
               console.log(data.reverse())
               setTasksList(data.reverse()) // Update state with fetched data
             } else {
@@ -72,14 +73,16 @@ const Tasks = () => {
           }
         }
 
-    
+        
         fetchAllTasks()
       }, [access]) 
 
     return (
-        <div className="page-crm"  style={{
-            height: '100vh'
-        }}>
+        <div className="page-crm"  
+        // style={{
+        //     height: '100vh'
+        // }}
+        >
             <ClientModal
                 title="Добавить задачу"
                 show={isOpen}

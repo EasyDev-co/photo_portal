@@ -6,6 +6,8 @@ from rest_framework import status
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -13,6 +15,7 @@ from rest_framework.response import Response
 from apps_crm.roles.permissions import IsROPorDirector
 from apps_crm.roles.models import UserRole
 from apps_crm.roles.models import Employee
+from apps_crm.roles.filters import EmployeeFilter
 from apps_crm.roles.api.v1.serializers import (
     EmployeeSerializer,
     EmployeeAndUserSerializer,
@@ -52,6 +55,8 @@ class EmployeeSearchView(generics.ListAPIView):
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeAndUserSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EmployeeFilter
     permission_classes = [IsAuthenticated, IsROPorDirector]
 
     def perform_create(self, serializer):
