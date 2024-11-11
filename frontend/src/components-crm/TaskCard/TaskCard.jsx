@@ -3,9 +3,9 @@ import burger from '../../assets/icons/card-burger.svg'
 import styles from './TaskCard.style.css'
 
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 
 const TaskCard = ({ data, handleShowEdit }) => {
-
   function formatDate(dateString) {
     const date = new Date(dateString)
     const year = date.getFullYear()
@@ -71,7 +71,8 @@ const TaskCard = ({ data, handleShowEdit }) => {
           <div className="d-flex gap-1">
             <div className="fw-400 text-secondary">Дата создания: </div>
             <div className="fw-400">
-              {formatDate(data.created_at.slice(0, 10))}
+              {/* {formatDate(data.created_at.slice(0, 10))} */}
+              {data.created_at ? formatDate(data.created_at.slice(0, 10)) : 'Дата не указана'}
             </div>
           </div>
         </Card.Text>
@@ -79,6 +80,7 @@ const TaskCard = ({ data, handleShowEdit }) => {
           <div className="d-flex gap-1">
             <div className="fw-400 text-secondary">Дедлайн: </div>
             <div className="fw-400">
+              
               {formatDate(data.date_end.slice(0, 10))}
             </div>
           </div>

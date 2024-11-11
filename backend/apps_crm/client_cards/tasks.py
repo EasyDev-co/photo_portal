@@ -90,4 +90,5 @@ class CreateNotifyForExpiredTask(BaseTask):
                 )
 
 
-app.register_task(CreateNotifyForExpiredTask())
+
+app.register_task(CreateNotifyForExpiredTask)

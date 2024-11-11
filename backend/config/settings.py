@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     "phonenumber_field",
     'auditlog',
+    'yadisk',
 
     # Приложения
     'apps.kindergarten',
@@ -204,7 +205,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend', ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -264,7 +265,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute='0', hour='*/1'),
     },
     "send_notify": {
-        "task": "apps_crm.client_cards.tasks.CreateNotifyForExpiredTask",
+        "task": "create_notify_for_expired_task",
         "schedule": crontab(minute='0', hour='*/1'),
     }
 }
@@ -352,3 +353,7 @@ YC_S3_ENDPOINT = os.environ.get("YC_S3_ENDPOINT")
 
 UPLOAD_URL = os.getenv('UPLOAD_URL')
 JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js')
+
+YAD_OAUTH_TOKEN=os.getenv('YAD_OAUTH_TOKEN')
+YAD_CLIENT_ID = os.getenv("YAD_CLIENT_ID")
+YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")

@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Pagination } from "react-bootstrap";
 
-
-import { fetchEmployeeskWithTokenInterceptor } from "../../http/employees/getEmployeeList";
 import EmployeeCard from "../../components-crm/EmployeeCard/EmployeeCard";
 import { fetchAllTaskWithTokenInterceptor } from "../../http/client-cards/getAllTasks";
 import TaskCard from "../../components-crm/TaskCard/TaskCard";
@@ -41,9 +39,10 @@ const Tasks = () => {
       setShowEdit(false)
     }
 
-    const handleAddTaskCard = (card)=>{
-        setTasksList([tasksList,...tasksList])
-      }
+      const deleteTask = (taskId) => {
+        const updatedTasks = tasksList.filter(item => item.id !== taskId);
+        setTasksList(updatedTasks)
+    }
 
     // Функция для получения карточек на текущей странице
     const paginate = (array, page_number, page_size) => {
@@ -79,23 +78,20 @@ const Tasks = () => {
 
     return (
         <div className="page-crm"  
-        // style={{
-        //     height: '100vh'
-        // }}
         >
             <ClientModal
                 title="Добавить задачу"
                 show={isOpen}
                 handleClose={handleCloseModal}
             >
-                <BasicTaskForm closeModal={handleCloseModal} handleAddTaskCard={handleAddTaskCard}/>
+                <BasicTaskForm closeModal={handleCloseModal} setTasksList={setTasksList}/>
             </ClientModal>
             <ClientModal
                 title="Редактировать задачу"
                 show={showEdit}
                 handleClose={handleCloseEdit}
             >
-                <EditBasicTaskForm closeModal={handleCloseEdit} taskId={editId} />
+                <EditBasicTaskForm closeModal={handleCloseEdit} deleteItem={deleteTask} taskId={editId} />
             </ClientModal>
             <div className="header-title">
                 <h1 className="">Задачи</h1>
