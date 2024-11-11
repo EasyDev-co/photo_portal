@@ -73,6 +73,7 @@ const EditBasicTaskForm = ({
           })
           closeModal()
           deleteTask(taskId)
+          deleteItem(taskId)
         } else {
           console.error('Failed to delete task')
         }
