@@ -1,15 +1,8 @@
 from django.db import models
 
+from .season import Season
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from apps.kindergarten.models import Kindergarten
-
-
-class Season(models.IntegerChoices):
-    """ Сезоны """
-    WINTER = 1, 'Зима'
-    SPRING = 2, 'Весна'
-    SUMMER = 3, 'Лето'
-    AUTUMN = 4, 'Осень'
 
 
 class PhotoTheme(UUIDMixin, TimeStampedMixin):
@@ -41,10 +34,13 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name='Выкуп подсчитан',
         default=False
     )
-    season = models.PositiveSmallIntegerField(
-        choices=Season.choices,
-        default=Season.WINTER,
-        verbose_name='Сезон'
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        verbose_name='Сезон',
+        related_name='photo_themes',
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
