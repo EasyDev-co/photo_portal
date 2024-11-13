@@ -11,7 +11,7 @@ from apps.kindergarten.models import Region
 from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine,
-                               Coefficient, UserPhotoCount)
+                               Coefficient, UserPhotoCount, Season)
 from apps.photo.models.photo_theme import PhotoPopularityStat
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
@@ -54,11 +54,12 @@ class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
         'name',
         'is_active',
         'date_start',
-        'date_end'
+        'date_end',
+        'season'
     )
     readonly_fields = ('are_qrs_removed',)
     list_filter = ('is_active',)
-    search_fields = ('name',)
+    search_fields = ('name', 'season')
     ordering = ('name', 'date_start', 'date_end')
 
 
@@ -208,4 +209,18 @@ class UserPhotoCountAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'photo_theme')
 
     def has_add_permission(self, request):
+        return False
+
+
+@admin.register(Season)
+class SeasonAdmin(admin.ModelAdmin):
+    list_display = ('season',)
+
+    # def has_add_permission(self, request):
+    #     return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False
