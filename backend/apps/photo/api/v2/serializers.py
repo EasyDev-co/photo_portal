@@ -9,9 +9,6 @@ class PhotoUploadSerializer(serializers.Serializer):
         source='kindergarten',
         write_only=True
     )
-    photo_theme = serializers.PrimaryKeyRelatedField(
-        queryset=PhotoTheme.objects.all()
-    )
     photos = serializers.ListField(
         child=serializers.FileField(),
         write_only=True

@@ -244,11 +244,9 @@
         
                 // Получаем дополнительные параметры
                 var kindergartenId = document.getElementById('kindergarten-id').value;
-                var photoTheme = document.getElementById('id_photo_theme').value;
         
                 // Добавляем параметры
                 formData.append('kindergarten_id', kindergartenId);
-                formData.append('photo_theme', photoTheme);
                 
                 // Отправляем AJAX запрос
                 $.ajax({
