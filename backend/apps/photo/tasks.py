@@ -58,7 +58,7 @@ class UpdatePhotoThemeActivityTask(BaseTask):
     def run(self, *args, **kwargs):
         # деактивируем прошедшие фототемы
         PhotoTheme.objects.filter(
-            is_active=True,
+            kindergartenphototheme__is_active=True,
             date_end__lt=timezone.now()
         ).update(is_active=False)
 

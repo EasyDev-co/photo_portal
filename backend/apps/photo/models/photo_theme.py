@@ -10,16 +10,6 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         max_length=255,
         verbose_name='Название'
     )
-    kindergartens = models.ManyToManyField(
-        Kindergarten,
-        verbose_name="Детский сад",
-        related_name="photo_themes",
-        blank=True,
-        null=True,
-    )
-    is_active = models.BooleanField(
-        verbose_name='Активно'
-    )
     date_start = models.DateTimeField(
         verbose_name='Дата начала'
     )

@@ -120,7 +120,7 @@ class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
     """
     Получение информации об актуальной теме фотосессии.
     """
-    queryset = PhotoTheme.objects.filter(is_active=True)
+    queryset = PhotoTheme.objects.filter(kindergartenphototheme__is_active=True)
     serializer_class = PhotoThemeSerializer
     permission_classes = [IsAuthenticated]
 

@@ -7,7 +7,6 @@ from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
 from apps.kindergarten.form import KindergartenForm
 from .models import Ransom
 
-
 from apps.kindergarten.models.kindergarten import Kindergarten
 
 from itertools import zip_longest
@@ -38,7 +37,7 @@ class PhotoPriceInline(admin.TabularInline):
 
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
-    list_display = ('name', 'region', 'code', 'has_photobook', 'locality')
+    list_display = ('name', 'region', 'code', 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code', 'file_upload')
@@ -48,6 +47,10 @@ class KindergartenAdmin(admin.ModelAdmin):
     def qr_image(self, obj):
         if obj.qr_code:
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
+
+    @staticmethod
+    def active_photo_theme(obj):
+        return obj.kindergartenphototheme.get(is_active=True)
 
     def get_fields(self, request, obj=None):
         if obj:

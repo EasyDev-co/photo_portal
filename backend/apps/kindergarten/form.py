@@ -1,6 +1,4 @@
-from apps.photo.models.photo_theme import PhotoTheme
 from django import forms
-from .widget import DragAndDropWidget
 
 
 class KindergartenForm(forms.Form):

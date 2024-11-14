@@ -52,7 +52,9 @@ class PhotoUploadView(APIView):
         if serializer.is_valid():
             kindergarten = serializer.validated_data['kindergarten']
             photos = serializer.validated_data['photos']
-            photo_theme = serializer.validated_data['photo_theme']
+            photo_theme = kindergarten.photo_themes.get(is_active=True)
+            if len(photo_theme) > 1:
+                raise ValidationError("У детского сада больше одной фототемы")
             self.save_photos(kindergarten, photos, photo_theme)
             return Response({'detail': 'Файлы успешно загружены!'}, status=status.HTTP_201_CREATED)
 
@@ -383,10 +385,10 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
     """
     Получение фотосессий для календаря.
     """
-    queryset = PhotoTheme.objects.filter(is_active=True)
+    queryset = PhotoTheme.objects.filter(kindergartenphototheme__is_active=True)
     serializer_class = PhotoThemeSerializerV2
     permission_classes = [IsAuthenticated]
-    ilter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = PhotoThemeFilter
 
     def get_queryset(self):
