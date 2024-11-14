@@ -52,6 +52,16 @@ class PhotoInline(admin.TabularInline):
                 self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
+class KindergartenPhotoThemeInline(admin.TabularInline):
+    model = KindergartenPhotoTheme
+    extra = 0
+    verbose_name = 'Фотосессия в детском саду'
+    verbose_name_plural = 'Фотосессии в детском саду'
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(PhotoTheme)
 class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = (

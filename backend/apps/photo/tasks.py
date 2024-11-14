@@ -60,7 +60,7 @@ class UpdatePhotoThemeActivityTask(BaseTask):
         PhotoTheme.objects.filter(
             kindergartenphototheme__is_active=True,
             date_end__lt=timezone.now()
-        ).update(is_active=False)
+        ).update(kindergartenphototheme__is_active=False)
 
 
 app.register_task(QRCodeRemoverTask)
