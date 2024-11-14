@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .season import Season
@@ -40,6 +41,11 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name = 'Фотосессия'
         verbose_name_plural = 'Фотосессии'
         ordering = ("-created",)
+
+    def clean(self):
+        super().clean()
+        if self.date_start >= self.date_end:
+            raise ValidationError("Дата окончания фотосессии не может быть раньше даты начала.")
 
 
 class PhotoPopularityStat(PhotoTheme):
