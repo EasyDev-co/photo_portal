@@ -1,5 +1,6 @@
 from urllib.parse import parse_qsl
 
+from django.utils import timezone
 from django.utils.html import format_html
 from django.contrib import admin
 from django.utils.datastructures import MultiValueDictKeyError
@@ -57,6 +58,14 @@ class KindergartenPhotoThemeInline(admin.TabularInline):
     extra = 0
     verbose_name = 'Фотосессия в детском саду'
     verbose_name_plural = 'Фотосессии в детском саду'
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        # Отображение только незаконченных фотосессий в выпадающем списке
+        if db_field.name == "photo_theme":
+            kwargs["queryset"] = PhotoTheme.objects.filter(
+                date_end__gt=timezone.now()
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_delete_permission(self, request, obj=None):
         return False
