@@ -153,7 +153,7 @@ class ClientCardRetrieveSerializer(BaseClientCardSerializer):
             photo_lines__in=obj.kindergarten.photo_lines.all()
         ).distinct()
         current_photo_theme = all_photo_themes.filter(
-            is_active=True
+            kindergartenphototheme__is_active=True
         ).first()
         context = {'kindergarten': obj.kindergarten}
 

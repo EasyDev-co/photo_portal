@@ -174,7 +174,7 @@ class ManagerSerializer(UserSerializer):
     def get_promocode(self, obj):
         photo_theme = PhotoTheme.objects.filter(
             photo_lines__in=obj.managed_kindergarten.photo_lines.all(),
-            is_active=True
+            kindergartenphototheme__is_active=True
         ).distinct().first()
         promocode = Promocode.objects.filter(
             user=obj,
