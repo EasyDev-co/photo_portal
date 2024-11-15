@@ -20,13 +20,17 @@ class ClientCardTaskReadSerializer(serializers.ModelSerializer):
 class ClientCardTaskWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и редактирования задач"""
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    review_task_status_name = serializers.ReadOnlyField()
 
     class Meta:
         model = ClientCardTask
         fields = [
             'id', 'author', 'executor', 'client_card', 'text',
-            'revision_comment', 'task_status', 'task_type', 'date_end'
+            'revision_comment', 'task_status', 'task_type', 'date_end', 'review_task_status',
+            "review_task_status_name"
         ]
         read_only_fields = ['author']
 
+    def get_client_card_kindergarten_name(self, obj):
+        ...
 

@@ -27,11 +27,12 @@ from apps.photo.filters import PhotoThemeFilter
 from apps.kindergarten.models import Kindergarten
 from apps_crm.roles.models import UserRole
 
+from loguru import logger
 
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [SessionAuthentication]
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -47,6 +48,7 @@ class PhotoUploadView(APIView):
         responses={200: PhotoLineSerializer()},
     )
     def post(self, request, *args, **kwargs):
+        logger.info(f"req_data: {request.data}")
         serializer = PhotoUploadSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -65,6 +67,9 @@ class PhotoUploadView(APIView):
                 photo_line__photo_theme=photo_theme
             ).aggregate(Max('number'))['number__max'] or 6
             next_photo_number = last_photo_number + 1
+
+            logger.info(f"LAST_PHOTO_NUMBER: {last_photo_number}")
+            logger.info(f"NEXT_PHOTO_NUMBER: {next_photo_number}")
 
             groups = self._grouper(photos, 6)
 
