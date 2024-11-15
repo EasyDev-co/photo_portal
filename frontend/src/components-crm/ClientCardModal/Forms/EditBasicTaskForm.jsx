@@ -319,7 +319,7 @@ useEffect(() => {
         />
       </div>
 
-      {/* <Form.Group className="mb-3">
+      <Form.Group className="mb-3">
         <Form.Label className="text-secondary">Оценка задачи</Form.Label>
         <Form.Select
           name="review_task_status"
@@ -383,7 +383,7 @@ useEffect(() => {
             <div className="text-danger">{errors.revision_comment[0]}</div>
           )}
         </Form.Group>
-      )} */}
+      )}
 
 
       <ModalFooter style={{ padding: '5px' }}>
