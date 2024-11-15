@@ -16,6 +16,17 @@ const Kindergartens = () => {
     const [kindergartens, setKindergartens] = useState([]);
     const [filters, setFilters] = useState({});
     const access = localStorage.getItem('access');
+    const [isOpen, setIsOpen] = useState(false)
+
+    const handleShowModal = () => {
+        setIsOpen(true)
+      }
+      const handleCloseModal = () => {
+        setIsOpen(false)
+      }
+      const handleAddClientCard = (item) => {
+        setClientCards([item, ...clientCards])
+    }
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -69,9 +80,16 @@ const Kindergartens = () => {
 
     return (
         <div className="page-crm">
+            <ClientModal
+                title="Добавить карточку клиента"
+                show={isOpen}
+                handleClose={handleCloseModal}
+            >
+                <ClientCardForm closeModal={handleCloseModal} handleAddClientCard={handleAddClientCard}/>
+            </ClientModal>
             <div className="header-title">
                 <h1>Клиенты</h1>
-                <Button className="create-btn">Создать</Button>
+                <Button onClick={handleShowModal} className="create-btn">Создать</Button>
             </div>
             <ClientFilter onFilterChange={handleFilterChange}/>
             <div className="d-flex flex-wrap gap-3">

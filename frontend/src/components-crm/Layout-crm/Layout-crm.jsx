@@ -19,10 +19,14 @@ import person from '../../assets/icons/person.jpg'
 import React, {useEffect} from "react";
 import Notification from "../Notification/Notification";
 import {localUrl} from "../../constants/constants";
+import { useSelector } from 'react-redux'
+import { fetchUserDataWithTokenInterceptor } from '../../http/user/getUserData'
 
 const LayoutCrm = () => {
     const BASE = '#25243D'
     const BLUE = '#4F46E5'
+    const access = localStorage.getItem("access");
+    const refresh = useSelector(state => state.user.refresh);
 
     const location = useLocation()
     const navigate = useNavigate()
@@ -30,12 +34,23 @@ const LayoutCrm = () => {
     const [clientRadioValue, setСlientRadioValue] = useState('1')
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [userName, setUserName] = useState('');
+    const [userLastName, setUserLastName] = useState('');
+    const [userRole, setUserRole] = useState(null);
     const clientRadios = [
         {name: 'Детские сады', value: '1', path: '/crm/kindergartens'},
         {name: 'Календарь', value: '2', path: '/crm/calendar'},
     ]
 
     const [notifications, setNotifications] = useState([]);
+
+    const employRole = {
+        "1": "Руководитель отдела продаж",
+        "2": "Менеджер",
+        "3": "Исполнительный директор",
+        "4": "Старший менеджер",
+      }
+
     const fetchNotifications = async () => {
         try {
             const accessToken = localStorage.getItem("access");
@@ -78,6 +93,25 @@ const LayoutCrm = () => {
     useEffect(() => {
         fetchNotifications();
     }, []);
+
+    useEffect(() => {
+        if (!localStorage.getItem('access')) {
+          return;
+        }
+        fetchUserDataWithTokenInterceptor(access, refresh)
+          .then(res => {
+            if (res.ok) {
+              res.json()
+                .then(res => {
+                  console.log(res.first_name, res.last_name);
+                  setUserName(res.first_name);
+                  setUserLastName(res.last_name)
+                  setUserRole(res.employee.employee_role);
+                //   setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
+                });
+            }
+          });
+      }, []); //accessStor, cookieData, dispatch, refresh
 
     const toggleNotification = () => {
         setIsNotificationOpen((prev) => !prev);
@@ -171,8 +205,8 @@ const LayoutCrm = () => {
                                             <img src={person} alt=""/>
                                         </div>
                                         <div>
-                                            <div>Марк Ифанасьев</div>
-                                            <div className="fs-13 text-black-50">Директор</div>
+                                            <div>{userName} {userLastName}</div>
+                                            <div className="fs-13 text-black-50">{employRole[userRole]}</div>
                                         </div>
                                     </div>
                                 </div>

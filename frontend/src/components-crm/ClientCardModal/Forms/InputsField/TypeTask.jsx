@@ -15,7 +15,18 @@ const TypeTask = ({onSelect, initialType}) => {
     "Позвонить по КП, Проверить смс по Вотсапп": "8"
   }
 
-  const [type, setType] = useState(init[initialType] || '1')
+  const revertInit = {
+    "1": "Звонок",
+    "2": "Сбор оплаты+ отправка ссылок",
+    "3": "Принять заказ",
+    "4": "Позвонить холодный/списки",
+    "5": "Проверить отправку образцов, Готовые фото.",
+    "6": "Теплые сады",
+    "7": "Напомнить о записи",
+    "8": "Позвонить по КП, Проверить смс по Вотсапп",
+  }
+
+  const [type, setType] = useState(initialType ? [initialType] : '')
 
   const [errors, setErrors] = useState({})
 

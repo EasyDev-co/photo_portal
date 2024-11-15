@@ -36,6 +36,7 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
             const response = await fetchSingleManagerWithToken(access, value.trim());
             if (response.ok) {
                 const data = await response.json();
+                console.log(data)
                 setSearchResults(data);
             } else {
                 console.error('Ошибка при поиске менеджеров');
@@ -60,9 +61,11 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
     // Функция для выбора менеджера
     const handleSelectManager = (manager) => {
         if (multiplyObject) {
+            console.log(manager)
             if (!selectedManagers.some((m) => m.id === manager.id)) {
                 const newSelectedManagers = [...selectedManagers, manager];
                 setSelectedManagers(newSelectedManagers);
+                console.log(newSelectedManagers)
                 onSelect(newSelectedManagers);
             }
         } else {

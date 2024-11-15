@@ -51,6 +51,7 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
             ...prevState,
             task_type: selectedType,
         }));
+        console.log(formState.task_type);
     };
 
     const handleChange = (e) => {
