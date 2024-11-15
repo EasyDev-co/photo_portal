@@ -52,9 +52,7 @@ class PhotoUploadView(APIView):
         if serializer.is_valid():
             kindergarten = serializer.validated_data['kindergarten']
             photos = serializer.validated_data['photos']
-            photo_theme = kindergarten.photo_themes.get(is_active=True)
-            if len(photo_theme) > 1:
-                raise ValidationError("У детского сада больше одной фототемы")
+            photo_theme = kindergarten.kindergartenphototheme.get(is_active=True).photo_theme
             self.save_photos(kindergarten, photos, photo_theme)
             return Response({'detail': 'Файлы успешно загружены!'}, status=status.HTTP_201_CREATED)
 
@@ -274,11 +272,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
 
     @staticmethod
     def get_active_photo_theme(kindergarten):
-        active_photo_themes = kindergarten.photo_themes.filter(is_active=True)
-        if active_photo_themes.count() != 1:
-            raise ValidationError('У д/с более одной активной фототемы')
-
-        return active_photo_themes[0]
+        return kindergarten.kindergartenphototheme.get(is_active=True).photo_theme
 
     @staticmethod
     def validate_photo_line(kindergarten, active_photo_theme, photo_line):

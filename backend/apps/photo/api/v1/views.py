@@ -113,7 +113,10 @@ class PhotoLinesGetByParent(ListAPIView):
 
     def get_queryset(self):
         parent = self.request.user
-        return PhotoLine.objects.filter(parent=parent, photo_theme__is_active=True)
+        return PhotoLine.objects.filter(
+            parent=parent,
+            photo_theme__kindergartenphototheme__is_active=True
+        )
 
 
 class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
