@@ -4,7 +4,7 @@ import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 export const patchBasicTask = async (access, data, taskId) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/${taskId}/`;
+    const url = `${localUrl}/api/crm/v2/client_cards/tasks/${taskId}/`;
 
     const response = await fetch(url, {
         method: 'PATCH', 

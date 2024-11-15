@@ -1,11 +1,16 @@
 import { Card } from 'react-bootstrap'
 import burger from '../../assets/icons/card-burger.svg'
-import styles from './TaskCard.style.css'
+import styles from './TaskCard.style.css';
+import trash from '../../assets/icons/trash.svg';
 
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { deleteBasicTaskWithToken } from '../../http/client-cards/deleteBasicTask';
 
-const TaskCard = ({ data, handleShowEdit }) => {
+const TaskCard = ({ data, handleShowEdit, deleteItem }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const access = localStorage.getItem('access')
+  console.log(data)
   function formatDate(dateString) {
     const date = new Date(dateString)
     const year = date.getFullYear()
@@ -15,8 +20,25 @@ const TaskCard = ({ data, handleShowEdit }) => {
     return `${day}-${month}-${year}`
   }
 
-  console.log(data)
   //   const navigate = useNavigate()
+  const handleDelete = () => {
+    const deleteTask = async () => {
+      try {
+        const response = await deleteBasicTaskWithToken(access, data.id) // Use the function to fetch data
+        if (response.ok) {
+
+          deleteTask(data.id)
+          deleteItem(data.id)
+        } else {
+          console.error('Failed to delete task')
+        }
+      } catch (error) {
+        console.error('Error deleting task:', error)
+      }
+    }
+
+    deleteTask()
+  }
 
   return (
     <Card
@@ -27,11 +49,14 @@ const TaskCard = ({ data, handleShowEdit }) => {
         border: 'none',
         padding: '24px',
         height: '100%',
+        minHeight: '267px',
         maxHeight: '270px',
       }}
-      onClick={() => handleShowEdit(data.id)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      // onClick={() => handleShowEdit(data.id)}
     >
-      <Card.Header className="card-header" style={{ border: 'none' }}>
+      <Card.Header onClick={() => handleShowEdit(data.id)} className="card-header" style={{ border: 'none' }}>
         <div className="card-header-title cursor-pointer">
           {data.task_type_name}
         </div>
@@ -86,6 +111,23 @@ const TaskCard = ({ data, handleShowEdit }) => {
           </div>
         </Card.Text>
       </Card.Body>
+      {isHovered && ( // Условное рендеринг иконки
+        <button
+          style={{
+            position: 'absolute',
+            bottom: '25px',
+            right: '25px',
+            cursor: 'pointer',
+          }}
+          onClick={handleDelete}
+        >
+          <img 
+          style={{
+            width: '20px',
+          }} 
+          src={trash} alt="Удалить" />
+        </button>
+      )}
     </Card>
   )
 }

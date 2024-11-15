@@ -18,7 +18,15 @@ const Tasks = () => {
     const totalPages = Math.ceil(totalItems / itemsPerPage); // Общее количество страниц
     const [isOpen, setIsOpen] = useState(false)
     const [showEdit, setShowEdit] = useState(false)
-    const [editId, setEditId] = useState("")
+    const [editId, setEditId] = useState("");
+    const [filters, setFilters] = useState({});
+
+
+    const handleFilterChange = (newFilters) => {
+      console.log(newFilters)
+      setFilters(newFilters);
+      console.log("Фильтры обновлены:", newFilters);
+  };
 
     const handleShowModal = () => {
       setIsOpen(true)
@@ -26,6 +34,33 @@ const Tasks = () => {
     const handleCloseModal = () => {
       setIsOpen(false)
     }
+
+    const editTask = (updatedTask) => {
+      console.log(updatedTask)
+      setTasksList((prevTasks) =>
+          prevTasks.map((task) =>
+              task.id === updatedTask.id ? updatedTask : task
+          )
+      );
+      const fetchAllTasks = async () => {
+        try {
+          const response = await fetchAllTaskWithTokenInterceptor({access, filters})
+          if (response.ok) {
+            const data = await response.json() // Parse the JSON response
+            console.log(data.reverse())
+            setTasksList(data.reverse()) // Update state with fetched data
+          } else {
+            console.error('Failed to fetch client cards')
+          }
+        } catch (error) {
+          console.error('Error fetching client cards:', error)
+        }
+      }
+
+      
+      fetchAllTasks()
+      console.log(tasksList)
+  };
 
     const handleShowEdit = (id) => {
       console.log('open')
@@ -55,10 +90,9 @@ const Tasks = () => {
     useEffect(() => {
         const fetchAllTasks = async () => {
           try {
-            const response = await fetchAllTaskWithTokenInterceptor(access)
+            const response = await fetchAllTaskWithTokenInterceptor({access, filters})
             if (response.ok) {
               const data = await response.json() // Parse the JSON response
-              console.log(data)
               console.log(data.reverse())
               setTasksList(data.reverse()) // Update state with fetched data
             } else {
@@ -71,7 +105,10 @@ const Tasks = () => {
 
         
         fetchAllTasks()
-      }, [access]) 
+      }, [access, filters]);
+      useEffect(() => {
+        console.log(tasksList);
+      }, [tasksList])
 
     return (
         <div className="page-crm"  
@@ -88,7 +125,11 @@ const Tasks = () => {
                 show={showEdit}
                 handleClose={handleCloseEdit}
             >
-                <EditBasicTaskForm closeModal={handleCloseEdit} deleteItem={deleteTask} taskId={editId} />
+                <EditBasicTaskForm
+                closeModal={handleCloseEdit} 
+                deleteItem={deleteTask} 
+                taskId={editId} 
+                editTask={editTask}/>
             </ClientModal>
             <div className="header-title">
                 <h1 className="">Задачи</h1>
@@ -96,11 +137,11 @@ const Tasks = () => {
                     <Button onClick={handleShowModal} className="create-btn">Создать</Button>
                 </div>
             </div>
-            <TasksFilter />
+            <TasksFilter onFilterChange={handleFilterChange} />
             <div className="d-flex flex-column justify-content-between"  style={{ height: '100%' }}>
             <div className="d-flex flex-wrap gap-3 align-items-stretch">
                 {tasksList.map(item => (
-                    <TaskCard handleShowEdit={handleShowEdit} key={item.id} data={item}/>
+                    <TaskCard handleShowEdit={handleShowEdit} key={item.id} data={item} deleteItem={deleteTask}/>
                 ))}
 
             </div>
