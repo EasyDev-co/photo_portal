@@ -21,6 +21,14 @@ class Ransom(models.Model):
         default=0,
         verbose_name='Сумма выкупа'
     )
+    average_bill = models.DecimalField(
+        default=0,
+        decimal_places=2,
+        max_digits=10,
+        verbose_name='Средний чек',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Сумма выкупа'

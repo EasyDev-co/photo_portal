@@ -148,7 +148,7 @@ class PhotoPriceAdmin(admin.ModelAdmin):
 
 @admin.register(Ransom)
 class RansomAdmin(admin.ModelAdmin):
-    list_display = ('kindergarten', 'photo_theme', 'ransom_amount')
+    list_display = ('kindergarten', 'photo_theme', 'ransom_amount', 'average_bill')
     list_filter = ('kindergarten', 'photo_theme')
     list_per_page = 20  # Устанавливает количество записей на странице
 
