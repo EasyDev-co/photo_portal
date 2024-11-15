@@ -11,7 +11,11 @@ from apps.kindergarten.models import Region
 from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine,
-                               Coefficient, UserPhotoCount, Season)
+                               Coefficient,
+                               UserPhotoCount,
+                               Season,
+                               KindergartenPhotoTheme
+                               )
 from apps.photo.models.photo_theme import PhotoPopularityStat
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
@@ -48,17 +52,25 @@ class PhotoInline(admin.TabularInline):
                 self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
+class KindergartenPhotoThemeInline(admin.TabularInline):
+    model = KindergartenPhotoTheme
+    extra = 0
+    verbose_name = 'Фотосессия в детском саду'
+    verbose_name_plural = 'Фотосессии в детском саду'
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(PhotoTheme)
 class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = (
         'name',
-        'is_active',
         'date_start',
         'date_end',
         'season'
     )
     readonly_fields = ('are_qrs_removed',)
-    list_filter = ('is_active',)
     search_fields = ('name', 'season')
     ordering = ('name', 'date_start', 'date_end')
 
@@ -216,8 +228,8 @@ class UserPhotoCountAdmin(admin.ModelAdmin):
 class SeasonAdmin(admin.ModelAdmin):
     list_display = ('season',)
 
-    # def has_add_permission(self, request):
-    #     return False
+    def has_add_permission(self, request):
+        return False
 
     def has_change_permission(self, request, obj=None):
         return False

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .season import Season
@@ -9,16 +10,6 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     name = models.CharField(
         max_length=255,
         verbose_name='Название'
-    )
-    kindergartens = models.ManyToManyField(
-        Kindergarten,
-        verbose_name="Детский сад",
-        related_name="photo_themes",
-        blank=True,
-        null=True,
-    )
-    is_active = models.BooleanField(
-        verbose_name='Активно'
     )
     date_start = models.DateTimeField(
         verbose_name='Дата начала'
@@ -50,6 +41,11 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name = 'Фотосессия'
         verbose_name_plural = 'Фотосессии'
         ordering = ("-created",)
+
+    def clean(self):
+        super().clean()
+        if self.date_start >= self.date_end:
+            raise ValidationError("Дата окончания фотосессии не может быть раньше даты начала.")
 
 
 class PhotoPopularityStat(PhotoTheme):

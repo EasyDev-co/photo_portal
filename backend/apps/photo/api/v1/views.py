@@ -113,14 +113,17 @@ class PhotoLinesGetByParent(ListAPIView):
 
     def get_queryset(self):
         parent = self.request.user
-        return PhotoLine.objects.filter(parent=parent, photo_theme__is_active=True)
+        return PhotoLine.objects.filter(
+            parent=parent,
+            photo_theme__kindergartenphototheme__is_active=True
+        )
 
 
 class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
     """
     Получение информации об актуальной теме фотосессии.
     """
-    queryset = PhotoTheme.objects.filter(is_active=True)
+    queryset = PhotoTheme.objects.filter(kindergartenphototheme__is_active=True)
     serializer_class = PhotoThemeSerializer
     permission_classes = [IsAuthenticated]
 

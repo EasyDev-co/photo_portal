@@ -7,12 +7,12 @@ from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
 from apps.kindergarten.form import KindergartenForm
 from .models import Ransom
 
-
 from apps.kindergarten.models.kindergarten import Kindergarten
 
 from itertools import zip_longest
 
 from config.settings import UPLOAD_URL, JQUERY_CDN
+from ..photo.admin import KindergartenPhotoThemeInline
 
 
 class KindergartenInline(admin.TabularInline):
@@ -38,12 +38,13 @@ class PhotoPriceInline(admin.TabularInline):
 
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
-    list_display = ('name', 'region', 'code', 'has_photobook', 'locality')
+    list_display = ('name', 'region', 'code', 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code', 'file_upload')
     raw_id_fields = ('region',)
     ordering = ('name',)
+    inlines = [KindergartenPhotoThemeInline]
 
     def qr_image(self, obj):
         if obj.qr_code:
@@ -70,6 +71,27 @@ class KindergartenAdmin(admin.ModelAdmin):
         """Группировка по n элементов с заполнением отсутствующих значений."""
         args = [iter(iterable)] * n
         return zip_longest(*args, fillvalue=fillvalue)
+
+    def save_related(self, request, form, formsets, change):
+        obj = form.instance
+        if change:
+            if self._is_active_changed(formsets):
+                self._deactivate_other_themes(obj)
+        super().save_related(request, form, formsets, change)
+
+    @staticmethod
+    def _is_active_changed(formsets):
+        """Проверяет, изменился ли статус 'is_active' в formsets."""
+        for formset in formsets:
+            for inline_form in formset.forms:
+                if 'is_active' in inline_form.changed_data:
+                    return True
+        return False
+
+    @staticmethod
+    def _deactivate_other_themes(obj):
+        """Деактивирует все активные фототемы для данного д/с."""
+        obj.kindergartenphototheme.filter(is_active=True).update(is_active=False)
 
 
 @admin.register(Region)

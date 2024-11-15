@@ -89,7 +89,7 @@ class CheckPhotoThemeDeadlinesTask(BaseTask):
         time_left_to_deadline = time_now + notification_period
         time_border_to_send_notification = time_left_to_deadline - timedelta(hours=2)
         photo_themes = PhotoTheme.objects.filter(
-            is_active=True,
+            kindergartenphototheme__is_active=True,
             date_end__lt=time_left_to_deadline,
             date_end__gt=time_border_to_send_notification
         )

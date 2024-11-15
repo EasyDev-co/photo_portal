@@ -21,7 +21,7 @@ from apps.kindergarten.api.v1.serializers import (
 from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten, Region
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus
-from apps.photo.models import PhotoTheme
+from apps.photo.models import PhotoTheme, KindergartenPhotoTheme
 
 
 class PhotoPriceAPIView(APIView):
@@ -51,10 +51,11 @@ class KindergartenStatsAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Получаем текущую фототему
-        current_photo_theme = PhotoTheme.objects.filter(
-            date_end__gte=django_timezone.now()
-        )
+        # Получаем текущую фотосессию
+        current_photo_theme = KindergartenPhotoTheme.objects.get(
+            is_active=True,
+            kindergarten=kindergarten,
+        ).photo_theme
 
         # Получаем все заказы для текущей фототемы
         orders = Order.objects.filter(

@@ -60,3 +60,9 @@ class Kindergarten(UUIDMixin):
                 ContentFile(buffer.read())
             )
         super().save(*args, **kwargs)
+
+    @property
+    def active_photo_theme(self):
+        return self.kindergartenphototheme.get(is_active=True).photo_theme.name
+
+    active_photo_theme.fget.short_description = "Активная фотосессия"
