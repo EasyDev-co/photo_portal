@@ -1,5 +1,6 @@
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Avg
+from django.db.models.functions import Round
 
 from apps.kindergarten.models import Ransom
 from apps.order.models import Order
@@ -27,7 +28,8 @@ class CalculateRansomOfPastPhotoThemes(BaseTask):
             'photo_line__photo_theme',
             'photo_line__kindergarten'
         ).annotate(
-            ransom_amount=Sum('order_price')
+            ransom_amount=Sum('order_price'),
+            average_bill=Round(Avg('order_price', default=0), precision=2)
         )
 
         ransom_objects = []
@@ -41,7 +43,8 @@ class CalculateRansomOfPastPhotoThemes(BaseTask):
             ransom_objects.append(Ransom(
                 kindergarten_id=item['photo_line__kindergarten'],
                 photo_theme_id=photo_theme_id,
-                ransom_amount=item['ransom_amount']
+                ransom_amount=item['ransom_amount'],
+                average_bill=item['average_bill']
             ))
             photo_theme_ids_to_update.add(photo_theme_id)
 
