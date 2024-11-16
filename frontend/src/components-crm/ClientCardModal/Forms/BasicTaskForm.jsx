@@ -11,8 +11,10 @@ import { fetchAllTaskWithTokenInterceptor } from '../../../http/client-cards/get
 
 const BasicTaskForm = ({closeModal, setTasksList}) => {
     const access = localStorage.getItem('access') // Get access token
+    const [filters, setFilters] = useState({});
 
-    const maxCharacters = 100
+
+    const maxCharacters = 200
     const [isActive, setIsActive] = useState(false)
     const formatDate = (date) => {
         const [day, month, year] = date.split(".");
@@ -23,8 +25,6 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
         charge_dates: '', // Will store the selected date
         manager: '',
         clientCard: '',
-        children_count: '',
-        children_for_photoshoot: '',
         task_type: '',
     })
 
@@ -56,7 +56,7 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
 
     const handleChange = (e) => {
         const {name, value} = e.target
-
+        console.log(e)
         // Limit character count for 'text' field only
         if (name === 'text' && value.length > maxCharacters) return
 
@@ -64,6 +64,7 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
             ...prevState,
             [name]: value,
         }))
+        console.log(e)
     }
 
     const handleDateChange = (formattedDate) => {
@@ -95,10 +96,10 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
             client_card: formState.clientCard.id,
             task_type: formState.task_type || 1,
             executor: formState.manager.id,
-            task_status: 1
+            task_status: 1,
         }
 
-        console.log(formState.charge_dates);
+        console.log(formState);
 
 
         const postTask = async () => {
@@ -110,11 +111,13 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
                 
             if (response.ok) {
                 const newTask = await response.json(); // Получаем новую задачу из ответа
+                console.log(newTask)
                 if (newTask) {
                     // Получаем все задачи после добавления новой
-                    const allTasksResponse = await fetchAllTaskWithTokenInterceptor(access);
+                    const allTasksResponse = await fetchAllTaskWithTokenInterceptor({access, filters});
                     if (allTasksResponse.ok) {
                         const allTasks = await allTasksResponse.json();
+                        console.log(allTasksResponse);
                         setTasksList(allTasks.reverse()); // Обновляем список всех задач
                         closeModal(); // Закрываем модальное окно
                     } else {
@@ -171,13 +174,13 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
                 <Form.Control
                     as="textarea"
                     rows={6}
-                    name="garden_details"
+                    name="details"
                     style={{padding: '15px', resize: 'none', height: '120px'}}
-                    value={formState.garden_details}
+                    value={formState.details}
                     onChange={handleChange}
                     placeholder="Write a message"
                 />
-                {errors.garden_details && <div className="text-danger">{errors.garden_details[0]}</div>}
+                {errors.details && <div className="text-danger">{errors.details[0]}</div>}
             </Form.Group>
             <div>
                 <CardSelectInput 
