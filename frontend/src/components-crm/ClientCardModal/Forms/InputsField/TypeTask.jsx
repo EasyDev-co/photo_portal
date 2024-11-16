@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, ModalFooter } from 'react-bootstrap'
 
-const TypeTask = ({onSelect, initialType}) => {
+const TypeTask = ({onSelect, initialType, includeEmptyOption = false, defaultToFirst = true}) => {
   const access = localStorage.getItem('access') // Get access token
 
   const init = {
@@ -26,7 +26,14 @@ const TypeTask = ({onSelect, initialType}) => {
     "8": "Позвонить по КП, Проверить смс по Вотсапп",
   }
 
-  const [type, setType] = useState(initialType ? [initialType] : '')
+  // const [type, setType] = useState(initialType ? [initialType] : '')
+  const [type, setType] = useState(
+    initialType !== undefined
+      ? initialType
+      : defaultToFirst
+      ? Object.values(init)[0] // По умолчанию выбираем первый элемент
+      : ''
+  );
 
   const [errors, setErrors] = useState({})
 
@@ -46,13 +53,15 @@ const TypeTask = ({onSelect, initialType}) => {
         name="status"
         className="shadow-none"
         style={{ width: '100%' }}
-        value={type || init[initialType] || '1'}
+        // value={type || init[initialType] || '1'}
+        value={type}
         onChange={(e) => {
           if (e.target.value !== type) {
             handleChange(e) // Передаем событие e, а не значение
           }
         }}
       >
+        {includeEmptyOption && <option value="">Не выбрано</option>}
         <option value="1">Звонок</option>
         <option value="2">Сбор оплаты + отправка ссылок</option>
         <option value="3">Принять заказ</option>

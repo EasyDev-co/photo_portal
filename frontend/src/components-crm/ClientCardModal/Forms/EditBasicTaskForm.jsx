@@ -48,12 +48,13 @@ const EditBasicTaskForm = ({
     date_end: "",
     executor_fi: "",
     id: "",
-    revision_comment: null,
+    revision_comment: "",
     task_status_name: "",
     task_type_name: "",
     text: "",
     executor_id: "",
     review_task_status_name: "",
+    kindergarten_name: "",
   });
 
   const statusTextToValueMap = {
@@ -165,7 +166,8 @@ useEffect(() => {
       // status: statusMap[formState.task_status_name],
       task_status: formState.task_status_name,
       client_card	: formState.client_card,
-      // review_task_status: statusTextToValueMap[formState.review_task_status_name],
+      review_task_status: statusTextToValueMap[formState.review_task_status_name],
+      revision_comment: formState.revision_comment,
     }
 
     console.log(data);
@@ -213,7 +215,9 @@ useEffect(() => {
               task_status_name: statusMap[data.task_status_name] || '',
               task_type_name: typeMap[data.task_type_name] || '',
               text: data.text || '',
-              // review_task_status_name: data.review_task_status_name || '',
+              kindergarten_name: data.kindergarten_name,
+              review_task_status_name: data.review_task_status_name || '',
+              // review_task_status_name: statusValueToTextMap[data.review_task_status] || "",
             })
             setIsDataLoaded(true)
           } else {
@@ -233,7 +237,7 @@ useEffect(() => {
       task_type_name: selectedType,
     }))
     console.log(selectedType)
-    console.log(formState.task_type_name)
+    console.log(formState)
   }
 
   if (!isDataLoaded) return <div>Загрузка...</div>;
@@ -315,7 +319,7 @@ useEffect(() => {
           onSelect={handleCardSelect}
           errors={errors}
           name="Карточка клиента"
-          initialCard={formState.client_card}
+          initialCard={formState.kindergarten_name}
         />
       </div>
 

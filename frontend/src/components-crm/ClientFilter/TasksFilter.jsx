@@ -34,7 +34,7 @@ const TasksFilter = ({ onFilterChange }) => {
     <div>
       <div className="d-flex align-items-center gap-3">
         <Form className="d-flex column-gap-3 flex-wrap mb-3">
-        <TypeTask onSelect={handleTaskTypeChange} initialType=""/>
+        <TypeTask onSelect={handleTaskTypeChange} initialType="" includeEmptyOption={true} defaultToFirst = {false}/>
 
           <Form.Group>
             <DatePicker

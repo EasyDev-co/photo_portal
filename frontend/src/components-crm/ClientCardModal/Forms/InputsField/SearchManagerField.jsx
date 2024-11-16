@@ -158,7 +158,8 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
                             <p className={styles.text}>{manager.full_name}</p>
                         </div>
                     ))
-                ) : (
+                ) : 
+                (
                     selectedManagers && (
                         <div className={styles.selected_manager}>
                             <button onClick={() => handleRemoveManager(selectedManagers.id)}>
@@ -167,7 +168,8 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
                             <p className={styles.text}>{selectedManagers.full_name}</p>
                         </div>
                     )
-                )}
+                )
+                }
             </div>
         </div>
         </div>
