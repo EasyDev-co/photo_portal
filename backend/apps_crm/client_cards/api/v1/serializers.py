@@ -45,8 +45,13 @@ class ClientCardTaskSerializer(BaseClientCardSerializer):
 
 
 class ClientCardSerializer(BaseClientCardSerializer):
-    responsible_manager = EmployeeSerializer()
+    responsible_manager = serializers.PrimaryKeyRelatedField(
+        queryset=Employee.objects.all(),
+        write_only=True,
+        source="responsible_manager_id"
+    )
     kindergarten_name = serializers.SerializerMethodField()
+    responsible_manager_fi = serializers.SerializerMethodField()
 
     class Meta:
         model = ClientCard
@@ -63,11 +68,25 @@ class ClientCardSerializer(BaseClientCardSerializer):
             'status',
             'charges',
             'charge_dates',
-            "kindergarten_name",
+            'kindergarten_name',
+            'responsible_manager_fi',
         ]
 
     def get_kindergarten_name(self, obj):
         return obj.kindergarten_name
+
+    def get_responsible_manager_fi(self, obj):
+        return obj.responsible_manager_fi
+
+    def to_representation(self, instance):
+        """
+        Переопределяем метод to_representation, чтобы при отображении
+        возвращать полный объект Employee через EmployeeSerializer.
+        """
+        representation = super().to_representation(instance)
+        representation['responsible_manager'] = EmployeeSerializer(instance.responsible_manager).data if instance.responsible_manager else None
+        return representation
+
 
 
 class ClientCardUpdateSerializer(BaseClientCardSerializer):

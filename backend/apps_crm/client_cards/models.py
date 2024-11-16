@@ -73,6 +73,15 @@ class ClientCard(models.Model):
             return getattr(manager, 'manager_discount', "Скидка не указана")
         return "Скидка не указана"
 
+    @property
+    def responsible_manager_fi(self) -> str:
+        """Возвращает имя и фамилию исполнителя задачи, если они существуют."""
+        if self.responsible_manager and self.responsible_manager.user:
+            first_name = self.responsible_manager.user.first_name or "Без имени"
+            last_name = self.responsible_manager.user.last_name or "Без фамилии"
+            return f"{first_name} {last_name}"
+        return "Ответственный менеджер не указан"
+
 class Notes(models.Model):
     """Заметки"""
     text = models.TextField(max_length=1024, verbose_name="Текст заметки")
