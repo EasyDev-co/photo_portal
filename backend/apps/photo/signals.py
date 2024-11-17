@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from apps.photo.models import PhotoTheme, Season
+from apps.photo.models import PhotoTheme, Season, PhotoLine
 from apps.photo.tasks import generate_promocodes_for_photo_theme
 from apps.utils.services.season_matcher import get_season
 

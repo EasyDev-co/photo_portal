@@ -95,7 +95,7 @@ const aboutUsItems = [
 const localUrl = `http://77.232.37.60:8000`
 // const localUrl = `http://localhost:8000`;
 // const localUrl = `https://photodetstvo.easydev-program.com`;
-// const localUrl = `https://photodetstvo.ru`;
+const localUrl = `https://photodetstvo.ru`;
 export {
   logo,
   bagIcon,

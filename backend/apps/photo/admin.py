@@ -89,9 +89,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = ('kindergarten', 'photo_theme', 'parent', 'photos')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
-    inlines = [
-        PhotoInline
-    ]
+    inlines = [PhotoInline]
 
     def photos(self, obj):
         return ",".join([str(p.number) for p in obj.photos.all()])
@@ -102,29 +100,6 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
         return 'Недоступно'
 
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-
-        obj = form.instance
-        kindergarten_code = obj.kindergarten.code
-        photo_numbers = []
-
-        for formset in formsets:
-            for inline_form in formset.forms:
-                if 'DELETE' not in inline_form.changed_data and inline_form.is_valid():
-                    photo_numbers.append(inline_form.instance.number)
-
-        qr_code, buffer = generate_qr_code(
-            photo_line_id=obj.id,
-            url=PHOTO_LINE_URL,
-            kindergarten_code=kindergarten_code,
-            photo_numbers=photo_numbers,
-        )
-
-        obj.qr_code.save(
-            f'{str(obj.photo_theme.id)}/{str(obj.photo_theme.name)}_qr.png',
-            ContentFile(buffer.read())
-        )
 
 
 @admin.register(Photo)

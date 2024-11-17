@@ -1,7 +1,8 @@
 import traceback
+import secrets
+
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 
 from apps.user.models import ConfirmCode
@@ -19,7 +20,7 @@ class SendConfirmCodeTask(BaseTask):
 
     def process(self, user_id, code_purpose, *args, **kwargs):
         user: User = User.objects.get(id=user_id)
-        code = default_token_generator.make_token(user)
+        code = self.generate_numeric_code()
         if code_purpose == CodePurpose.RESET_PASSWORD:
             subject = 'Сброс пароля'
             message = 'Код для сброса пароля:\n'
@@ -67,6 +68,10 @@ class SendConfirmCodeTask(BaseTask):
             user=kwargs['user'],
         )
         super().on_failure(exc, task_id, args, kwargs, einfo)
+
+    @staticmethod
+    def generate_numeric_code():
+        return str(secrets.randbelow(10000)).zfill(4)
 
 
 class ResendConfirmCodeTask(BaseTask):
