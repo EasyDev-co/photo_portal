@@ -20,8 +20,8 @@ COPY pyproject.toml pyproject.toml
 # Создаем необходимые директории и устанавливаем зависимости
 RUN mkdir -p /opt/src/static/ && \
     mkdir -p /opt/src/media/ && \
-    pip install --upgrade pip --index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install 'poetry>=1.4.2' --index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --upgrade pip --index-url https://pypi.tuna.tsinghua.edu.cn/simple --default-timeout=100 && \
+    pip install 'poetry>=1.4.2' --index-url https://pypi.tuna.tsinghua.edu.cn/simple --default-timeout=100 && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --only main
 
