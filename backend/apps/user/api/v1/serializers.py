@@ -14,6 +14,7 @@ from apps.promocode.models import Promocode
 from apps.user.models import User
 from apps.user.models.manager_bonus import ManagerBonus
 from apps.user.validators import validate_cyrillic
+from apps_crm.roles.models import Employee
 
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -70,12 +71,26 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
 
+class EmployeeSerializerForUser(serializers.ModelSerializer):
+    manager = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Employee
+        fields = (
+            'employee_role',
+            'status',
+            'manager',
+            'can_edit_task',
+        )
+
+
 class UserGetSerializer(serializers.ModelSerializer):
     """
     Сериализатор для просмотра модели пользователя.
     """
     kindergarten = KindergartenSerializer(read_only=True, many=True)
     managed_kindergarten = KindergartenSerializer(read_only=True, required=False)
+    employee = EmployeeSerializerForUser(read_only=True)
 
     class Meta:
         model = User
@@ -90,6 +105,7 @@ class UserGetSerializer(serializers.ModelSerializer):
             'kindergarten',
             'is_verified',
             'managed_kindergarten',
+            'employee',
         )
 
 
@@ -158,7 +174,7 @@ class ManagerSerializer(UserSerializer):
     def get_promocode(self, obj):
         photo_theme = PhotoTheme.objects.filter(
             photo_lines__in=obj.managed_kindergarten.photo_lines.all(),
-            is_active=True
+            kindergartenphototheme__is_active=True
         ).distinct().first()
         promocode = Promocode.objects.filter(
             user=obj,

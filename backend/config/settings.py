@@ -29,7 +29,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://7c8a-188-234-12-6.ngrok-free.app",
     "https://7e9a-109-120-151-148.ngrok-free.app",
     "http://0.0.0.0:3000",
-    "https://photodetstvo.ru"
+    "https://photodetstvo.ru",
+    "http://0.0.0.0:8000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -44,7 +45,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://0.0.0.0:3000",
     "https://7c8a-188-234-12-6.ngrok-free.app",
     "https://7e9a-109-120-151-148.ngrok-free.app",
-    "https://photodetstvo.ru"
+    "https://photodetstvo.ru",
+    "http://0.0.0.0:8000",
 ]
 
 INSTALLED_APPS = [

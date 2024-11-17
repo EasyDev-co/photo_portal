@@ -43,10 +43,6 @@
             margin-bottom: 10px;
         }
 
-        .file-item span {
-            display: block;
-        }
-
         .delete-all-button {
             background-color: #ff4d4d;
             border: none;
@@ -57,28 +53,54 @@
             margin-top: 10px;
         }
 
-        .delete-all-button:hover {
-            background-color: #ff1a1a;
+
+        #upload-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background: #333;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            z-index: 1000;
         }
+
+        /* Фон затемнения */
+        #upload-modal::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
     </style>
     <title>Загрузка файлов</title>
 </head>
 <body>
-    <form id="file-upload-form" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="drag-and-drop">
-            <input type="file" name="{{ widget.name }}" class="drag-and-drop-input" multiple>
-            <input type="hidden" id="kindergarten-id" value="{{ form.initial.kindergarten_id }}">
-            <div class="drag-and-drop-area">
-                <p>Перетащите файлы сюда или нажмите, чтобы выбрать</p>
-            </div>
-            <!-- Контейнер для отображения списка файлов -->
-            <div class="file-list"></div>
+<form id="file-upload-form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="drag-and-drop">
+        <input type="file" name="{{ widget.name }}" class="drag-and-drop-input" multiple>
+        <input type="hidden" id="kindergarten-id" value="{{ form.initial.kindergarten_id }}">
+        <div class="drag-and-drop-area">
+            <p>Перетащите файлы сюда или нажмите, чтобы выбрать</p>
         </div>
-        <!-- Кнопка для удаления всех файлов -->
-        <button type="button" class="delete-all-button">Удалить все</button>
-        <button type="button" class="upload-button" style="
+        <div class="file-list"></div>
+    </div>
+    <button type="button" class="delete-all-button">Удалить все</button>
+    <button type="button" class="upload-button" style="
                     background-color: #205067;
                     border: none;
                     color: white;
@@ -88,193 +110,190 @@
                     cursor: pointer;
                     border-radius: 5px;
                     margin-top: 10px;
-                ">Загрузить файлы</button>
-    </form>
+                ">Загрузить файлы
+    </button>
+</form>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropArea = document.querySelector('.drag-and-drop-area');
-            const input = document.querySelector('.drag-and-drop-input');
-            const fileList = document.querySelector('.file-list');
-            const deleteAllButton = document.querySelector('.delete-all-button');
-            const uploadButton = document.querySelector('.upload-button');
-            const uploadUrl = "{{ upload_url }}";
+<!-- Модальное окно -->
+<div id="upload-modal">
+    <p>Загрузка файлов... Это может занять некоторое время.</p>
+</div>
 
-            let dataTransfer = new DataTransfer(); // Создаем объект DataTransfer
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropArea = document.querySelector('.drag-and-drop-area');
+        const input = document.querySelector('.drag-and-drop-input');
+        const fileList = document.querySelector('.file-list');
+        const deleteAllButton = document.querySelector('.delete-all-button');
+        const uploadButton = document.querySelector('.upload-button');
+        const uploadModal = document.getElementById('upload-modal');
+        const uploadUrl = "{{ upload_url }}";
 
-            // Предотвращаем поведение по умолчанию для событий перетаскивания
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false);
-            });
+        let dataTransfer = new DataTransfer();
 
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            // Добавляем визуальную индикацию при перетаскивании файлов
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, unhighlight, false);
-            });
-
-            function highlight(e) {
-                dropArea.classList.add('dragover');
-            }
-
-            function unhighlight(e) {
-                dropArea.classList.remove('dragover');
-            }
-
-            // Обрабатываем событие drop
-            dropArea.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            }
-
-            // Обрабатываем событие выбора файлов через диалог
-            input.addEventListener('change', function(e) {
-                const files = input.files;
-                handleFiles(files);
-            });
-
-            function handleFiles(files) {
-                // Добавляем файлы в DataTransfer
-                for (let i = 0; i < files.length; i++) {
-                    dataTransfer.items.add(files[i]);
-                }
-                // Обновляем файлы в input
-                input.files = dataTransfer.files;
-                // Обновляем отображение
-                updateFileDisplay();
-            }
-
-            function updateFileDisplay() {
-                // Очищаем текущий список файлов
-                fileList.innerHTML = '';
-
-                const files = dataTransfer.files;
-                const fileCount = files.length;
-
-                if (fileCount > 0) {
-                    if (fileCount < 6) {
-                        // Отображаем каждый файл
-                        for (let i = 0; i < fileCount; i++) {
-                            const file = files[i];
-
-                            const fileItem = document.createElement('div');
-                            fileItem.classList.add('file-item');
-
-                            const fileName = document.createElement('span');
-                            fileName.textContent = file.name;
-
-                            fileItem.appendChild(fileName);
-                            fileList.appendChild(fileItem);
-                        }
-                    } else {
-                        // Отображаем количество файлов
-                        const fileCountText = document.createElement('p');
-                        fileCountText.textContent = `Выбрано файлов: ${fileCount}`;
-                        fileList.appendChild(fileCountText);
-                    }
-                    // Показываем кнопку "Удалить все"
-                    deleteAllButton.style.display = 'inline-block';
-                } else {
-                    // Скрываем кнопку "Удалить все", если нет файлов
-                    deleteAllButton.style.display = 'none';
-                }
-            }
-
-            // Открываем диалог выбора файлов при клике на область
-            dropArea.addEventListener('click', function(e) {
-                input.click();
-            });
-            
-            // Функция для получения CSRF-токена из куки
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    let cookies = document.cookie.split(';');
-                    for (let cookie of cookies) {
-                        cookie = cookie.trim();
-                        if (cookie.startsWith(name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-
-            // Обрабатываем нажатие на кнопку "Удалить все"
-            deleteAllButton.addEventListener('click', function(e) {
-                // Очищаем DataTransfer и input
-                dataTransfer = new DataTransfer();
-                input.files = dataTransfer.files;
-                // Обновляем отображение
-                updateFileDisplay();
-            });
-
-            // Изначально скрываем кнопку "Удалить все"
-            deleteAllButton.style.display = 'none';
-        
-            uploadButton.addEventListener('click', function(e) {
-                sendRequest();
-            });
-             
-            // Функция для загрузки файлов
-            function sendRequest() {
-                if (input.files.length === 0) {
-                    alert('Выберите файлы для загрузки.');
-                    return;
-                }
-        
-                var formData = new FormData(); // Создаем новый объект FormData
-        
-                // Добавляем файлы
-                for (var i = 0; i < input.files.length; i++) {
-                    formData.append('photos', input.files[i]);
-                }
-        
-                // Получаем дополнительные параметры
-                var kindergartenId = document.getElementById('kindergarten-id').value;
-                var photoTheme = document.getElementById('id_photo_theme').value;
-        
-                // Добавляем параметры
-                formData.append('kindergarten_id', kindergartenId);
-                formData.append('photo_theme', photoTheme);
-                
-                // Отправляем AJAX запрос
-                $.ajax({
-                    url: uploadUrl,
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    credentials: 'same-origin',
-                    success: function(response) {
-                        alert('Файлы успешно загружены.');
-                        
-                        // Очищаем выбранные файлы после успешной загрузки
-                        dataTransfer = new DataTransfer();
-                        input.files = dataTransfer.files;
-                        updateFileDisplay();
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        alert('Ошибка при загрузке файлов.');
-                    }
-                });
-            }
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
         });
-    </script>
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function disableButtons() {
+            const uploadButton = document.querySelector('.upload-button');
+            const deleteAllButton = document.querySelector('.delete-all-button');
+
+            uploadButton.disabled = true;
+            deleteAllButton.disabled = true;
+
+            // Добавляем стили для визуального эффекта
+            uploadButton.style.opacity = '0.5';
+            uploadButton.style.cursor = 'not-allowed';
+            deleteAllButton.style.opacity = '0.5';
+            deleteAllButton.style.cursor = 'not-allowed';
+        }
+
+        function enableButtons() {
+            const uploadButton = document.querySelector('.upload-button');
+            const deleteAllButton = document.querySelector('.delete-all-button');
+
+            uploadButton.disabled = false;
+            deleteAllButton.disabled = false;
+
+            // Восстанавливаем стили
+            uploadButton.style.opacity = '1';
+            uploadButton.style.cursor = 'pointer';
+            deleteAllButton.style.opacity = '1';
+            deleteAllButton.style.cursor = 'pointer';
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+        input.addEventListener('change', () => handleFiles(input.files));
+        dropArea.addEventListener('click', () => input.click());
+
+        function handleDrop(e) {
+            handleFiles(e.dataTransfer.files);
+        }
+
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                dataTransfer.items.add(files[i]);
+            }
+            input.files = dataTransfer.files;
+            updateFileDisplay();
+        }
+
+        function updateFileDisplay() {
+            fileList.innerHTML = '';
+            const files = dataTransfer.files;
+            const maxDisplayCount = 12;
+
+            if (files.length > 0) {
+                if (files.length > maxDisplayCount) {
+                    // Если файлов больше 12, показываем только количество
+                    const infoItem = document.createElement('div');
+                    infoItem.classList.add('file-info');
+                    infoItem.textContent = `Вы выбрали ${files.length} файлов.`;
+                    fileList.appendChild(infoItem);
+                } else {
+                    // Если файлов 12 или меньше, показываем полный список
+                    for (let i = 0; i < files.length; i++) {
+                        const fileItem = document.createElement('div');
+                        fileItem.classList.add('file-item');
+                        fileItem.textContent = `${i + 1}. ${files[i].name}`;
+                        fileList.appendChild(fileItem);
+                    }
+                }
+                deleteAllButton.style.display = 'inline-block';
+            } else {
+                deleteAllButton.style.display = 'none';
+            }
+        }
+
+        deleteAllButton.addEventListener('click', () => {
+            dataTransfer = new DataTransfer();
+            input.files = dataTransfer.files;
+            updateFileDisplay();
+        });
+
+        function clearFileList() {
+            dataTransfer = new DataTransfer();
+            input.files = dataTransfer.files;
+            updateFileDisplay();
+        }
+
+        uploadButton.addEventListener('click', sendRequest);
+
+        function showModal() {
+            uploadModal.style.display = 'block';
+        }
+
+        function hideModal() {
+            uploadModal.style.display = 'none';
+        }
+
+        function sendRequest() {
+            if (input.files.length === 0) {
+                alert('Выберите файлы для загрузки.');
+                return;
+            }
+
+            showModal();
+            disableButtons();
+
+            const formData = new FormData();
+            const files = Array.from(input.files);
+            const kindergartenId = document.getElementById('kindergarten-id').value;
+
+            // Добавляем все файлы в FormData
+            files.forEach((file) => {
+                formData.append('photos', file);
+            });
+
+            // Добавляем ID детского сада
+            formData.append('kindergarten_id', kindergartenId);
+
+            // Отправляем все файлы одним запросом
+            $.ajax({
+                url: uploadUrl,
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {'X-CSRFToken': getCookie('csrftoken')},
+                success: () => {
+                    hideModal();
+                    clearFileList();
+                    alert('Все файлы успешно загружены.');
+                    deleteAllButton.click();
+                    enableButtons();
+                },
+                error: (error) => {
+                    console.error('Ошибка при загрузке файлов:', error);
+                    hideModal();
+                    clearFileList();
+                    alert('Ошибка при загрузке файлов.');
+                    enableButtons();
+                }
+            });
+        }
+
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                for (let cookie of document.cookie.split(';')) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
 </body>
 </html>

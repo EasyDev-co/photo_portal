@@ -5,11 +5,23 @@ import people from '../../../../assets/icons/people.svg'
 import styles from './SearchManagerField.module.css';
 import close_button from '../../../../assets/icons/close_button.svg'
 
-const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, name }) => {
+const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, name, initialManager }) => {
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedManagers, setSelectedManagers] = useState(multiplyObject ? [] : null);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (initialManager) {
+            const managerData = { full_name: initialManager }; // Независимо от формата, создаем объект с ключом `full_name`
+            setSelectedManagers(multiplyObject ? [managerData] : managerData);
+        }
+        setIsLoading(false);
+    }, [initialManager, multiplyObject]);
+
+    if (isLoading) {
+        return <div>Загрузка...</div>;  // Компонент загрузки
+    }
 
     // Функция для поиска менеджеров
     const handleSearch = async (value) => {
@@ -24,6 +36,7 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
             const response = await fetchSingleManagerWithToken(access, value.trim());
             if (response.ok) {
                 const data = await response.json();
+                console.log(data)
                 setSearchResults(data);
             } else {
                 console.error('Ошибка при поиске менеджеров');
@@ -48,9 +61,11 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
     // Функция для выбора менеджера
     const handleSelectManager = (manager) => {
         if (multiplyObject) {
+            console.log(manager)
             if (!selectedManagers.some((m) => m.id === manager.id)) {
                 const newSelectedManagers = [...selectedManagers, manager];
                 setSelectedManagers(newSelectedManagers);
+                console.log(newSelectedManagers)
                 onSelect(newSelectedManagers);
             }
         } else {
@@ -143,7 +158,8 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
                             <p className={styles.text}>{manager.full_name}</p>
                         </div>
                     ))
-                ) : (
+                ) : 
+                (
                     selectedManagers && (
                         <div className={styles.selected_manager}>
                             <button onClick={() => handleRemoveManager(selectedManagers.id)}>
@@ -152,7 +168,8 @@ const ManagerSelectInput = ({ access, multiplyObject = false, onSelect, errors, 
                             <p className={styles.text}>{selectedManagers.full_name}</p>
                         </div>
                     )
-                )}
+                )
+                }
             </div>
         </div>
         </div>

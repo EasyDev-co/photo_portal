@@ -48,25 +48,6 @@ const ClientCardForm = ({handleAddClientCard, closeModal}) => {
         }))
     }
 
-    const handleDateChange = (e) => {
-        let value = e.target.value;
-
-        // Remove any non-digit characters
-        value = value.replace(/\D/g, '');
-
-        // Apply the xx.xx.xxxx format
-        if (value.length > 2 && value.length <= 4) {
-            value = `${value.slice(0, 2)}.${value.slice(2)}`;
-        } else if (value.length > 4) {
-            value = `${value.slice(0, 2)}.${value.slice(2, 4)}.${value.slice(4, 8)}`;
-        }
-
-        setFormState((prevState) => ({
-            ...prevState,
-            charge_dates: value,
-        }));
-    };
-
     const handleKindergarden = (e) => {
         const {value} = e.target
         setKindergarten(value)
@@ -76,6 +57,12 @@ const ClientCardForm = ({handleAddClientCard, closeModal}) => {
         const {value} = e.target
         setManager(value)
     }
+    const handleDateChange = (formattedDate) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            charge_dates: formattedDate,
+        }));
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -101,10 +88,10 @@ const ClientCardForm = ({handleAddClientCard, closeModal}) => {
             status: formState.status || 1,
             children_count: formState.children_count || 0,
             children_for_photoshoot: formState.children_for_photoshoot || 0,
-            responsible_manager: formState.manager.id
+            responsible_manager: formState.manager.id,
         }
 
-        console.log(formState.charge_dates);
+        console.log(data);
 
 
         const postCard = async () => {
@@ -208,6 +195,8 @@ const ClientCardForm = ({handleAddClientCard, closeModal}) => {
                         img={calendar}
                         isActive={isActive}
                         setIsActive={setIsActive}
+                        onDateChange={handleDateChange}
+                        value={formState.charge_dates}
                         navTitles={{
                             days: 'MMMM <i>yyyy</i>',
                             months: 'yyyy',

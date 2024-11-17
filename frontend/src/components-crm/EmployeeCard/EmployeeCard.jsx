@@ -19,6 +19,7 @@ const EmployeeCard = ({ data }) => {
         border: 'none',
         padding: '24px',
         height: '100%',
+        minHeight: '174px',
         maxHeight: '181px'
       }}
     >

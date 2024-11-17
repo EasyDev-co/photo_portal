@@ -435,17 +435,15 @@ const OrderCard = ({
               photoThemes.all_photo_themes.map((item, i) => {
                 return (
                   <>
-                  <div className="d-flex justify-content-between px-4">
-                    <div className="text-secondary fw-600" style={{ fontSize: '15px' }}>
-                      Дата
-                    </div>
-                  </div>
                   <div
                     key={i}
                     className="call-item pe-5"
                     style={{ fontSize: '15px' }}
                   >
-                    {formatDate(item.date_start)}
+                    <p>Дата начала: {formatDate(item.date_start)}</p>
+                    <p>Дата конца: {formatDate(item.date_end)}</p>
+                    <p>Тема: {item.name}</p>
+                    <p>Сумма выкупа: {item.ransom ? item.ransom.ransom_amount : 0}</p>
                   </div>
                   </>
                 )

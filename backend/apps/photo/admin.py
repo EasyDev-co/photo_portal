@@ -1,5 +1,6 @@
 from urllib.parse import parse_qsl
 
+from django.utils import timezone
 from django.utils.html import format_html
 from django.contrib import admin
 from django.utils.datastructures import MultiValueDictKeyError
@@ -11,7 +12,11 @@ from apps.kindergarten.models import Region
 from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine,
-                               Coefficient, UserPhotoCount)
+                               Coefficient,
+                               UserPhotoCount,
+                               Season,
+                               KindergartenPhotoTheme
+                               )
 from apps.photo.models.photo_theme import PhotoPopularityStat
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
@@ -48,17 +53,34 @@ class PhotoInline(admin.TabularInline):
                 self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
+class KindergartenPhotoThemeInline(admin.TabularInline):
+    model = KindergartenPhotoTheme
+    extra = 0
+    verbose_name = 'Фотосессия в детском саду'
+    verbose_name_plural = 'Фотосессии в детском саду'
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        # Отображение только незаконченных фотосессий в выпадающем списке
+        if db_field.name == "photo_theme":
+            kwargs["queryset"] = PhotoTheme.objects.filter(
+                date_end__gt=timezone.now()
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(PhotoTheme)
 class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = (
         'name',
-        'is_active',
         'date_start',
-        'date_end'
+        'date_end',
+        'season'
     )
     readonly_fields = ('are_qrs_removed',)
-    list_filter = ('is_active',)
-    search_fields = ('name',)
+    search_fields = ('name', 'season')
     ordering = ('name', 'date_start', 'date_end')
 
 
@@ -67,9 +89,7 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = ('kindergarten', 'photo_theme', 'parent', 'photos')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
-    inlines = [
-        PhotoInline
-    ]
+    inlines = [PhotoInline]
 
     def photos(self, obj):
         return ",".join([str(p.number) for p in obj.photos.all()])
@@ -80,29 +100,6 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
         return 'Недоступно'
 
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-
-        obj = form.instance
-        kindergarten_code = obj.kindergarten.code
-        photo_numbers = []
-
-        for formset in formsets:
-            for inline_form in formset.forms:
-                if 'DELETE' not in inline_form.changed_data and inline_form.is_valid():
-                    photo_numbers.append(inline_form.instance.number)
-
-        qr_code, buffer = generate_qr_code(
-            photo_line_id=obj.id,
-            url=PHOTO_LINE_URL,
-            kindergarten_code=kindergarten_code,
-            photo_numbers=photo_numbers,
-        )
-
-        obj.qr_code.save(
-            f'{str(obj.photo_theme.id)}/{str(obj.photo_theme.name)}_qr.png',
-            ContentFile(buffer.read())
-        )
 
 
 @admin.register(Photo)
@@ -209,3 +206,8 @@ class UserPhotoCountAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(Season)
+class SeasonAdmin(admin.ModelAdmin):
+    list_display = ('season',)

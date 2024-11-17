@@ -4,7 +4,7 @@ from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from apps.photo.models import PhotoTheme
+from apps.photo.models import PhotoTheme, KindergartenPhotoTheme
 from apps.promocode.models import Promocode
 from apps.user.models.user import UserRole
 from apps.utils.services.remove_qr_code import remove_qr_code
@@ -57,9 +57,9 @@ class UpdatePhotoThemeActivityTask(BaseTask):
     """
     def run(self, *args, **kwargs):
         # деактивируем прошедшие фототемы
-        PhotoTheme.objects.filter(
+        KindergartenPhotoTheme.objects.filter(
             is_active=True,
-            date_end__lt=timezone.now()
+            photo_theme__date_end__lt=timezone.now()
         ).update(is_active=False)
 
 

@@ -73,6 +73,15 @@ class ClientCard(models.Model):
             return getattr(manager, 'manager_discount', "Скидка не указана")
         return "Скидка не указана"
 
+    @property
+    def responsible_manager_fi(self) -> str:
+        """Возвращает имя и фамилию исполнителя задачи, если они существуют."""
+        if self.responsible_manager and self.responsible_manager.user:
+            first_name = self.responsible_manager.user.first_name or "Без имени"
+            last_name = self.responsible_manager.user.last_name or "Без фамилии"
+            return f"{first_name} {last_name}"
+        return "Ответственный менеджер не указан"
+
 class Notes(models.Model):
     """Заметки"""
     text = models.TextField(max_length=1024, verbose_name="Текст заметки")
@@ -137,6 +146,10 @@ class TaskStatus(models.IntegerChoices):
     OPEN = 1, "Открыта"
     DONE = 2, "Выполнена"
 
+class ReviewTaskStatus(models.IntegerChoices):
+    TO_BE_FINALIZED = 1, "Доработать"
+    FAIL = 2, "Провалить"
+    ACCEPT = 3, "Принять"
 
 class TaskType(models.IntegerChoices):
     CALL = 1, "Звонок"
@@ -177,6 +190,9 @@ class ClientCardTask(models.Model):
         related_name="client_card_task",
         null=True,
         blank=True,
+    )
+    review_task_status = models.PositiveSmallIntegerField(
+        verbose_name="Статус ревью", choices=ReviewTaskStatus.choices, default=ReviewTaskStatus.ACCEPT
     )
     text = models.TextField(max_length=2048, verbose_name="Описание", null=True, blank=True)
     revision_comment = models.TextField(max_length=2048, verbose_name="", null=True, blank=True)
@@ -219,6 +235,10 @@ class ClientCardTask(models.Model):
     def task_type_name(self) -> str:
         """Возвращает название текущего типа задачи."""
         return self.get_task_type_display()
+
+    @property
+    def review_task_status_name(self) -> str:
+        return self.get_review_task_status_display()
 
     class Meta:
         verbose_name = 'Задача'

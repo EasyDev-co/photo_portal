@@ -1,31 +1,15 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
+from .season import Season
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from apps.kindergarten.models import Kindergarten
-
-
-class Season(models.IntegerChoices):
-    """ Сезоны """
-    WINTER = 1, 'Зима'
-    SPRING = 2, 'Весна'
-    SUMMER = 3, 'Лето'
-    AUTUMN = 4, 'Осень'
 
 
 class PhotoTheme(UUIDMixin, TimeStampedMixin):
     name = models.CharField(
         max_length=255,
         verbose_name='Название'
-    )
-    kindergartens = models.ManyToManyField(
-        Kindergarten,
-        verbose_name="Детский сад",
-        related_name="photo_themes",
-        blank=True,
-        null=True,
-    )
-    is_active = models.BooleanField(
-        verbose_name='Активно'
     )
     date_start = models.DateTimeField(
         verbose_name='Дата начала'
@@ -41,10 +25,13 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name='Выкуп подсчитан',
         default=False
     )
-    season = models.PositiveSmallIntegerField(
-        choices=Season.choices,
-        default=Season.WINTER,
-        verbose_name='Сезон'
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        verbose_name='Сезон',
+        related_name='photo_themes',
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -54,6 +41,11 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
         verbose_name = 'Фотосессия'
         verbose_name_plural = 'Фотосессии'
         ordering = ("-created",)
+
+    def clean(self):
+        super().clean()
+        if self.date_start >= self.date_end:
+            raise ValidationError("Дата окончания фотосессии не может быть раньше даты начала.")
 
 
 class PhotoPopularityStat(PhotoTheme):
