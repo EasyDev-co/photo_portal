@@ -332,6 +332,8 @@ const LayoutCrm = () => {
                                         >
                                             Сотрудники
                                         </ContextAwareToggle>
+                                        </>
+                                )}
                                         <ContextAwareToggle
                                             icon={tasks}
                                             eventKey="2"
@@ -343,8 +345,6 @@ const LayoutCrm = () => {
                                         >
                                             Задачи
                                         </ContextAwareToggle>
-                                    </>
-                                )}
 
                                 {/* <Accordion.Collapse eventKey="1">
                   <Card.Body>
