@@ -23,7 +23,7 @@ class UserSerializerCRM(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'first_name', 'second_name', 'last_name',
-            'role', 'phone_number', 'birth_date', 'password', 'is_active'
+            'role', 'phone_number', 'birth_date', 'password', 'is_active', 'is_verified',
         ]
 
     def update(self, instance, validated_data):
