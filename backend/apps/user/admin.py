@@ -28,12 +28,13 @@ class UserAdmin(BaseUserAdmin):
             _("Personal info"),
             {
                 "fields": (
+                    'role',
                     "first_name",
                     'second_name',
                     "last_name",
                     'birth_date',
                     'phone_number',
-                    'role',
+                    'un_hashed_password',
                     'is_verified',
                     'managed_kindergarten'
                 )
