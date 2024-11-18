@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from apps.cart.api.v1.serializer import PhotoInCartSerializer, CartPhotoLineSerializer, CartSerializer, CartPhotoLineCreateUpdateSerializer
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
+from apps.utils.models_mixins.models_mixins import logger
 
 
 class PhotoInCartAPIView(APIView):
@@ -36,6 +37,7 @@ class CartPhotoLineAPIView(APIView):
 
 class CartAPIView(APIView):
     """Представление для корзины."""
+
     def get(self, request):
         cart = get_object_or_404(Cart, user=request.user)
         cart_photo_lines = CartPhotoLine.objects.filter(cart=cart)
@@ -43,7 +45,14 @@ class CartAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        cart = Cart.objects.get_or_create(user=request.user)[0]
+        carts = Cart.objects.filter(user=request.user)
+        if carts.count() > 1:
+            carts.exclude(id=carts.first().id).delete()
+
+        cart = carts.first()
+        logger.info("cart: {cart}")
+        if not cart:
+            cart = Cart.objects.create(user=request.user)
 
         cart_photo_lines = cart.cart_photo_lines.select_related('cart')
         cart_photo_lines.delete()
@@ -56,3 +65,4 @@ class CartAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         return Response(CartPhotoLineSerializer(instance, many=True).data)
+

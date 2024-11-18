@@ -29,6 +29,10 @@ from apps_crm.roles.models import UserRole
 
 from loguru import logger
 
+from config.settings import PHOTO_LINE_URL
+from apps.utils.services import generate_qr_code
+from django.core.files.base import ContentFile
+
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
     # permission_classes = [IsAuthenticated]
@@ -80,15 +84,45 @@ class PhotoUploadView(APIView):
                     photo_theme=photo_theme,
                 )
 
+                photo_numbers = []
+
                 for i, photo_file in enumerate(filter(None, group)):
-                    serial_number = i + 1  # От 1 до 6
-                    Photo.objects.create(
+                    serial_number = i + 1
+                    photo = Photo.objects.create(
                         photo_line=photo_line,
                         number=next_photo_number,
                         photo_file=photo_file,
                         serial_number=serial_number,
                     )
+                    photo_numbers.append(photo.number)
                     next_photo_number += 1
+
+                self.generate_qr_code_for_photo_line(photo_line, photo_numbers)
+
+    @staticmethod
+    def generate_qr_code_for_photo_line(photo_line, photo_numbers):
+        """
+        Метод для генерации QR-кода для объекта PhotoLine.
+        """
+        kindergarten_code = photo_line.kindergarten.code
+
+        logger.info(f"photo_num: {photo_numbers}")
+
+        if not photo_numbers:
+            logger.warning("Список номеров фотографий пуст, пропускаем генерацию QR-кода.")
+            return
+
+        qr_code, buffer = generate_qr_code(
+            photo_line_id=photo_line.id,
+            url=PHOTO_LINE_URL,
+            kindergarten_code=kindergarten_code,
+            photo_numbers=photo_numbers,
+        )
+
+        buffer.seek(0)
+        qr_code_filename = f'{str(photo_line.photo_theme.id)}/{str(photo_line.photo_theme.name)}_qr.png'
+        photo_line.qr_code.save(qr_code_filename, ContentFile(buffer.read()), save=True)
+
 
     @staticmethod
     def _grouper(iterable, n, fillvalue=None):
@@ -121,7 +155,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         active_photo_theme = active_photo_theme_response
 
         # Получение фотографий и проверка их целостности
-        photos_response = self.get_photos(photo_numbers, active_photo_theme)
+        photos_response = self.get_photos(photo_numbers, active_photo_theme, kindergarten)
         if isinstance(photos_response, Response):
             return photos_response
         photo_line = photos_response
@@ -197,18 +231,23 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         return photo_numbers
 
     @staticmethod
-    def get_photos(photo_numbers, active_photo_theme):
+    def get_photos(photo_numbers, active_photo_theme, kindergarten):
         """Получение фотографий и проверка их принадлежности к одному пробнику"""
+        logger.info(f"photo_num: {photo_numbers}")
+        logger.info(f"active_photo_theme: {active_photo_theme}")
+        logger.info(f"kindergarten: {kindergarten}")
         if len(photo_numbers) == 1:
             photo_line = Photo.objects.get(
                 number=photo_numbers[0],
-                photo_line__photo_theme=active_photo_theme
+                photo_line__photo_theme=active_photo_theme,
+                photo_line__kindergarten=kindergarten,
             ).photo_line
             return photo_line
 
         photos = Photo.objects.filter(
             number__in=photo_numbers,
-            photo_line__photo_theme=active_photo_theme
+            photo_line__photo_theme=active_photo_theme,
+            photo_line__kindergarten=kindergarten,
         )
 
         # Проверка, что найдены все 6 фотографий

@@ -92,9 +92,11 @@ const aboutUsItems = [
     infoAltPhoto: "фото ребёнка",
   },
 ];
+
 // const localUrl = `http://77.232.37.60:8000`
 const localUrl = `https://stage.photodetstvo.ru`
 // const localUrl = `http://localhost:8000`;
+
 // const localUrl = `https://photodetstvo.easydev-program.com`;
 // const localUrl = `https://photodetstvo.ru`;
 export {

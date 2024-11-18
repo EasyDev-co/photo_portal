@@ -3,6 +3,8 @@ from urllib.parse import urlencode
 
 import qrcode
 
+from loguru import logger
+
 
 def generate_qr_code(url: str, photo_line_id: str = None, kindergarten_code: str = None, photo_numbers: list = None):
     """
@@ -20,7 +22,7 @@ def generate_qr_code(url: str, photo_line_id: str = None, kindergarten_code: str
 
     query_string = urlencode(params)
     full_url += f'{query_string}'
-
+    logger.info(f"fill_url: {full_url}")
     qr_code = qrcode.make(full_url)
 
     buffer = BytesIO()
