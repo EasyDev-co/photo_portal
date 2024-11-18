@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {Form, Button, ModalFooter} from 'react-bootstrap'
 import DatePicker from '../../DatePicker/DatePicker'
 import calendar from '../../../assets/icons/calendar-event.svg'
-import ManagerSelectInput from "./InputsField/SearchManagerField";
+import ManagerSelectInput from "./InputsField/SearchMultiplyManager";
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
