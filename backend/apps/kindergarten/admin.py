@@ -41,7 +41,7 @@ class KindergartenAdmin(admin.ModelAdmin):
     list_display = ('name', 'region', 'code', 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
-    readonly_fields = ('qr_image', 'qr_code', 'file_upload')
+    readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info')
     raw_id_fields = ('region',)
     ordering = ('name',)
     inlines = [KindergartenPhotoThemeInline]
@@ -52,7 +52,7 @@ class KindergartenAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if obj:
-            return 'region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload'
+            return 'region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload', 'manager_info'
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
@@ -71,11 +71,16 @@ class KindergartenAdmin(admin.ModelAdmin):
         html = render_to_string('admin/widgets/drag_and_drop.html', context)
         return mark_safe(html)
 
-    @staticmethod
-    def _grouper(iterable, n, fillvalue=None):
-        """Группировка по n элементов с заполнением отсутствующих значений."""
-        args = [iter(iterable)] * n
-        return zip_longest(*args, fillvalue=fillvalue)
+    def manager_info(self, obj):
+        """Отображает информацию о заведующей, связанной с детским садом."""
+        manager = obj.manager
+        if manager:
+            email = manager.email
+            password = manager.un_hashed_password or "Пароль недоступен"
+            return mark_safe(f"<strong>Email:</strong> {email}<br><strong>Password:</strong> {password}")
+        return "Заведующая не назначена"
+
+    manager_info.short_description = "Информация о заведующей"
 
     def save_related(self, request, form, formsets, change):
         obj = form.instance
