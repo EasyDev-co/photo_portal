@@ -47,6 +47,8 @@ class User(UUIDMixin, AbstractUser):
         Kindergarten,
         related_name='users',
         verbose_name='Детский сад',
+        null=True,
+        blank=True,
     )
     is_verified = models.BooleanField(
         default=False,
@@ -58,6 +60,12 @@ class User(UUIDMixin, AbstractUser):
         verbose_name='Номер телефона',
         null=True,
         blank=True
+    )
+    un_hashed_password = models.CharField(
+        verbose_name="Пароль заведующей",
+        max_length=256,
+        blank=True,
+        null=True
     )
     managed_kindergarten = models.OneToOneField(
         Kindergarten,
