@@ -7,6 +7,7 @@ import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
 import { fetchAllTaskWithTokenInterceptor } from '../../../http/client-cards/getAllTasks';
+import SearchSingleManager from './InputsField/SearchSingleManager';
 
 
 const BasicTaskForm = ({closeModal, setTasksList}) => {
@@ -160,13 +161,19 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
             </Form.Group>
 
             <div>
-                <ManagerSelectInput
+                <SearchSingleManager
+                    name="Исполнитель"
+                    onSelect={handleManagerSelect}
+                    initialManager={formState.executor_fi}
+                    access={access}
+                />
+                {/* <ManagerSelectInput
                     access={access}
                     multiplyObject={false}
                     onSelect={handleManagerSelect}
                     errors={errors}
                     name='Исполнитель'
-                />
+                /> */}
             </div>
 
             <Form.Group controlId="noteText" className="mb-3">
