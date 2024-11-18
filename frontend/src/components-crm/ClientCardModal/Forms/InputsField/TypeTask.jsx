@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, ModalFooter } from 'react-bootstrap'
 
-const TypeTask = ({onSelect, initialType}) => {
+const TypeTask = ({onSelect, initialType, includeEmptyOption = false, defaultToFirst = true, userRole}) => {
   const access = localStorage.getItem('access') // Get access token
 
   const init = {
@@ -15,7 +15,25 @@ const TypeTask = ({onSelect, initialType}) => {
     "Позвонить по КП, Проверить смс по Вотсапп": "8"
   }
 
-  const [type, setType] = useState(init[initialType] || '1')
+  const revertInit = {
+    "1": "Звонок",
+    "2": "Сбор оплаты+ отправка ссылок",
+    "3": "Принять заказ",
+    "4": "Позвонить холодный/списки",
+    "5": "Проверить отправку образцов, Готовые фото.",
+    "6": "Теплые сады",
+    "7": "Напомнить о записи",
+    "8": "Позвонить по КП, Проверить смс по Вотсапп",
+  }
+
+  // const [type, setType] = useState(initialType ? [initialType] : '')
+  const [type, setType] = useState(
+    initialType !== undefined
+      ? initialType
+      : defaultToFirst
+      ? Object.values(init)[0] // По умолчанию выбираем первый элемент
+      : ''
+  );
 
   const [errors, setErrors] = useState({})
 
@@ -35,13 +53,16 @@ const TypeTask = ({onSelect, initialType}) => {
         name="status"
         className="shadow-none"
         style={{ width: '100%' }}
-        value={type || init[initialType] || '1'}
+        // value={type || init[initialType] || '1'}
+        value={type}
         onChange={(e) => {
           if (e.target.value !== type) {
             handleChange(e) // Передаем событие e, а не значение
           }
         }}
+        disabled={userRole === 2}
       >
+        {includeEmptyOption && <option value="">Не выбрано</option>}
         <option value="1">Звонок</option>
         <option value="2">Сбор оплаты + отправка ссылок</option>
         <option value="3">Принять заказ</option>

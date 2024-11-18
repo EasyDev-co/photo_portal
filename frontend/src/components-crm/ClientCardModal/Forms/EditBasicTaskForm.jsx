@@ -3,14 +3,16 @@ import { Form, Button, ModalFooter } from 'react-bootstrap'
 import calendar from '../../../assets/icons/calendar-event.svg'
 import people from '../../../assets/icons/people.svg'
 import { patchTaskWithToken } from '../../../http/client-cards/patchTasks'
-import { fetchsingleTaskWithTokenInterceptor } from '../../../http/client-cards/getSingleTask'
-import { deleteTaskWithToken } from '../../../http/client-cards/deleteTask'
-import ManagerSelectInput from './InputsField/SearchManagerField'
+import ManagerSelectInput from './InputsField/SearchMultiplyManager'
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import DatePicker from '../../DatePicker/DatePicker'
 import { deleteBasicTaskWithToken } from '../../../http/client-cards/deleteBasicTask'
 import { fetchBasicSingleTaskWithTokenInterceptor } from '../../../http/client-cards/getBasicSingleTask'
+import { patchBasicTaskWithToken } from '../../../http/client-cards/patchBasicTasks'
+import { fetchUserDataWithTokenInterceptor } from '../../../http/user/getUserData'
+import { useSelector } from 'react-redux'
+import SearchSingleManager from './InputsField/SearchSingleManager'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -18,6 +20,7 @@ const EditBasicTaskForm = ({
   editTask,
   deleteItem,
 }) => {
+  console.log(taskId)
   const access = localStorage.getItem('access') // Get access token
 
   const formatDate = (dateString) => {
@@ -30,7 +33,17 @@ const EditBasicTaskForm = ({
     "Открыта": "1",
     "Выполнена": "2"
   }
-
+  const typeMap = {
+    "Звонок": "1",
+    "Сбор оплаты+ отправка ссылок": "2",
+    "Принять заказ": "3",
+    "Позвонить холодный/списки": "4",
+    "Проверить отправку образцов, Готовые фото.": "5",
+    "Теплые сады": "6",
+    "Напомнить о записи": "7",
+    "Позвонить по КП, Проверить смс по Вотсапп": "8"
+  }
+  
   const [formState, setFormState] = useState({
     author_fi:"",
     client_card: "",
@@ -38,22 +51,55 @@ const EditBasicTaskForm = ({
     date_end: "",
     executor_fi: "",
     id: "",
-    revision_comment: null,
+    revision_comment: "",
     task_status_name: "",
     task_type_name: "",
     text: "",
-  })
+    executor_id: "",
+    review_task_status_name: "",
+    kindergarten_name: "",
+  });
 
+  const statusTextToValueMap = {
+    Доработать: "1",
+    Провалить: "2",
+    Принять: "3",
+  };
+  const statusValueToTextMap = {
+    "1": "Принять",
+    "2": "Провалить",
+    "3": "Доработать",
+  };
   
 
   const [errors, setErrors] = useState({})
   const [isActive, setIsActive] = useState(false)
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const refresh = useSelector(state => state.user.refresh);
+
+  useEffect(() => {
+    if (!localStorage.getItem('access')) {
+      return;
+    }
+    fetchUserDataWithTokenInterceptor(access, refresh)
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(res => {
+              console.log(res.employee.employee_role)
+              setUserRole(res.employee.employee_role);
+            //   setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
+            });
+        }
+      });
+  }, []);
 
   const handleManagerSelect = (selectedManager) => {
+    console.log(selectedManager)
     setFormState((prevState) => ({
       ...prevState,
-      manager: selectedManager,
+      executor_id: selectedManager.id
     }))
   }
   const handleCardSelect = (selectedCard) => {
@@ -61,6 +107,7 @@ const EditBasicTaskForm = ({
       ...prevState,
       clientCard: selectedCard,
     }))
+    console.log(selectedCard);
   }
 
   function reformatDate(dateStr) {
@@ -83,6 +130,19 @@ const EditBasicTaskForm = ({
         date_end: formattedDate,
     }));
 };
+
+const handleStatusChange = (e) => {
+  const selectedValue = e.target.value;
+  console.log(selectedValue);
+  setFormState((prevState) => ({
+    ...prevState,
+    task_status_name: selectedValue, // Сохраняем значение (число)
+  }));
+  console.log(formState);
+}
+useEffect(() => {
+  console.log(formState);
+}, [formState])
 
   const handleDelete = () => {
     const deleteTask = async () => {
@@ -115,15 +175,6 @@ const EditBasicTaskForm = ({
     deleteTask()
   }
 
-  const handleStatusChange = (e) => {
-    const selectedValue = e.target.value;
-    const statusText = selectedValue === "1" ? "Открыта" : "Выполнена";
-    setFormState((prevState) => ({
-      ...prevState,
-      task_status_name: statusText
-    }));
-  }
-
   const handleSubmit = (e) => {
 
     //СДЕЛАТЬ ОБРАБОТЧИК СТАТУСОВ И ТИПОВ ДЛЯ ОТПРАВКИ НА БЭК
@@ -132,15 +183,20 @@ const EditBasicTaskForm = ({
     const data = {
       date_end: reformatDate(formState.date_end),
       text: formState.text,
-      task_type: formState.task_type,
-      manager: formState.manager,
-      status: statusMap[formState.task_status_name],
-      // status: formState.status,
-      clientCard: formState.clientCard,
+      task_type: formState.task_type_name,
+      executor: formState.executor_id,
+      // status: statusMap[formState.task_status_name],
+      task_status: formState.task_status_name,
+      client_card	: formState.client_card,
+      review_task_status: statusTextToValueMap[formState.review_task_status_name],
+      revision_comment: formState.revision_comment,
     }
 
+    console.log(data);
+    //revision_comment!!!!
+
     const patchTask = async () => {
-      const response = await patchTaskWithToken(access, data, taskId)
+      const response = await patchBasicTaskWithToken(access, data, taskId)
       if (response.ok) {
         const res = await response.json()
         editTask(res)
@@ -155,6 +211,9 @@ const EditBasicTaskForm = ({
     patchTask()
   }
 
+  useEffect(() => {
+    console.log(formState);
+  }, [formState]);
 
   useEffect(() => {
     if (taskId) {
@@ -175,9 +234,12 @@ const EditBasicTaskForm = ({
               executor_fi: data.executor_fi || '',
               id: data.id || '',
               revision_comment: data.revision_comment || '',
-              task_status_name: data.task_status_name || '',
-              task_type_name: data.task_type_name || '',
+              task_status_name: statusMap[data.task_status_name] || '',
+              task_type_name: typeMap[data.task_type_name] || '',
               text: data.text || '',
+              kindergarten_name: data.kindergarten_name,
+              review_task_status_name: data.review_task_status_name || '',
+              // review_task_status_name: statusValueToTextMap[data.review_task_status] || "",
             })
             setIsDataLoaded(true)
           } else {
@@ -196,13 +258,15 @@ const EditBasicTaskForm = ({
       ...prevState,
       task_type_name: selectedType,
     }))
+    console.log(selectedType)
+    console.log(formState)
   }
 
   if (!isDataLoaded) return <div>Загрузка...</div>;
 
   return (
     <Form>
-      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} />
+      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} userRole={userRole} />
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
@@ -218,6 +282,7 @@ const EditBasicTaskForm = ({
             }}
             onDateChange={handleDateChange}
             value={formState.date_end}
+            userRole={userRole}
           />
         </div>
         {errors.date_end && (
@@ -225,13 +290,12 @@ const EditBasicTaskForm = ({
         )}
       </Form.Group>
 
-      <ManagerSelectInput
-        access={access}
-        multiplyObject={false}
-        onSelect={handleManagerSelect}
-        errors={errors}
+      <SearchSingleManager 
         name="Исполнитель"
+        onSelect={handleManagerSelect}
+        userRole={userRole}
         initialManager={formState.executor_fi}
+        access={access}
       />
 
       <Form.Group className="mb-3">
@@ -240,14 +304,16 @@ const EditBasicTaskForm = ({
           name="status"
           className="shadow-none"
           style={{ width: '100%' }}
-          // value={formState.status || '1'}
-          value={statusMap[formState.task_status_name] || "1"}
-          onChange={handleStatusChange}
-          // onChange={(e) => {
-          //   if (e.target.value !== formState.status) {
-          //     handleChange(e)
-          //   }
-          // }}
+          value={statusMap[formState.task_status_name] || '1'} // Преобразуем текст в значение
+          onChange={(e) => {
+            const selectedText = Object.keys(statusMap).find(
+              (key) => statusMap[key] === e.target.value
+            ); // Находим текст по значению
+            setFormState((prevState) => ({
+              ...prevState,
+              task_status_name: selectedText, // Сохраняем текстовое значение
+            }));
+          }}
         >
           <option value="1">Открыта</option>
           <option value="2">Выполнена</option>
@@ -275,14 +341,85 @@ const EditBasicTaskForm = ({
           onSelect={handleCardSelect}
           errors={errors}
           name="Карточка клиента"
-          initialCard={formState.client_card}
+          initialCard={formState.kindergarten_name}
+          userRole={userRole}
         />
       </div>
 
+      <Form.Group className="mb-3">
+        <Form.Label className="text-secondary">Оценка задачи</Form.Label>
+        <Form.Select
+          name="review_task_status"
+          className="shadow-none"
+          style={{ width: '100%' }}
+          // value={formState.review_task_status_name || ""}
+          value={
+            Object.keys(statusTextToValueMap).includes(formState.review_task_status_name)
+              ? statusTextToValueMap[formState.review_task_status_name]
+              : ""
+          }
+          onChange={(e) => {
+            const selectedText = e.target.options[e.target.selectedIndex].text; // Получаем текст выбранного варианта
+            setFormState((prev) => ({
+              ...prev,
+              review_task_status_name: selectedText,
+              revision_comment: selectedText === "Доработать" ? formState.revision_comment : "", // Очищаем, если выбор изменился
+            }));
+          }}
+          disabled={userRole == 2}
+          // value={
+          //   Object.keys(statusTextToValueMap).includes(formState.review_task_status_name)
+          //     ? statusTextToValueMap[formState.review_task_status_name]
+          //     : ""
+          // }
+          // onChange={(e) => {
+          //   const selectedText = e.target.options[e.target.selectedIndex].text; // Получаем текст выбранного варианта
+          //   setFormState((prev) => ({
+          //     ...prev,
+          //     review_task_status_name: selectedText,
+          //   }));
+          // }}
+        >
+          <option value="">-- Выберите статус --</option>
+          <option value="1">Доработать</option>
+          <option value="2">Провалить</option>
+          <option value="3">Принять</option>
+        </Form.Select>
+        {errors.review_task_status_name && (
+          <div className="text-danger">{errors.review_task_status_name[0]}</div>
+        )}
+      </Form.Group>
+      {formState.review_task_status_name === "Доработать" && (
+        <Form.Group controlId="revisionComment" className="mb-3">
+          <Form.Label className="text-secondary">Описание доработок</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={4}
+            name="revision_comment"
+            style={{ padding: '15px', resize: 'none', height: '100px' }}
+            value={formState.revision_comment}
+            onChange={(e) => {
+              const { value } = e.target;
+              setFormState((prev) => ({
+                ...prev,
+                revision_comment: value,
+              }));
+            }}
+            placeholder="Опишите необходимые доработки"
+          />
+          {errors.revision_comment && (
+            <div className="text-danger">{errors.revision_comment[0]}</div>
+          )}
+        </Form.Group>
+      )}
+
+
       <ModalFooter style={{ padding: '5px' }}>
-        <Button className="btn-filter-reset text-center" onClick={handleDelete}>
-          Удалить
-        </Button>
+      {userRole !== 2 && (
+          <Button className="btn-filter-reset text-center" onClick={handleDelete}>
+            Удалить
+          </Button>
+        )}
         <Button
           className="create-btn"
           style={{ padding: '7px 12px' }}

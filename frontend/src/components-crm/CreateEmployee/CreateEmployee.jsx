@@ -39,6 +39,26 @@ const CreateEmployee = () => {
     };
 
     // Функция обработки сохранения
+    // const handleSubmit = async () => {
+    //     const data = {
+    //         user: {
+    //             ...personalInfo,
+    //             ...securityInfo,
+    //         }, employee_role: personalInfo.employee_role, status: "active"
+
+    //     };
+
+    //     try {
+    //         const accessToken = localStorage.getItem('access');
+    //         const createdEmployee = await createEmployee(data, accessToken);
+
+    //         navigate(`/crm/employees/edit/${createdEmployee.id}`);
+    //     } catch (error) {
+    //         console.error('Ошибка при создании сотрудника:', error);
+    //         alert('Не удалось создать сотрудника. Попробуйте снова.');
+    //     }
+    // };
+
     const handleSubmit = async () => {
         const data = {
             user: {
@@ -47,13 +67,13 @@ const CreateEmployee = () => {
                 is_verified: true,
                 role: 3,
             }, employee_role: personalInfo.employee_role, status: "active"
-
+    
         };
-
+    
         try {
             const accessToken = localStorage.getItem('access');
             const createdEmployee = await createEmployee(data, accessToken);
-
+    
             navigate(`/crm/employees/edit/${createdEmployee.id}`);
         } catch (error) {
             console.error('Ошибка при создании сотрудника:', error);
