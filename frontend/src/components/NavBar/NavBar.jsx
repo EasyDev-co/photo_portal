@@ -55,6 +55,7 @@ export const NavBar = ({ localStorageValue, onClose }) => {
                   ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
                 bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
               />
+              <h1>${localStorage.getItem("role")}</h1>
             </ul>
             <ul className={styles.navList}>
               <NavBarItem

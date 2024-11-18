@@ -5,7 +5,7 @@ import logo from '../../assets/logos/PP_Logo.png'
 import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'
 import Accordion from 'react-bootstrap/Accordion'
 import {useAccordionButton} from 'react-bootstrap/AccordionButton'
-import {useContext, useState} from 'react'
+import React, {useContext, useState,useEffect} from 'react'
 import AccordionContext from 'react-bootstrap/AccordionContext'
 import Card from 'react-bootstrap/Card'
 import arrow from '../../assets/icons/arrow.svg'
@@ -16,7 +16,7 @@ import ToggleButton from 'react-bootstrap/ToggleButton'
 import tasks from '../../assets/icons/list-task.svg'
 import bell from '../../assets/icons/bell.svg'
 import person from '../../assets/icons/person.jpg'
-import React, {useEffect} from "react";
+
 import Notification from "../Notification/Notification";
 import {localUrl} from "../../constants/constants";
 import { useSelector } from 'react-redux'
@@ -201,9 +201,6 @@ const LayoutCrm = () => {
                                     )}
 
                                     <div className="d-flex align-items-center ">
-                                        <div className="pe-2 cursor-pointer">
-                                            <img src={person} alt=""/>
-                                        </div>
                                         <div>
                                             <div>{userName} {userLastName}</div>
                                             <div className="fs-13 text-black-50">{employRole[userRole]}</div>

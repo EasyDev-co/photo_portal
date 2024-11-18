@@ -23,10 +23,6 @@ from apps.utils.services.calculate_photo_popularity import (
     calculate_popularity
 )
 
-from config.settings import PHOTO_LINE_URL
-from apps.utils.services import generate_qr_code
-from django.core.files.base import ContentFile
-
 
 class CustomMessageMixin:
     def save_model(self, request, obj, form, change):
