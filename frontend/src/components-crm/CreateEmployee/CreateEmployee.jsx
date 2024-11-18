@@ -44,6 +44,8 @@ const CreateEmployee = () => {
             user: {
                 ...personalInfo,
                 ...securityInfo,
+                is_verified: true,
+                role: 3,
             }, employee_role: personalInfo.employee_role, status: "active"
 
         };
