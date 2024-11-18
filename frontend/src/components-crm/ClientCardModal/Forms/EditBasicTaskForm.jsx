@@ -3,13 +3,16 @@ import { Form, Button, ModalFooter } from 'react-bootstrap'
 import calendar from '../../../assets/icons/calendar-event.svg'
 import people from '../../../assets/icons/people.svg'
 import { patchTaskWithToken } from '../../../http/client-cards/patchTasks'
-import ManagerSelectInput from './InputsField/SearchManagerField'
+import ManagerSelectInput from './InputsField/SearchMultiplyManager'
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import DatePicker from '../../DatePicker/DatePicker'
 import { deleteBasicTaskWithToken } from '../../../http/client-cards/deleteBasicTask'
 import { fetchBasicSingleTaskWithTokenInterceptor } from '../../../http/client-cards/getBasicSingleTask'
 import { patchBasicTaskWithToken } from '../../../http/client-cards/patchBasicTasks'
+import { fetchUserDataWithTokenInterceptor } from '../../../http/user/getUserData'
+import { useSelector } from 'react-redux'
+import SearchSingleManager from './InputsField/SearchSingleManager'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -72,6 +75,25 @@ const EditBasicTaskForm = ({
   const [errors, setErrors] = useState({})
   const [isActive, setIsActive] = useState(false)
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const refresh = useSelector(state => state.user.refresh);
+
+  useEffect(() => {
+    if (!localStorage.getItem('access')) {
+      return;
+    }
+    fetchUserDataWithTokenInterceptor(access, refresh)
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(res => {
+              console.log(res.employee.employee_role)
+              setUserRole(res.employee.employee_role);
+            //   setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
+            });
+        }
+      });
+  }, []);
 
   const handleManagerSelect = (selectedManager) => {
     console.log(selectedManager)
@@ -244,7 +266,7 @@ useEffect(() => {
 
   return (
     <Form>
-      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} />
+      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} userRole={userRole} />
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
@@ -260,6 +282,7 @@ useEffect(() => {
             }}
             onDateChange={handleDateChange}
             value={formState.date_end}
+            userRole={userRole}
           />
         </div>
         {errors.date_end && (
@@ -267,13 +290,12 @@ useEffect(() => {
         )}
       </Form.Group>
 
-      <ManagerSelectInput
-        access={access}
-        multiplyObject={false}
-        onSelect={handleManagerSelect}
-        errors={errors}
+      <SearchSingleManager 
         name="Исполнитель"
+        onSelect={handleManagerSelect}
+        userRole={userRole}
         initialManager={formState.executor_fi}
+        access={access}
       />
 
       <Form.Group className="mb-3">
@@ -320,6 +342,7 @@ useEffect(() => {
           errors={errors}
           name="Карточка клиента"
           initialCard={formState.kindergarten_name}
+          userRole={userRole}
         />
       </div>
 
@@ -343,6 +366,7 @@ useEffect(() => {
               revision_comment: selectedText === "Доработать" ? formState.revision_comment : "", // Очищаем, если выбор изменился
             }));
           }}
+          disabled={userRole == 2}
           // value={
           //   Object.keys(statusTextToValueMap).includes(formState.review_task_status_name)
           //     ? statusTextToValueMap[formState.review_task_status_name]
@@ -391,9 +415,11 @@ useEffect(() => {
 
 
       <ModalFooter style={{ padding: '5px' }}>
-        <Button className="btn-filter-reset text-center" onClick={handleDelete}>
-          Удалить
-        </Button>
+      {userRole !== 2 && (
+          <Button className="btn-filter-reset text-center" onClick={handleDelete}>
+            Удалить
+          </Button>
+        )}
         <Button
           className="create-btn"
           style={{ padding: '7px 12px' }}

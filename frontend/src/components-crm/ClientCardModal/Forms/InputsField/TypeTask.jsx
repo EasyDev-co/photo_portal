@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, ModalFooter } from 'react-bootstrap'
 
-const TypeTask = ({onSelect, initialType, includeEmptyOption = false, defaultToFirst = true}) => {
+const TypeTask = ({onSelect, initialType, includeEmptyOption = false, defaultToFirst = true, userRole}) => {
   const access = localStorage.getItem('access') // Get access token
 
   const init = {
@@ -60,6 +60,7 @@ const TypeTask = ({onSelect, initialType, includeEmptyOption = false, defaultToF
             handleChange(e) // Передаем событие e, а не значение
           }
         }}
+        disabled={userRole === 2}
       >
         {includeEmptyOption && <option value="">Не выбрано</option>}
         <option value="1">Звонок</option>

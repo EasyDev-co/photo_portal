@@ -6,7 +6,7 @@ import styles from './SearchManagerField.module.css';
 import close_button from '../../../../assets/icons/close_button.svg'
 import { fetchSingleClientCardWithToken } from '../../../../http/client-cards/getSearchClientCard';
 
-const CardSelectInput = ({ access, multiplyObject = false, onSelect, errors, name, initialCard }) => {
+const CardSelectInput = ({ access, multiplyObject = false, onSelect, errors, name, initialCard, userRole }) => {
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedCard, setSelectedCard] = useState(multiplyObject ? [] : null);
@@ -93,6 +93,7 @@ const CardSelectInput = ({ access, multiplyObject = false, onSelect, errors, nam
                         placeholder="Не указано"
                         value={searchValue}
                         onChange={handleChange}
+                        disabled={userRole == 2}
                     />
                     {isLoading && <div>Загрузка...</div>}
                     <div className="control-img">
