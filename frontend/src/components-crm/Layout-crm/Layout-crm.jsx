@@ -321,28 +321,34 @@ const LayoutCrm = () => {
                                         </ButtonGroup>
                                     </Card.Body>
                                 </Accordion.Collapse>
-                                <ContextAwareToggle
-                                    icon={employees}
-                                    eventKey="1"
-                                    callback={(eventKey) => {
-                                        if (eventKey === '1') {
-                                            navigate('/crm/employees') // Navigate only when this section is active
-                                        }
-                                    }}
-                                >
-                                    Сотрудники
-                                </ContextAwareToggle>
-                                <ContextAwareToggle
-                                    icon={tasks}
-                                    eventKey="2"  //??????????????????????????????????????????????????????????????????????????????????????????
-                                    callback={(eventKey) => {
-                                        if (eventKey === '2') {
-                                            navigate('/crm/tasks') // Navigate only when this section is active
-                                        }
-                                    }}
-                                >
-                                    Задачи
-                                </ContextAwareToggle>
+                                
+                                {userRole !== 2 && (
+                                    <>
+                                        <ContextAwareToggle
+                                            icon={employees}
+                                            eventKey="1"
+                                            callback={(eventKey) => {
+                                                if (eventKey === '1') {
+                                                    navigate('/crm/employees'); // Navigate only when this section is active
+                                                }
+                                            }}
+                                        >
+                                            Сотрудники
+                                        </ContextAwareToggle>
+                                        <ContextAwareToggle
+                                            icon={tasks}
+                                            eventKey="2"
+                                            callback={(eventKey) => {
+                                                if (eventKey === '2') {
+                                                    navigate('/crm/tasks'); // Navigate only when this section is active
+                                                }
+                                            }}
+                                        >
+                                            Задачи
+                                        </ContextAwareToggle>
+                                    </>
+                                )}
+
                                 {/* <Accordion.Collapse eventKey="1">
                   <Card.Body>
                     <ButtonGroup

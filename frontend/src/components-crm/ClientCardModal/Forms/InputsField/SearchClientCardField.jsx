@@ -35,6 +35,7 @@ const CardSelectInput = ({ access, multiplyObject = false, onSelect, errors, nam
             const response = await fetchSingleClientCardWithToken(access, value.trim());
             if (response.ok) {
                 const data = await response.json();
+                console.log(data)
                 setSearchResults(data);
             } else {
                 console.error('Ошибка при поиске менеджеров');
