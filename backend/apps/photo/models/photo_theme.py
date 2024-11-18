@@ -44,6 +44,10 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
 
     def clean(self):
         super().clean()
+
+        if not self.date_start or not self.date_end:
+            raise ValidationError("Оба поля 'Дата начала' и 'Дата окончания' должны быть заполнены.")
+
         if self.date_start >= self.date_end:
             raise ValidationError("Дата окончания фотосессии не может быть раньше даты начала.")
 
