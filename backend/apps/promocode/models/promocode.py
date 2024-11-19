@@ -35,7 +35,9 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         PhotoTheme,
         on_delete=models.CASCADE,
         related_name="promo_codes",
-        verbose_name="Фотосессия"
+        verbose_name="Фотосессия",
+        null=True,
+        blank=True,
     )
     user = models.ForeignKey(
         User,
@@ -86,9 +88,9 @@ class Promocode(UUIDMixin, TimeStampedMixin):
                 return code
 
     def apply_discount(
-        self,
-        price: Decimal,
-        is_photobook: bool = False
+            self,
+            price: Decimal,
+            is_photobook: bool = False
     ) -> Decimal:
         """
         Применяет скидку к стоимости.
