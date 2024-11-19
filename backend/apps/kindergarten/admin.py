@@ -9,10 +9,7 @@ from .models import Ransom
 
 from apps.kindergarten.models.kindergarten import Kindergarten
 
-from itertools import zip_longest
-
 from config.settings import UPLOAD_URL, JQUERY_CDN
-from ..photo.admin import KindergartenPhotoThemeInline
 
 
 class KindergartenInline(admin.TabularInline):
@@ -41,10 +38,9 @@ class KindergartenAdmin(admin.ModelAdmin):
     list_display = ('name', 'region', 'code', 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
-    readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info')
+    readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info', 'active_photo_theme')
     raw_id_fields = ('region',)
     ordering = ('name',)
-    inlines = [KindergartenPhotoThemeInline]
 
     def qr_image(self, obj):
         if obj.qr_code:
@@ -52,7 +48,8 @@ class KindergartenAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if obj:
-            return 'region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload', 'manager_info'
+            return ('region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload',
+                    'manager_info', 'active_photo_theme')
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
@@ -81,22 +78,6 @@ class KindergartenAdmin(admin.ModelAdmin):
         return "Заведующая не назначена"
 
     manager_info.short_description = "Информация о заведующей"
-
-    def save_related(self, request, form, formsets, change):
-        obj = form.instance
-        if change:
-            if self._is_active_changed(formsets):
-                self._deactivate_other_themes(obj)
-        super().save_related(request, form, formsets, change)
-
-    @staticmethod
-    def _is_active_changed(formsets):
-        """Проверяет, изменился ли статус 'is_active' в formsets."""
-        for formset in formsets:
-            for inline_form in formset.forms:
-                if 'is_active' in inline_form.changed_data:
-                    return True
-        return False
 
     @staticmethod
     def _deactivate_other_themes(obj):
