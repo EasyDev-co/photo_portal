@@ -15,14 +15,15 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
 import tasks from '../../assets/icons/list-task.svg'
 import bell from '../../assets/icons/bell.svg'
-import person from '../../assets/icons/person.jpg'
-
+import addTaskButton from '../../assets/icons/icon_button-add.svg';
 import Notification from '../Notification/Notification'
 import { localUrl } from '../../constants/constants'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchUserDataWithTokenInterceptor } from '../../http/user/getUserData'
 import logout_icon from '../../assets/icons/logout.svg'
 import { removeUser } from '../../store/authSlice'
+import ClientModal from '../ClientCardModal/ClientModal'
+import BasicTaskForm from '../ClientCardModal/Forms/BasicTaskForm'
 
 const LayoutCrm = () => {
   const BASE = '#25243D'
@@ -52,6 +53,15 @@ const LayoutCrm = () => {
     2: 'Менеджер',
     3: 'Исполнительный директор',
     4: 'Старший менеджер',
+  }
+  const [isOpen, setIsOpen] = useState(false)
+
+
+  const handleShowModal = () => {
+    setIsOpen(true)
+  }
+  const handleCloseModal = () => {
+    setIsOpen(false)
   }
 
   const fetchNotifications = async () => {
@@ -166,11 +176,20 @@ const LayoutCrm = () => {
   return (
     <>
       <header>
+        <ClientModal
+          title="Добавить задачу"
+          show={isOpen}
+          handleClose={handleCloseModal}
+        >
+          <BasicTaskForm closeModal={handleCloseModal} /> 
+          {/* setTasksList={setTasksList} */}
+        </ClientModal>
         <div className="position-fixed header bg-white z-3">
           {location.pathname.split('/').length - 1 >= 3 ? (
             <>
-              <div
-                className="search-container go-back-header d-flex justify-content-center align-items-center gap-4 fw-600"
+            <div className='search-container d-flex'>
+            <div
+                className="new_container go-back-header d-flex justify-content-center align-items-center gap-4 fw-600"
                 style={{
                   fontSize: '20px',
                 }}
@@ -178,6 +197,46 @@ const LayoutCrm = () => {
               >
                 Назад
               </div>
+              <div className="d-flex align-items-center">
+                <div className="cursor-pointer">
+                  {/* <img src={write} alt="" /> */}
+                </div>
+                <div className="d-flex align-items-center">
+                  <button
+                  onClick={handleShowModal}
+                  >
+                    <img src={addTaskButton} alt='Плюсик для добавления задачи'></img>
+                  </button>
+                  <div
+                    className="px-3 cursor-pointer position-relative d-flex"
+                    onClick={toggleNotification}
+                  >
+                    <img src={bell} alt="Уведомления" />
+                    {unreadCount > 0 && (
+                      <span className="notification-count">{unreadCount}</span>
+                    )}
+                  </div>
+
+                  {isNotificationOpen && (
+                    <Notification
+                      notifications={notifications}
+                      onClose={toggleNotification}
+                      fetchNotifications={fetchNotifications}
+                    />
+                  )}
+                  </div>
+                  </div>
+            </div>
+              {/* <div
+                className="search-container go-back-header d-flex justify-content-center align-items-center gap-4 fw-600"
+                style={{
+                  fontSize: '20px',
+                }}
+                onClick={() => navigate(-1)}
+              >
+                Назад
+              </div> */}
+              
             </>
           ) : (
             <div className="search-container d-flex justify-content-between align-items-center gap-4">
@@ -187,6 +246,11 @@ const LayoutCrm = () => {
                   {/* <img src={write} alt="" /> */}
                 </div>
                 <div className="d-flex align-items-center">
+                  <button
+                  onClick={handleShowModal}
+                  >
+                    <img src={addTaskButton} alt='Плюсик для добавления задачи'></img>
+                  </button>
                   <div
                     className="px-3 cursor-pointer position-relative"
                     onClick={toggleNotification}
