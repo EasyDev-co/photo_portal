@@ -10,7 +10,7 @@ import { fetchAllTaskWithTokenInterceptor } from '../../../http/client-cards/get
 import SearchSingleManager from './InputsField/SearchSingleManager';
 
 
-const BasicTaskForm = ({closeModal, setTasksList}) => {
+const FireEmployeeForm = ({closeModal, setTasksList}) => {
     const access = localStorage.getItem('access') // Get access token
     const [filters, setFilters] = useState({});
 
@@ -140,80 +140,20 @@ const BasicTaskForm = ({closeModal, setTasksList}) => {
 
     return (
         <Form>
-            <TypeTask onSelect={handleTypeSelect} />
-
-            <Form.Group className="mb-3">
-                <div className="form-control-wrap">
-                    <DatePicker
-                        label={'Дедлайн'}
-                        placeholder={'Не указно'}
-                        img={calendar}
-                        isActive={isActive}
-                        setIsActive={setIsActive}
-                        onDateChange={handleDateChange}
-                        value={formState.charge_dates}
-                        navTitles={{
-                            days: 'MMMM <i>yyyy</i>',
-                            months: 'yyyy',
-                        }}
-                    />
-                </div>
-                {errors.charge_dates && <div className="text-danger">{errors.charge_dates[0]}</div>}
-            </Form.Group>
-
-            <div>
-                <SearchSingleManager
-                    name="Исполнитель"
-                    onSelect={handleManagerSelect}
-                    initialManager={formState.executor_fi}
-                    access={access}
-                />
-                {/* <ManagerSelectInput
-                    access={access}
-                    multiplyObject={false}
-                    onSelect={handleManagerSelect}
-                    errors={errors}
-                    name='Исполнитель'
-                /> */}
-            </div>
-
-            <Form.Group controlId="noteText" className="mb-3">
-                <Form.Label className="text-secondary">Описание задачи</Form.Label>
-                <Form.Control
-                    as="textarea"
-                    rows={6}
-                    name="details"
-                    style={{padding: '15px', resize: 'none', height: '120px'}}
-                    value={formState.details}
-                    onChange={handleChange}
-                    placeholder="Write a message"
-                />
-                {errors.details && <div className="text-danger">{errors.details[0]}</div>}
-            </Form.Group>
-            <div>
-                <CardSelectInput 
-                    access={access}
-                    multiplyObject={false}
-                    onSelect={handleCardSelect}
-                    errors={errors}
-                    name='Карточка клиента'
-                />
-            </div>
-
             <ModalFooter style={{padding: '5px'}}>
                 <Button className="btn-filter-reset text-center" onClick={closeModal}>
-                    Отмена
+                    Нет
                 </Button>
                 <Button
                     className="create-btn"
                     style={{padding: '7px 12px'}}
                     onClick={handleSubmit}
                 >
-                    Добавить
+                    Да
                 </Button>
             </ModalFooter>
         </Form>
     )
 }
 
-export default BasicTaskForm
+export default FireEmployeeForm

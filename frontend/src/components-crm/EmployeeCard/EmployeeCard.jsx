@@ -20,15 +20,16 @@ const EmployeeCard = ({ data }) => {
         padding: '24px',
         height: '100%',
         minHeight: '174px',
-        maxHeight: '181px'
+        maxHeight: '181px',
+        cursor: 'pointer',
       }}
+      onClick={() => navigate(`/crm/employees/edit/${data.id}`)}
     >
       <Card.Header
         className="card-header"
         style={{ border: 'none' }}
-        onClick={() => navigate(`/crm/employees/edit/${data.id}`)}
       >
-        <div className="card-header-title cursor-pointer">
+        <div className="card-header-title">
           {data.user.first_name} {data.user.last_name}
         </div>
         <OverlayTrigger
