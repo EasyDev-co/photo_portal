@@ -50,6 +50,27 @@ export const App = () => {
     return children;
   };
 
+  if (!('fetch' in window)) {
+    alert('Fetch не поддерживается! Пожалуйста, обновите браузер или используйте другой.');
+    // Здесь можно добавить подключение полифилла, если требуется
+} else {
+    alert('Fetch поддерживается!');
+    
+    // Проверяем работу fetch с тестовым запросом
+    fetch('https://jsonplaceholder.typicode.com/posts')
+        .then(response => {
+            if (response.ok) {
+                alert('Fetch работает корректно!');
+            } else {
+                alert(`Fetch работает, но сервер вернул ошибку: ${response.status}`);
+            }
+        })
+        .catch(error => {
+            alert(`Ошибка при использовании fetch: ${error.message}`);
+        });
+}
+
+
   return (
     <Routes>
 
