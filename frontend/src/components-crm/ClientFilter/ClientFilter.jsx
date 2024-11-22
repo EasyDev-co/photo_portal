@@ -4,7 +4,7 @@ import DatePicker from '../DatePicker/DatePicker';
 import { useEffect, useState } from 'react';
 import calendar from '../../assets/icons/calendar-event.svg';
 import { localUrl } from '../../constants/constants';
-import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchManagerField';
+import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchMultiplyManager';
 
 const ClientFilter = ({ onFilterChange }) => {
   const [isActive, setIsActive] = useState(false);
@@ -72,7 +72,7 @@ const ClientFilter = ({ onFilterChange }) => {
         <Form className="d-flex column-gap-3 flex-wrap mb-3">
           <Form.Group controlId="formKindergarten">
             <Form.Label className="text-secondary">Детский сад</Form.Label>
-            <Form.Select className="shadow-none" onChange={handleKindergartenChange}>
+            <Form.Select className="shadow-none" onChange={handleKindergartenChange} style={{ cursor: 'pointer' }}>
               <option hidden>Не указано</option>
               <option>От А до Я</option>
               <option>От Я до А</option>
@@ -80,7 +80,7 @@ const ClientFilter = ({ onFilterChange }) => {
           </Form.Group>
           <Form.Group controlId="formRegion">
             <Form.Label className="text-secondary">Регион</Form.Label>
-            <Form.Select className="shadow-none" onChange={handleRegionChange}>
+            <Form.Select className="shadow-none" onChange={handleRegionChange} style={{ cursor: 'pointer' }}>
               <option hidden>Регион</option>
               {regions.map((region) => (
                 <option key={region.id} value={region.id}>

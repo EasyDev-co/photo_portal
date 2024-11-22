@@ -31,6 +31,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://0.0.0.0:3000",
     "https://photodetstvo.ru",
     "http://0.0.0.0:8000",
+    "https://stage.photodetstvo.ru",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -47,6 +48,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://7e9a-109-120-151-148.ngrok-free.app",
     "https://photodetstvo.ru",
     "http://0.0.0.0:8000",
+    "https://stage.photodetstvo.ru",
 ]
 
 INSTALLED_APPS = [
@@ -150,17 +152,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
         'OPTIONS': {
-            'min_length': 8,
+            'min_length': 6,
         },
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-    {
-        'NAME': 'apps.user.validators.CustomPasswordValidator',
     },
 ]
 

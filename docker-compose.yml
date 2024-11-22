@@ -65,7 +65,7 @@ services:
       nginx_network:
 
   db:
-    image: postgres:16
+    image: postgres:latest
     container_name: ${PROJECT_SLUG}_db
     volumes:
       - pgdata:/var/lib/postgresql/data

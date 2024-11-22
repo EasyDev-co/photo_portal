@@ -4,7 +4,7 @@ import './style/DatePicker.scss';
 import { useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 
-function DatePicker({ value, setIsActive, placeholder, label, img, onDateChange, isModal, navTitles }) {
+function DatePicker({ value, setIsActive, placeholder, label, img, onDateChange, isModal, navTitles, userRole }) {
     let $input = useRef();
     let dp = useRef();
 
@@ -64,6 +64,7 @@ function DatePicker({ value, setIsActive, placeholder, label, img, onDateChange,
                 ref={$input}
                 value={value}
                 onChange={handleInputChange}
+                disabled={userRole === 2}
             />
             <div className="calendar-img">
                 <img src={img} alt="" />

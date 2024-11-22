@@ -12,7 +12,11 @@ const ClientCard = ({data}) => {
     
     const navigate = useNavigate();
     return ( 
-        <Card onClick={()=>navigate(`/crm/kindergartens/${data.id}`)} className="card-shadow" style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px' }}>
+        <Card 
+            onClick={()=>navigate(`/crm/kindergartens/${data.id}`)} 
+            className="card-shadow" 
+            style={{ width: '381px', borderRadius: '8px', border: 'none', padding: '24px', cursor: 'pointer' }}
+        >
             <Card.Header className="card-header" style={{ border: 'none' }}>
                 <div className="card-header-title">
                     {data.kindergarten_name}

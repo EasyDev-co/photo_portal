@@ -51,13 +51,13 @@ const TaskCard = ({ data, handleShowEdit, deleteItem }) => {
         height: '100%',
         minHeight: '267px',
         maxHeight: '270px',
+        cursor: 'pointer',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      // onClick={() => handleShowEdit(data.id)}
     >
       <Card.Header onClick={() => handleShowEdit(data.id)} className="card-header" style={{ border: 'none' }}>
-        <div className="card-header-title cursor-pointer">
+        <div className="card-header-title">
           {data.task_type_name}
         </div>
         <div className="card-burger">
@@ -70,6 +70,7 @@ const TaskCard = ({ data, handleShowEdit, deleteItem }) => {
           flexDirection: 'column',
           gap: '5px',
         }}
+        onClick={() => handleShowEdit(data.id)}
       >
         <Card.Text className="d-flex flex-column gap-3">
           <div className="d-flex gap-1">

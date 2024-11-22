@@ -185,3 +185,12 @@
     left: 32px;
     cursor: pointer;
 }
+.logout_button{
+    display: flex;
+    align-items: flex-start;
+    margin: 0 0 0 10px;
+}
+.new_container {
+    display: flex;
+    width: calc(100vw - 350px);
+}

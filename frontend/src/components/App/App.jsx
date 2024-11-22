@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/aria-role */
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { Layout } from '../Layout/Layout'
 import { Orders } from '../Orders/Orders'
@@ -28,93 +28,102 @@ import Employees from '../../components-crm/Employees/Employees'
 import CreateEmployee from '../../components-crm/CreateEmployee/CreateEmployee'
 import EditEmployee from '../../components-crm/EditEmployee/EditEmployee'
 import Tasks from '../../pages-crm/Tasks/Tasks'
+import { LoginCrm } from '../../pages-crm/LoginCrm/LoginCrm'
 
 export const App = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { isAuth } = useAuth()
-  const role = useSelector((state) => state.user.role)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuth } = useAuth();
 
   useEffect(() => {
-    // Перенаправляем на "/orders" при входе на сайт
-    if (location.pathname === '/') {
-      navigate('/orders')
+    // Перенаправляем неавторизованных пользователей с любых CRM-маршрутов на /crm/sign-in
+    if (!isAuth && location.pathname.startsWith('/crm') && location.pathname !== '/crm/sign-in') {
+      navigate('/crm/sign-in');
     }
+  }, [isAuth, location.pathname, navigate]);
+
+  const CRMProtectedRoute = ({ children }) => {
+    // Компонент для защиты маршрутов CRM
     if (!isAuth) {
-      if (location.pathname === '/') {
-        navigate('/about-us')
-      }
+      return <Navigate to="/crm/sign-in" />;
     }
-  }, [location.pathname, navigate])
+    return children;
+  };
 
   return (
-    <>
-      <Routes>
-        {isAuth && role !== 1 && (
-          <Route element={<LayoutCrm />}>
-            <Route path="/crm/kindergartens" element={<Kindergartens />} />
-            <Route
-              path="/crm/kindergartens/:id"
-              element={<KindergartensInfo />}
-            />
-            <Route path="/crm/calendar" element={<Calendar />} />
-            <Route path="/crm/employees" element={<Employees/>}/>
-            <Route path="/crm/employees/create" element={<CreateEmployee/>}/>
-            <Route path="/crm/employees/edit/:employeeId" element={<EditEmployee/>}/>
-            <Route path='/crm/tasks' element={<Tasks/>}></Route>
-            <Route path="/*" element={<>qwdqwdqwdqw</>} />
+    // <Routes>
+    //   {/* CRM маршруты */}
+    //   <Route path="/crm" element={<Navigate to="/crm/sign-in" />} /> {/* Переадресация на sign-in */}
+    //   <Route path="/crm/sign-in" element={<LoginCrm />} /> {/* Страница входа для сотрудников */}
+    //   <Route
+    //     element={
+    //       <CRMProtectedRoute>
+    //         <LayoutCrm />
+    //       </CRMProtectedRoute>
+    //     }
+    //   >
+    //     <Route path="/crm/kindergartens" element={<Kindergartens />} />
+    //     <Route path="/crm/kindergartens/:id" element={<KindergartensInfo />} />
+    //     <Route path="/crm/calendar" element={<Calendar />} />
+    //     <Route path="/crm/employees" element={<Employees />} />
+    //     <Route path="/crm/employees/create" element={<CreateEmployee />} />
+    //     <Route path="/crm/employees/edit/:employeeId" element={<EditEmployee />} />
+    //     <Route path="/crm/tasks" element={<Tasks />} />
+    //     <Route path="/*" element={<NotFound />} />
+    //   </Route>
+    <Routes>
+      {/* Переадресация с /crm на /crm/sign-in */}
+      <Route path="/crm" element={<Navigate to="/crm/sign-in" />} />
+      
+      {/* Страница авторизации CRM */}
+      <Route path="/crm/sign-in" element={<LoginCrm />} />
+
+      {/* Защищенные маршруты CRM */}
+      <Route
+        element={
+          <CRMProtectedRoute>
+            <LayoutCrm />
+          </CRMProtectedRoute>
+        }
+      >
+        <Route path="/crm/kindergartens" element={<Kindergartens />} />
+        <Route path="/crm/kindergartens/:id" element={<KindergartensInfo />} />
+        <Route path="/crm/calendar" element={<Calendar />} />
+        <Route path="/crm/employees" element={<Employees />} />
+        <Route path="/crm/employees/create" element={<CreateEmployee />} />
+        <Route path="/crm/employees/edit/:employeeId" element={<EditEmployee />} />
+        <Route path="/crm/tasks" element={<Tasks />} />
+        <Route path="/*" element={<NotFound />} />
+      </Route>
+
+      {/* Фотопортал маршруты */}
+      {isAuth ? (
+        <Route element={<Layout />}>
+          <Route path="/orders" element={<Account role="parent" />} />
+          <Route path="/profile" element={<Profile role="parent" />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/cart/:id" element={<Cart />} />
+          <Route path="/orders/payment" element={<Payment />} />
+          <Route path="/*" element={<NotFound />} />
+        </Route>
+      ) : (
+        <>
+          <Route element={<Layout />}>
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/rules" element={<Rules />} />
+            <Route path="/*" element={<NotFound />} />
           </Route>
-        )}
-        {isAuth ? (
-          <>
-            <Route element={<Layout />}>
-              <Route
-                path={'/orders'}
-                role={'manager'}
-                element={<Account role={'parent'} />}
-              />
-              {role !== 1 && (
-                <Route path={'/orders_manager'} element={<Orders />} />
-              )}
-              <Route path={'/profile'} element={<Profile role={'parent'} />} />
-              <Route path={'/gallery'} element={<Gallery />} />
-              <Route path={'/about-us'} element={<AboutUs />} />
-              <Route path={'/rules'} element={<Rules />} />
-              <Route path={'/cart/:id'} element={<Cart />} />
-              <Route path={'orders/payment'} element={<Payment />} />
-              <Route path="/*" element={<NotFound />} />
-            </Route>
-            <Route element={<AuthRoutes />}>
-              <Route path="/sign-in" element={<Login />} />
-              <Route path="/sign-up" element={<Registration />} />
-              <Route path="/verification" element={<Verification />} />
-              <Route path="/password-reset" element={<ResetPassword />} />
-              <Route
-                path="/password-reset/new-password"
-                element={<NewPassword />}
-              />
-            </Route>
-          </>
-        ) : (
-          <>
-            <Route element={<Layout />}>
-              <Route path={'/about-us'} element={<AboutUs />} />
-              <Route path={'/rules'} element={<Rules />} />
-              <Route path="/*" element={<NotFound />} />
-            </Route>
-            <Route element={<AuthRoutes />}>
-              <Route path="/sign-in" element={<Login />} />
-              <Route path="/sign-up" element={<Registration />} />
-              <Route path="/verification" element={<Verification />} />
-              <Route path="/password-reset" element={<ResetPassword />} />
-              <Route
-                path="/password-reset/new-password"
-                element={<NewPassword />}
-              />
-            </Route>
-          </>
-        )}
-      </Routes>
-    </>
-  )
-}
+          <Route element={<AuthRoutes />}>
+            <Route path="/sign-in" element={<Login />} />
+            <Route path="/sign-up" element={<Registration />} />
+            <Route path="/verification" element={<Verification />} />
+            <Route path="/password-reset" element={<ResetPassword />} />
+            <Route path="/password-reset/new-password" element={<NewPassword />} />
+          </Route>
+        </>
+      )}
+    </Routes>
+  );
+};

@@ -3,7 +3,7 @@ import './styles/ClientFilter.scss'
 import DatePicker from '../DatePicker/DatePicker'
 import { useEffect, useState } from 'react'
 import calendar from '../../assets/icons/calendar-event.svg'
-import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchManagerField'
+import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchMultiplyManager'
 import TypeTask from '../ClientCardModal/Forms/InputsField/TypeTask'
 
 const TasksFilter = ({ onFilterChange }) => {

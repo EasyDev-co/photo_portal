@@ -2,11 +2,8 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import Form from 'react-bootstrap/Form'
 import './styles/ClientFilter.scss'
-import DatePicker from '../DatePicker/DatePicker'
 import {useEffect, useState} from 'react'
-import calendar from '../../assets/icons/calendar-event.svg'
-import {localUrl} from '../../constants/constants'
-import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchManagerField'
+import ManagerSelectInput from '../ClientCardModal/Forms/InputsField/SearchMultiplyManager'
 
 const EmployeeFilter = ({onManagerSelect}) => {
     const [managers, setManagers] = useState([]);

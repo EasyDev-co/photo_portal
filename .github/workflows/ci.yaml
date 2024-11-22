@@ -22,4 +22,4 @@ jobs:
             cd /home/photo_portal
             git pull origin main
             docker-compose down
-            docker-compose up -d
+            docker-compose -f "docker-compose.stage.yaml" up -d

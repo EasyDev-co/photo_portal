@@ -14,7 +14,11 @@ def create_or_update_notification(sender, instance: ClientCardTask, created: boo
         # Формируем текст уведомления
 
         if instance.client_card:
-            message = f"Задача по КК: http://http://0.0.0.0:3000/crm/kindergartens/{instance.client_card.id}/"
+            message = f"""
+                    {instance.get_task_type_display()}<br>
+                    {instance.text}<br>
+                    https://stage.photodetstvo.ru/crm/kindergartens/{instance.client_card.id}/
+                    """
         else:
             message = f"""
                       {instance.get_task_type_display()}

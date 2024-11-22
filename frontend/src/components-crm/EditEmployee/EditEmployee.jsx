@@ -4,6 +4,8 @@ import {Button, Card, Form} from 'react-bootstrap';
 import {fetchsingleEmployeeWithTokenInterceptor} from '../../http/employees/getSingleEmployee';
 import {updateEmployeeData} from "../../http/employees/updateEmployee";
 import {deleteEmployeeWithTokenInterceptor} from "../../http/employees/deleteEmployee";
+import FireEmployeeForm from '../ClientCardModal/Forms/FireEmployeeForm';
+import ClientModal from '../ClientCardModal/ClientModal';
 
 
 const EditEmployee = () => {
@@ -20,11 +22,19 @@ const EditEmployee = () => {
         phone_number: '',
     });
     const [updatedPersonalInfo, setUpdatedPersonalInfo] = useState({user: {}})
+    const [isOpen, setIsOpen] = useState(false)
     const [status, setStatus] = useState("Не указано")
     const [securityInfo, setSecurityInfo] = useState({
         login: '',
         password: '',
     });
+
+    const handleShowModal = () => {
+        setIsOpen(true)
+      }
+      const handleCloseModal = () => {
+        setIsOpen(false)
+      }
 
     const handlePersonalInfoChange = (e) => {
         const {name, value} = e.target;
@@ -113,7 +123,7 @@ const EditEmployee = () => {
             alert('Ошибка при обновлении логина и пароля');
         }
     };
-
+    // ВЗЯТЬ ЭТУ ФУНКЦИЮ ДЛЯ ДОРАБОТКИ УВОЛЬЕНИЯ
     const handleDeleteEmployee = async () => {
         try {
             if (employeeId) {
@@ -132,6 +142,13 @@ const EditEmployee = () => {
 
     return (
         <div className="page-crm">
+            <ClientModal
+                title="Вы уверены, что хотите уволить сотрудника?"
+                show={isOpen}
+                handleClose={handleCloseModal}
+            >
+                <FireEmployeeForm closeModal={handleCloseModal} />
+            </ClientModal>
             <div className="header-title">
                 <h1>Настройки профиля</h1>
             </div>
@@ -282,8 +299,8 @@ const EditEmployee = () => {
                                 </Button>
                             </div>
                             <div className="d-flex justify-content-end">
-                                <Button className="create-btn" onClick={handleDeleteEmployee}>
-                                    Удалить сотрудника
+                                <Button className="create-btn" onClick={handleShowModal}>
+                                    Уволить сотрудника
                                 </Button>
                             </div>
                         </Form>

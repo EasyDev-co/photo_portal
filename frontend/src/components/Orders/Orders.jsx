@@ -268,7 +268,7 @@ export const Orders = () => {
           {lineLenght >= 3 ?
             <div className={styles.buttonAddKidsWrap}>
               <div className={styles.promoButtonWrap}>
-                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button>
+                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Сделать заказ</button>
                 <span>{lineLenght} из 3</span>
               </div>
               <div className={styles.errMessage}>
@@ -284,7 +284,7 @@ export const Orders = () => {
             </div> :
             <div>
               <div className={styles.promoButtonWrap}>
-                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
+                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Сделать заказ</button>
                 <span>{lineLenght} из 3</span>
               </div>
             </div>

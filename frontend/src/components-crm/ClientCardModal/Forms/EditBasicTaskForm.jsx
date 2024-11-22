@@ -3,13 +3,18 @@ import { Form, Button, ModalFooter } from 'react-bootstrap'
 import calendar from '../../../assets/icons/calendar-event.svg'
 import people from '../../../assets/icons/people.svg'
 import { patchTaskWithToken } from '../../../http/client-cards/patchTasks'
-import ManagerSelectInput from './InputsField/SearchManagerField'
+import ManagerSelectInput from './InputsField/SearchMultiplyManager'
 import TypeTask from './InputsField/TypeTask'
 import CardSelectInput from './InputsField/SearchClientCardField'
 import DatePicker from '../../DatePicker/DatePicker'
 import { deleteBasicTaskWithToken } from '../../../http/client-cards/deleteBasicTask'
 import { fetchBasicSingleTaskWithTokenInterceptor } from '../../../http/client-cards/getBasicSingleTask'
 import { patchBasicTaskWithToken } from '../../../http/client-cards/patchBasicTasks'
+import { fetchUserDataWithTokenInterceptor } from '../../../http/user/getUserData'
+import { useSelector } from 'react-redux'
+import SearchSingleManager from './InputsField/SearchSingleManager'
+import SearchSingleClientCard from './InputsField/SearchSingleClientCard'
+import StatusTask from './InputsField/StatusTask'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -72,6 +77,25 @@ const EditBasicTaskForm = ({
   const [errors, setErrors] = useState({})
   const [isActive, setIsActive] = useState(false)
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const refresh = useSelector(state => state.user.refresh);
+
+  useEffect(() => {
+    if (!localStorage.getItem('access')) {
+      return;
+    }
+    fetchUserDataWithTokenInterceptor(access, refresh)
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(res => {
+              console.log(res.employee.employee_role)
+              setUserRole(res.employee.employee_role);
+            //   setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
+            });
+        }
+      });
+  }, []);
 
   const handleManagerSelect = (selectedManager) => {
     console.log(selectedManager)
@@ -239,12 +263,20 @@ useEffect(() => {
     console.log(selectedType)
     console.log(formState)
   }
+  const handleStatusSelect = (selectedStatus) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      task_status_name: selectedStatus,
+    }))
+    console.log(selectedStatus)
+    console.log(formState)
+  }
 
   if (!isDataLoaded) return <div>Загрузка...</div>;
 
   return (
     <Form>
-      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} />
+      <TypeTask initialType={formState.task_type_name} onSelect={handleTypeSelect} userRole={userRole} />
 
       <Form.Group className="mb-3">
         <div className="form-control-wrap">
@@ -260,6 +292,7 @@ useEffect(() => {
             }}
             onDateChange={handleDateChange}
             value={formState.date_end}
+            userRole={userRole}
           />
         </div>
         {errors.date_end && (
@@ -267,37 +300,33 @@ useEffect(() => {
         )}
       </Form.Group>
 
-      <ManagerSelectInput
-        access={access}
-        multiplyObject={false}
-        onSelect={handleManagerSelect}
-        errors={errors}
+      <SearchSingleManager 
         name="Исполнитель"
+        onSelect={handleManagerSelect}
+        userRole={userRole}
         initialManager={formState.executor_fi}
       />
 
-      <Form.Group className="mb-3">
+      <StatusTask initialStatus={formState.task_status_name} onSelect={handleStatusSelect}/>
+
+      {/* <Form.Group className="mb-3">
         <Form.Label className="text-secondary">Статус задачи</Form.Label>
         <Form.Select
           name="status"
           className="shadow-none"
           style={{ width: '100%' }}
-          value={statusMap[formState.task_status_name] || '1'} // Преобразуем текст в значение
+          value={formState.task_status_name || '1'} // Преобразуем текст в значение
           onChange={(e) => {
-            const selectedText = Object.keys(statusMap).find(
-              (key) => statusMap[key] === e.target.value
-            ); // Находим текст по значению
-            setFormState((prevState) => ({
-              ...prevState,
-              task_status_name: selectedText, // Сохраняем текстовое значение
-            }));
+            if (e.target.value !== formState.task_status_name) {
+              handleChange(e) // Передаем событие e, а не значение
+            }
           }}
         >
           <option value="1">Открыта</option>
           <option value="2">Выполнена</option>
         </Form.Select>
         {errors.status && <div className="text-danger">{errors.status[0]}</div>}
-      </Form.Group>
+      </Form.Group> */}
 
       <Form.Group controlId="noteText" className="mb-3">
         <Form.Control
@@ -320,7 +349,15 @@ useEffect(() => {
           errors={errors}
           name="Карточка клиента"
           initialCard={formState.kindergarten_name}
+          userRole={userRole}
         />
+        {/* <SearchSingleClientCard 
+          onSelect={handleCardSelect}
+          errors={errors}
+          name="Карточка клиента"
+          initialManager={formState.kindergarten_name}
+          userRole={userRole}
+        /> */}
       </div>
 
       <Form.Group className="mb-3">
@@ -343,6 +380,7 @@ useEffect(() => {
               revision_comment: selectedText === "Доработать" ? formState.revision_comment : "", // Очищаем, если выбор изменился
             }));
           }}
+          disabled={userRole == 2}
           // value={
           //   Object.keys(statusTextToValueMap).includes(formState.review_task_status_name)
           //     ? statusTextToValueMap[formState.review_task_status_name]
@@ -391,9 +429,11 @@ useEffect(() => {
 
 
       <ModalFooter style={{ padding: '5px' }}>
-        <Button className="btn-filter-reset text-center" onClick={handleDelete}>
-          Удалить
-        </Button>
+      {userRole !== 2 && (
+          <Button className="btn-filter-reset text-center" onClick={handleDelete}>
+            Удалить
+          </Button>
+        )}
         <Button
           className="create-btn"
           style={{ padding: '7px 12px' }}
