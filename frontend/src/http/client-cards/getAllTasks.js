@@ -39,18 +39,6 @@ export const getAllTasks = async (access, filters = {}) => {
     return response;
 }
 
-// export const getAllTasks = async (access) => {
-//     const url = `${localUrl}/api/crm/v2/client_cards/tasks/`
-
-//     const response = await fetch(url, {
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${access}`
-//         }
-//     });
-//     return response;
-// }
-
 export const fetchAllTaskWithTokenInterceptor = async ({ access, filters }) => {
     try {
         let response = await getAllTasks(access, filters)

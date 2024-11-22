@@ -8,6 +8,7 @@ import CardSelectInput from './InputsField/SearchClientCardField'
 import { postBasicTaskWithToken } from '../../../http/client-cards/postBasicTask'
 import { fetchAllTaskWithTokenInterceptor } from '../../../http/client-cards/getAllTasks';
 import SearchSingleManager from './InputsField/SearchSingleManager';
+import styles from './FireEmployeeForm.module.css'
 
 
 const FireEmployeeForm = ({closeModal, setTasksList}) => {
@@ -139,8 +140,8 @@ const FireEmployeeForm = ({closeModal, setTasksList}) => {
     }
 
     return (
-        <Form>
-            <ModalFooter style={{padding: '5px'}}>
+        <Form className={styles.form}>
+            {/* <ModalFooter style={{padding: '5px'}}> */}
                 <Button className="btn-filter-reset text-center" onClick={closeModal}>
                     Нет
                 </Button>
@@ -151,7 +152,7 @@ const FireEmployeeForm = ({closeModal, setTasksList}) => {
                 >
                     Да
                 </Button>
-            </ModalFooter>
+            {/* </ModalFooter> */}
         </Form>
     )
 }
