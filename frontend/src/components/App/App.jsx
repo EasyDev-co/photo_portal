@@ -52,14 +52,18 @@ export const App = () => {
 
   return (
     <Routes>
-      {/* Переадресация с корневого маршрута на фотопортал */}
-      <Route path="/" element={<Navigate to="/about-us" />} />
 
-      {/* Маршруты фотопортала */}
+      <Route element={<AuthRoutes />}>
+        <Route path="/sign-in" element={<Login />} />
+        <Route path="/sign-up" element={<Registration />} />
+        <Route path="/verification" element={<Verification />} />
+        <Route path="/password-reset" element={<ResetPassword />} />
+        <Route path="/password-reset/new-password" element={<NewPassword />} />
+      </Route>
       <Route element={<Layout />}>
+        <Route path="/" element={<Navigate to="/about-us" />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/rules" element={<Rules />} />
-        <Route path="/gallery" element={<Gallery />} />
         {isAuth ? (
           <>
             <Route path="/orders" element={<Account role="parent" />} />
