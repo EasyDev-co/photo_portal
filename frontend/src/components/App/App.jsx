@@ -51,30 +51,39 @@ export const App = () => {
   };
 
   return (
-    // <Routes>
-    //   {/* CRM маршруты */}
-    //   <Route path="/crm" element={<Navigate to="/crm/sign-in" />} /> {/* Переадресация на sign-in */}
-    //   <Route path="/crm/sign-in" element={<LoginCrm />} /> {/* Страница входа для сотрудников */}
-    //   <Route
-    //     element={
-    //       <CRMProtectedRoute>
-    //         <LayoutCrm />
-    //       </CRMProtectedRoute>
-    //     }
-    //   >
-    //     <Route path="/crm/kindergartens" element={<Kindergartens />} />
-    //     <Route path="/crm/kindergartens/:id" element={<KindergartensInfo />} />
-    //     <Route path="/crm/calendar" element={<Calendar />} />
-    //     <Route path="/crm/employees" element={<Employees />} />
-    //     <Route path="/crm/employees/create" element={<CreateEmployee />} />
-    //     <Route path="/crm/employees/edit/:employeeId" element={<EditEmployee />} />
-    //     <Route path="/crm/tasks" element={<Tasks />} />
-    //     <Route path="/*" element={<NotFound />} />
-    //   </Route>
     <Routes>
+      {/* Переадресация с корневого маршрута на фотопортал */}
+      <Route path="/" element={<Navigate to="/about-us" />} />
+
+      {/* Маршруты фотопортала */}
+      <Route element={<Layout />}>
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/rules" element={<Rules />} />
+        <Route path="/gallery" element={<Gallery />} />
+        {isAuth ? (
+          <>
+            <Route path="/orders" element={<Account role="parent" />} />
+            <Route path="/profile" element={<Profile role="parent" />} />
+            <Route path="/cart/:id" element={<Cart />} />
+            <Route path="/orders/payment" element={<Payment />} />
+          </>
+        ) : (
+          <>
+            <Route element={<AuthRoutes />}>
+              <Route path="/sign-in" element={<Login />} />
+              <Route path="/sign-up" element={<Registration />} />
+              <Route path="/verification" element={<Verification />} />
+              <Route path="/password-reset" element={<ResetPassword />} />
+              <Route path="/password-reset/new-password" element={<NewPassword />} />
+            </Route>
+          </>
+        )}
+        <Route path="/*" element={<NotFound />} />
+      </Route>
+
       {/* Переадресация с /crm на /crm/sign-in */}
       <Route path="/crm" element={<Navigate to="/crm/sign-in" />} />
-      
+
       {/* Страница авторизации CRM */}
       <Route path="/crm/sign-in" element={<LoginCrm />} />
 
@@ -95,35 +104,7 @@ export const App = () => {
         <Route path="/crm/tasks" element={<Tasks />} />
         <Route path="/*" element={<NotFound />} />
       </Route>
-
-      {/* Фотопортал маршруты */}
-      {isAuth ? (
-        <Route element={<Layout />}>
-          <Route path="/orders" element={<Account role="parent" />} />
-          <Route path="/profile" element={<Profile role="parent" />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/rules" element={<Rules />} />
-          <Route path="/cart/:id" element={<Cart />} />
-          <Route path="/orders/payment" element={<Payment />} />
-          <Route path="/*" element={<NotFound />} />
-        </Route>
-      ) : (
-        <>
-          <Route element={<Layout />}>
-            <Route path="/about-us" element={<AboutUs />} />
-            <Route path="/rules" element={<Rules />} />
-            <Route path="/*" element={<NotFound />} />
-          </Route>
-          <Route element={<AuthRoutes />}>
-            <Route path="/sign-in" element={<Login />} />
-            <Route path="/sign-up" element={<Registration />} />
-            <Route path="/verification" element={<Verification />} />
-            <Route path="/password-reset" element={<ResetPassword />} />
-            <Route path="/password-reset/new-password" element={<NewPassword />} />
-          </Route>
-        </>
-      )}
     </Routes>
   );
 };
+
