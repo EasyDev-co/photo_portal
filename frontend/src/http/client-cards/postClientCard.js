@@ -22,6 +22,35 @@ export const clientCardCreate = async (access, data) => {
     return response.json();
 };
 
+// export const postClientCardWithToken = async (access, data) => {
+//     try {
+//         let result;
+//         try {
+//             result = await clientCardCreate(access, data);
+//         } catch (error) {
+//             if (error.message.includes('401')) {
+//                 const createToken = await tokenRefreshCreate();
+//                 if (!createToken.ok) {
+//                     throw new Error(`Не удалось обновить токен: ${createToken.status}`);
+//                 }
+
+//                 const res = await createToken.json();
+//                 if (res.refresh) {
+//                     setCookie('refresh', res.refresh);
+//                     localStorage.setItem('access', res.access);
+//                     result = await clientCardCreate(res.access, data);
+//                 }
+//             } else {
+//                 throw error; // Для других ошибок повторно выбрасываем
+//             }
+//         }
+//         return result;
+//     } catch (error) {
+//         console.error('Ошибка при выполнении запроса:', error);
+//         throw error;
+//     }
+// };
+
 export const postClientCardWithToken = async (access, data) => {
     try {
         let result;
@@ -44,12 +73,13 @@ export const postClientCardWithToken = async (access, data) => {
                 throw error; // Для других ошибок повторно выбрасываем
             }
         }
-        return result;
+        return result; // Уже JSON
     } catch (error) {
         console.error('Ошибка при выполнении запроса:', error);
         throw error;
     }
 };
+
 
 
 

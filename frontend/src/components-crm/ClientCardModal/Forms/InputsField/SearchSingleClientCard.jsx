@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import people from '../../../../assets/icons/people.svg';
 import { fetchManagersWithToken } from '../../../../http/client-cards/getManagers';
+import { fetchSingleClientCardWithToken } from '../../../../http/client-cards/getSearchClientCard';
 
-const SearchSingleManager = ({ onSelect, name, initialManager, userRole }) => {
+const SearchSingleClientCard = ({ onSelect, name, initialManager, userRole }) => {
   const access = localStorage.getItem('access'); // Get access token
 
   const [manager, setManager] = useState(initialManager || ''); // Initialize with initialManager
@@ -19,14 +20,14 @@ const SearchSingleManager = ({ onSelect, name, initialManager, userRole }) => {
   useEffect(() => {
     const fetchManagers = async () => {
       try {
-        const response = await fetchManagersWithToken({
+        const response = await fetchSingleClientCardWithToken({
           access,
           name: manager, // Pass the current input value for filtering
         });
         if (response.ok) {
           const data = await response.json();
           const filteredResults = data.filter((item) =>
-            item.full_name.toLowerCase().includes(manager.toLowerCase()) // Case-insensitive filtering
+            item.kindergarten_name.toLowerCase().includes(manager.toLowerCase()) // Case-insensitive filtering
           );
           setManagerResults(filteredResults.slice(0, 5)); // Limit to top 5 results
         } else {
@@ -45,7 +46,7 @@ const SearchSingleManager = ({ onSelect, name, initialManager, userRole }) => {
   }, [manager, access, fetchTriggered]);
 
   const handleManagerSelect = (selectedManager) => {
-    setManager(selectedManager.full_name); // Update the input field
+    setManager(selectedManager.kindergarten_name); // Update the input field
     setManagerResults([]); // Clear the dropdown list
     setFetchTriggered(false); // Stop further fetching
     if (onSelect) onSelect(selectedManager); // Pass the selected manager
@@ -99,7 +100,7 @@ const SearchSingleManager = ({ onSelect, name, initialManager, userRole }) => {
                   color: 'black',
                 }}
               >
-                {item.full_name}
+                {item.kindergarten_name}
               </button>
             </li>
           ))}
@@ -109,4 +110,4 @@ const SearchSingleManager = ({ onSelect, name, initialManager, userRole }) => {
   );
 };
 
-export default SearchSingleManager;
+export default SearchSingleClientCard;

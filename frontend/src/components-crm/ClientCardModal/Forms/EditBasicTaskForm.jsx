@@ -13,6 +13,8 @@ import { patchBasicTaskWithToken } from '../../../http/client-cards/patchBasicTa
 import { fetchUserDataWithTokenInterceptor } from '../../../http/user/getUserData'
 import { useSelector } from 'react-redux'
 import SearchSingleManager from './InputsField/SearchSingleManager'
+import SearchSingleClientCard from './InputsField/SearchSingleClientCard'
+import StatusTask from './InputsField/StatusTask'
 
 const EditBasicTaskForm = ({
   taskId,
@@ -261,6 +263,14 @@ useEffect(() => {
     console.log(selectedType)
     console.log(formState)
   }
+  const handleStatusSelect = (selectedStatus) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      task_status_name: selectedStatus,
+    }))
+    console.log(selectedStatus)
+    console.log(formState)
+  }
 
   if (!isDataLoaded) return <div>Загрузка...</div>;
 
@@ -295,31 +305,28 @@ useEffect(() => {
         onSelect={handleManagerSelect}
         userRole={userRole}
         initialManager={formState.executor_fi}
-        access={access}
       />
 
-      <Form.Group className="mb-3">
+      <StatusTask initialStatus={formState.task_status_name} onSelect={handleStatusSelect}/>
+
+      {/* <Form.Group className="mb-3">
         <Form.Label className="text-secondary">Статус задачи</Form.Label>
         <Form.Select
           name="status"
           className="shadow-none"
           style={{ width: '100%' }}
-          value={statusMap[formState.task_status_name] || '1'} // Преобразуем текст в значение
+          value={formState.task_status_name || '1'} // Преобразуем текст в значение
           onChange={(e) => {
-            const selectedText = Object.keys(statusMap).find(
-              (key) => statusMap[key] === e.target.value
-            ); // Находим текст по значению
-            setFormState((prevState) => ({
-              ...prevState,
-              task_status_name: selectedText, // Сохраняем текстовое значение
-            }));
+            if (e.target.value !== formState.task_status_name) {
+              handleChange(e) // Передаем событие e, а не значение
+            }
           }}
         >
           <option value="1">Открыта</option>
           <option value="2">Выполнена</option>
         </Form.Select>
         {errors.status && <div className="text-danger">{errors.status[0]}</div>}
-      </Form.Group>
+      </Form.Group> */}
 
       <Form.Group controlId="noteText" className="mb-3">
         <Form.Control
@@ -344,6 +351,13 @@ useEffect(() => {
           initialCard={formState.kindergarten_name}
           userRole={userRole}
         />
+        {/* <SearchSingleClientCard 
+          onSelect={handleCardSelect}
+          errors={errors}
+          name="Карточка клиента"
+          initialManager={formState.kindergarten_name}
+          userRole={userRole}
+        /> */}
       </div>
 
       <Form.Group className="mb-3">

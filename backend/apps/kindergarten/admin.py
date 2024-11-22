@@ -77,7 +77,9 @@ class KindergartenAdmin(admin.ModelAdmin):
         if manager:
             email = manager.email
             password = manager.un_hashed_password or "Пароль недоступен"
-            return mark_safe(f"<strong>Email:</strong> {email}<br><strong>Password:</strong> {password}")
+            promocode = manager.promo_codes.latest('created')
+            return mark_safe(f"<strong>Email:</strong> {email}<br><strong>Password:</strong> {password}"
+                             f"<br><strong>Промокод:</strong> {promocode.code}")
         return "Заведующая не назначена"
 
     manager_info.short_description = "Информация о заведующей"
