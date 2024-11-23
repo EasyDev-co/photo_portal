@@ -120,7 +120,7 @@ const ManagerProfile = () => {
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
                 <h1 className={styles.profileTitle}>Статистика</h1>
-                <div className={styles.profileWidget}>
+                <div className={styles.profileWidget}> 
                     <StatisticItem
                         label={'Количество заказов'}
                         data={`${stats.current_stats.completed_orders} из ${stats.current_stats.total_orders}`}
