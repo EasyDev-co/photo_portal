@@ -50,6 +50,39 @@ export const App = () => {
     return children;
   };
 
+  // Проверка поддержки CSS Grid
+if ('CSS' in window && CSS.supports('display', 'grid')) {
+  alert('Поддержка CSS Grid: поддерживается');
+} else {
+  alert('Поддержка CSS Grid: НЕ поддерживается');
+}
+
+// Проверка координат элемента
+// Создаем тестовый элемент
+const testElement = document.createElement('div');
+testElement.id = 'test';
+testElement.style.cssText = 'width: 100px; height: 50px; background: lightblue; position: absolute; top: 50px; left: 100px;';
+document.body.appendChild(testElement);
+
+// Пытаемся получить координаты
+const rect = document.querySelector('#test')?.getBoundingClientRect();
+if (rect) {
+  alert(`Координаты элемента: 
+  Лево: ${rect.left}, 
+  Верх: ${rect.top}, 
+  Ширина: ${rect.width}, 
+  Высота: ${rect.height}`);
+} else {
+  alert('Элемент не найден или координаты недоступны.');
+}
+
+// Удаляем тестовый элемент через 3 секунды
+setTimeout(() => {
+  testElement.remove();
+  alert('Тестовый элемент удален.');
+}, 3000);
+
+
   return (
     <Routes>
 
