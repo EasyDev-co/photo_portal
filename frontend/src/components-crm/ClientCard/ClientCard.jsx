@@ -71,7 +71,9 @@ const ClientCard = ({data}) => {
             <Card.Footer className="card-footer" style={{ border: 'none' }}>
                 <div className="d-flex gap-1">
                     <div className="fw-400 fs-13 text-secondary">Менеджер:</div>
-                    <div className="fw-400 fs-13 text-primary">{ data.responsible_manager.full_name }</div>
+                    <div className="fw-400 fs-13 text-primary">
+                        {data?.responsible_manager?.full_name ? data.responsible_manager.full_name : "Менеджер не назначен"}
+                    </div>
                 </div>
             </Card.Footer>
         </Card>
