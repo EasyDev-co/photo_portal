@@ -10,14 +10,10 @@ class Seasons(models.IntegerChoices):
 
 
 class Season(models.Model):
-    season = models.PositiveSmallIntegerField(
-        choices=Seasons.choices,
-        default=Seasons.WINTER,
-        verbose_name='Сезон'
-    )
+    season = models.CharField(verbose_name="Сезон", max_length=50)
 
     def __str__(self):
-        return self.get_season_display()
+        return self.season
 
     class Meta:
         verbose_name = "Сезон"

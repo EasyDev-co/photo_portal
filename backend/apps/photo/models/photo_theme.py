@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import now
 from django.utils import timezone
 
 from .season import Season
@@ -7,16 +8,39 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 from apps.kindergarten.models import Kindergarten
 
 
+class PhotoThemeName(UUIDMixin, TimeStampedMixin):
+    name = models.CharField(max_length=255, verbose_name="Тема фотосессии")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Тема фотосессии"
+        verbose_name_plural = 'Темы фотосессии'
+
+
 class PhotoTheme(UUIDMixin, TimeStampedMixin):
     name = models.CharField(
         max_length=255,
-        verbose_name='Название'
+        verbose_name='Название',
+        null=True,
+        blank=True,
+    )
+    photo_theme_name = models.ForeignKey(
+        PhotoThemeName,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Тема фотосессии"
     )
     date_start = models.DateTimeField(
-        verbose_name='Дата начала'
+        verbose_name='Дата начала',
+        default=now,
+        blank=True,
     )
     date_end = models.DateTimeField(
-        verbose_name='Дата окончания'
+        verbose_name='Дата окончания',
+        default=now,
+        blank=True,
     )
     are_qrs_removed = models.BooleanField(
         verbose_name='Удалены ли QR коды',
@@ -58,6 +82,13 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
 
     ongoing.fget.short_description = "Сейчас активна"
     ongoing.fget.boolean = True
+
+    def save(self, *args, **kwargs):
+        # Если связана тема фотосессии, копируем её имя в поле name
+        if self.photo_theme_name:
+            self.name = self.photo_theme_name.name
+
+        super().save(*args, **kwargs)
 
 
 class PhotoPopularityStat(PhotoTheme):
