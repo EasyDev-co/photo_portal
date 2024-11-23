@@ -34,6 +34,7 @@ export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuth } = useAuth();
+  const role = useSelector((state) => state.user.role);
 
   useEffect(() => {
     // Перенаправляем неавторизованных пользователей с любых CRM-маршрутов на /crm/sign-in
@@ -67,6 +68,9 @@ export const App = () => {
         <Route path="/rules" element={<Rules />} />
         {isAuth ? (
           <>
+          {role !== 1 && (
+                <Route path={'/orders_manager'} element={<Orders />} />
+              )}
             <Route path="/orders" element={<Account role="parent" />} />
             <Route path="/profile" element={<Profile role="parent" />} />
             <Route path="/cart/:id" element={<Cart />} />
