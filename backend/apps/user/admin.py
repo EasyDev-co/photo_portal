@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 from apps.user.models import ConfirmCode
 from apps.user.models.manager_bonus import ManagerBonus
@@ -177,50 +180,6 @@ class StaffAdmin(BaseUserAdmin):
         super().save_model(request, obj, form, change)
 
 
-@admin.register(EmailErrorLog)
-class EmailErrorLogAdmin(admin.ModelAdmin):
-    list_display = (
-        'confirm_code',
-        'message',
-        'is_sent',
-        'created_at',
-        'user'
-    )
-    search_fields = (
-        'user__email',
-    )
-    ordering = ('created_at',)
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-
-@admin.register(ConfirmCode)
-class ConfirmCodeAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-        'code',
-        'created_at',
-        'purpose',
-        'is_used',
-    )
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-
 @admin.register(ManagerBonus)
 class ManagerBonus(admin.ModelAdmin):
     list_display = (
@@ -231,3 +190,59 @@ class ManagerBonus(admin.ModelAdmin):
         'paid_for',
     )
     raw_id_fields = ('user',)
+
+
+if settings.SHOW_IN_ADMIN:
+    @admin.register(EmailErrorLog)
+    class EmailErrorLogAdmin(admin.ModelAdmin):
+        list_display = (
+            'confirm_code',
+            'message',
+            'is_sent',
+            'created_at',
+            'user'
+        )
+        search_fields = (
+            'user__email',
+        )
+        ordering = ('created_at',)
+
+        def has_add_permission(self, request):
+            return False
+
+        def has_delete_permission(self, request, obj=None):
+            return False
+
+        def has_change_permission(self, request, obj=None):
+            return False
+
+
+    @admin.register(ConfirmCode)
+    class ConfirmCodeAdmin(admin.ModelAdmin):
+        list_display = (
+            'user',
+            'code',
+            'created_at',
+            'purpose',
+            'is_used',
+        )
+
+        def has_add_permission(self, request):
+            return False
+
+        def has_delete_permission(self, request, obj=None):
+            return False
+
+        def has_change_permission(self, request, obj=None):
+            return False
+
+if not settings.SHOW_IN_ADMIN:
+    try:
+        admin.site.unregister(BlacklistedToken)
+    except admin.sites.NotRegistered:
+        pass
+
+    try:
+        admin.site.unregister(OutstandingToken)
+    except admin.sites.NotRegistered:
+        pass
