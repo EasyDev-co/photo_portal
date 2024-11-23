@@ -123,6 +123,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+SHOW_IN_ADMIN = os.environ.get('SHOW_IN_ADMIN', False)
+
 # Настройки SENTRY
 SENTRY_IS_ON = os.environ.get('SENTRY_IS_ON')
 
@@ -293,13 +295,8 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-DJANGO_FILE_FORM_TUS_ENDPOINT = '/tus-upload/'
 
-# CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(', ')
-# CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(', ')
-#
-# CORS_ALLOWED_ORIGINS.append("https://7c8a-188-234-12-6.ngrok-free.app")
-# CORS_ALLOWED_ORIGINS.append("https://7c8a-188-234-12-6.ngrok-free.app")
+DJANGO_FILE_FORM_TUS_ENDPOINT = '/tus-upload/'
 
 CORS_ALLOW_CREDENTIALS = True
 

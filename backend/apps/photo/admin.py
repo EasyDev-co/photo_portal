@@ -16,7 +16,7 @@ from apps.photo.models import (Photo,
                                UserPhotoCount,
                                Season,
                                )
-from apps.photo.models.photo_theme import PhotoPopularityStat
+from apps.photo.models.photo_theme import PhotoPopularityStat, PhotoThemeName
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
     calculate_popularity
@@ -59,7 +59,16 @@ class PhotoThemeAdmin(admin.ModelAdmin):
         'season',
         'ongoing'
     )
-    readonly_fields = ('are_qrs_removed', 'ongoing')
+    fields = (
+        'photo_theme_name',
+        'name',
+        'kindergartens',
+        'date_start',
+        'date_end',
+        'season',
+        'are_qrs_removed',
+    )
+    readonly_fields = ('are_qrs_removed', )
     search_fields = ('name', 'season')
     ordering = ('name', 'date_start', 'date_end')
 
@@ -73,6 +82,11 @@ class PhotoThemeAdmin(admin.ModelAdmin):
                 message=result.get('message'),
                 level=messages.WARNING
             )
+
+
+@admin.register(PhotoThemeName)
+class PhotoThemeNameAdmin(admin.ModelAdmin):
+    ...
 
 
 @admin.register(PhotoLine)
