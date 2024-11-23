@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     "phonenumber_field",
     'auditlog',
     'yadisk',
+    'dal',
+    'dal_select2',
 
     # Приложения
     'apps.kindergarten',

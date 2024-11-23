@@ -120,7 +120,7 @@ const ManagerProfile = () => {
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
                 <h1 className={styles.profileTitle}>Статистика</h1>
-                <div className={styles.profileWidget}>
+                <div className={styles.profileWidget}> 
                     <StatisticItem
                         label={'Количество заказов'}
                         data={`${stats.current_stats.completed_orders} из ${stats.current_stats.total_orders}`}
@@ -163,6 +163,14 @@ const ManagerProfile = () => {
                         label={'Средняя выручка за фотосессию'}
                         data={`${stats.average_ransom_amount}`}
                     />
+                </div>
+                <div className={styles.checkWrap}>
+                    <div onClick={() => navigate('/orders_manager')}>
+                        <MainButton
+                            value={'Заказ для себя'}
+                        />
+                    </div>
+
                 </div>
             </div>
 
