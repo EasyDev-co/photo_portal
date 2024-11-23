@@ -1,6 +1,5 @@
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import Round
-from django.utils import timezone as django_timezone
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -8,6 +7,7 @@ from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework import permissions
+from dal import autocomplete
 
 from apps.kindergarten.api.v1.permissions import IsManager
 from apps.kindergarten.api.v1.serializers import (
@@ -21,7 +21,7 @@ from apps.kindergarten.api.v1.serializers import (
 from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten, Region
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus
-from apps.photo.models import PhotoTheme, KindergartenPhotoTheme
+from apps.photo.models import KindergartenPhotoTheme
 
 
 class PhotoPriceAPIView(APIView):
@@ -115,3 +115,15 @@ class RegionSearchAPIView(ListAPIView):
     serializer_class = RegionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name']
+
+
+class KindergartenAutocomplete(autocomplete.Select2QuerySetView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        kindergartens = Kindergarten.objects.exclude(kindergartenphototheme__is_active=True)
+
+        if self.q:
+            kindergartens = kindergartens.filter(name__icontains=self.q)
+
+        return kindergartens

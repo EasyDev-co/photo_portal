@@ -1,27 +1,27 @@
 from urllib.parse import parse_qsl
 
-from django.utils import timezone
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.contrib import admin
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.safestring import mark_safe
-from rest_framework.exceptions import ValidationError
 from django.contrib import messages
 
 from apps.kindergarten.models import Region
+from apps.photo.form import PhotoThemeForm
 from apps.photo.models import (Photo,
                                PhotoTheme,
                                PhotoLine,
                                Coefficient,
                                UserPhotoCount,
                                Season,
-                               KindergartenPhotoTheme
                                )
 from apps.photo.models.photo_theme import PhotoPopularityStat
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
     calculate_popularity
 )
+from apps.utils.services.update_photo_theme_kindergartens import update_photo_theme_kindergartens
 
 
 class CustomMessageMixin:
@@ -49,35 +49,30 @@ class PhotoInline(admin.TabularInline):
                 self.message_user(request, f"Ошибка при удалении {obj}: {e}", level=messages.ERROR)
 
 
-class KindergartenPhotoThemeInline(admin.TabularInline):
-    model = KindergartenPhotoTheme
-    extra = 0
-    verbose_name = 'Фотосессия в детском саду'
-    verbose_name_plural = 'Фотосессии в детском саду'
-
-    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        # Отображение только незаконченных фотосессий в выпадающем списке
-        if db_field.name == "photo_theme":
-            kwargs["queryset"] = PhotoTheme.objects.filter(
-                date_end__gt=timezone.now()
-            )
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
 @admin.register(PhotoTheme)
-class PhotoThemeAdmin(CustomMessageMixin, admin.ModelAdmin):
+class PhotoThemeAdmin(admin.ModelAdmin):
+    form = PhotoThemeForm
     list_display = (
         'name',
         'date_start',
         'date_end',
-        'season'
+        'season',
+        'ongoing'
     )
-    readonly_fields = ('are_qrs_removed',)
+    readonly_fields = ('are_qrs_removed', 'ongoing')
     search_fields = ('name', 'season')
     ordering = ('name', 'date_start', 'date_end')
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        result = update_photo_theme_kindergartens(form, obj)
+        if isinstance(result, dict):
+            self.message_user(
+                request,
+                message=result.get('message'),
+                level=messages.WARNING
+            )
 
 
 @admin.register(PhotoLine)
@@ -95,7 +90,6 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
         if obj.qr_code:
             return mark_safe(f'<img src="{obj.qr_code.url}" width="200" height="200" />')
         return 'Недоступно'
-
 
 
 @admin.register(Photo)

@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from .season import Season
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
@@ -50,6 +51,13 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
 
         if self.date_start >= self.date_end:
             raise ValidationError("Дата окончания фотосессии не может быть раньше даты начала.")
+
+    @property
+    def ongoing(self) -> bool:
+        return self.date_end > timezone.now()
+
+    ongoing.fget.short_description = "Сейчас активна"
+    ongoing.fget.boolean = True
 
 
 class PhotoPopularityStat(PhotoTheme):
