@@ -164,6 +164,14 @@ const ManagerProfile = () => {
                         data={`${stats.average_ransom_amount}`}
                     />
                 </div>
+                <div className={styles.checkWrap}>
+                    <div onClick={() => navigate('/orders_manager')}>
+                        <MainButton
+                            value={'Заказ для себя'}
+                        />
+                    </div>
+
+                </div>
             </div>
 
             {bonus.length !== 0 &&
