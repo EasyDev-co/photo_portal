@@ -24,6 +24,10 @@ const KindergartensInfo = () => {
 
     const access = localStorage.getItem('access') // Get access token
 
+    useEffect(() => {
+        console.log(clientCardData)
+    }, [notes])
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const options = {day: '2-digit', month: '2-digit', year: 'numeric'};
@@ -160,7 +164,8 @@ const KindergartensInfo = () => {
         console.log(clientCardData);
         return (
             <div className="page-crm">
-                <div className="d-flex gap-3">
+                <div className="kindergartens_info_block"> 
+                {/* d-flex gap-3 */}
                     <div className="d-flex flex-column gap-3">
                         <div className="d-flex gap-3">
                             <Card
@@ -274,7 +279,7 @@ const KindergartensInfo = () => {
                                 region={clientCardData.kindergarten.region.country}
                                 id={clientCardData.id}
                                 itemName={clientCardData.name}
-                                responsible_manager={clientCardData.responsible_manager.id}
+                                responsible_manager={clientCardData.responsible_manager ? clientCardData.responsible_manager.id : null}
                                 addCall={addCall}
                                 deleteItemCall = {deleteItemCall}
                             />
