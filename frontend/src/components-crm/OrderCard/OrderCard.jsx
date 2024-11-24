@@ -38,7 +38,7 @@ const OrderCard = ({
     name: itemName || null,
     region: { country: region || '', name: city || '', address: address || '' },
   })
-  const [managerData, setManagerData] = useState(managerInfo || {})
+  const [managerData, setManagerData] = useState(managerInfo ? managerInfo : 'Заведующий не прикреплен' || {})
   const [childrenData, setChildrenData] = useState({
     children_count: children_count || '',
     children_for_photoshoot: children_for_photoshoot || '',
@@ -143,7 +143,7 @@ const OrderCard = ({
         show={showModalCall}
         handleClose={handleCloseCall}
       >
-        <CallForm responsible_manager={responsible_manager} closeModal={handleCloseCall} cardId={id} addCall={addCall} />
+        <CallForm responsible_manager={responsible_manager ? responsible_manager : 'Менеджер не прикреплен'} closeModal={handleCloseCall} cardId={id} addCall={addCall} />
       </ClientModal>
       <Card
         className="border-0 d-flex flex-column"
@@ -273,7 +273,7 @@ const OrderCard = ({
                         style={{ fontSize: '17px' }}
                       >
                         <p style={{ textTransform: 'capitalize' }}>
-                          {managerInfo.first_name} {managerInfo.last_name}
+                          {managerInfo ? managerInfo.first_name : 'Заведующий не прикреплен'} {managerInfo ? managerInfo.last_name: ''}
                         </p>
                       </Card.Header>
                       <Card.Title className="fs-6 text-secondary">
