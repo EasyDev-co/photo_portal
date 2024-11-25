@@ -61,7 +61,6 @@ class PhotoThemeAdmin(admin.ModelAdmin):
     )
     fields = (
         'photo_theme_name',
-        'name',
         'kindergartens',
         'date_start',
         'date_end',
@@ -94,6 +93,14 @@ class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
     list_display = ('kindergarten', 'photo_theme', 'parent', 'photos')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
+    search_fields = (
+        'kindergarten__name',
+        'parent__first_name',
+        'parent__last_name',
+        'parent__email',
+        'kindergarten__region__name',
+    )
+    list_filter = ('photo_theme', )
     inlines = [PhotoInline]
 
     def photos(self, obj):
