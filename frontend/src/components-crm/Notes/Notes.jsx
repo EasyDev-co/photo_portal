@@ -7,6 +7,7 @@ import ClientModal from '../ClientCardModal/ClientModal'
 import NoteForm from '../ClientCardModal/Forms/NoteForm'
 import EditNoteForm from '../ClientCardModal/Forms/EditNoteForm'
 import { useParams } from 'react-router-dom'
+import { postNoteWithToken } from '../../http/client-cards/postNotes'
 
 
 const Notes = ({ notes, addNote, deleteNote , editNote}) => {
@@ -23,32 +24,54 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
   const [showModalAdd, setShowModalAdd] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [editId, setEditId] = useState("")
-  const [newNoteText, setNewNoteText] = useState('');
   const [showAddButton, setShowAddButton] = useState(false);
 
-  const handleNewNoteChange = (e) => {
-    const value = e.target.value;
-    setNewNoteText(value);
-    setShowAddButton(value.trim().length > 0);
-  };
+  const access = localStorage.getItem('access') // Get access token
+  const [noteText, setNoteText] = useState('')
+  const maxCharacters = 100
 
-  const handleAddNote = () => {
-    if (newNoteText.trim().length > 0) {
-      addNote({
-        id: Date.now(), // Или замените на ID, получаемый от API
-        text: newNoteText,
-        created_at: new Date(),
-        priority: false, // Можно изменить по логике
-        author: { full_name: "Текущий пользователь" }, // Вставьте актуальные данные
-      });
-      setNewNoteText('');
-      setShowAddButton(false);
+  const [errors, setErrors] = useState({})
+
+  const handleChange = (e) => {
+    const { value } = e.target
+    // Limit the input to a maximum of 100 characters
+    if (value.length <= maxCharacters) {
+      setNoteText(value)
+      setShowAddButton(value.trim().length > 0);
     }
-  };
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && newNoteText.trim().length > 0) {
-      handleAddNote();
+  }
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault(); // Убедитесь, что событие передано и предотвращено
+
+    try {
+        const response = await postNoteWithToken({
+            access,
+            data: { client_card: id, text: noteText },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            addNote(data); // Добавляем заметку
+            setNoteText(''); // Очищаем поле ввода
+            setShowAddButton(false); // Скрываем кнопку "Добавить"
+        } else {
+            const err = await response.json();
+            setErrors(err);
+            console.error('Failed to post note');
+        }
+    } catch (error) {
+        console.error('An error occurred while posting the note:', error);
+        setErrors([{ message: 'Network error. Please try again later.' }]);
     }
+};
+
+  const handleKeyDown  = (e) => {
+    if (e.key === 'Enter' && noteText.trim().length > 0) {
+      e.preventDefault(); // Предотвращаем стандартное поведение Enter
+      handleSubmit(e); // Передаём событие в handleSubmit
+  }
   };
 
   const handleShowAdd = () => setShowModalAdd(true)
@@ -63,6 +86,13 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
   const handleCloseEdit = () => {
     setShowEdit(false)
   }
+
+  const handleInput = (e) => {
+    const target = e.target;
+    target.style.height = '30px'; // Сбрасываем текущую высоту
+    target.style.height = `${target.scrollHeight}px`; // Устанавливаем высоту по содержимому
+};
+
 
   return (
     <>
@@ -112,19 +142,17 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
       <div className="add-note-section">
         <textarea
           rows={3}
-          value={newNoteText}
-          onChange={handleNewNoteChange}
-          onKeyPress={handleKeyPress}
+          value={noteText}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
           placeholder="Введите текст заметки..."
-          style={{
-            width: '100%',
-            resize: 'none',
-            padding: '10px',
-            marginBottom: '10px',
-          }}
+          className='textarea_notes'
+          onInput={handleInput}
+
         />
         {showAddButton && (
-          <button onClick={handleAddNote} className="btn btn-primary">
+          <button onClick={handleSubmit} className="button_notes">
+            {/* btn btn-primary */}
             Добавить
           </button>
         )}

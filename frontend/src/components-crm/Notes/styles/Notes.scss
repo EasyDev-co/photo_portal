@@ -34,3 +34,19 @@
     text-overflow: ellipsis;
     /* Добавляем многоточие */
 }
+.button_notes {
+    background-color: rgba(99, 102, 241, 1);
+    padding: 5px 10px;
+    color: '#fff';
+    border-radius: 8px;
+}
+.textarea_notes {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    height: 30px;
+    // height: auto;
+    margin-left: 5px;
+    overflow: 'hidden'
+}
