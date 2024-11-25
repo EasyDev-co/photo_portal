@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.contrib.admin import DateFieldListFilter
 
 from apps.order.models import Order, OrderItem
+from django.conf import settings
 
 
 class OrderItemInline(admin.TabularInline):
@@ -40,9 +42,9 @@ class OrderAdmin(admin.ModelAdmin):
         'created',
         'modified',
     )
-    list_filter = ('status', 'photo_line', 'is_digital')
-    search_fields = ('user__email', 'photo_line__kindergarten__name')
-    ordering = ('created', 'modified')
+    list_filter = ('status', 'photo_line', 'is_digital', ('created', DateFieldListFilter))
+    search_fields = ('user__email', 'photo_line__kindergarten__name', 'user__firstname', 'user__lastname')
+    ordering = ('-created', 'modified')
     readonly_fields = (
         'id',
         'order_price',
@@ -62,29 +64,29 @@ class OrderAdmin(admin.ModelAdmin):
     def kindergarten(self, instance):
         return instance.photo_line.kindergarten
 
-
-@admin.register(OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'photo_type',
-        'amount',
-        'price',
-        'order',
-        'photo',
-        'created',
-        'modified'
-    )
-    list_filter = ('order', 'photo_type')
-    ordering = ('created', 'modified')
-    search_fields = ('order__id', 'order__user__email')
-    readonly_fields = (
-        'id',
-        'photo_type',
-        'amount',
-        'price',
-        'order',
-        'photo',
-        'created',
-        'modified',
-    )
+if settings.SHOW_IN_ADMIN:
+    @admin.register(OrderItem)
+    class OrderItemAdmin(admin.ModelAdmin):
+        list_display = (
+            'id',
+            'photo_type',
+            'amount',
+            'price',
+            'order',
+            'photo',
+            'created',
+            'modified'
+        )
+        list_filter = ('order', 'photo_type')
+        ordering = ('created', 'modified')
+        search_fields = ('order__id', 'order__user__email')
+        readonly_fields = (
+            'id',
+            'photo_type',
+            'amount',
+            'price',
+            'order',
+            'photo',
+            'created',
+            'modified',
+        )
