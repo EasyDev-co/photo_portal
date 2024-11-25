@@ -8,6 +8,7 @@ import NoteForm from '../ClientCardModal/Forms/NoteForm'
 import EditNoteForm from '../ClientCardModal/Forms/EditNoteForm'
 import { useParams } from 'react-router-dom'
 
+
 const Notes = ({ notes, addNote, deleteNote , editNote}) => {
   const { id } = useParams()
 
@@ -22,6 +23,33 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
   const [showModalAdd, setShowModalAdd] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [editId, setEditId] = useState("")
+  const [newNoteText, setNewNoteText] = useState('');
+  const [showAddButton, setShowAddButton] = useState(false);
+
+  const handleNewNoteChange = (e) => {
+    const value = e.target.value;
+    setNewNoteText(value);
+    setShowAddButton(value.trim().length > 0);
+  };
+
+  const handleAddNote = () => {
+    if (newNoteText.trim().length > 0) {
+      addNote({
+        id: Date.now(), // Или замените на ID, получаемый от API
+        text: newNoteText,
+        created_at: new Date(),
+        priority: false, // Можно изменить по логике
+        author: { full_name: "Текущий пользователь" }, // Вставьте актуальные данные
+      });
+      setNewNoteText('');
+      setShowAddButton(false);
+    }
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && newNoteText.trim().length > 0) {
+      handleAddNote();
+    }
+  };
 
   const handleShowAdd = () => setShowModalAdd(true)
   const handleCloseAdd = () => {
@@ -80,6 +108,27 @@ const Notes = ({ notes, addNote, deleteNote , editNote}) => {
         <Tab eventKey="home" title="Важные" />
         <Tab eventKey="profile" title="Все" />
       </Tabs>
+
+      <div className="add-note-section">
+        <textarea
+          rows={3}
+          value={newNoteText}
+          onChange={handleNewNoteChange}
+          onKeyPress={handleKeyPress}
+          placeholder="Введите текст заметки..."
+          style={{
+            width: '100%',
+            resize: 'none',
+            padding: '10px',
+            marginBottom: '10px',
+          }}
+        />
+        {showAddButton && (
+          <button onClick={handleAddNote} className="btn btn-primary">
+            Добавить
+          </button>
+        )}
+      </div>
 
       {activeTab === 'home' && (
         <div className="shadow-none border-0 d-flex flex-column gap-2">

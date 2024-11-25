@@ -350,7 +350,8 @@ const KindergartensInfo = () => {
                         >
                             <Notes notes={notes} addNote={addNote} deleteNote={deleteNote} editNote={editNote}/>
                             {notes && notes.length > 0 ?
-                                <Button className="btn-filter-reset text-center">Сбросить</Button> : <p>Заметок нет</p>}
+                                <></> : <p>Заметок нет</p>}
+                                 {/* <Button className="btn-filter-reset text-center">Сбросить</Button> */}
                         </Card>
                         <Card
                             className="border-0 d-flex flex-column gap-2 card-shadow "

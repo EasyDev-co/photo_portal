@@ -73,6 +73,7 @@ export const App = () => {
               )}
             <Route path="/orders" element={<Account role="parent" />} />
             <Route path="/profile" element={<Profile role="parent" />} />
+            <Route path={'/gallery'} element={<Gallery />} />
             <Route path="/cart/:id" element={<Cart />} />
             <Route path="/orders/payment" element={<Payment />} />
           </>
