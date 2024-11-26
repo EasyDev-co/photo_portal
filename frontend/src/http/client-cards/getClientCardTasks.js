@@ -4,7 +4,8 @@ import { setCookie } from "../../utils/setCookie";
 import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 export const clientCardTasks = async (access, clientCardId) => {
-    const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/?client_card=${clientCardId}`;
+        const url = `${localUrl}/api/crm/v1/client_cards/client-card-tasks/?client_card=${clientCardId}`;
+
 
     const response = await fetch(url, {
         headers: {

@@ -77,7 +77,7 @@ const TaskForm = ({ cardId, closeModal, addTask }) => {
   }
   return (
     <Form>
-    <TasksFilter onSelect={handleTypeSelect} />
+    {/* <TasksFilter onSelect={handleTypeSelect} /> */}
 
 
     <Form.Group className="mb-3">

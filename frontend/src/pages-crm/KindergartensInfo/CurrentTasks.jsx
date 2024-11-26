@@ -15,8 +15,6 @@ const CurrentTasks = ({ tasks, formatDate, addTask, editTask, deleteTask  }) => 
   const [showEdit, setShowEdit] = useState(false)
   const [editId, setEditId] = useState("")
 
-  
-
   const handleShowAdd = () => {
     setShowModalAdd(true)
   }
