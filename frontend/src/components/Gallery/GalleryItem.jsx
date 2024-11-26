@@ -1,50 +1,57 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import styles from './Gallery.module.css';
-import {useState} from 'react';
+import { useState } from 'react';
+import uploadIcon from '../../assets/icons/upload-svgrepo-com.svg'
 
-const GalleryItem = ({orders}) => {
-    const [activePhotos, setActivePhotos] = useState([]);
-    const [activeIds, setActiveIds] = useState([]);
+const GalleryItem = ({ orders }) => {
 
-    const handleActivePhoto = (id, photo_theme_date, photo_theme_name, number, photo_path) => {
-        setActivePhotos(prev => {
-            const photoIndex = prev.findIndex(photo => photo.id === id);
-            if (photoIndex !== -1) {
-                // Удаление выбранного фото
-                setActiveIds(prevIds => prevIds.filter(activeId => activeId !== id));
-                return prev.filter(photo => photo.id !== id);
-            } else {
-                // Добавление нового фото
-                setActiveIds(prevIds => [...prevIds, id]);
-                return [...prev, {
-                    id,
-                    photo_theme_date,
-                    photo_theme_name,
-                    number,
-                    photo_path
-                }];
+    const [hoveredPhotoId, setHoveredPhotoId] = useState(null);
+
+    const handleDownloadSinglePhoto = (photoPath, photoName) => {
+        const a = document.createElement('a');
+        a.href = photoPath;
+        a.download = photoName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    };
+
+    // const handleDownload = async () => {
+    //     if (activePhotos.length === 0) return;
+    
+    //     for (const photo of activePhotos) {
+    //         await new Promise((resolve) => {
+    //             const a = document.createElement('a');
+    //             a.href = photo.photo_path;
+    //             a.download = `${photo.photo_theme_name}_${photo.photo_theme_date}_${photo.number}.jpg`;
+    //             document.body.appendChild(a);
+    //             a.click();
+    //             a.remove();
+    //             setTimeout(resolve, 200); // Небольшая задержка (200 мс) между скачиваниями
+    //         });
+    //     }
+    
+    //     // Очистка состояния после завершения скачивания
+    //     setActivePhotos([]);
+    //     setActiveIds([]);
+    // };
+    
+    const handleDownloadAllPhotos = async () => {
+        for (const elem of orders) {
+            for (const photo of elem.photos) {
+                await new Promise((resolve) => {
+                    const a = document.createElement('a');
+                    a.href = photo.photo_path;
+                    a.download = `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    setTimeout(resolve, 200); // Задержка между скачиваниями
+                });
             }
-        });
+        }
     };
-
-    const handleDownload = () => {
-        activePhotos.forEach((photo, index) => {
-            setTimeout(() => {
-                const a = document.createElement('a');
-                a.href = photo.photo_path;
-                a.download = `${photo.photo_theme_name}_${photo.photo_theme_date}_${photo.number}.jpg`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                if (index === activePhotos.length - 1) {
-                    setActivePhotos([]);
-                    setActiveIds([]);
-                }
-            }, index * 200);
-        });
-    };
-
 
     return (
         <>
@@ -55,40 +62,50 @@ const GalleryItem = ({orders}) => {
                 return (
                     <div key={i} className={styles.galleryItemWrap}>
                         <div className={styles.titleWrap}>
-                            <div className={styles.galleryTitle}>
-                                {elem.photo_theme_name}
-                            </div>
+                            <div className={styles.galleryTitle}>{elem.photo_theme_name}</div>
                             <div className={styles.date}>
                                 {elem.photo_theme_date}. {elem.region}
                             </div>
                         </div>
                         <div className={styles.photosGallery}>
                             {elem.photos.map((photo, i) => {
-                                const isActive = activeIds.includes(photo.id);
                                 return (
-
                                     <div
-                                        onClick={() => handleActivePhoto(photo.id, elem.photo_theme_date, elem.photo_theme_name, photo.number, photo.photo_path)}
+                                        onMouseEnter={() => setHoveredPhotoId(photo.id)}
+                                        onMouseLeave={() => setHoveredPhotoId(null)}
                                         key={photo.id}
-                                        className={isActive ? styles.imgWrapActive : styles.imgWrap}
+                                        className={ styles.imgWrap}
                                     >
-                                        <img src={photo.photo_path} alt=""/>
+                                        <img src={photo.photo_path} alt="" />
                                         <div className={styles.photoNumber}>Фото № {photo.number}</div>
+                                        {hoveredPhotoId === photo.id && (
+                                        <div
+                                            className={styles.uploadIconBlock}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Предотвращаем всплытие клика
+                                                handleDownloadSinglePhoto(
+                                                    photo.photo_path,
+                                                    `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`
+                                                );
+                                            }}
+                                        >
+                                            <img className={styles.uploadIcon} src={uploadIcon} alt="Download" />
+                                        </div>
+                                    )}
                                     </div>
-
-                                )
+                                );
                             })}
                         </div>
                     </div>
-                )
+                );
             })}
             <div className={styles.btnWrap}>
-                <button onClick={handleDownload} className={styles.galleryBtn}>
-                    Скачать
+                <button onClick={handleDownloadAllPhotos} className={styles.galleryBtn}>
+                    Скачать все
                 </button>
             </div>
         </>
     );
-}
+};
 
 export default GalleryItem;
