@@ -1,7 +1,7 @@
 import traceback
 import secrets
 
-from django.core.mail import send_mail
+from unisender_go_api import SyncClient, SendRequest
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
@@ -10,7 +10,7 @@ from apps.user.models.code import CodePurpose
 from apps.user.models.email_error_log import EmailErrorLog
 
 from config.celery import BaseTask, app
-from config.settings import EMAIL_HOST_USER
+from config.settings import UNISENER_TOKEN, FROM_EMAIL
 
 User = get_user_model()
 
@@ -22,11 +22,9 @@ class SendConfirmCodeTask(BaseTask):
         user: User = User.objects.get(id=user_id)
         code = self.generate_numeric_code()
         if code_purpose == CodePurpose.RESET_PASSWORD:
-            subject = 'Сброс пароля'
-            message = 'Код для сброса пароля:\n'
+            message = 'Код для сброса пароля:'
         elif code_purpose == CodePurpose.CONFIRM_EMAIL:
-            subject = 'Подтверждение почты'
-            message = 'Код для подтверждения почты:\n'
+            message = 'Код для подтверждения почты'
         else:
             raise ValueError('Неизвестный code_purpose.')
 
@@ -43,14 +41,35 @@ class SendConfirmCodeTask(BaseTask):
                 purpose=code_purpose,
             )
 
+        html_msg = f"""
+                        <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+                            <div style="background-color: #007BFF; color: white; text-align: center; padding: 20px 0;">
+                                <h1 style="margin: 0; color: #000;">ФотоДетство</h1>
+                            </div>
+                            <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
+                                <p style="font-size: 18px; color: #333;">{message}</p>
+                                <div style="display: inline-block; background-color: #e0e0e0; padding: 20px 40px; border-radius: 5px;">
+                                    <span style="font-size: 24px; font-weight: bold; color: #000;">{code}</span>
+                                </div>
+                            </div>
+                        </div>
+                        """
+
         try:
-            send_mail(
-                subject=subject,
-                message=message + code,
-                from_email=EMAIL_HOST_USER,
-                recipient_list=(user.email,),
-                fail_silently=False,
-            )
+            with SyncClient.setup(UNISENER_TOKEN):
+                request = SendRequest(
+                    message={
+                        "recipients": [
+                            {"email": user.email},
+                        ],
+                        "body": {
+                            "html": html_msg,
+                        },
+                        "subject": "Код подтверждения",
+                        "from_email": FROM_EMAIL,
+                    },
+                )
+                request.send()
         except Exception as e:
             self.on_failure(
                 exc=e,
