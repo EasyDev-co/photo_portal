@@ -24,6 +24,8 @@ import logout_icon from '../../assets/icons/logout.svg'
 import { removeUser } from '../../store/authSlice'
 import ClientModal from '../ClientCardModal/ClientModal'
 import BasicTaskForm from '../ClientCardModal/Forms/BasicTaskForm'
+import calendarIcon from '../../assets/icons/calendar-svgrepo-com.svg'
+import gartenIcon from '../../assets/icons/kindergarten-svgrepo-com.svg'
 
 const LayoutCrm = () => {
   const BASE = '#25243D'
@@ -41,8 +43,8 @@ const LayoutCrm = () => {
   const [userLastName, setUserLastName] = useState('')
   const [userRole, setUserRole] = useState(null)
   const clientRadios = [
-    { name: 'Детские сады', value: '1', path: '/crm/kindergartens' },
-    { name: 'Календарь', value: '2', path: '/crm/calendar' },
+    { name: 'Детские сады', value: '1', path: '/crm/kindergartens', icon: gartenIcon },
+    { name: 'Календарь', value: '2', path: '/crm/calendar', icon: calendarIcon },
   ]
 
   const [notifications, setNotifications] = useState([]);
@@ -378,11 +380,15 @@ const LayoutCrm = () => {
                               ? 'toggle-btn'
                               : 'toggle-btn-checked'
                           }
+                          style={{
+                            paddingLeft: '35px'
+                          }}
                           value={radio.value}
                           checked={clientRadioValue === radio.value}
                           onChange={(e) => setСlientRadioValue(e.target.value)}
                         >
-                          <svg
+                          <img className='icon' src={radio.icon} alt='Иконка'></img>
+                          {/* <svg
                             width="8"
                             height="9"
                             viewBox="0 0 8 9"
@@ -393,7 +399,7 @@ const LayoutCrm = () => {
                               d="M4 8.05469C6.20914 8.05469 8 6.26383 8 4.05469C8 1.84555 6.20914 0.0546875 4 0.0546875C1.79086 0.0546875 0 1.84555 0 4.05469C0 6.26383 1.79086 8.05469 4 8.05469Z"
                               fill="white"
                             />
-                          </svg>
+                          </svg> */}
                           {radio.name}
                         </ToggleButton>
                       ))}
