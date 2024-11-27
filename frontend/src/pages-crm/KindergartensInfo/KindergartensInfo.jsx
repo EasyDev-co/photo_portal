@@ -424,6 +424,34 @@ const KindergartensInfo = () => {
                                 const changes = item[0]; // Измененные данные (объект)
                                 const timestamp = item[1]; // Дата изменения
 
+                                const ignoredFields = [
+                                    'id',
+                                    'notes',
+                                    'charges',
+                                    'managers',
+                                    'modified',
+                                    'charge_dates',
+                                    'kindergarten',
+                                    'history_calls',
+                                    'client_card_task',
+                                    'responsible_manager',
+                                  ];
+                                  const fieldLabels = {
+                                    address: 'Адрес изменен:',
+                                    garden_details: 'Реквизиты изменены:',
+                                    city: 'Город изменен:',
+                                    children_count: 'Количество детей изменено:',
+                                    status: 'Статус изменен:',
+                                    children_for_photoshoot: 'Количество детей на фотосессию изменено:',
+                                  };
+                                //   const filteredChanges = Object.entries(changes).filter(
+                                //     ([key]) => !ignoredFields.includes(key)
+                                //   );
+                                const filteredChanges = Object.entries(changes)
+                                    .filter(([key, [oldValue]]) => !ignoredFields.includes(key) && oldValue !== "None");
+
+                                if (filteredChanges.length === 0) return null;
+
                                 return (
                                     <Card className="" key={i}>
                                         <Card.Header className="border-0">
@@ -436,15 +464,19 @@ const KindergartensInfo = () => {
                                                 fontSize: '15px',
                                             }}
                                         >
-                                            {Object.entries(changes).map(([key, [oldValue, newValue]]) => (
+                                            {filteredChanges.map(([key, [oldValue, newValue]]) => (
                                                 <div
                                                     key={key}
                                                     className="truncate text-secondary"
                                                     style={{
                                                         marginBottom: '8px',
+                                                        whiteSpace: 'normal'
                                                     }}
                                                 >
-                                                    <strong>{key}:</strong> <span style={{ color: 'red' }}>{oldValue}</span> →{' '}
+                                                    <strong>
+                                                        {fieldLabels[key] || `${key}:`}
+                                                    </strong>{' '} <br />
+                                                    <span style={{ color: 'red' }}>{oldValue}</span> →{' '}
                                                     <span style={{ color: 'green' }}>{newValue}</span>
                                                 </div>
                                             ))}
@@ -453,54 +485,8 @@ const KindergartensInfo = () => {
                                 );
                             })}
 
-                            <Button className="btn-filter-reset text-center">Сбросить</Button>
+                            {/* <Button className="btn-filter-reset text-center">Сбросить</Button> */}
                         </Card>
-
-                        {/* <Card
-                            className="border-0 d-flex flex-column gap-2 card-shadow "
-                            style={{
-                                padding: '24px',
-                                height: 'auto',
-                            }}
-                        >
-                            <Card.Header
-                                style={{
-                                    fontSize: '17px',
-                                }}
-                                className="border-0 fw-600 p-0"
-                            >
-                                История изменений
-                            </Card.Header>
-                            {clientCardData.change_history.map((item, i) => {
-                                return (
-                                    <Card className="" key={i}>
-                                        <Card.Header className="border-0">
-                                            <div>{formatDate(item[1])}</div>
-                                            <div
-                                                style={{
-                                                    color: '#0a58ca',
-                                                }}
-                                            >
-                                                Имя Фамилия
-                                            </div>
-                                        </Card.Header>
-                                        <Card.Body
-                                            className="py-2"
-                                            style={{
-                                                maxWidth: '545px',
-                                                fontSize: '15px',
-                                            }}
-                                        >
-                                            <div className="truncate text-secondary">
-                                                {Object.keys(item[0]).map((name, i) => <p key={i}>{name.map((item, i) => <p key={i}>{item}</p>)}</p>)}
-                                            </div>
-                                        </Card.Body>
-                                    </Card>
-                                )
-                            })}
-
-                            <Button className="btn-filter-reset text-center">Сбросить</Button>
-                        </Card> */}
                     </div>
                 </div>
             </div>

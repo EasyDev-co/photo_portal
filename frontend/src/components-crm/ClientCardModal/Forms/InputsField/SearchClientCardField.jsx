@@ -54,6 +54,7 @@ const CardSelectInput = ({
         const value = e.target.value;
         setSearchValue(value);
         handleSearch(value);
+        console.log(searchResults);
     };
 
     const handleSelectCard = (card) => {

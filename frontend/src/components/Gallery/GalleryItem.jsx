@@ -16,26 +16,6 @@ const GalleryItem = ({ orders }) => {
         a.click();
         a.remove();
     };
-
-    // const handleDownload = async () => {
-    //     if (activePhotos.length === 0) return;
-    
-    //     for (const photo of activePhotos) {
-    //         await new Promise((resolve) => {
-    //             const a = document.createElement('a');
-    //             a.href = photo.photo_path;
-    //             a.download = `${photo.photo_theme_name}_${photo.photo_theme_date}_${photo.number}.jpg`;
-    //             document.body.appendChild(a);
-    //             a.click();
-    //             a.remove();
-    //             setTimeout(resolve, 200); // Небольшая задержка (200 мс) между скачиваниями
-    //         });
-    //     }
-    
-    //     // Очистка состояния после завершения скачивания
-    //     setActivePhotos([]);
-    //     setActiveIds([]);
-    // };
     
     const handleDownloadAllPhotos = async () => {
         for (const elem of orders) {

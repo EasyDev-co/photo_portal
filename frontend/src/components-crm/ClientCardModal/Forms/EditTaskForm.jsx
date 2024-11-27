@@ -129,7 +129,6 @@ const EditTaskForm = ({ taskId, closeModal, formatDate, editTask, deleteItem }) 
       {errors.task_type && <div className="text-danger">{errors.task_type[0]}</div>}
     </Form.Group>
 
-
     <Form.Group className="mb-3">
       <div className="form-control-wrap">
         <Form.Label className="text-secondary">Выберите дату</Form.Label>
