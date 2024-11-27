@@ -105,25 +105,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
 WSGI_APPLICATION = 'config.wsgi.application'
 
-SHOW_IN_ADMIN = os.environ.get('SHOW_IN_ADMIN', False)
+SHOW_IN_ADMIN = False
 
 # Настройки SENTRY
 SENTRY_IS_ON = os.environ.get('SENTRY_IS_ON')
@@ -231,10 +215,10 @@ SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 CELERY_BEAT_SCHEDULE = {
-    "resend_code": {
-        "task": "apps.user.tasks.ResendConfirmCodeTask",
-        "schedule": crontab(minute="*/1"),
-    },
+    # "resend_code": {
+    #     "task": "apps.user.tasks.ResendConfirmCodeTask",
+    #     "schedule": crontab(minute="*/1"),
+    # },
     "check_photo_theme_deadlines": {
         "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
         "schedule": crontab(minute='0', hour='*/2'),  # проверка каждые два часа
@@ -351,3 +335,6 @@ JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jque
 YAD_OAUTH_TOKEN=os.getenv('YAD_OAUTH_TOKEN')
 YAD_CLIENT_ID = os.getenv("YAD_CLIENT_ID")
 YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")
+
+UNISENER_TOKEN=os.getenv('UNISENER_TOKEN')
+FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
