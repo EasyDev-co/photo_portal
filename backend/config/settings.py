@@ -107,7 +107,7 @@ ROOT_URLCONF = 'config.urls'
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-SHOW_IN_ADMIN = os.environ.get('SHOW_IN_ADMIN', False)
+SHOW_IN_ADMIN = False
 
 # Настройки SENTRY
 SENTRY_IS_ON = os.environ.get('SENTRY_IS_ON')
