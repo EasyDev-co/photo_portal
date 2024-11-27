@@ -215,10 +215,10 @@ SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 CELERY_BEAT_SCHEDULE = {
-    "resend_code": {
-        "task": "apps.user.tasks.ResendConfirmCodeTask",
-        "schedule": crontab(minute="*/1"),
-    },
+    # "resend_code": {
+    #     "task": "apps.user.tasks.ResendConfirmCodeTask",
+    #     "schedule": crontab(minute="*/1"),
+    # },
     "check_photo_theme_deadlines": {
         "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
         "schedule": crontab(minute='0', hour='*/2'),  # проверка каждые два часа
