@@ -17,7 +17,13 @@ class PromocodeAdmin(admin.ModelAdmin):
     readonly_fields = (
         'created',
         'modified',
+        'activate_count'
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return self.readonly_fields + ('user',)
+        return self.readonly_fields
 
 
 @admin.register(BonusCoupon)
