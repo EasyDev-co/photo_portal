@@ -351,3 +351,6 @@ JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jque
 YAD_OAUTH_TOKEN=os.getenv('YAD_OAUTH_TOKEN')
 YAD_CLIENT_ID = os.getenv("YAD_CLIENT_ID")
 YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")
+
+UNISENER_TOKEN=os.getenv('UNISENER_TOKEN')
+FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
