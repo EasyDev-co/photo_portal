@@ -11,10 +11,10 @@ import { parentRegisterCreate } from "../../http/parent/parentRegisterCreate";
 import { useDispatch, useSelector } from "react-redux";
 import { addQrIdPhoto, setEmail, setPhotoNumbers } from "../../store/authSlice";
 import { useClickOutside } from "../../utils/useClickOutside";
-
 import danger from '../../assets/images/Auth/DangerCircle.svg'
 import Scaner from "../Scaner/Scaner";
 import Modal from "../Modal/Modlal";
+import agreementPdf from '../../assets/agreement.pdf'
 
 export const Registration = () => {
 
@@ -266,12 +266,34 @@ export const Registration = () => {
               />
               <div className={isChecked ? styles.privacyCheckbox : styles.privacyCheckboxUnCheck}>
                 <input className={styles.privacyInput} onChange={(e) => setIsChecked(e.target.checked)} type="checkbox" name="" id="privacy" />
-                <label htmlFor="privacy">
+                {/* <label htmlFor="privacy"> */}
                   <p>
-                    Даю согласие на обработку своих персональных данных.
-                    <span> С соглашением ознакомлен.</span>
+                    Даю согласие на обработку своих персональных данных. {' '}
+                    {/* <span> С соглашением ознакомлен.</span> */}
+                    <span 
+                      style={{ cursor: 'pointer', color: 'blue', }}
+                      role="button" 
+                      tabIndex={0} 
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = agreementPdf; // Путь к вашему файлу
+                        link.download = 'agreement.pdf'; // Имя файла при загрузке
+                        link.click();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          const link = document.createElement('a');
+                          link.href = agreementPdf;
+                          link.download = 'agreement.pdf';
+                          link.click();
+                        }
+                      }}
+                    >
+                      С соглашением ознакомлен.
+                    </span>
+
                   </p>
-                </label>
+                {/* </label> */}
               </div>
               {error.isChecked &&
                 error.isChecked?.map((elem, i) => {

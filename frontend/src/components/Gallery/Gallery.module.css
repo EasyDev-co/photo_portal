@@ -15,6 +15,14 @@
         -ms-flex-direction: column;
             flex-direction: column;
 }
+.uploadIcon {
+    width: 20px;
+}
+.uploadIconBlock {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
 
 @media screen and (max-width: 1000px) {
     .ordersWrap {
@@ -78,6 +86,7 @@
     border-radius: 8px;
     border:1px solid rgb(229, 229, 229);
     cursor: pointer;
+    position: relative;
 }
 .imgWrap>img{
     width: 174px;

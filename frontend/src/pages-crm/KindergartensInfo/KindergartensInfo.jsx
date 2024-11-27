@@ -24,6 +24,10 @@ const KindergartensInfo = () => {
 
     const access = localStorage.getItem('access') // Get access token
 
+    useEffect(() => {
+        console.log(tasks)
+    }, [notes])
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const options = {day: '2-digit', month: '2-digit', year: 'numeric'};
@@ -93,6 +97,7 @@ const KindergartensInfo = () => {
                 ) // Use the function to fetch data
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
+                    console.log(data)
                     setClientCardData(data) // Store the data in state
                 } else {
                     console.error('Failed to fetch single client card')
@@ -110,6 +115,7 @@ const KindergartensInfo = () => {
                 ) // Use the function to fetch data
                 if (response.ok) {
                     const data = await response.json() // Parse the response JSON
+                    console.log(data)
 
                     setTasks(data.reverse()) // Store the data in state
                 } else {
@@ -160,7 +166,8 @@ const KindergartensInfo = () => {
         console.log(clientCardData);
         return (
             <div className="page-crm">
-                <div className="d-flex gap-3">
+                <div className="kindergartens_info_block"> 
+                {/* d-flex gap-3 */}
                     <div className="d-flex flex-column gap-3">
                         <div className="d-flex gap-3">
                             <Card
@@ -274,7 +281,7 @@ const KindergartensInfo = () => {
                                 region={clientCardData.kindergarten.region.country}
                                 id={clientCardData.id}
                                 itemName={clientCardData.name}
-                                responsible_manager={clientCardData.responsible_manager.id}
+                                responsible_manager={clientCardData.responsible_manager ? clientCardData.responsible_manager.id : null}
                                 addCall={addCall}
                                 deleteItemCall = {deleteItemCall}
                             />
@@ -345,7 +352,8 @@ const KindergartensInfo = () => {
                         >
                             <Notes notes={notes} addNote={addNote} deleteNote={deleteNote} editNote={editNote}/>
                             {notes && notes.length > 0 ?
-                                <Button className="btn-filter-reset text-center">Сбросить</Button> : <p>Заметок нет</p>}
+                                <></> : <p>Заметок нет</p>}
+                                 {/* <Button className="btn-filter-reset text-center">Сбросить</Button> */}
                         </Card>
                         <Card
                             className="border-0 d-flex flex-column gap-2 card-shadow "
@@ -396,7 +404,59 @@ const KindergartensInfo = () => {
                                 <Button className="btn-filter-reset text-center">Сбросить</Button> :
                                 <p>История заказов пуста</p>}
                         </Card>
+
                         <Card
+                            className="border-0 d-flex flex-column gap-2 card-shadow"
+                            style={{
+                                padding: '24px',
+                                height: 'auto',
+                            }}
+                        >
+                            <Card.Header
+                                style={{
+                                    fontSize: '17px',
+                                }}
+                                className="border-0 fw-600 p-0"
+                            >
+                                История изменений
+                            </Card.Header>
+                            {clientCardData.change_history.map((item, i) => {
+                                const changes = item[0]; // Измененные данные (объект)
+                                const timestamp = item[1]; // Дата изменения
+
+                                return (
+                                    <Card className="" key={i}>
+                                        <Card.Header className="border-0">
+                                            <div>{formatDate(timestamp)}</div>
+                                        </Card.Header>
+                                        <Card.Body
+                                            className="py-2"
+                                            style={{
+                                                maxWidth: '545px',
+                                                fontSize: '15px',
+                                            }}
+                                        >
+                                            {Object.entries(changes).map(([key, [oldValue, newValue]]) => (
+                                                <div
+                                                    key={key}
+                                                    className="truncate text-secondary"
+                                                    style={{
+                                                        marginBottom: '8px',
+                                                    }}
+                                                >
+                                                    <strong>{key}:</strong> <span style={{ color: 'red' }}>{oldValue}</span> →{' '}
+                                                    <span style={{ color: 'green' }}>{newValue}</span>
+                                                </div>
+                                            ))}
+                                        </Card.Body>
+                                    </Card>
+                                );
+                            })}
+
+                            <Button className="btn-filter-reset text-center">Сбросить</Button>
+                        </Card>
+
+                        {/* <Card
                             className="border-0 d-flex flex-column gap-2 card-shadow "
                             style={{
                                 padding: '24px',
@@ -432,7 +492,7 @@ const KindergartensInfo = () => {
                                             }}
                                         >
                                             <div className="truncate text-secondary">
-                                                {Object.keys(item[0]).map((name, i) => <p key={i}>{name}</p>)}
+                                                {Object.keys(item[0]).map((name, i) => <p key={i}>{name.map((item, i) => <p key={i}>{item}</p>)}</p>)}
                                             </div>
                                         </Card.Body>
                                     </Card>
@@ -440,7 +500,7 @@ const KindergartensInfo = () => {
                             })}
 
                             <Button className="btn-filter-reset text-center">Сбросить</Button>
-                        </Card>
+                        </Card> */}
                     </div>
                 </div>
             </div>

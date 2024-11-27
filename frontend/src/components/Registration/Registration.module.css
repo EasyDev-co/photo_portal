@@ -320,7 +320,7 @@
   
 }
 .privacyInput{
-
+  margin-top: 2px;
 }
 .privacyInputUnActive{
   border: 1px solid #007bff; /* Цвет рамки */
