@@ -80,6 +80,7 @@ class SendConfirmCodeTask(BaseTask):
             )
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
+        # TODO проверять не валидные emil на которые вообще не возможо отправить код.
         EmailErrorLog.objects.create(
             confirm_code=kwargs['confirm_code'],
             message=str(exc),
@@ -108,4 +109,4 @@ class ResendConfirmCodeTask(BaseTask):
 
 
 send_confirm_code = app.register_task(SendConfirmCodeTask)
-app.register_task(ResendConfirmCodeTask)
+# app.register_task(ResendConfirmCodeTask)
