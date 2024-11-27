@@ -50,19 +50,38 @@ class DigitalPhotosNotificationTask(BaseTask):
     def process(self, user_id, *args, **kwargs):
         user = get_object_or_404(User, id=user_id)
         if user:
+            html_message = f"""
+                        <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+                            <div style="background-color: #007BFF; color: white; text-align: center; padding: 20px 0;">
+                                <h1 style="margin: 0;">ФотоДетство</h1>
+                            </div>
+                            <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
+                                <p style="font-size: 18px; color: #333;">
+                                   Ваши электронные фото готовы
+                                </p>
+                                <p style="font-size: 16px; color: #555; line-height: 1.5;">
+                                    Вы можете скачать электронные фото в личном кабинете.
+                                </p>
+                                <p style="font-size: 16px; color: #555; line-height: 1.5; margin-top: 20px;">
+                                    С уважением,<br>Администрация Фото-портала
+                                </p>
+                            </div>
+                        </div>
+                        """
             subject = f"Ваши электронные фото готовы."
-            message = (f"Ваши электронные фото готовы.\n"
-                       f"Вы можете скачать электронные фото в личном кабинете.\n\n"
-                       f"C уважением,\n"
-                       f"Администрация Фото-портала")
             try:
-                send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=EMAIL_HOST_USER,
-                    recipient_list=(user.email,),
-                    fail_silently=False,
-                )
+                with SyncClient.setup(UNISENER_TOKEN):
+                    request = SendRequest(
+                        message={
+                            "recipients": [{"email": user.email}],
+                            "body": {
+                                "html": html_message,
+                            },
+                            "subject": subject,
+                            "from_email": FROM_EMAIL,
+                        },
+                    )
+                    request.send()
             except Exception as e:
                 self.on_failure(
                     exc=e,
@@ -118,7 +137,7 @@ class SendDeadLineNotificationTask(BaseTask):
                 </div>
                 <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
                     <p style="font-size: 18px; color: #333;">
-                        До истечения срока фотосессии осталось менее 24 часов.
+                       Осталось менее 24 часов до завершения заказа.
                     </p>
                     <p style="font-size: 16px; color: #555; line-height: 1.5;">
                         После истечения срока Вы больше не сможете заказать фотографии.
