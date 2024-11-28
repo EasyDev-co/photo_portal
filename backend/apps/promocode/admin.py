@@ -13,17 +13,24 @@ class PromocodeAdmin(admin.ModelAdmin):
         'created',
         'modified',
         'is_active',
+        'kindergarten'
     )
     readonly_fields = (
         'created',
         'modified',
-        'activate_count'
+        'activate_count',
+        'kindergarten'
     )
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return self.readonly_fields + ('user',)
         return self.readonly_fields
+
+    def kindergarten(self, obj):
+        return obj.user.managed_kindergarten
+
+    kindergarten.short_description = 'Детский сад'
 
 
 @admin.register(BonusCoupon)

@@ -9,6 +9,7 @@ from apps.kindergarten.models import PhotoPrice, PhotoType
 from apps.photo.models import Photo, PhotoLine
 from apps.promocode.models import Promocode
 from apps.promocode.models.bonus_coupon import BonusCoupon
+from apps.user.models import UserRole
 
 
 class PhotoInCartSerializer(serializers.ModelSerializer):
@@ -86,9 +87,15 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         promo_code = None
         if promo_code_data:
-            promo_code = Promocode.objects.filter(
-                code=promo_code_data, is_active=True
-            ).first()
+            try:
+                manager = user if user.role == UserRole.manager else user.kindergarten.first().manager
+                promo_code = Promocode.objects.get(
+                    code=promo_code_data,
+                    is_active=True,
+                    user=manager
+                )
+            except Promocode.DoesNotExist:
+                raise serializers.ValidationError('Неверный промокод.')
 
         # стоимость остальных фоток без фотокниги и э/ф
         for photo in photos_in_cart:

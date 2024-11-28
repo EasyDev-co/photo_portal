@@ -64,6 +64,12 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         default=1,
         verbose_name="Кол-во активаций промо кода",
     )
+    used_by = models.JSONField(
+        verbose_name='Кем использован',
+        null=True,
+        blank=True,
+        default=list
+    )
 
     class Meta:
         verbose_name = "Промокод"
