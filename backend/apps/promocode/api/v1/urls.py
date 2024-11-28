@@ -3,5 +3,5 @@ from apps.promocode.api.v1.views import PromocodeRetrieveAPIView, PromocodeAPIVi
 
 urlpatterns = [
     path('get/', PromocodeRetrieveAPIView.as_view(), name="promocode"),
-    path('get_manager_promocode/', PromocodeAPIView.as_view(), name="promocode")
+    path('get_manager_promocode/', PromocodeAPIView.as_view(), name="manager_promocode")
 ]

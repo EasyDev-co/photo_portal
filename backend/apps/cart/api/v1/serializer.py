@@ -99,6 +99,8 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         # стоимость остальных фоток без фотокниги и э/ф
         for photo in photos_in_cart:
+            if photo.get('quantity') == 0:
+                continue
             price_per_piece = region_prices.get(photo_type=photo['photo_type']).price
 
             discount_price = price_per_piece
