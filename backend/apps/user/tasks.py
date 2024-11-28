@@ -109,4 +109,4 @@ class ResendConfirmCodeTask(BaseTask):
 
 
 send_confirm_code = app.register_task(SendConfirmCodeTask)
-# app.register_task(ResendConfirmCodeTask)
+app.register_task(ResendConfirmCodeTask)
