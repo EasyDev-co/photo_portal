@@ -3,7 +3,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.cart.api.v1.serializer import PhotoInCartSerializer, CartPhotoLineSerializer, CartSerializer, CartPhotoLineCreateUpdateSerializer
+from apps.cart.api.v1.serializer import (
+    PhotoInCartSerializer,
+    CartPhotoLineSerializer,
+    CartPhotoLineCreateUpdateSerializer
+)
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
 from apps.utils.models_mixins.models_mixins import logger
 
@@ -65,4 +69,3 @@ class CartAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         return Response(CartPhotoLineSerializer(instance, many=True).data)
-
