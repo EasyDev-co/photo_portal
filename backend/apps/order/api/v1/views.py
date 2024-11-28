@@ -28,7 +28,6 @@ from apps.order.permissions import IsOrdersPaymentOwner
 from apps.order.tasks import parse_notification_fiscalization
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
-from apps.user.dto import UserDto
 
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
@@ -158,8 +157,7 @@ class OrderAPIView(APIView):
             promocode.used_by = promocode.used_by or []
 
             # Добавление информации о пользователе, использующем промокод
-            user_dto = UserDto(id=str(user.id), email=user.email)
-            promocode.used_by.append(user_dto.__dict__)
+            promocode.used_by.append({'id': str(user.id), 'email': user.email})
 
             # Обновление счетчика активаций
             promocode.activate_count += 1

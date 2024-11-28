@@ -60,6 +60,14 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         photos_in_cart = validated_data.pop('photos')
+
+        quantity = 0
+        for photo_in_cart in photos_in_cart:
+            quantity += photo_in_cart.get('quantity')
+        if quantity == 0:
+            validated_data.pop('cart').delete()
+            return CartPhotoLine()
+
         promo_code_data = validated_data.pop('promo_code', None)
         instance = CartPhotoLine.objects.create(**validated_data)
         user = self.context.get('request').user
