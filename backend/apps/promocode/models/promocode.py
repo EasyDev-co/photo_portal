@@ -3,8 +3,9 @@ from random import choice
 import string
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
-from django.db import models, IntegrityError
+from django.db import models
 
 from apps.photo.models import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
@@ -63,6 +64,12 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         default=1,
         verbose_name="Кол-во активаций промо кода",
     )
+    used_by = models.JSONField(
+        verbose_name='Кем использован',
+        null=True,
+        blank=True,
+        default=list
+    )
 
     class Meta:
         verbose_name = "Промокод"
@@ -75,6 +82,10 @@ class Promocode(UUIDMixin, TimeStampedMixin):
     def save(self, *args, **kwargs):
         if not self.code:
             self.code = self.generate_unique_code()
+        if not self._state.adding:
+            old = Promocode.objects.get(pk=self.pk)
+            if self.user and old.user != self.user:
+                raise ValidationError("Промокод принадлежит другому заведующему.")
         super().save(*args, **kwargs)
 
     @staticmethod

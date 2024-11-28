@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-
+from apps.kindergarten.api.v1.permissions import IsManager
 from apps.promocode.models.promocode import Promocode
 from .serializers import PromocodeSerializer
 
@@ -40,3 +40,26 @@ class PromocodeRetrieveAPIView(APIView):
 
         serializer = PromocodeSerializer(promocode)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PromocodeAPIView(APIView):
+    permission_classes = [IsManager]
+
+    def get(self, request):
+        promocode = Promocode.objects.get(
+            user=request.user,
+            is_active=True
+        )
+
+        if not promocode:
+            return Response(
+                {'message': 'Активный промокод не найден.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(
+            PromocodeSerializer(promocode).data,
+            status=status.HTTP_200_OK
+        )
+
+
