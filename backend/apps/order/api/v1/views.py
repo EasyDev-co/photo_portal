@@ -54,10 +54,10 @@ class OrderAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        # Получаем фотолинии, привязанные к пользователю
         photo_lines = PhotoLine.objects.filter(
             kindergarten__in=user.kindergarten.all(),
-            parent=user
+            parent=user,
+            orders__status=OrderStatus.paid_for
         ).annotate(is_digital=F('orders__is_digital')).order_by('photo_theme__date_end')
 
         # Проверяем наличие фотолиний

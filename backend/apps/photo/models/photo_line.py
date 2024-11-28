@@ -12,11 +12,6 @@ from .photo_theme import PhotoTheme
 from apps.utils.models_mixins.models_mixins import UUIDMixin
 from ..fields import NullImageField
 
-from config.settings import PHOTO_LINE_URL
-from apps.utils.services import generate_qr_code
-from django.core.files.base import ContentFile
-
-from loguru import logger
 
 User = get_user_model()
 
