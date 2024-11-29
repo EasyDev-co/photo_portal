@@ -63,7 +63,8 @@ export const App = () => {
         <Route path="/password-reset/new-password" element={<NewPassword />} />
       </Route>
       <Route element={<Layout />}>
-        <Route path="/" element={<Navigate to="/about-us" />} />
+        {/* <Route path="/" element={<Navigate to="/about-us" />} /> */}
+        <Route path="/" element={<Navigate to={isAuth ? "/orders" : "/about-us"} />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/rules" element={<Rules />} />
         {isAuth ? (

@@ -170,6 +170,7 @@ export const Registration = () => {
           ))
           setInputValue(initialState);
           navigation('/verification');
+          // navigation('/orders');
         } else {
           const data = await response.json();
           setError(data);

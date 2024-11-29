@@ -61,14 +61,14 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
                     </label>
                   </div>
                 </div>
-                <button className={styles.mainButton} onClick={() => handleRemoveBlock(blocksId, photo.photoLineId)}>Удалить блок</button>
+                {/* <button className={styles.mainButton} onClick={() => handleRemoveBlock(blocksId, photo.photoLineId)}>Удалить блок</button> */}
               </div>
             }
           </div>
         ))}
       </div>
       <div className={styles.orderPromo}>
-        <div className={styles.promoStringWrap}>
+        {/* <div className={styles.promoStringWrap}>
           <div className={styles.dot}></div>
           <div className={styles.promoInputWrapp}>
             <span className={styles.promoString}>Отправить электронную версию на электронную почту</span>
@@ -80,7 +80,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
               style={{ width: '94%' }}
             />
           </div>
-        </div>
+        </div> */}
         
         <div className={styles.promoStringWrap}>
           {price.total_price >= priceCalendar.ransom_amount_for_digital_photos ?
