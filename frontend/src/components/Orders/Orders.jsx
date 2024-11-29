@@ -115,6 +115,9 @@ export const Orders = () => {
     }
   }, [blocks.length]);
 
+  const [currentPromoCode, setCurrentPromoCode] = useState("");
+
+  
   const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
     const newValue = {
       blockId: blockId,
@@ -124,10 +127,10 @@ export const Orders = () => {
       is_photobook: isChecked,
       is_digital: false,
       photoLineId: photoLineId,
-      promo_code: ''
+      promo_code: currentPromoCode // Используем текущий промокод из state
     };
-
-    setOrderValue(prev => {
+  
+    setOrderValue((prev) => {
       const updatedState = [...prev];
       const existingIndex = updatedState.findIndex(
         item => item.id === photoId && item.photo_type === newValue.photo_type
@@ -139,9 +142,10 @@ export const Orders = () => {
       }
       return updatedState;
     });
-
-    setInputValue(prevInput => ({ ...prevInput, [name]: count }));
+  
+    setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
   };
+
   useEffect(() => {
     const transformedData = transformData(orderValue);
     fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
@@ -208,6 +212,7 @@ export const Orders = () => {
 
   const handlePromocodeChange = (e) => {
     const newPromoCode = e.target.value;
+    setCurrentPromoCode(newPromoCode);
 
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
@@ -220,6 +225,7 @@ export const Orders = () => {
       setOrderValue(updatedOrders);
     }, 1000);
   };
+  
 
   return (
     <div className={styles.ordersWrap}>
@@ -268,7 +274,7 @@ export const Orders = () => {
           {lineLenght >= 3 ?
             <div className={styles.buttonAddKidsWrap}>
               <div className={styles.promoButtonWrap}>
-                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Сделать заказ</button>
+                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button>
                 <span>{lineLenght} из 3</span>
               </div>
               <div className={styles.errMessage}>
@@ -284,7 +290,7 @@ export const Orders = () => {
             </div> :
             <div>
               <div className={styles.promoButtonWrap}>
-                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Сделать заказ</button>
+                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
                 <span>{lineLenght} из 3</span>
               </div>
             </div>

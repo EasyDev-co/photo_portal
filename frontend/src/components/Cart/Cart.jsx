@@ -173,6 +173,7 @@ const Cart = () => {
                             <button onClick={() => deleteCartItem()} className={styles.deleteButton}>Удалить</button>
                         </div>
                     }
+                    
                 </div>
                 <div className={styles.diagramContainer}>
                     <PaymentDiagram amount={amount} />

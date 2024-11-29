@@ -69,7 +69,7 @@ export const Login = () => {
             refresh: data.refresh
           })
         )
-        navigation('/')
+        navigation('/orders')
       } else {
         const data = await response.json();
         setError({
