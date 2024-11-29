@@ -19,6 +19,12 @@ class UserNotFound(APIException):
     default_code = 'user_not_found'
 
 
+class UserRegistered(APIException):
+    status_code = 400
+    default_detail = "Пользователь с таким email уже зарегистрирован"
+    default_code = 'user_registered'
+
+
 class InvalidCode(APIException):
     status_code = 400
     default_detail = 'Неверный код или истек срок его действия.'
