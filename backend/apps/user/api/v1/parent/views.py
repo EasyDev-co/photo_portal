@@ -12,14 +12,19 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from apps.exceptions.api_exceptions import (MissingKindergartenCode,
-                                            KindergartenCodeNotFound,
-                                            InvalidCode)
+from apps.exceptions.api_exceptions import (
+    MissingKindergartenCode,
+    KindergartenCodeNotFound,
+    InvalidCode,
+    UserRegistered
+)
 from apps.kindergarten.models import Kindergarten
 from apps.user.api.v1.serializers import UserSerializer
-from apps.user.api.v1.parent.serializers import (EmailAndCodeSerializer,
-                                                 EmailSerializer,
-                                                 PasswordChangeSerializer)
+from apps.user.api.v1.parent.serializers import (
+    EmailAndCodeSerializer,
+    EmailSerializer,
+    PasswordChangeSerializer
+)
 
 from apps.user.models import ConfirmCode
 from apps.user.models.code import CodePurpose
@@ -47,6 +52,9 @@ class ParentRegisterAPIView(CreateAPIView):
 
         with transaction.atomic():
             user = User.objects.filter(email=validate_data['email']).first()
+            if user.is_verified:
+                raise UserRegistered
+
             if not user:
                 user = User.objects.create_user(
                     password=password,
