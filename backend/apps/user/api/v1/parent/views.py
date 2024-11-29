@@ -46,13 +46,15 @@ class ParentRegisterAPIView(CreateAPIView):
             raise KindergartenCodeNotFound
 
         with transaction.atomic():
-            user = User.objects.create_user(
-                password=password,
-                **validate_data,
-            )
-            user.kindergarten.add(kindergarten)
-            user.role = UserRole.parent
-            user.save()
+            user = User.objects.filter(email=validate_data['email']).first()
+            if not user:
+                user = User.objects.create_user(
+                    password=password,
+                    **validate_data,
+                )
+                user.kindergarten.add(kindergarten)
+                user.role = UserRole.parent
+                user.save()
 
         send_confirm_code.delay(
             user_id=user.pk,
