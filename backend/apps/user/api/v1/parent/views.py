@@ -52,8 +52,6 @@ class ParentRegisterAPIView(CreateAPIView):
 
         with transaction.atomic():
             user = User.objects.filter(email=validate_data['email']).first()
-            if user.is_verified:
-                raise UserRegistered
 
             if not user:
                 user = User.objects.create_user(
@@ -63,6 +61,9 @@ class ParentRegisterAPIView(CreateAPIView):
                 user.kindergarten.add(kindergarten)
                 user.role = UserRole.parent
                 user.save()
+
+            if user.is_verified:
+                raise UserRegistered
 
         send_confirm_code.delay(
             user_id=user.pk,
