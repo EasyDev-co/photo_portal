@@ -67,8 +67,18 @@ class UserSerializer(serializers.ModelSerializer):
 
         )
         extra_kwargs = {
+            'email': {'validators': []},
             'password': {'write_only': True}
         }
+
+        def validate_email(self, value):
+            """
+            Кастомная проверка email.
+            """
+            user = User.objects.filter(email=value).first()
+            if user and user.is_verified:
+                raise serializers.ValidationError("Пользователь с таким email уже существует и подтвержден.")
+            return value
 
 
 class EmployeeSerializerForUser(serializers.ModelSerializer):
