@@ -261,7 +261,6 @@ export const Orders = () => {
           <Modal active={modalActive} setActive={setModalActive} text={modalText} />
           <div className={styles.orderPromoWrap}>
             <div className={styles.orderPromoPromocode}>
-              <span className={styles.promoString}>Введите промо-код для получения скидки</span>
               <div className={styles.promoInputWrap}>
                 <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
                   placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}

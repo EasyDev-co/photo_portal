@@ -303,7 +303,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                     <MainButton
                         value={"Сохранить"}
                     />
-                    {!nurseryIsAuth && <div className={styles.parentPromotion}>
+                    {/* {!nurseryIsAuth && <div className={styles.parentPromotion}>
                         <p>
                             <span>
                                 Активный родитель!
@@ -311,7 +311,7 @@ const ParentProfile = ({ nurseryIsAuth }) => {
                             Мы не работаем в вашем детском саду и предлагаем вам продвинуть наши услуги в вашем детском саду. За это вы получите 90% скидку, как активный родитель. Если вам удасться продвинуть нас свяжитесь с нами по почте @…. и мы выдадим вам уникальный промокод со скидкой
                         </p>
                     </div>
-                    }
+                    } */}
                 </form>
                 <form className={styles.formReset} onSubmit={(e) => onSubmitToReset(e)} action="">
                     <div className={styles.profileInputWrap}>
