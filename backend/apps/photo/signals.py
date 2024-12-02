@@ -1,8 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from apps.photo.models import PhotoTheme, Season, PhotoLine
-from apps.photo.tasks import generate_promocodes_for_photo_theme
+from apps.photo.models import Season
+from apps.photo.models.photo_theme import PhotoThemeName
 from apps.utils.services.season_matcher import get_season
 
 
@@ -17,7 +17,7 @@ from apps.utils.services.season_matcher import get_season
 #         generate_promocodes_for_photo_theme.delay(instance.id)
 
 
-@receiver(post_save, sender=PhotoTheme)
+@receiver(post_save, sender=PhotoThemeName)
 def set_season(sender, instance, created, **kwargs):
     if created:
         season = get_season(instance.name)
