@@ -5,11 +5,18 @@ from django.utils import timezone
 
 from .season import Season
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
-from apps.kindergarten.models import Kindergarten
 
 
 class PhotoThemeName(UUIDMixin, TimeStampedMixin):
     name = models.CharField(max_length=255, verbose_name="Тема фотосессии")
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        verbose_name='Сезон',
+        related_name='photo_themes',
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
@@ -49,14 +56,6 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     ransom_counted = models.BooleanField(
         verbose_name='Выкуп подсчитан',
         default=False
-    )
-    season = models.ForeignKey(
-        Season,
-        on_delete=models.PROTECT,
-        verbose_name='Сезон',
-        related_name='photo_themes',
-        null=True,
-        blank=True,
     )
 
     def __str__(self):

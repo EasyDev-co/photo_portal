@@ -1,3 +1,5 @@
+from enum import property
+
 from apps.photo.models.season import Seasons
 
 seasons = {
@@ -55,7 +57,7 @@ seasons = {
 }
 
 
-def get_season(string: str) -> None | Seasons:
+def get_season(string: str) -> None | property | property:
     words = string.lower().split(' ')
     possible_seasons = set()
     for word in words:

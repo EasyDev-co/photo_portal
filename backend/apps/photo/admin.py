@@ -54,21 +54,21 @@ class PhotoThemeAdmin(admin.ModelAdmin):
     form = PhotoThemeForm
     list_display = (
         'name',
+        'season',
         'date_start',
         'date_end',
-        'season',
         'ongoing'
     )
     fields = (
         'photo_theme_name',
+        'season',
         'kindergartens',
         'date_start',
         'date_end',
-        'season',
         'are_qrs_removed',
     )
-    readonly_fields = ('are_qrs_removed', )
-    search_fields = ('name', 'season')
+    readonly_fields = ('are_qrs_removed', 'season',)
+    search_fields = ('name',)
     ordering = ('name', 'date_start', 'date_end')
 
     def save_model(self, request, obj, form, change):
@@ -81,6 +81,11 @@ class PhotoThemeAdmin(admin.ModelAdmin):
                 message=result.get('message'),
                 level=messages.WARNING
             )
+
+    def season(self, obj):
+        return obj.photo_theme_name.season if obj.photo_theme_name else '-'
+
+    season.short_description = 'Сезон'
 
 
 @admin.register(PhotoThemeName)
