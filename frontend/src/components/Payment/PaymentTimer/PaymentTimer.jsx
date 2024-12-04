@@ -17,6 +17,7 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
         fetchPhotoPriceWithTokenInterceptor(accessStor, country)
             .then(res => res.json())
             .then(res => {
+                console.log(res)
                 if (!res.detail) {
                     dispatch(addPhotoPrice(res))
                 }
