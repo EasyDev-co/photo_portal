@@ -108,22 +108,25 @@ class PhotoPriceAdmin(admin.ModelAdmin):
 
     get_price_display.short_description = 'Цены для регионов'
 
-    def save_model(self, request, obj, form, change):
-        if obj.region and obj.region.name in ['Москва', 'Санкт-Петербург'] and obj.price == 0:
-            raise ValueError(f'Необходимо указать цену для региона {obj.region.name}.')
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.exclude(photo_type__in=(PhotoType.free_calendar, PhotoType.digital))
 
+
+    def save_model(self, request, obj, form, change):
         if not obj.region:
             regions = Region.objects.exclude(name__in=['Москва', 'Санкт-Петербург'])
+
             for region in regions:
-                if not PhotoPrice.objects.filter(region=region, photo_type=obj.photo_type).exists():
-                    PhotoPrice.objects.create(
-                        price=obj.price,
-                        region=region,
-                        photo_type=obj.photo_type
-                    )
+                PhotoPrice.objects.update_or_create(
+                    region=region,
+                    photo_type=obj.photo_type,
+                    defaults={'price': obj.price}
+                )
+
             self.message_user(
                 request,
-                'Цены успешно добавлены для всех регионов, кроме Москвы и Санкт-Петербурга.'
+                f'Цены успешно добавлены для {len(regions)} регионов, кроме Москвы и Санкт-Петербурга.'
             )
             return
         super().save_model(request, obj, form, change)

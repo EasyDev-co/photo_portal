@@ -47,19 +47,24 @@ class PhotoPrice(UUIDMixin):
         verbose_name = 'Цена фото'
         verbose_name_plural = 'Цены фото'
 
-    def save(self, *args, **kwargs):
-        if self._state.adding and PhotoPrice.objects.filter(region=self.region, photo_type=self.photo_type).exists():
+    def clean(self):
+
+        if self._state.adding and PhotoPrice.objects.filter(
+            region=self.region,
+            photo_type=self.photo_type
+        ).exists():
             raise ValidationError(
                 f"Запись с типом фото '{self.get_photo_type_display()}' и регионом '{self.region}' уже существует."
             )
-        super().save(*args, **kwargs)
+
+        if self.region and self.region.name in ['Москва', 'Санкт-Петербург'] and self.price == 0:
+            raise ValidationError(f'Необходимо указать цену для региона {self.region.name}.')
 
     def get_price_for_region(self, region_name):
         """Возвращает цену для указанного региона или общую цену, если регион не Москва/СПБ."""
-        if region_name == 'Москва':
-            return self.price
-        elif region_name == 'Санкт-Петербург':
-            return self.price
-        else:
-            common_price = PhotoPrice.objects.filter(region__isnull=True, photo_type=self.photo_type).first()
-            return common_price.price if common_price else self.price
+        match region_name:
+            case 'Москва' | 'Санкт-Петербург':
+                return self.price
+            case _:
+                common_price = PhotoPrice.objects.filter(region__isnull=True, photo_type=self.photo_type).first()
+                return common_price.price if common_price else self.price
