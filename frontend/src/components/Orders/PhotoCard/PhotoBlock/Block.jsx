@@ -7,7 +7,6 @@ import { removePhotos } from '../../../../store/authSlice';
 
 const Block = ({ setlineLenght, addPhoto, price, priceCalendar, orderValue, setOrderValue, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, setIsChecked, isChecked }) => {
 
-
   const [photoBlocks, setPhotoBlocks] = useState([]);
   const dispatch = useDispatch();
   const accessStor = localStorage.getItem('access');
