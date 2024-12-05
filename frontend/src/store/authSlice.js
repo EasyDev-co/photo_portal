@@ -148,12 +148,19 @@ const authSlice = createSlice({
         addCartList(state, action){
             state.cartList.push(action.payload);
         },
-        setCart(state, action){
-            state.cart = action.payload
-            state.total_price += action.payload.map(elem=>{
-                return parseFloat(elem.total_price)
-            })
-        },
+        // setCart(state, action){
+        //     state.cart = action.payload
+        //     state.total_price += action.payload.map(elem=>{
+        //         return parseFloat(elem.total_price)
+        //     })
+        // },
+        setCart(state, action) {
+            state.cart = action.payload;
+            state.total_price = action.payload.reduce((sum, elem) => {
+                return sum + parseFloat(elem.total_price);
+            }, 0);
+            console.log(state.cart);
+        },        
         setOrderId(state, action){
             state.order = action.payload
         }

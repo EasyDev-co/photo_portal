@@ -59,6 +59,19 @@ export const Orders = () => {
   const blurRef = useRef(null);
   const timeoutId = useRef(null);
   const [isActiveForm, setIsActiveForm] = useState(false);
+  const cart = useSelector(state => state.user.cart);
+
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem('cart'));
+    if (savedCart) {
+        dispatch(setCart(savedCart));
+    }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }, [cart]);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -146,24 +159,56 @@ export const Orders = () => {
     setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
   };
 
+  // useEffect(() => {
+  //   const transformedData = transformData(orderValue);
+  //   fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
+  //     .then(res => {
+  //       if (res.ok) {
+  //         res.json()
+  //           .then(res => {
+  //             setPrice({
+  //               total_price: res[0]?.total_price || ''
+  //             })
+  //             dispatch(setCart(res))
+  //           })
+  //       }
+  //     })
+  // }, [orderValue])
   useEffect(() => {
-    const transformedData = transformData(orderValue);
-    fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-      .then(res => {
-        if (res.ok) {
-          res.json()
-            .then(res => {
-              setPrice({
-                total_price: res[0]?.total_price || ''
-              })
-              dispatch(setCart(res))
+    const savedCart = JSON.parse(localStorage.getItem('cart'));
+    
+    if (savedCart && savedCart.length > 0) {
+        dispatch(setCart(savedCart)); // Используем localStorage если данные есть
+    } else {
+        // Запрос данных корзины с сервера
+        fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
+            .then((res) => res.json())
+            .then((data) => {
+                dispatch(setCart(data)); // Обновляем Redux корзину с сервера
             })
-        }
-      })
-  }, [orderValue])
+            .catch((err) => console.error("Ошибка загрузки корзины:", err));
+    }
+}, [dispatch, accessStor]);
+
+// Синхронизация корзины с сервером при изменении orderValue
+useEffect(() => {
+    if (orderValue.length > 0) {
+        const transformedData = transformData(orderValue);
+        fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
+            .then((res) => res.json())
+            .then((data) => {
+                dispatch(setCart(data));
+                localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
+            })
+            .catch((err) => console.error("Ошибка синхронизации корзины:", err));
+    }
+}, [orderValue, accessStor, dispatch]);
+
 
   const onSubmitHandler = async (e) => {
-    if (orderValue.length !== 0) {
+    console.log("Текущее состояние корзины перед отправкой заказа:", cart);
+
+    if (cart.length !== 0) {
       try {
         const order = await fetchOrderCreateWithTokenInterceptor(accessStor)
         if (order.ok) {
