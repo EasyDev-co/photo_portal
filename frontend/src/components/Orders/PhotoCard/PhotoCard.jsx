@@ -46,6 +46,7 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     <div onClick={() => increment()} className={styles.rotateRight}></div>
                 </div>
             </div>
+            <div className={styles.photoNumber}>Фото № {number}</div>
             <form id={number} className={styles.photoCountersCardsWrapper}>
                 <Counter
                     blocksId={blocksId}
@@ -103,7 +104,6 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
                     onChangeHandler={onChangeHandler}
                 />
             </form>
-            <div className={styles.photoNumber}>Фото № {number}</div>
         </div>
     );
 })
