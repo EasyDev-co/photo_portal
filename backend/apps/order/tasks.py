@@ -246,7 +246,7 @@ class CheckIfOrdersPaid(BaseTask):
                 order_paid_notify.delay(email=order.user.email, message=message)
 
         # Вызов задачи для загрузки файлов на Яндекс Диск
-        upload_files_to_yadisk.delay(successful_payment_order_ids)
+        # upload_files_to_yadisk.delay(successful_payment_order_ids)
 
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
