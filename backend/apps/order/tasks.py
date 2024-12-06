@@ -238,8 +238,9 @@ class CheckIfOrdersPaid(BaseTask):
         if len(orders) > 0:
             for order in orders:
                 price = self.get_price(order)
-                photos = self.format_photo_links(order)
-                message = self.get_message(order, price, photos)
+                photos = self.get_digital_photos(order)
+                photos_link = self.format_photo_links(photos)
+                message = self.get_message(order, price, photos_link)
                 logger.info(f"message: {message}")
 
                 order_paid_notify.delay(email=order.user.email, message=message)
