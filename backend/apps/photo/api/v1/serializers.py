@@ -117,12 +117,16 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
     photos = serializers.SerializerMethodField()
+    is_date_end = serializers.BooleanField()
+    is_digital = serializers.BooleanField()
+    is_digital_free = serializers.BooleanField()
 
     class Meta:
         model = PhotoLine
         fields = (
             'id', 'photos', 'region', 'photo_theme_name',
-            'photo_theme_date', 'orders'
+            'photo_theme_date', 'orders', 'is_date_end',
+            'is_digital', 'is_digital_free'
         )
 
     def get_photo_theme_name(self, obj):
@@ -139,6 +143,6 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
         return obj.kindergarten.region.name
 
     def get_photos(self, obj):
-        if obj.is_digital:
+        if obj.is_date_end:
             return PhotoRetrieveSerializer(obj.photos.all(), many=True).data
         return []
