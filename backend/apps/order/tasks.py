@@ -491,8 +491,10 @@ class OrderPaidNotificationTask(BaseTask):
     name = "order_paid_notification"
 
     def process(self, email, message, *args, **kwargs):
+        logger.info("send_email")
         try:
             with SyncClient.setup(UNISENER_TOKEN):
+                logger.info("email_sending")
                 request = SendRequest(
                     message={
                         "recipients": [
@@ -506,6 +508,7 @@ class OrderPaidNotificationTask(BaseTask):
                     },
                 )
                 request.send()
+                logger.info("email_sent")
         except Exception as e:
             logger.error(f"Error: {e}")
 
