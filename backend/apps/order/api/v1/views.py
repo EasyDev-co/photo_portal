@@ -47,35 +47,38 @@ from config.settings import (
 User = get_user_model()
 
 
+from django.utils.timezone import now
+from django.db.models import F
+
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         user = request.user
 
-        photo_lines = (
-            PhotoLine.objects.filter(
-                kindergarten__in=user.kindergarten.all(),
-                parent=user,
-                orders__status=OrderStatus.paid_for,
-            )
-            .annotate(
-                is_digital=F('orders__is_digital'),  # Существующая аннотация
-                is_digital_free=F('orders__is_digital_free'),  # Новая аннотация
-                is_date_end=ExpressionWrapper(
-                    F('photo_theme__date_end') < now(),  # Логическое выражение
-                    output_field=BooleanField()  # Указываем тип результата
-                )
-            )
-            .distinct('id')
-            .order_by('photo_theme__date_end')
-        )
+        # Получаем данные из базы
+        photo_lines_queryset = PhotoLine.objects.filter(
+            kindergarten__in=user.kindergarten.all(),
+            parent=user,
+            orders__status=OrderStatus.paid_for,
+        ).annotate(
+            is_digital=F('orders__is_digital'),
+            is_digital_free=F('orders__is_digital_free'),
+        ).distinct('id').order_by('photo_theme__date_end')
 
-        if not photo_lines.exists():
+        photo_lines = []
+        for photo_line in photo_lines_queryset:
+            photo_line.is_date_end = photo_line.photo_theme.date_end < now()
+            photo_lines.append(photo_line)
+
+        # Проверяем наличие фотолиний
+        if not photo_lines:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        # Сериализация данных
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
 
 
     def post(self, request):
