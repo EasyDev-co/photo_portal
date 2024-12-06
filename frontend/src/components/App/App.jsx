@@ -56,7 +56,8 @@ export const App = () => {
     <Routes>
 
       <Route element={<AuthRoutes />}>
-        <Route path="/sign-in" element={<Login />} />
+        {/* <Route path="/sign-in" element={<Login />} /> */}
+        <Route path="/sign-in" element={isAuth ? <Navigate to="/orders" /> : <Login />} />
         <Route path="/sign-up" element={<Registration />} />
         <Route path="/verification" element={<Verification />} />
         <Route path="/password-reset" element={<ResetPassword />} />
