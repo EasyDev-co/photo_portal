@@ -98,6 +98,21 @@ class PhotoLineSerializer(serializers.ModelSerializer):
 
 
 class PaidPhotoLineSerializer(serializers.ModelSerializer):
+    MONTHS_RU = {
+        "January": "Январь",
+        "February": "Февраль",
+        "March": "Март",
+        "April": "Апрель",
+        "May": "Май",
+        "June": "Июнь",
+        "July": "Июль",
+        "August": "Август",
+        "September": "Сентябрь",
+        "October": "Октябрь",
+        "November": "Ноябрь",
+        "December": "Декабрь",
+    }
+
     photo_theme_name = serializers.SerializerMethodField()
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
@@ -114,8 +129,11 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
         return obj.photo_theme.name
 
     def get_photo_theme_date(self, obj):
-        locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
-        return format(datetime.date(obj.photo_theme.date_start), '%B %Y')
+        date_start = obj.photo_theme.date_start
+        month_english = date_start.strftime('%B')
+        year = date_start.strftime('%Y')
+        month_russian = self.MONTHS_RU.get(month_english, month_english)
+        return f"{month_russian} {year}"
 
     def get_region(self, obj):
         return obj.kindergarten.region.name
