@@ -320,11 +320,15 @@ useEffect(() => {
             <div className={styles.buttonAddKidsWrap}>
               <div className={styles.promoButtonWrap}>
                 {/* <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button> */}
-                <button onClick={() => setIsActiveForm(true)} >
+                <button style={{display: 'flex', alignItems: 'center'}} onClick={() => setIsActiveForm(true)} >
                   <img 
                   style={{width: '50px'}}
                   src={plus} alt="plus"></img>
-                  <span style={{color: "#11bbd1", paddingLeft: '10px'}}>Добавить ребенка</span>
+                  <span 
+                  style={{color: "#11bbd1", paddingLeft: '10px', whiteSpace: 'nowrap'}}
+                  >
+                    Добавить ребенка
+                  </span>
                 </button>
                 <span>{lineLenght} из 3</span>
               </div>
@@ -342,11 +346,15 @@ useEffect(() => {
             <div>
               <div className={styles.promoButtonWrap}>
                 {/* <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button> */}
-                <button onClick={() => setIsActiveForm(true)} >
+                <button style={{display: 'flex', alignItems: 'center'}} onClick={() => setIsActiveForm(true)} >
                   <img 
                   style={{width: '50px'}}
                   src={plus} alt="plus"></img>
-                  <span style={{color: "#11bbd1", paddingLeft: '10px'}}>Добавить ребенка</span>
+                  <span 
+                  style={{color: "#11bbd1", paddingLeft: '10px', whiteSpace: 'nowrap'}}
+                  >
+                    Добавить ребенка
+                  </span>
                 </button>
                 <span>{lineLenght} из 3</span>
               </div>
