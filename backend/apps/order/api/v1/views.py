@@ -3,6 +3,7 @@ from decimal import Decimal
 import requests
 from django.contrib.auth import get_user_model
 from django.db.models import F
+from django.utils.timezone import now
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -25,8 +26,6 @@ from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus, PaymentMethod
 from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
-from apps.order.const import message_is_digital_free, message_is_calendar_free, message_digital_photo
-from apps.order.tasks import order_paid_notify
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
 
@@ -45,8 +44,6 @@ from config.settings import (
     PAYMENT_OBJECT,
 )
 
-from loguru import logger
-
 User = get_user_model()
 
 
@@ -56,11 +53,17 @@ class OrderAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        photo_lines = PhotoLine.objects.filter(
-            kindergarten__in=user.kindergarten.all(),
-            parent=user,
-            orders__status=OrderStatus.paid_for
-        ).annotate(is_digital=F('orders__is_digital')).order_by('photo_theme__date_end')
+        photo_lines = (
+            PhotoLine.objects.filter(
+                kindergarten__in=user.kindergarten.all(),
+                parent=user,
+                orders__status=OrderStatus.paid_for,
+                # photo_theme__date_end__lt=now(),
+            )
+            .distinct('id')
+            .annotate(is_digital=F('orders__is_digital'))
+            # .order_by('photo_theme__date_end')
+        )
 
         # Проверяем наличие фотолиний
         if not photo_lines.exists():
