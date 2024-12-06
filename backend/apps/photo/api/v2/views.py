@@ -132,6 +132,7 @@ class PhotoUploadView(APIView):
         args = [iter(iterable)] * n
         return zip_longest(*args, fillvalue=fillvalue)
 
+
 class PhotoUploadAPIView(APIView):
     """Загрузка фотографий"""
 
@@ -199,7 +200,7 @@ class PhotoUploadAPIView(APIView):
                 for i, photo_data in enumerate(filter(None, group)):
                     # Получаем ссылки на оригинальное фото и с водяным знаком
                     original_url = photo_data.get('original_photo')
-                    watermarked_url = photo_data.get('original_photo')
+                    watermarked_url = photo_data.get('watermarked_photo')
 
                     photo = Photo.objects.create(
                         photo_line=photo_line,

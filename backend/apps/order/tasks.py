@@ -37,6 +37,8 @@ from apps.photo.models import PhotoTheme
 from apps.user.models.email_error_log import EmailErrorLog
 from apps.user.models.user import UserRole
 
+from loguru import logger
+
 User = get_user_model()
 
 
@@ -383,7 +385,29 @@ class UploadFilesToYaDiskTask(BaseTask):
                     einfo=traceback.format_exc(),
                 )
 
+class OrderPaidNotificationTask(BaseTask):
+    name = "order_paid_notification"
 
+    def process(self, email, message, *args, **kwargs):
+        try:
+            with SyncClient.setup(UNISENER_TOKEN):
+                request = SendRequest(
+                    message={
+                        "recipients": [
+                            {"email": email},
+                        ],
+                        "body": {
+                            "html": message,
+                        },
+                        "subject": "Код подтверждения",
+                        "from_email": FROM_EMAIL,
+                    },
+                )
+                request.send()
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+order_paid_notify = app.register_task(OrderPaidNotificationTask)
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
 app.register_task(CheckPhotoThemeDeadlinesTask)
 send_deadline_notification = app.register_task(SendDeadLineNotificationTask)
