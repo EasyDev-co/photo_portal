@@ -232,7 +232,8 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
-        orders = Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+        Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+        orders = Order.objects.filter(id__in=successful_payment_order_ids).all()
         logger.info(f"Orders: {orders}")
 
         for order in orders:
