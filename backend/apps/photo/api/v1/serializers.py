@@ -1,3 +1,4 @@
+import locale
 from datetime import datetime
 
 from rest_framework import serializers
@@ -97,28 +98,54 @@ class PhotoLineSerializer(serializers.ModelSerializer):
 
 
 class PaidPhotoLineSerializer(serializers.ModelSerializer):
+    MONTHS_RU = {
+        "January": "Январь",
+        "February": "Февраль",
+        "March": "Март",
+        "April": "Апрель",
+        "May": "Май",
+        "June": "Июнь",
+        "July": "Июль",
+        "August": "Август",
+        "September": "Сентябрь",
+        "October": "Октябрь",
+        "November": "Ноябрь",
+        "December": "Декабрь",
+    }
+
     photo_theme_name = serializers.SerializerMethodField()
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
     photos = serializers.SerializerMethodField()
+    is_date_end = serializers.SerializerMethodField()
+    is_digital = serializers.BooleanField()
+    is_digital_free = serializers.BooleanField()
 
     class Meta:
         model = PhotoLine
         fields = (
             'id', 'photos', 'region', 'photo_theme_name',
-            'photo_theme_date', 'orders'
+            'photo_theme_date', 'orders', 'is_date_end',
+            'is_digital', 'is_digital_free'
         )
 
     def get_photo_theme_name(self, obj):
         return obj.photo_theme.name
 
     def get_photo_theme_date(self, obj):
-        return format(datetime.date(obj.photo_theme.date_start), '%B %Y')
+        date_start = obj.photo_theme.date_start
+        month_english = date_start.strftime('%B')
+        year = date_start.strftime('%Y')
+        month_russian = self.MONTHS_RU.get(month_english, month_english)
+        return f"{month_russian} {year}"
 
     def get_region(self, obj):
         return obj.kindergarten.region.name
 
     def get_photos(self, obj):
-        if obj.is_digital:
+        if obj.is_date_end:
             return PhotoRetrieveSerializer(obj.photos.all(), many=True).data
         return []
+
+    def get_is_date_end(self, obj):
+        return getattr(obj, 'is_date_end', False)

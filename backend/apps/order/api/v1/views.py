@@ -2,7 +2,8 @@ from decimal import Decimal
 
 import requests
 from django.contrib.auth import get_user_model
-from django.db.models import F
+from django.db.models import F, BooleanField, ExpressionWrapper
+from django.utils.timezone import now
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -25,8 +26,6 @@ from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus, PaymentMethod
 from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
-from apps.order.const import message_is_digital_free, message_is_calendar_free, message_digital_photo
-from apps.order.tasks import order_paid_notify
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine
 
@@ -48,24 +47,43 @@ from config.settings import (
 User = get_user_model()
 
 
+from django.utils.timezone import now
+from django.db.models import F
+
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         user = request.user
 
-        photo_lines = PhotoLine.objects.filter(
-            kindergarten__in=user.kindergarten.all(),
-            parent=user,
-            orders__status=OrderStatus.paid_for
-        ).annotate(is_digital=F('orders__is_digital')).order_by('photo_theme__date_end')
+        # Получаем данные из базы
+        photo_lines_queryset = (
+            PhotoLine.objects.filter(
+                kindergarten__in=user.kindergarten.all(),
+                parent=user,
+                orders__status=OrderStatus.paid_for,
+            )
+            .annotate(
+                is_digital=F('orders__is_digital'),
+                is_digital_free=F('orders__is_free_digital'),
+            )
+            .order_by('id', 'photo_theme__date_end')  # Удаляем DISTINCT ON
+        )
+
+        photo_lines = []
+        for photo_line in photo_lines_queryset.distinct('id'):
+            photo_line.is_date_end = photo_line.photo_theme.date_end < now()
+            photo_lines.append(photo_line)
 
         # Проверяем наличие фотолиний
-        if not photo_lines.exists():
+        if not photo_lines:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        # Сериализация данных
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
 
     def post(self, request):
         user = request.user
@@ -247,12 +265,7 @@ class GetPaymentStateAPIView(APIView):
             json=values
         )
         if response.json()['Success'] and response.json()['Status'] == 'CONFIRMED':
-            order = Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
-            price = self.get_price(order)
-            photos = self.format_photo_links(order)
-            message = self.get_message(order, price, photos)
-
-            order_paid_notify.delay(email=order.user.email, message=message)
+            Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
             return Response(
                 response.json()['Message'],
                 status=status.HTTP_200_OK
@@ -264,90 +277,6 @@ class GetPaymentStateAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    @staticmethod
-    def get_digital_photos(order):
-        order_item_with_photo = order.order_items.filter(photo__isnull=False).first()
-        photo_line = order_item_with_photo.photo.photo_line
-        if not photo_line:
-            return []
-
-        all_digital_photos = photo_line.photos.all()
-        if not all_digital_photos:
-            return []
-
-        return [photo.photo_path for photo in all_digital_photos]
-
-    @staticmethod
-    def format_photo_links(photos):
-        links_html = ""
-        for photo_url in photos:
-            links_html += f"""
-            <div style="text-align: center; width: 150px;">
-                <img src="{photo_url}" alt="Фото" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 8px;">
-                <div style="margin-top: 10px;">
-                    <a href="{photo_url}" download style="text-decoration: none; color: #007BFF; font-size: 14px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                            <path d="M.5 9.9V10.5H15.5V9.9L8 3.4L.5 9.9ZM8.5 11V0H7.5V11H4.5L8 14.5L11.5 11H8.5ZM0 16V15H16V16H0Z"/>
-                        </svg>
-                        Скачать
-                    </a>
-                </div>
-            </div>
-            """
-        return links_html
-
-    @staticmethod
-    def get_price(order):
-        """
-        Возвращает сумму выкупа для заказа в зависимости от его типа.
-        """
-        order_item_with_photo = order.order_items.filter(photo__isnull=False).first()
-        if not order_item_with_photo:
-            return 0
-
-        photo = order_item_with_photo.photo
-        if not photo:
-            return 0
-
-        photo_line = photo.photo_line
-        if not photo_line:
-            return 0
-
-        kindergarten = photo_line.kindergarten
-        if not kindergarten:
-            return 0
-
-        region = kindergarten.region
-        if not region:
-            return 0
-
-        if order.is_free_calendar:
-            return region.ransom_amount_for_calendar or 0
-        elif order.is_free_digital:
-            return region.ransom_amount_for_digital_photos or 0
-        return 0
-
-    @staticmethod
-    def get_message(order, price, photo_links):
-        if order.is_free_calendar:
-            return message_is_calendar_free.format(
-                first_name=order.user.first_name,
-                last_name=order.user.last_name,
-                price=price,
-                photo_links=photo_links
-            )
-        elif order.is_free_digital:
-            return message_is_digital_free.format(
-                first_name=order.user.first_name,
-                last_name=order.user.last_name,
-                price=price,
-                photo_links=photo_links
-            )
-        elif order.is_digital:
-            return message_digital_photo.format(
-                first_name=order.user.first_name,
-                last_name=order.user.last_name,
-            )
 
 class OrdersPaymentAPIView(APIView):
     """
