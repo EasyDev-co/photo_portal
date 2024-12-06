@@ -58,19 +58,22 @@ class OrderAPIView(APIView):
                 kindergarten__in=user.kindergarten.all(),
                 parent=user,
                 orders__status=OrderStatus.paid_for,
-                # photo_theme__date_end__lt=now(),
+            )
+            .annotate(
+                is_digital=F('orders__is_digital'),
+                is_digital_free=F('orders__is_free_digital'),
+                is_date_end=F('photo_theme__date_end') < now()
             )
             .distinct('id')
-            .annotate(is_digital=F('orders__is_digital'))
-            # .order_by('photo_theme__date_end')
+            .order_by('photo_theme__date_end')
         )
 
-        # Проверяем наличие фотолиний
         if not photo_lines.exists():
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
 
     def post(self, request):
         user = request.user
