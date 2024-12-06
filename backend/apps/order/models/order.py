@@ -39,6 +39,7 @@ class Order(TimeStampedMixin):
         default=False,
         verbose_name="Электронные фотографии",
     )
+    is_free_digital = models.BooleanField(default=False, verbose_name="Эл. фото в подарок")
     is_free_calendar = models.BooleanField(
         default=False,
         verbose_name="Бесплатный календарь",
