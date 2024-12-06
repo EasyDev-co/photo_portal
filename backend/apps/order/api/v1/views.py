@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import requests
 from django.contrib.auth import get_user_model
-from django.db.models import F
+from django.db.models import F, BooleanField, ExpressionWrapper
 from django.utils.timezone import now
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -60,9 +60,12 @@ class OrderAPIView(APIView):
                 orders__status=OrderStatus.paid_for,
             )
             .annotate(
-                is_digital=F('orders__is_digital'),
-                is_digital_free=F('orders__is_free_digital'),
-                is_date_end=F('photo_theme__date_end') < now()
+                is_digital=F('orders__is_digital'),  # Существующая аннотация
+                is_digital_free=F('orders__is_digital_free'),  # Новая аннотация
+                is_date_end=ExpressionWrapper(
+                    F('photo_theme__date_end') < now(),  # Логическое выражение
+                    output_field=BooleanField()  # Указываем тип результата
+                )
             )
             .distinct('id')
             .order_by('photo_theme__date_end')
