@@ -26,8 +26,13 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
                 console.log(res)
             })
     }, [])
+    const rootClassName = location.pathname === '/orders' 
+        ? styles.paymentTimerWrap_orders 
+        : styles.paymentTimerWrap;
     return (
-        <div className={styles.paymentTimerWrap}>
+        <div 
+            className={rootClassName}
+        >
             <Timer
                 date={'Sat Jun 30 2024 10:31:52 GMT+0300 (Moscow Standard Time)'}
                 desc={':'}

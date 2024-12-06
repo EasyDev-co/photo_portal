@@ -20,6 +20,7 @@ import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCrea
 import Modal from "../Modal/Modlal";
 import { setCookie } from "../../utils/setCookie";
 import { getNearestDate } from "./utils/utils";
+import plus from '../../assets/icons/plus.svg'
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -318,7 +319,13 @@ useEffect(() => {
           {lineLenght >= 3 ?
             <div className={styles.buttonAddKidsWrap}>
               <div className={styles.promoButtonWrap}>
-                <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button>
+                {/* <button onClick={() => setIsActiveForm(false)} className={styles.mainButton}>Добавить ребенка</button> */}
+                <button onClick={() => setIsActiveForm(true)} >
+                  <img 
+                  style={{width: '50px'}}
+                  src={plus} alt="plus"></img>
+                  <span style={{color: "#11bbd1", paddingLeft: '10px'}}>Добавить ребенка</span>
+                </button>
                 <span>{lineLenght} из 3</span>
               </div>
               <div className={styles.errMessage}>
@@ -334,7 +341,13 @@ useEffect(() => {
             </div> :
             <div>
               <div className={styles.promoButtonWrap}>
-                <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button>
+                {/* <button onClick={() => setIsActiveForm(true)} className={styles.mainButton}>Добавить ребенка</button> */}
+                <button onClick={() => setIsActiveForm(true)} >
+                  <img 
+                  style={{width: '50px'}}
+                  src={plus} alt="plus"></img>
+                  <span style={{color: "#11bbd1", paddingLeft: '10px'}}>Добавить ребенка</span>
+                </button>
                 <span>{lineLenght} из 3</span>
               </div>
             </div>
@@ -342,13 +355,15 @@ useEffect(() => {
         </div>
         <div className={styles.paymentTimerWrap} style={{
           padding: '69px 0 160px 0',
-          maxWidth: '380px'
+          maxWidth: '380px',
         }}>
           <PaymentTimer
             payOrder={payOrder}
             formId={'orderForm'}
             onSubmitHandler={onSubmitHandler}
             count={'3 500'}
+            stylesPosition={`position: 'fixed'`}
+            styleTop={`top: '40px'`}
           />
         </div>
       </div>

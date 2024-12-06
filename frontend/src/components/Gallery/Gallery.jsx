@@ -28,19 +28,23 @@ export const Gallery = () => {
 
   return (
     <>
-      <div className={styles.ordersWrap}>
+      {/* <div className={styles.ordersWrap}>
         {paidOrders.length !== 0 ? (
           paidOrders[0]?.photos.length > 0 ? (
             <GalleryItem orders={paidOrders} />
           ) : (
-            <div className={styles.ordersInfo}>В данном заказе вы не заказывали фотографии в электронном виде, поэтому они не сохранились.</div>
+            <div className={styles.ordersInfo}>
+              В данном заказе вы не заказывали фотографии в электронном виде, поэтому они не сохранились.
+              <br/> 
+              Фотосессия: {paidOrders[0].photo_theme_name}, {paidOrders[0 ].photo_theme_date}
+              </div>
           )
         ) : (
           <div className={styles.ordersInfo}>Нет оплаченных заказов.</div>
         )}
-      </div>
+      </div> */}
 
-      {/* <div className={styles.ordersWrap}>
+      <div className={styles.ordersWrap}>
       {(paidOrders.length !== 0 && paidOrders[0].id) ?
         <GalleryItem
           orders={paidOrders}
@@ -48,7 +52,7 @@ export const Gallery = () => {
         <div className={styles.ordersInfo}>
           Нет оплаченных заказов.
         </div>}
-    </div> */}
+    </div>
     </>
   )
 }
