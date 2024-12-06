@@ -100,6 +100,8 @@ class UserAdmin(BaseUserAdmin):
         'first_name',
         'second_name',
         'last_name',
+        'kindergarten__name',
+        'managed_kindergarten__name'
     )
     list_filter = ('role', 'is_verified')
     ordering = ('email', 'last_name', 'first_name')
