@@ -117,7 +117,7 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
     photos = serializers.SerializerMethodField()
-    is_date_end = serializers.BooleanField()
+    is_date_end = serializers.SerializerMethodField()
     is_digital = serializers.BooleanField()
     is_digital_free = serializers.BooleanField()
 
@@ -146,3 +146,6 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
         if obj.is_date_end:
             return PhotoRetrieveSerializer(obj.photos.all(), many=True).data
         return []
+
+    def get_is_date_end(self, obj):
+        return getattr(obj, 'is_date_end', False)
