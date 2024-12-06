@@ -57,17 +57,21 @@ class OrderAPIView(APIView):
         user = request.user
 
         # Получаем данные из базы
-        photo_lines_queryset = PhotoLine.objects.filter(
-            kindergarten__in=user.kindergarten.all(),
-            parent=user,
-            orders__status=OrderStatus.paid_for,
-        ).annotate(
-            is_digital=F('orders__is_digital'),
-            is_digital_free=F('orders__is_free_digital'),
-        ).distinct('id').order_by('photo_theme__date_end')
+        photo_lines_queryset = (
+            PhotoLine.objects.filter(
+                kindergarten__in=user.kindergarten.all(),
+                parent=user,
+                orders__status=OrderStatus.paid_for,
+            )
+            .annotate(
+                is_digital=F('orders__is_digital'),
+                is_digital_free=F('orders__is_free_digital'),
+            )
+            .order_by('id', 'photo_theme__date_end')  # Удаляем DISTINCT ON
+        )
 
         photo_lines = []
-        for photo_line in photo_lines_queryset:
+        for photo_line in photo_lines_queryset.distinct('id'):
             photo_line.is_date_end = photo_line.photo_theme.date_end < now()
             photo_lines.append(photo_line)
 
