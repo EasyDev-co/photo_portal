@@ -146,6 +146,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
             if not validated_data['is_digital'] and total_price >= ransom_amount_for_digital_photos:
                 instance.is_digital = True
+                instance.is_free_digital = True
                 instance.save()
 
             elif validated_data['is_digital'] and total_price < ransom_amount_for_digital_photos:

@@ -1,3 +1,5 @@
+import requests
+
 from rest_framework.authentication import SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
@@ -129,6 +131,137 @@ class PhotoUploadView(APIView):
         """Группировка по n элементов с заполнением отсутствующих значений."""
         args = [iter(iterable)] * n
         return zip_longest(*args, fillvalue=fillvalue)
+
+
+class PhotoUploadAPIView(APIView):
+    """Загрузка фотографий"""
+
+    upload_url: str = " https://60ae-45-76-88-92.ngrok-free.app/v1/files/upload/"
+
+    swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'numbers': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Список номеров кадров."
+                )
+            },
+            required=['numbers']
+        ),
+        responses={200: PhotoLineSerializer()},
+    )
+
+    def post(self, request, *args, **kwargs):
+        serializer = PhotoUploadSerializer(data=request.data)
+        logger.info("post")
+
+        if serializer.is_valid():
+            logger.info("valid_ser")
+            kindergarten = serializer.validated_data['kindergarten']
+            photos = serializer.validated_data['photos']
+            photo_theme = kindergarten.kindergartenphototheme.get(is_active=True).photo_theme
+            region = kindergarten.region
+
+            uploaded_photos = self.get_photos(
+                kindergarten=kindergarten,
+                photos=photos,
+                photo_theme=photo_theme,
+                region=region,
+            )
+            self.save_photos(kindergarten, uploaded_photos, photo_theme)
+
+            return Response({'detail': 'Файлы успешно загружены!'}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def save_photos(self, kindergarten, photos, photo_theme):
+        with transaction.atomic():
+            # Получаем последний номер фото для текущего photo_line
+            last_photo_number = Photo.objects.filter(
+                photo_line__kindergarten=kindergarten,
+                photo_line__photo_theme=photo_theme
+            ).aggregate(Max('number'))['number__max'] or 6
+            next_photo_number = last_photo_number + 1
+
+            logger.info(f"LAST_PHOTO_NUMBER: {last_photo_number}")
+            logger.info(f"NEXT_PHOTO_NUMBER: {next_photo_number}")
+
+            groups = self._grouper(photos, 6)
+
+            for group in groups:
+                photo_line = PhotoLine.objects.create(
+                    kindergarten=kindergarten,
+                    photo_theme=photo_theme,
+                )
+
+                photo_numbers = []
+
+                for i, photo_data in enumerate(filter(None, group)):
+                    # Получаем ссылки на оригинальное фото и с водяным знаком
+                    original_url = photo_data.get('original_photo')
+                    watermarked_url = photo_data.get('watermarked_photo')
+
+                    photo = Photo.objects.create(
+                        photo_line=photo_line,
+                        number=next_photo_number,
+                        photo_path=original_url,
+                        watermarked_photo_path=watermarked_url,
+                        serial_number=i + 1,
+                    )
+                    photo_numbers.append(photo.number)
+                    next_photo_number += 1
+
+                self.generate_qr_code_for_photo_line(photo_line, photo_numbers)
+
+    def get_photos(self, kindergarten, photo_theme, region, photos):
+        logger.info(f"get_photos: {photos}")
+        files_payload = [
+            ('files', (photo.name, photo.file)) for photo in photos
+        ]
+        try:
+            response = requests.post(
+                self.upload_url,
+                files=files_payload,
+                params={"kindergarten": kindergarten.name, "photo_theme": photo_theme.name, "region": region.name}
+            )
+            logger.info(f"status_code: {response.status_code}")
+            if response.status_code == 200:
+                logger.info(f"response: {response.json()}")
+                return response.json()
+
+        except Exception as e:
+            logger.error(e)
+            raise e
+
+    @staticmethod
+    def _grouper(iterable, n, fillvalue=None):
+        """Группировка по n элементов с заполнением отсутствующих значений."""
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
+
+    @staticmethod
+    def generate_qr_code_for_photo_line(photo_line, photo_numbers):
+        """
+        Метод для генерации QR-кода для объекта PhotoLine.
+        """
+        kindergarten_code = photo_line.kindergarten.code
+
+        logger.info(f"photo_num: {photo_numbers}")
+
+        if not photo_numbers:
+            logger.warning("Список номеров фотографий пуст, пропускаем генерацию QR-кода.")
+            return
+
+        qr_code, buffer = generate_qr_code(
+            photo_line_id=photo_line.id,
+            url=PHOTO_LINE_URL,
+            kindergarten_code=kindergarten_code,
+            photo_numbers=photo_numbers,
+        )
+        buffer.seek(0)
+        qr_code_filename = f'{str(photo_line.photo_theme.id)}/{str(photo_line.photo_theme.name)}_qr.png'
+        photo_line.qr_code.save(qr_code_filename, ContentFile(buffer.read()), save=True)
 
 
 class PhotoLineGetByPhotoNumberAPIView(APIView):

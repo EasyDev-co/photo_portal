@@ -27,48 +27,33 @@ class KindergartenInLine(admin.TabularInline):
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        (
-            _("Personal info"),
-            {
-                "fields": (
-                    'role',
-                    "first_name",
-                    'second_name',
-                    "last_name",
-                    'birth_date',
-                    'phone_number',
-                    'un_hashed_password',
-                    'is_verified',
-                    'managed_kindergarten'
-                )
-            }
-        ),
-        (
-            _("Permissions"),
-            {
-                "fields": (
-                    "groups",
-                    "user_permissions",
-                    "is_superuser",
-                    "is_staff"
-                ),
-            },
-        ),
-        (
-            _("Important dates"),
-            {
-                "fields": (
-                    "last_login",
-                    "date_joined"
-                )
-            }
-        ),
+        (_("Personal info"),
+         {"fields": (
+             'role',
+             "first_name",
+             'second_name',
+             "last_name",
+             'birth_date',
+             'phone_number',
+             'is_verified',
+             'managed_kindergarten',
+             'un_hashed_password'
+         )}),
+        (_("Permissions"),
+         {"fields": (
+             "groups",
+             "user_permissions",
+             "is_superuser",
+             "is_staff"
+         )}),
+        (_("Important dates"),
+         {"fields": (
+             "last_login",
+             "date_joined"
+         )}),
     )
     add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
+        (None, {"classes": ("wide",),
                 "fields": (
                     "email",
                     "password1",
@@ -78,14 +63,10 @@ class UserAdmin(BaseUserAdmin):
                     "last_name",
                     'phone_number',
                     'role',
-                    'is_verified',
-                    'managed_kindergarten'
-                ),
-            },
-        ),
+                    'is_verified'
+                )}),
     )
     list_display = (
-        'id',
         'email',
         'first_name',
         'second_name',
@@ -93,19 +74,70 @@ class UserAdmin(BaseUserAdmin):
         'phone_number',
         'role',
         'is_verified',
-        'managed_kindergarten'
+        'id'
     )
     search_fields = (
         'email',
         'first_name',
         'second_name',
         'last_name',
+        'kindergarten__name',
+        'managed_kindergarten__name'
     )
     list_filter = ('role', 'is_verified')
     ordering = ('email', 'last_name', 'first_name')
     readonly_fields = ('last_login', 'date_joined')
 
     inlines = [KindergartenInLine]
+
+    def get_fieldsets(self, request, obj=None):
+        if obj:
+            match obj.role:
+                case UserRole.manager:
+                    return (
+                        (None, {"fields": ("email", "password")}),
+                        (_("Personal info"),
+                         {"fields": (
+                             'role',
+                             "first_name",
+                             'second_name',
+                             "last_name",
+                             'birth_date',
+                             'phone_number',
+                             'is_verified',
+                             'managed_kindergarten',
+                             'un_hashed_password'
+                         )}),
+                        (_("Important dates"),
+                         {"fields": (
+                             "last_login",
+                             "date_joined"
+                         )}),
+                    )
+                case UserRole.parent | UserRole.staff:
+                    return (
+                        (None, {"fields": ("email", "password")}),
+                        (_("Personal info"),
+                         {"fields": (
+                             'role',
+                             "first_name",
+                             'second_name',
+                             "last_name",
+                             'phone_number',
+                             'is_verified'
+                         )}),
+                        (_("Important dates"),
+                         {"fields": (
+                             "last_login",
+                             "date_joined"
+                         )}),
+                    )
+        return super().get_fieldsets(request, obj)
+
+    def get_inlines(self, request, obj=None):
+        if obj and obj.role == UserRole.parent:
+            return [KindergartenInLine]
+        return []
 
 
 @admin.register(StaffUser)
