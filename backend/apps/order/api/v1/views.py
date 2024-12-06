@@ -63,7 +63,7 @@ class OrderAPIView(APIView):
             orders__status=OrderStatus.paid_for,
         ).annotate(
             is_digital=F('orders__is_digital'),
-            is_digital_free=F('orders__is_digital_free'),
+            is_digital_free=F('orders__is_free_digital'),
         ).distinct('id').order_by('photo_theme__date_end')
 
         photo_lines = []
