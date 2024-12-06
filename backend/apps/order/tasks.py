@@ -232,16 +232,17 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
-        orders = Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+        Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+        orders = Order.objects.filter(id__in=successful_payment_order_ids).all()
         logger.info(f"Orders: {orders}")
+        if len(orders) > 0:
+            for order in orders:
+                price = self.get_price(order)
+                photos = self.format_photo_links(order)
+                message = self.get_message(order, price, photos)
+                logger.info(f"message: {message}")
 
-        for order in orders:
-            price = self.get_price(order)
-            photos = self.format_photo_links(order)
-            message = self.get_message(order, price, photos)
-            logger.info(f"message: {message}")
-
-            order_paid_notify.delay(email=order.user.email, message=message)
+                order_paid_notify.delay(email=order.user.email, message=message)
 
         # Вызов задачи для загрузки файлов на Яндекс Диск
         upload_files_to_yadisk.delay(successful_payment_order_ids)
