@@ -334,27 +334,27 @@
     font-size: 15px;
 }
 .promoInputActive::-webkit-input-placeholder {
-    color:#11bbd1;
+    color: grey;
     font-size: 15px;
 }
 
 .promoInputActive::-moz-placeholder {
-    color:#11bbd1;
+    color: rgb(126, 126, 126);
     font-size: 15px;
 }
 
 .promoInputActive:-ms-input-placeholder {
-    color: #11bbd1;
+    color: rgb(126, 126, 126);
     font-size: 15px;
 }
 
 .promoInputActive::-ms-input-placeholder {
-    color: #11bbd1;
+    color: rgb(126, 126, 126);
     font-size: 15px;
 }
 
 .promoInputActive::placeholder {
-    color: #11bbd1;
+    color: rgb(126, 126, 126);
     font-size: 15px;
 }
 
@@ -419,6 +419,9 @@
     /* padding: 0px 40px 0px 40px; */
     gap: 80px;
     border-left: 1px solid rgb(229, 229, 229);
+    min-width: 380px; 
+    position: relative;
+    /* height: 100vh; */
 }
 
 @media screen and (max-width: 968px) {

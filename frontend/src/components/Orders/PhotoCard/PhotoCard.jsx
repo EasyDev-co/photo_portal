@@ -39,12 +39,18 @@ const PhotoCard = memo(({blocksId, isChecked, photoLineId, onChangeHandler, inpu
     return (
         <div className={styles.photoCardWrap}>
             <div ref={scaleRef} onClick={()=>{isScale && setIsBlur(true)}} className={isScale ? styles.imgWrapScale : styles.imgWrap}>
-                <img  style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} src={photo} alt="" />
-                <div onClick={() =>onScaleHandler()} className={styles.loupe}></div>
-                <div className={isScale ? styles.rotateWrap : styles.dNone}>
-                    <div onClick={() => decrement()} className={styles.rotateLeft}></div>
-                    <div onClick={() => increment()} className={styles.rotateRight}></div>
-                </div>
+                <div onClick={() =>onScaleHandler()}>
+                    <img  
+                        style={isScale ? { transform: `rotateZ(${count}deg)` } : { transform: `rotateZ(${0}deg)` }} className={styles.cardImg} 
+                        src={photo} 
+                        alt="" 
+                    />
+                    <div className={styles.loupe}></div>
+                    <div className={isScale ? styles.rotateWrap : styles.dNone}>
+                        <div onClick={() => decrement()} className={styles.rotateLeft}></div>
+                        <div onClick={() => increment()} className={styles.rotateRight}></div>
+                    </div>
+                    </div>
             </div>
             <div className={styles.photoNumber}>Фото № {number}</div>
             <form id={number} className={styles.photoCountersCardsWrapper}>
