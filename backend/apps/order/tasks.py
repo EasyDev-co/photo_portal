@@ -232,19 +232,19 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
+        # TODO изменить текст, отправлять только дедлайн
         Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
         orders = Order.objects.filter(id__in=successful_payment_order_ids).all()
-        logger.info(f"Orders: {orders}")
         if len(orders) > 0:
             for order in orders:
                 price = self.get_price(order)
                 photos = self.get_digital_photos(order)
                 photos_link = self.format_photo_links(photos)
                 message = self.get_message(order, price, photos_link)
-                logger.info(f"message: {message}")
 
                 order_paid_notify.delay(email=order.user.email, message=message)
 
+        # TODO Доработать
         # Вызов задачи для загрузки файлов на Яндекс Диск
         # upload_files_to_yadisk.delay(successful_payment_order_ids)
 
@@ -308,15 +308,10 @@ class CheckIfOrdersPaid(BaseTask):
         region = kindergarten.region
         if not region:
             return price
-        logger.info(f"def_price: {price}")
         if order.is_free_calendar:
-            price = region.ransom_amount_for_calendar or 0
-            logger.info(f"free_calendar_price: {price}")
-            return price
+            return region.ransom_amount_for_calendar or 0
         elif order.is_free_digital:
-            price = region.ransom_amount_for_digital_photos or 0
-            logger.info(f"digital_price: {price}")
-            return price
+            return region.ransom_amount_for_digital_photos or 0
         return price
 
     @staticmethod
@@ -503,7 +498,7 @@ class OrderPaidNotificationTask(BaseTask):
                         "body": {
                             "html": message,
                         },
-                        "subject": "Код подтверждения",
+                        "subject": "Спасибо за вашу покупку",
                         "from_email": FROM_EMAIL,
                     },
                 )
