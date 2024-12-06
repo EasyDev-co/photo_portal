@@ -1,3 +1,4 @@
+import locale
 from datetime import datetime
 
 from rest_framework import serializers
@@ -113,6 +114,7 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
         return obj.photo_theme.name
 
     def get_photo_theme_date(self, obj):
+        locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
         return format(datetime.date(obj.photo_theme.date_start), '%B %Y')
 
     def get_region(self, obj):
