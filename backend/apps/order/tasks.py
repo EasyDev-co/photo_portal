@@ -14,6 +14,7 @@ from django.utils import timezone
 from unisender_go_api import SyncClient, SendRequest
 
 from apps.kindergarten.models import PhotoType
+from apps.order.const import message_is_calendar_free, message_is_digital_free, message_digital_photo
 from apps.order.models import Order, NotificationFiscalization, OrdersPayment, OrderItem
 from apps.order.models.const import OrderStatus, PaymentStatus, PaymentMethod
 from apps.order.models.receipt import Receipt
@@ -231,13 +232,112 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
-        Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+        orders = Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
+        logger.info(f"Orders: {orders}")
+
+        for order in orders:
+            price = self.get_price(order)
+            photos = self.format_photo_links(order)
+            message = self.get_message(order, price, photos)
+            logger.info(f"message: {message}")
+
+            order_paid_notify.delay(email=order.user.email, message=message)
 
         # Вызов задачи для загрузки файлов на Яндекс Диск
         upload_files_to_yadisk.delay(successful_payment_order_ids)
 
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
+    @staticmethod
+    def get_digital_photos(order):
+        order_item_with_photo = order.order_items.filter(photo__isnull=False).first()
+        photo_line = order_item_with_photo.photo.photo_line
+        if not photo_line:
+            return []
+
+        all_digital_photos = photo_line.photos.all()
+        if not all_digital_photos:
+            return []
+
+        return [photo.photo_path for photo in all_digital_photos]
+
+    @staticmethod
+    def format_photo_links(photos):
+        links_html = ""
+        for photo_url in photos:
+            logger.info(f"photo_url: {photo_url}")
+            links_html += f"""
+                <div style="text-align: center; width: 150px;">
+                    <img src="{photo_url}" alt="Фото" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 8px;">
+                    <div style="margin-top: 10px;">
+                        <a href="{photo_url}" download style="text-decoration: none; color: #007BFF; font-size: 14px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                <path d="M.5 9.9V10.5H15.5V9.9L8 3.4L.5 9.9ZM8.5 11V0H7.5V11H4.5L8 14.5L11.5 11H8.5ZM0 16V15H16V16H0Z"/>
+                            </svg>
+                            Скачать
+                        </a>
+                    </div>
+                </div>
+                """
+        return links_html
+
+    @staticmethod
+    def get_price(order):
+        """
+        Возвращает сумму выкупа для заказа в зависимости от его типа.
+        """
+        price = 0
+        order_item_with_photo = order.order_items.filter(photo__isnull=False).first()
+        if not order_item_with_photo:
+            return price
+
+        photo = order_item_with_photo.photo
+        if not photo:
+            return price
+
+        photo_line = photo.photo_line
+        if not photo_line:
+            return price
+
+        kindergarten = photo_line.kindergarten
+        if not kindergarten:
+            return price
+
+        region = kindergarten.region
+        if not region:
+            return price
+        logger.info(f"def_price: {price}")
+        if order.is_free_calendar:
+            price = region.ransom_amount_for_calendar or 0
+            logger.info(f"free_calendar_price: {price}")
+            return price
+        elif order.is_free_digital:
+            price = region.ransom_amount_for_digital_photos or 0
+            logger.info(f"digital_price: {price}")
+            return price
+        return price
+
+    @staticmethod
+    def get_message(order, price, photo_links):
+        if order.is_free_calendar:
+            return message_is_calendar_free.format(
+                first_name=order.user.first_name,
+                last_name=order.user.last_name,
+                price=price,
+                photo_links=photo_links
+            )
+        elif order.is_free_digital:
+            return message_is_digital_free.format(
+                first_name=order.user.first_name,
+                last_name=order.user.last_name,
+                price=price,
+                photo_links=photo_links
+            )
+        elif order.is_digital:
+            return message_digital_photo.format(
+                first_name=order.user.first_name,
+                last_name=order.user.last_name,
+            )
 
 class DeleteExpiredOrders(BaseTask):
     """Крон для удаления заказов, которые находятся в статусе Создан >12 часов."""

@@ -45,6 +45,8 @@ from config.settings import (
     PAYMENT_OBJECT,
 )
 
+from loguru import logger
+
 User = get_user_model()
 
 
@@ -247,10 +249,12 @@ class GetPaymentStateAPIView(APIView):
             json=values
         )
         if response.json()['Success'] and response.json()['Status'] == 'CONFIRMED':
+            logger.error("Buy photos")
             order = Order.objects.filter(id=order.id).update(status=OrderStatus.paid_for)
             price = self.get_price(order)
             photos = self.format_photo_links(order)
             message = self.get_message(order, price, photos)
+            logger.info(f"message: {message}")
 
             order_paid_notify.delay(email=order.user.email, message=message)
             return Response(
@@ -281,6 +285,7 @@ class GetPaymentStateAPIView(APIView):
     def format_photo_links(photos):
         links_html = ""
         for photo_url in photos:
+            logger.info(f"photo_url: {photo_url}")
             links_html += f"""
             <div style="text-align: center; width: 150px;">
                 <img src="{photo_url}" alt="Фото" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 8px;">
@@ -301,31 +306,36 @@ class GetPaymentStateAPIView(APIView):
         """
         Возвращает сумму выкупа для заказа в зависимости от его типа.
         """
+        price = 0
         order_item_with_photo = order.order_items.filter(photo__isnull=False).first()
         if not order_item_with_photo:
-            return 0
+            return price
 
         photo = order_item_with_photo.photo
         if not photo:
-            return 0
+            return price
 
         photo_line = photo.photo_line
         if not photo_line:
-            return 0
+            return price
 
         kindergarten = photo_line.kindergarten
         if not kindergarten:
-            return 0
+            return price
 
         region = kindergarten.region
         if not region:
-            return 0
-
+            return price
+        logger.info(f"def_price: {price}")
         if order.is_free_calendar:
-            return region.ransom_amount_for_calendar or 0
+            price = region.ransom_amount_for_calendar or 0
+            logger.info(f"free_calendar_price: {price}")
+            return price
         elif order.is_free_digital:
-            return region.ransom_amount_for_digital_photos or 0
-        return 0
+            price = region.ransom_amount_for_digital_photos or 0
+            logger.info(f"digital_price: {price}")
+            return price
+        return price
 
     @staticmethod
     def get_message(order, price, photo_links):
