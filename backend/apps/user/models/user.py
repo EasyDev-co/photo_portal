@@ -31,7 +31,8 @@ class User(UUIDMixin, AbstractUser):
         max_length=56,
         validators=[MinLengthValidator(2), validate_cyrillic],
         verbose_name='Отчество',
-        blank=True
+        blank=True,
+        null=True,
     )
     last_name = models.CharField(
         max_length=56,
