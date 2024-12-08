@@ -16,11 +16,12 @@ export const Gallery = () => {
 
       try {
         const res = await fetchGetPaidOrderTokenInterceptor(accessStor)
+        console.log('govno', res)
 
         if (res.ok) {
           const data = await res.json()
-          // console.log('Данные загружены:', data)
-          setPaidOrders(data) // Устанавливаем массив данных
+          console.log('Данные загружены:', data)
+          setPaidOrders(data)// Устанавливаем массив данных
         } else {
           setError('Ошибка загрузки данных')
         }
@@ -36,11 +37,11 @@ export const Gallery = () => {
   }, [accessStor])
 
   // Отладка состояния
-  // useEffect(() => {
-  //   console.log('Текущее состояние paidOrders:', paidOrders)
-  //   console.log('Текущее состояние isLoading:', isLoading)
-  //   console.log('Текущее состояние error:', error)
-  // }, [paidOrders, isLoading, error])
+  useEffect(() => {
+    console.log('Текущее состояние paidOrders:', paidOrders)
+    console.log('Текущее состояние isLoading:', isLoading)
+    console.log('Текущее состояние error:', error)
+  }, [paidOrders, isLoading, error])
 
   // Состояние загрузки
   if (isLoading) {
@@ -53,11 +54,16 @@ export const Gallery = () => {
 
   // Обработка ошибок
   if (error) {
-    return <p>{error}</p>
+    return (
+      <div className={styles.ordersWrap}>
+        <div className={styles.ordersInfo}>Ошибка загрузки данных</div>
+      </div>
+    )
   }
 
   // Если массив пуст
   if (!paidOrders || paidOrders.length === 0) {
+    // if (paidOrders === 'null') {
     return (
       <div className={styles.ordersWrap}>
         <div className={styles.ordersInfo}>Нет оплаченных заказов</div>
