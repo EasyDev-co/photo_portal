@@ -107,7 +107,7 @@ const authSlice = createSlice({
             localStorage.setItem('last_name', action.payload.last_name);
             localStorage.setItem('second_name', action.payload.second_name);
             localStorage.setItem('email', action.payload.email);
-            localStorage.setItem('phone', action.payload.phone_number === null ? '+7' : action.payload.phone_number);
+            localStorage.setItem('phone', action.payload.phone_number === null ? '' : action.payload.phone_number);
 
             action.payload.kindergarten.forEach(elem => {
                 localStorage.setItem('kindergarten_id', elem.id)

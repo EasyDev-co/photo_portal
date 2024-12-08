@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
+import galkaSvg from '../../../../assets/icons/galka.svg'
 
 const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
 
@@ -85,7 +86,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
         <div className={styles.promoStringWrap}>
           {price.total_price >= priceCalendar.ransom_amount_for_digital_photos ?
             <div>
-              <img src={oke} alt="" />
+              <img src={galkaSvg} alt="galka" />
             </div>
             :
             <div className={styles.dot}></div>

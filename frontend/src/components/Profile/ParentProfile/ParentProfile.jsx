@@ -4,7 +4,7 @@ import MainButton from "../../Buttons/MainButton";
 import ResetPassButton from "../../Buttons/ResetPassButton";
 import InputField from "../../InputField/InputField";
 import styles from "./ParentProfile.module.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gen_password } from "./utils";
 import PaymentTimer from "../../Payment/PaymentTimer/PaymentTimer";
 import { useSelector , useDispatch } from "react-redux";
@@ -58,6 +58,10 @@ const ParentProfile = ({ nurseryIsAuth }) => {
     const [inputValueReset, setResetValue] = useState({
         code: ''
     });
+
+    useEffect(() => {
+        console.log(inputValue)
+    }, [inputValue])
 
     const dispatch = useDispatch();
     const onChangeHandler = (event) => {
