@@ -72,7 +72,6 @@ def generate_random_string(length=10) -> str:
 
 def create_file_dtos_from_order(order: Order) -> list[FileDTO]:
     """Создание списка FileDTO из заказа."""
-    logger.info(f"order: {order}")
     region = order.photo_line.kindergarten.region.name
     kindergarten = order.photo_line.kindergarten.name
     photo_theme = order.photo_line.photo_theme.name
@@ -82,16 +81,15 @@ def create_file_dtos_from_order(order: Order) -> list[FileDTO]:
 
     files = []
     for order_item in order.order_items.all():
+        if not order_item.photo:
+            logger.warning(f"order_item {order_item} не имеет связанной фотографии.")
+            continue
 
-        logger.info(f"order_item: {order_item}")
         yadisk_path = f"{yadisk_base_path}/{PhotoType(order_item.photo_type).label}"
-        logger.info(f"yadisk_path: {order_item.photo}")
-        logger.info(f"yadisk_path: {order_item.photo.photo_path}")
 
         if order_item.photo_type == PhotoType.photobook:
             # Добавляем все фотографии в папку Фотокнига
             for photo in order.photo_line.photos.all():
-                logger.info(f"photo: {photo}")
                 files.append(
                     FileDTO(
                         file_url=photo.photo_path,
