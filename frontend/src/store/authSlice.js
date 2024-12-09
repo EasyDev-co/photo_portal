@@ -105,7 +105,7 @@ const authSlice = createSlice({
             localStorage.setItem('idP', action.payload.id);
             localStorage.setItem('first_name', action.payload.first_name);
             localStorage.setItem('last_name', action.payload.last_name);
-            localStorage.setItem('second_name', action.payload.second_name);
+            localStorage.setItem('second_name', action.payload.second_name === null ? '' : action.payload.second_name);
             localStorage.setItem('email', action.payload.email);
             localStorage.setItem('phone', action.payload.phone_number === null ? '' : action.payload.phone_number);
 
