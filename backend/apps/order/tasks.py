@@ -245,7 +245,8 @@ class CheckIfOrdersPaid(BaseTask):
 
         # TODO Доработать
         # Вызов задачи для загрузки файлов на Яндекс Диск
-        # upload_files_to_yadisk.delay(successful_payment_order_ids)
+        logger.info(f"successful_payment_order_ids: {successful_payment_order_ids}")
+        upload_files_to_yadisk.delay(successful_payment_order_ids)
 
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
@@ -259,7 +260,8 @@ class CheckIfOrdersPaid(BaseTask):
         if not photo_theme or not photo_theme.date_end:
             return "Ошибка получения даты"
 
-        return photo_theme.date_end + timedelta(days=7)
+        deadline = photo_theme.date_end + timedelta(days=7)
+        return deadline.strftime('%d %m %Y')
 
     @staticmethod
     def get_price(order):
@@ -314,6 +316,8 @@ class CheckIfOrdersPaid(BaseTask):
             return message_digital_photo.format(
                 first_name=order.user.first_name,
                 last_name=order.user.last_name,
+                deadline=deadline,
+                base_url=GALLERY_URL,
             )
 
 class DeleteExpiredOrders(BaseTask):
@@ -446,11 +450,12 @@ class UploadFilesToYaDiskTask(BaseTask):
 
     def run(self, paid_order_ids, *args, **kwargs):
         if paid_order_ids:
-            paid_orders = Order.objects.filter(id__in=paid_order_ids)
+            paid_orders = Order.objects.filter(id__in=paid_order_ids).all()
+            logger.info(f"paid orders: {paid_orders}")
             files = []
             for paid_order in paid_orders:
                 files.extend(create_file_dtos_from_order(paid_order))
-
+            logger.info(f"files: {files}")
             try:
                 yadisk_service.upload(files)
             except Exception as e:

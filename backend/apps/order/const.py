@@ -6,14 +6,15 @@ message_digital_photo = """
                 <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
                     <p style="font-size: 18px; color: #333;">
                         {first_name} {last_name}, вы приобрели фотографии в электронном виде.
-                        Прилагаем их в этом письме. 
                     </p>
                     <p style="font-size: 16px; color: #555; line-height: 1.5;">
-                        Также вы их можете скачать в личном кабинете в любое время.
-                        Надеемся, что фотографии вам понравятся и вы останетесь довольны!
+                        Фотографии будут доступны в вашем <a href="{base_url}">личном кабинете</a> после {deadline}, когда сад получит фотографии.
+                        Надеемся, что фотографии Вам понравятся и Вы останетесь довольны!
                     </p>
-                    <p style="font-size: 16px; color: #555; line-height: 1.5; margin-top: 20px;">
-                        С любовью к вам и вашим детям ❤️
+                    <p style="font-size: 16px; color: #555; text-align: center; margin-top: 30px;">
+                        С любовью к Вам и вашим детям ❤️
+                    </p>
+                     <p style="font-size: 14px; color: #aaa; text-align: center;">
                         ФотоДетство ®
                     </p>
                 </div>
@@ -44,7 +45,6 @@ message_is_digital_free = """
 </div>
 """
 
-
 message_is_calendar_free = """
 <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
     <div style="background-color: #007BFF; color: white; text-align: center; padding: 20px 0;">
@@ -73,4 +73,3 @@ message_is_calendar_free = """
     </div>
 </div>
 """
-
