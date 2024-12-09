@@ -345,3 +345,5 @@ YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")
 
 UNISENER_TOKEN=os.getenv('UNISENER_TOKEN')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
+
+GALLERY_URL = "https://stage.photodetstvo.ru/gallery"
