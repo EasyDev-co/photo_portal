@@ -77,7 +77,7 @@ class ManagerBonusAPIView(APIView):
         # извлекаем бонус заведующей за активные фотосессии в детском саду
         manager_bonus_for_active_photo_themes = ManagerBonus.objects.filter(
             user=manager,
-            photo_theme__is_active=True,
+            photo_theme__kindergartenphototheme__is_active=True,
             photo_theme__photo_lines__kindergarten=manager.managed_kindergarten
         ).distinct()
 
