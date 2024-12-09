@@ -96,10 +96,15 @@ export const Gallery = () => {
   }
 
   const deadline = localStorage.getItem('deadline');
-//   const formatDate = (isoDate) => {
-//     return format(new Date(isoDate), 'dd.MM.yyyy');
-// };
-// const formattedDate = formatDate(deadline);
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0'); // Добавляем 0 перед однозначными числами
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы от 0 до 11
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  const formattedDate = formatDate(deadline);
 
   const isSessionNotEnded = paidOrders.some(
     (order) => order.is_digital && !order.is_date_end,
@@ -113,7 +118,7 @@ export const Gallery = () => {
           Фотосессия: {paidOrders[0].photo_theme_name},{' '}
           {paidOrders[0].photo_theme_date}
           <br />
-          Дедлайн фотосессии: {deadline}
+          Дедлайн фотосессии: {formattedDate}
         </div>
         {/* <p>Дождитесь окончания фотосессии</p> */}
       </div>
