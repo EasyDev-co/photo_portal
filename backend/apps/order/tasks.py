@@ -261,7 +261,7 @@ class CheckIfOrdersPaid(BaseTask):
             return "Ошибка получения даты"
 
         deadline = photo_theme.date_end + timedelta(days=7)
-        return deadline.strftime('%d %m %Y')
+        return deadline.strftime('%d.%m.%Y')
 
     @staticmethod
     def get_price(order):
