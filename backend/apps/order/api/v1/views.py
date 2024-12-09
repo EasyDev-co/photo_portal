@@ -75,11 +75,9 @@ class OrderAPIView(APIView):
             photo_line.is_date_end = photo_line.photo_theme.date_end < now()
             photo_lines.append(photo_line)
 
-        # Проверяем наличие фотолиний
         if not photo_lines:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # Сериализация данных
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
