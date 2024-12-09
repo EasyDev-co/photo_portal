@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import GalleryItem from './GalleryItem'
 import styles from './Gallery.module.css'
 import { fetchGetPaidOrderTokenInterceptor } from '../../http/getPaidOrders'
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 export const Gallery = () => {
   const accessStor = localStorage.getItem('access')
@@ -96,10 +96,10 @@ export const Gallery = () => {
   }
 
   const deadline = localStorage.getItem('deadline');
-  const formatDate = (isoDate) => {
-    return format(new Date(isoDate), 'dd.MM.yyyy');
-};
-const formattedDate = formatDate(deadline);
+//   const formatDate = (isoDate) => {
+//     return format(new Date(isoDate), 'dd.MM.yyyy');
+// };
+// const formattedDate = formatDate(deadline);
 
   const isSessionNotEnded = paidOrders.some(
     (order) => order.is_digital && !order.is_date_end,
@@ -113,7 +113,7 @@ const formattedDate = formatDate(deadline);
           Фотосессия: {paidOrders[0].photo_theme_name},{' '}
           {paidOrders[0].photo_theme_date}
           <br />
-          Дедлайн фотосессии: {formattedDate}
+          Дедлайн фотосессии: {deadline}
         </div>
         {/* <p>Дождитесь окончания фотосессии</p> */}
       </div>
