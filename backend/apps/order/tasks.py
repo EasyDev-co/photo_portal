@@ -470,6 +470,7 @@ class OrderPaidNotificationTask(BaseTask):
 
     def process(self, email, message, *args, **kwargs):
         logger.info("send_email")
+        logger.info(f"message: {message}")
         try:
             with SyncClient.setup(UNISENER_TOKEN):
                 logger.info("email_sending")

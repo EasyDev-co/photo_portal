@@ -11,8 +11,7 @@ from apps.order.models import Order
 from config.settings import YAD_OAUTH_TOKEN, YAD_CLIENT_ID, YAD_CLIENT_SECRET
 from dataclasses import dataclass
 
-logger = logging.getLogger(__name__)
-
+from loguru import logger
 
 @dataclass
 class FileDTO:
@@ -26,6 +25,9 @@ class YaDiskService:
     """Сервис для работы с Яндекс Диском"""
 
     def __init__(self):
+        logger.info(f"cli_id: {YAD_CLIENT_ID}")
+        logger.info(f"client_secret: {YAD_CLIENT_SECRET}")
+        logger.info(f"token: {YAD_OAUTH_TOKEN}")
         self.client = yadisk.Client(YAD_CLIENT_ID, YAD_CLIENT_SECRET, YAD_OAUTH_TOKEN)
 
     def _create_directories(self, path: PurePosixPath):
