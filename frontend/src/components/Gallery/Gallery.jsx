@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import GalleryItem from './GalleryItem'
 import styles from './Gallery.module.css'
 import { fetchGetPaidOrderTokenInterceptor } from '../../http/getPaidOrders'
+import { format } from 'date-fns';
 
 export const Gallery = () => {
   const accessStor = localStorage.getItem('access')
@@ -19,6 +20,13 @@ export const Gallery = () => {
         console.log('govno', res)
 
         if (res.ok) {
+          if (res.status===204) {
+            return (
+              <div className={styles.ordersWrap}>
+                <div className={styles.ordersInfo}>Нет оплаченных заказов</div>
+              </div>
+            )
+          }
           const data = await res.json()
           console.log('Данные загружены:', data)
           setPaidOrders(data)// Устанавливаем массив данных
@@ -26,7 +34,7 @@ export const Gallery = () => {
           setError('Ошибка загрузки данных')
         }
       } catch (err) {
-        console.error('Ошибка:', err)
+        console.error('Ошибка:', err) 
         setError('Произошла ошибка при загрузке данных')
       } finally {
         setIsLoading(false)
@@ -87,6 +95,12 @@ export const Gallery = () => {
     )
   }
 
+  const deadline = localStorage.getItem('deadline');
+  const formatDate = (isoDate) => {
+    return format(new Date(isoDate), 'dd.MM.yyyy');
+};
+const formattedDate = formatDate(deadline);
+
   const isSessionNotEnded = paidOrders.some(
     (order) => order.is_digital && !order.is_date_end,
   )
@@ -98,6 +112,8 @@ export const Gallery = () => {
           <br />
           Фотосессия: {paidOrders[0].photo_theme_name},{' '}
           {paidOrders[0].photo_theme_date}
+          <br />
+          Дедлайн фотосессии: {formattedDate}
         </div>
         {/* <p>Дождитесь окончания фотосессии</p> */}
       </div>
