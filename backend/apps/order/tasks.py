@@ -23,14 +23,14 @@ from apps.utils.services.parse_notification_to_get_receipt import ParseNotificat
 from apps.utils.services.ya_disk import create_file_dtos_from_order, get_yadisk_service
 from config.celery import BaseTask, app
 from config.settings import (
-    EMAIL_HOST_USER,
     TERMINAL_KEY,
     PAYMENT_GET_STATE_URL,
     SEND_CLOSING_RECEIPT_URL,
     VAT,
     PAYMENT_OBJECT,
     TAXATION,
-    FFD_VERSION
+    FFD_VERSION,
+    GALLERY_URL,
 )
 from config.settings import UNISENER_TOKEN, FROM_EMAIL
 
@@ -238,9 +238,8 @@ class CheckIfOrdersPaid(BaseTask):
         if len(orders) > 0:
             for order in orders:
                 price = self.get_price(order)
-                photos = self.get_digital_photos(order)
-                photos_link = self.format_photo_links(photos)
-                message = self.get_message(order, price, photos_link)
+                deadline = self.get_deadline(order)
+                message = self.get_message(order, price, deadline)
 
                 order_paid_notify.delay(email=order.user.email, message=message)
 
@@ -251,37 +250,16 @@ class CheckIfOrdersPaid(BaseTask):
         Order.objects.filter(id__in=failed_payment_order_ids).update(status=OrderStatus.failed)
 
     @staticmethod
-    def get_digital_photos(order):
-        order_item_with_photo = order.order_items.filter(photo__isnull=False).first()
-        photo_line = order_item_with_photo.photo.photo_line
+    def get_deadline(order):
+        photo_line = order.photo_line
         if not photo_line:
-            return []
+            return "Ошибка получения даты"
+        photo_theme = photo_line.photo_theme
 
-        all_digital_photos = photo_line.photos.all()
-        if not all_digital_photos:
-            return []
+        if not photo_theme or not photo_theme.date_end:
+            return "Ошибка получения даты"
 
-        return [photo.photo_path for photo in all_digital_photos]
-
-    @staticmethod
-    def format_photo_links(photos):
-        links_html = ""
-        for photo_url in photos:
-            logger.info(f"photo_url: {photo_url}")
-            links_html += f"""
-                <div style="text-align: center; width: 150px;">
-                    <img src="{photo_url}" alt="Фото" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 8px;">
-                    <div style="margin-top: 10px;">
-                        <a href="{photo_url}" download style="text-decoration: none; color: #007BFF; font-size: 14px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                                <path d="M.5 9.9V10.5H15.5V9.9L8 3.4L.5 9.9ZM8.5 11V0H7.5V11H4.5L8 14.5L11.5 11H8.5ZM0 16V15H16V16H0Z"/>
-                            </svg>
-                            Скачать
-                        </a>
-                    </div>
-                </div>
-                """
-        return links_html
+        return photo_theme.date_end + timedelta(days=7)
 
     @staticmethod
     def get_price(order):
@@ -315,20 +293,22 @@ class CheckIfOrdersPaid(BaseTask):
         return price
 
     @staticmethod
-    def get_message(order, price, photo_links):
+    def get_message(order, price, deadline):
         if order.is_free_calendar:
             return message_is_calendar_free.format(
                 first_name=order.user.first_name,
                 last_name=order.user.last_name,
                 price=price,
-                photo_links=photo_links
+                deadline=deadline,
+                base_url=GALLERY_URL,
             )
         elif order.is_free_digital:
             return message_is_digital_free.format(
                 first_name=order.user.first_name,
                 last_name=order.user.last_name,
                 price=price,
-                photo_links=photo_links
+                deadline=deadline,
+                base_url=GALLERY_URL,
             )
         elif order.is_digital:
             return message_digital_photo.format(

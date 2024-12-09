@@ -1,12 +1,17 @@
-import locale
-from datetime import datetime
-
 from rest_framework import serializers
 
 from apps.kindergarten.models import Ransom
 from apps.photo.models import Photo, PhotoLine, PhotoTheme
 from apps.order.models import OrderItem
 from apps.order.models.order import OrderStatus, Order
+
+
+class WatermarkedPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения фотографии."""
+    class Meta:
+        model = Photo
+        fields = ('id', 'number', 'watermarked_photo_path')
+
 
 class PhotoRetrieveSerializer(serializers.ModelSerializer):
     """
@@ -70,7 +75,7 @@ class PhotoLineSerializer(serializers.ModelSerializer):
     Сериализатор для получения пробников.
     """
     deadline = serializers.SerializerMethodField()
-    photos = PhotoRetrieveSerializer(many=True, read_only=True)
+    photos = WatermarkedPhotoSerializer(many=True, read_only=True)
     ransom_amount_for_digital_photos = serializers.SerializerMethodField()
     ransom_amount_for_calendar = serializers.SerializerMethodField()
     photo_theme = PhotoThemeSerializer(read_only=True, required=False)
