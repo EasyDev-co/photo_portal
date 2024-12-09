@@ -96,13 +96,23 @@ export const Gallery = () => {
   }
 
   const deadline = localStorage.getItem('deadline');
+  // const formatDate = (isoDate) => {
+  //   const date = new Date(isoDate);
+  //   const day = String(date.getDate()).padStart(2, '0'); // Добавляем 0 перед однозначными числами
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы от 0 до 11
+  //   const year = date.getFullYear();
+  //   return `${day}.${month}.${year}`;
+  // };
+
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
+    date.setDate(date.getDate() + 7); // Добавляем 7 дней
     const day = String(date.getDate()).padStart(2, '0'); // Добавляем 0 перед однозначными числами
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы от 0 до 11
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
-  };
+};
+
 
   const formattedDate = formatDate(deadline);
 
