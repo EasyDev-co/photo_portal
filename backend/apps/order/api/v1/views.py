@@ -2,8 +2,6 @@ from decimal import Decimal
 
 import requests
 from django.contrib.auth import get_user_model
-from django.db.models import F, BooleanField, ExpressionWrapper
-from django.utils.timezone import now
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -11,9 +9,10 @@ from requests import JSONDecodeError
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from datetime import timedelta
 
 from apps.cart.models import Cart
 from apps.kindergarten.models import PhotoType
@@ -72,7 +71,8 @@ class OrderAPIView(APIView):
 
         photo_lines = []
         for photo_line in photo_lines_queryset.distinct('id'):
-            photo_line.is_date_end = photo_line.photo_theme.date_end < now()
+            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
+            photo_line.is_date_end = extended_date_end < now()
             photo_lines.append(photo_line)
 
         if not photo_lines:
