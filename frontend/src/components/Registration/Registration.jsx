@@ -29,6 +29,9 @@ export const Registration = () => {
       navigate('/orders')
     }
   }, [])
+  useEffect(() => {
+    console.log(searchParams)
+  }, [searchParams])
 
   const initialState = {
     gardenCode: '',
