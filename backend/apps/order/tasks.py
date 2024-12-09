@@ -261,7 +261,7 @@ class CheckIfOrdersPaid(BaseTask):
             return "Ошибка получения даты"
 
         deadline = photo_theme.date_end + timedelta(days=7)
-        return deadline.strftime('%d %m %Y')
+        return deadline.strftime('%d.%m.%Y')
 
     @staticmethod
     def get_price(order):
@@ -451,11 +451,9 @@ class UploadFilesToYaDiskTask(BaseTask):
     def run(self, paid_order_ids, *args, **kwargs):
         if paid_order_ids:
             paid_orders = Order.objects.filter(id__in=paid_order_ids).all()
-            logger.info(f"paid orders: {paid_orders}")
             files = []
             for paid_order in paid_orders:
                 files.extend(create_file_dtos_from_order(paid_order))
-            logger.info(f"files: {files}")
             try:
                 yadisk_service.upload(files)
             except Exception as e:
