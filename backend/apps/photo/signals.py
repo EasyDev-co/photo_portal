@@ -22,5 +22,9 @@ def set_season(sender, instance, created, **kwargs):
     if created:
         season = get_season(instance.name)
         if season:
-            instance.season = Season.objects.get(season=season)
-            instance.save()
+            try:
+                instance.season = Season.objects.get(season=season)
+            except Season.DoesNotExist:
+                pass
+            else:
+                instance.save()
