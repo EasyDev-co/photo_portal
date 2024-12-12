@@ -90,7 +90,7 @@ class PhotoThemeAdmin(admin.ModelAdmin):
 
 @admin.register(PhotoThemeName)
 class PhotoThemeNameAdmin(admin.ModelAdmin):
-    ...
+    list_display = ('name', 'season')
 
 
 @admin.register(PhotoLine)

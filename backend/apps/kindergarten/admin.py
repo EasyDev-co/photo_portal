@@ -112,7 +112,6 @@ class PhotoPriceAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.exclude(photo_type__in=(PhotoType.free_calendar, PhotoType.digital))
 
-
     def save_model(self, request, obj, form, change):
         if not obj.region:
             regions = Region.objects.exclude(name__in=['Москва', 'Санкт-Петербург'])

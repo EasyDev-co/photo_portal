@@ -60,7 +60,7 @@ class KindergartenStatsAPIView(APIView):
         # Получаем все заказы для текущей фототемы
         orders = Order.objects.filter(
             photo_line__kindergarten=kindergarten,
-            photo_line__photo_theme__in=current_photo_theme
+            photo_line__photo_theme=current_photo_theme
         )
 
         # Статистика текущих заказов

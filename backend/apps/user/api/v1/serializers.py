@@ -128,7 +128,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     second_name = serializers.CharField(
         max_length=56,
         required=False,
-        validators=[validate_cyrillic, MinLengthValidator(2)]
+        validators=[validate_cyrillic, MinLengthValidator(2)],
+        allow_blank=True,
+        allow_null=True,
     )
     last_name = serializers.CharField(
         max_length=56,
@@ -138,7 +140,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=False)
     phone_number = PhoneNumberField(
         required=False,
-        max_length=12
+        max_length=12,
+        allow_null=True,
+        allow_blank=True,
     )
 
     class Meta:
