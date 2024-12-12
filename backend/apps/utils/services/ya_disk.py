@@ -1,4 +1,3 @@
-import logging
 import random
 import string
 import urllib.parse
@@ -8,10 +7,12 @@ import yadisk
 
 from apps.kindergarten.models import PhotoType
 from apps.order.models import Order
+from apps.photo.models.const import MONTHS_RU
 from config.settings import YAD_OAUTH_TOKEN, YAD_CLIENT_ID, YAD_CLIENT_SECRET
 from dataclasses import dataclass
 
 from loguru import logger
+
 
 @dataclass
 class FileDTO:
@@ -25,9 +26,6 @@ class YaDiskService:
     """Сервис для работы с Яндекс Диском"""
 
     def __init__(self):
-        logger.info(f"cli_id: {YAD_CLIENT_ID}")
-        logger.info(f"client_secret: {YAD_CLIENT_SECRET}")
-        logger.info(f"token: {YAD_OAUTH_TOKEN}")
         self.client = yadisk.Client(YAD_CLIENT_ID, YAD_CLIENT_SECRET, YAD_OAUTH_TOKEN)
 
     def _create_directories(self, path: PurePosixPath):
@@ -74,12 +72,12 @@ def generate_random_string(length=10) -> str:
 
 def create_file_dtos_from_order(order: Order) -> list[FileDTO]:
     """Создание списка FileDTO из заказа."""
-    region = order.photo_line.kindergarten.region.name
     kindergarten = order.photo_line.kindergarten.name
-    photo_theme = order.photo_line.photo_theme.name
-    user = order.user.full_name
 
-    yadisk_base_path = f"/{region}/{kindergarten}/{photo_theme}/{user}"
+    year = order.photo_line.photo_theme.date_end.strftime("%Y")
+    month = MONTHS_RU.get(order.photo_line.photo_theme.date_end.strftime("%B"))
+
+    yadisk_base_path = f"/{year}/{month}/{kindergarten}"
 
     files = []
     for order_item in order.order_items.all():
@@ -100,6 +98,8 @@ def create_file_dtos_from_order(order: Order) -> list[FileDTO]:
                     )
                 )
             continue
+
+        logger.info(f"Путь до файла: {yadisk_path}/{order_item.photo.number}_({order_item.amount} шт.).jpg")
 
         files.append(
             FileDTO(

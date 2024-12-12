@@ -4,10 +4,12 @@ from apps.kindergarten.models import Ransom
 from apps.photo.models import Photo, PhotoLine, PhotoTheme
 from apps.order.models import OrderItem
 from apps.order.models.order import OrderStatus, Order
+from apps.photo.models.const import MONTHS_RU
 
 
 class WatermarkedPhotoSerializer(serializers.ModelSerializer):
     """Сериализатор для получения фотографии."""
+
     class Meta:
         model = Photo
         fields = ('id', 'number', 'watermarked_photo_path')
@@ -21,6 +23,7 @@ class PhotoRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
         fields = ('id', 'number', 'photo_file', 'watermarked_photo', 'watermarked_photo_path', 'photo_path')
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
     photo_name = serializers.CharField(source='photo.name', read_only=True)
@@ -103,21 +106,6 @@ class PhotoLineSerializer(serializers.ModelSerializer):
 
 
 class PaidPhotoLineSerializer(serializers.ModelSerializer):
-    MONTHS_RU = {
-        "January": "Январь",
-        "February": "Февраль",
-        "March": "Март",
-        "April": "Апрель",
-        "May": "Май",
-        "June": "Июнь",
-        "July": "Июль",
-        "August": "Август",
-        "September": "Сентябрь",
-        "October": "Октябрь",
-        "November": "Ноябрь",
-        "December": "Декабрь",
-    }
-
     photo_theme_name = serializers.SerializerMethodField()
     photo_theme_date = serializers.SerializerMethodField()
     region = serializers.SerializerMethodField()
@@ -141,7 +129,7 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
         date_start = obj.photo_theme.date_start
         month_english = date_start.strftime('%B')
         year = date_start.strftime('%Y')
-        month_russian = self.MONTHS_RU.get(month_english, month_english)
+        month_russian = MONTHS_RU.get(month_english, month_english)
         return f"{month_russian} {year}"
 
     def get_region(self, obj):

@@ -320,6 +320,7 @@ class CheckIfOrdersPaid(BaseTask):
                 base_url=GALLERY_URL,
             )
 
+
 class DeleteExpiredOrders(BaseTask):
     """Крон для удаления заказов, которые находятся в статусе Создан >12 часов."""
 
@@ -465,6 +466,7 @@ class UploadFilesToYaDiskTask(BaseTask):
                     einfo=traceback.format_exc(),
                 )
 
+
 class OrderPaidNotificationTask(BaseTask):
     name = "order_paid_notification"
 
@@ -490,6 +492,7 @@ class OrderPaidNotificationTask(BaseTask):
                 logger.info("email_sent")
         except Exception as e:
             logger.error(f"Error: {e}")
+
 
 order_paid_notify = app.register_task(OrderPaidNotificationTask)
 digital_photos_notification = app.register_task(DigitalPhotosNotificationTask)
