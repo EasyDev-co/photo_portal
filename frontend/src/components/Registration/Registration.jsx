@@ -77,6 +77,7 @@ export const Registration = () => {
       pictureNumbers: photos.join('-') || ''
     })
     dispatch(addQrIdPhoto(searchParams.get('photo_line_id')))
+    console.log(location.search)
   }, [location.search]);
 
   const onChangeHandler = (event) => {

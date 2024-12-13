@@ -27,12 +27,14 @@ import 'swiper/css/navigation';
 
 // import required modules
 import {EffectFlip, Pagination, Navigation} from 'swiper/modules';
+import { getPromocode } from "../../../http/getPromocode";
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
     const accessStor = localStorage.getItem('access');
     const navigate = useNavigate()
     const [bonus, setBonus] = useState([])
+    const [promocode, setPromocode] = useState('');
     const [stats, setStats] = useState({
             current_stats: {
                 total_orders: 0,
@@ -89,7 +91,6 @@ const ManagerProfile = () => {
                     if (res.ok) {
                         res.json()
                             .then(res => {
-                                console.log(res)
                                 setStats(res)
                             })
                     }
@@ -108,7 +109,6 @@ const ManagerProfile = () => {
                         res.json()
                             .then(res => {
                                 setBonus(res)
-                                console.log(res)
                             })
                     }
                 })
@@ -116,6 +116,23 @@ const ManagerProfile = () => {
             console.log(error)
         }
     }, [])
+
+    useEffect(() => {
+        try {
+            getPromocode(accessStor)
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(res => {
+                                setPromocode(res)
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [])
+
     return (
         <div className={styles.profileWrap}>
             <div className={styles.profileWidgetWrap}>
@@ -129,7 +146,8 @@ const ManagerProfile = () => {
                         setIsCopy={setIsCopy}
                         isCopy
                         label={'Промо-код для сотрудников'}
-                        data={'code20'}
+                        // data={'code20'}
+                        data={promocode.code}
                     />
                     <StatisticItem
                         label={'Средний чек, руб'}
