@@ -45,9 +45,9 @@ from config.settings import (
 
 User = get_user_model()
 
-
 from django.utils.timezone import now
 from django.db.models import F
+
 
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -80,8 +80,6 @@ class OrderAPIView(APIView):
 
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
 
     def post(self, request):
         user = request.user

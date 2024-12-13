@@ -36,15 +36,10 @@ def transliterate_to_latin(text):
 def create_photoprice_for_region(sender, instance, created, **kwargs):
     """Сигнал для создания бесплатных айтемов для региона"""
     if created:
-        with transaction.atomic():
-            PhotoPrice.objects.create(
-                region=instance,
-                photo_type=PhotoType.free_calendar
-            )
-            PhotoPrice.objects.create(
-                region=instance,
-                photo_type=PhotoType.digital
-            )
+        PhotoPrice.objects.create(
+            region=instance,
+            photo_type=PhotoType.free_calendar
+        )
 
 
 @receiver(post_save, sender=Kindergarten)
