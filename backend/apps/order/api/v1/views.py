@@ -136,7 +136,7 @@ class OrderAPIView(APIView):
                 user=user,
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
-                # is_free_digital=cart_photo_line.is,
+                is_free_digital=cart_photo_line.is_free_digital,
                 is_photobook=cart_photo_line.is_photobook,
                 is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,
