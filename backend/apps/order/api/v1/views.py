@@ -48,56 +48,51 @@ from django.db.models import F
 
 User = get_user_model()
 
+IS_DIGITAL = 0
+IS_FREE_DIGITAL = 1
+
 
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @staticmethod
-    def get_photo_lines_queryset(user):
-        """Получает queryset с аннотацией is_digital и is_digital_free."""
-        return (
-            PhotoLine.objects
-            .filter(
-                kindergarten__in=user.kindergarten.all(),
-                parent=user,
-                orders__status=OrderStatus.paid_for
-            )
-            .annotate(
-                is_digital=F('orders__is_digital'),
-                is_digital_free=F('orders__is_free_digital'),
-            )
-            .order_by('id', 'photo_theme__date_end')
-        )
-
-    @staticmethod
     def aggregate_is_digital(photo_lines_queryset):
         """
-        Формирует словари с уникальными PhotoLine и со значением is_digital для каждого PhotoLine
+        Формирует словари с уникальными PhotoLine и со значением is_digital и is_free_digital для каждого PhotoLine
         """
         photo_lines_dict = {}
-        is_photo_line_digital = {}
+        is_digital_by_photo_line_id = {}
+
         for photo_line in photo_lines_queryset:
-            _id = photo_line.id
-            if _id not in photo_lines_dict:
-                photo_lines_dict[_id] = photo_line
-                is_photo_line_digital[_id] = photo_line.is_digital
+            photo_line_id = photo_line.id
+
+            if photo_line_id not in photo_lines_dict:
+                photo_lines_dict[photo_line_id] = photo_line
+                is_digital_by_photo_line_id[photo_line_id] = [photo_line.is_digital, photo_line.is_free_digital]
+
             else:
-                # обновляем, если is_digital=True
+                # обновляем, если is_digital=True и/или is_free_digital=True
                 if photo_line.is_digital:
-                    is_photo_line_digital[_id] = True
-        return photo_lines_dict, is_photo_line_digital
+                    is_digital_by_photo_line_id[photo_line_id][IS_DIGITAL] = True
+                if photo_line.is_free_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_FREE_DIGITAL] = True
+
+        return photo_lines_dict, is_digital_by_photo_line_id
 
     @staticmethod
-    def finalize_photo_lines(photo_lines_dict, is_photo_line_digital):
+    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id):
         """
         Формирует итоговый список объектов.
         """
         current_time = now()
         photo_lines = []
-        for _id, photo_line in photo_lines_dict.items():
-            photo_line.is_digital = is_photo_line_digital[_id]
+
+        for photo_line_id, photo_line in photo_lines_dict.items():
+            photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
+
             extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
             photo_line.is_date_end = extended_date_end < current_time
+
             photo_lines.append(photo_line)
         return photo_lines
 
@@ -105,13 +100,20 @@ class OrderAPIView(APIView):
         user = request.user
 
         # Получаем данные из базы
-        photo_lines_queryset = self.get_photo_lines_queryset(user)
+        photo_lines_queryset = PhotoLine.objects.filter(
+            kindergarten__in=user.kindergarten.all(),
+            parent=user,
+            orders__status=OrderStatus.paid_for
+        ).annotate(
+            is_digital=F('orders__is_digital'),
+            is_free_digital=F('orders__is_free_digital'),
+        ).order_by('id', 'photo_theme__date_end')
 
         if not photo_lines_queryset.exists():
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        photo_lines_map, is_photo_line_digital = self.aggregate_is_digital(photo_lines_queryset)
-        photo_lines = self.finalize_photo_lines(photo_lines_map, is_photo_line_digital)
+        photo_lines_dict, is_digital_by_photo_line_id = self.aggregate_is_digital(photo_lines_queryset)
+        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id)
 
         if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
