@@ -43,37 +43,75 @@ from config.settings import (
     PAYMENT_OBJECT,
 )
 
-User = get_user_model()
-
 from django.utils.timezone import now
 from django.db.models import F
+
+User = get_user_model()
 
 
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
-        user = request.user
-
-        # Получаем данные из базы
-        photo_lines_queryset = (
-            PhotoLine.objects.filter(
+    @staticmethod
+    def get_photo_lines_queryset(user):
+        """Получает queryset с аннотацией is_digital и is_digital_free."""
+        return (
+            PhotoLine.objects
+            .filter(
                 kindergarten__in=user.kindergarten.all(),
                 parent=user,
-                orders__status=OrderStatus.paid_for,
+                orders__status=OrderStatus.paid_for
             )
             .annotate(
                 is_digital=F('orders__is_digital'),
                 is_digital_free=F('orders__is_free_digital'),
             )
-            .order_by('id', 'photo_theme__date_end')  # Удаляем DISTINCT ON
+            .order_by('id', 'photo_theme__date_end')
         )
 
+    @staticmethod
+    def aggregate_is_digital(photo_lines_queryset):
+        """
+        Формирует словари с уникальными PhotoLine и со значением is_digital для каждого PhotoLine
+        """
+        photo_lines_dict = {}
+        is_photo_line_digital = {}
+        for photo_line in photo_lines_queryset:
+            _id = photo_line.id
+            if _id not in photo_lines_dict:
+                photo_lines_dict[_id] = photo_line
+                is_photo_line_digital[_id] = photo_line.is_digital
+            else:
+                # обновляем, если is_digital=True
+                if photo_line.is_digital:
+                    is_photo_line_digital[_id] = True
+        return photo_lines_dict, is_photo_line_digital
+
+    @staticmethod
+    def finalize_photo_lines(photo_lines_dict, is_photo_line_digital):
+        """
+        Формирует итоговый список объектов.
+        """
+        current_time = now()
         photo_lines = []
-        for photo_line in photo_lines_queryset.distinct('id'):
+        for _id, photo_line in photo_lines_dict.items():
+            photo_line.is_digital = is_photo_line_digital[_id]
             extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
-            photo_line.is_date_end = extended_date_end < now()
+            photo_line.is_date_end = extended_date_end < current_time
             photo_lines.append(photo_line)
+        return photo_lines
+
+    def get(self, request):
+        user = request.user
+
+        # Получаем данные из базы
+        photo_lines_queryset = self.get_photo_lines_queryset(user)
+
+        if not photo_lines_queryset.exists():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        photo_lines_map, is_photo_line_digital = self.aggregate_is_digital(photo_lines_queryset)
+        photo_lines = self.finalize_photo_lines(photo_lines_map, is_photo_line_digital)
 
         if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -98,6 +136,7 @@ class OrderAPIView(APIView):
                 user=user,
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
+                # is_free_digital=cart_photo_line.is,
                 is_photobook=cart_photo_line.is_photobook,
                 is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,
