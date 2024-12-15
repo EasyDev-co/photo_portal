@@ -161,7 +161,7 @@ class OrderAPIView(APIView):
                         photo_type=photo_in_cart.photo_type,
                         amount=photo_in_cart.quantity,
                         order=order,
-                        photo=photo_in_cart.photo,
+                        photo = photo_in_cart.photo if photo_in_cart and photo_in_cart.photo else None,
                     ) for photo_in_cart in photos_in_cart
                 ]
             )
