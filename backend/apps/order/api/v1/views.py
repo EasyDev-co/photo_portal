@@ -183,7 +183,8 @@ class OrderAPIView(APIView):
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.free_calendar,
-                        photo=photos_in_cart.first().photo if photos_in_cart.first().photo else None,
+                        photo=photos_in_cart.first().photo
+                        if photos_in_cart.first() and photos_in_cart.first().photo else None,
                         order=order,
                     ))
 
