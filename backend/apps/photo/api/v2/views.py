@@ -1,8 +1,6 @@
 import requests
 
-from rest_framework.authentication import SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -31,7 +29,7 @@ from apps_crm.roles.models import UserRole
 
 from loguru import logger
 
-from config.settings import PHOTO_LINE_URL
+from config.settings import PHOTO_LINE_URL, UPLOAD_SERVICE_SECRET_KEY, GO_UPLOAD_URL
 from apps.utils.services import generate_qr_code
 from django.core.files.base import ContentFile
 
@@ -136,7 +134,8 @@ class PhotoUploadView(APIView):
 class PhotoUploadAPIView(APIView):
     """Загрузка фотографий"""
 
-    upload_url: str = " https://60ae-45-76-88-92.ngrok-free.app/v1/files/upload/"
+    upload_url: str = GO_UPLOAD_URL
+    secret_key: str = UPLOAD_SERVICE_SECRET_KEY
 
     swagger_auto_schema(
         request_body=openapi.Schema(
@@ -223,6 +222,7 @@ class PhotoUploadAPIView(APIView):
             response = requests.post(
                 self.upload_url,
                 files=files_payload,
+                headers={"Authorization-Token": self.secret_key},
                 params={"kindergarten": kindergarten.name, "photo_theme": photo_theme.name, "region": region.name}
             )
             logger.info(f"status_code: {response.status_code}")

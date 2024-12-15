@@ -347,3 +347,5 @@ UNISENER_TOKEN=os.getenv('UNISENER_TOKEN')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
 
 GALLERY_URL = "https://stage.photodetstvo.ru/gallery"
+UPLOAD_SERVICE_SECRET_KEY = os.getenv('UPLOAD_SERVICE_SECRET_KEY')
+GO_UPLOAD_URL = os.getenv('GO_UPLOAD_URL')
