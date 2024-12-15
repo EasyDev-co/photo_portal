@@ -62,6 +62,8 @@ class PhotoInCart(UUIDMixin):
         on_delete=models.CASCADE,
         related_name='photos_in_cart',
         verbose_name='Фото',
+        null=True,
+        blank=True,
     )
     cart_photo_line = models.ForeignKey(
         'CartPhotoLine',
