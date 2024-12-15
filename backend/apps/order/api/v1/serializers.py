@@ -128,3 +128,17 @@ class OrdersPaymentBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrdersPayment
         fields = ['id', 'amount', 'created']
+
+from rest_framework import serializers
+from apps.order.models import Order
+
+
+class OrderManagerSerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации о заказе"""
+
+    user_first_name = serializers.CharField(source='user.first_name', read_only=True)
+    user_last_name = serializers.CharField(source='user.last_name', read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['order_price', 'user_first_name', 'user_last_name', 'payment_id']
