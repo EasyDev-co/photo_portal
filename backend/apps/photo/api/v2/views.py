@@ -153,7 +153,7 @@ class PhotoUploadAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = PhotoUploadSerializer(data=request.data)
-        logger.info("post")
+        logger.info("in post")
 
         if serializer.is_valid():
             logger.info("valid_ser")
@@ -161,7 +161,7 @@ class PhotoUploadAPIView(APIView):
             photos = serializer.validated_data['photos']
             photo_theme = kindergarten.kindergartenphototheme.get(is_active=True).photo_theme
             region = kindergarten.region
-
+            logger.info("upload_photos")
             uploaded_photos = self.get_photos(
                 kindergarten=kindergarten,
                 photos=photos,
@@ -218,7 +218,9 @@ class PhotoUploadAPIView(APIView):
         files_payload = [
             ('files', (photo.name, photo.file)) for photo in photos
         ]
+        logger.info(f"files_payload: {files_payload}")
         try:
+            logger.info("try post")
             response = requests.post(
                 self.upload_url,
                 files=files_payload,
