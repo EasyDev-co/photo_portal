@@ -112,14 +112,14 @@ class PaidPhotoLineSerializer(serializers.ModelSerializer):
     photos = serializers.SerializerMethodField()
     is_date_end = serializers.SerializerMethodField()
     is_digital = serializers.BooleanField()
-    is_digital_free = serializers.BooleanField()
+    is_free_digital = serializers.BooleanField()
 
     class Meta:
         model = PhotoLine
         fields = (
             'id', 'photos', 'region', 'photo_theme_name',
             'photo_theme_date', 'orders', 'is_date_end',
-            'is_digital', 'is_digital_free'
+            'is_digital', 'is_free_digital'
         )
 
     def get_photo_theme_name(self, obj):

@@ -43,45 +43,83 @@ from config.settings import (
     PAYMENT_OBJECT,
 )
 
-User = get_user_model()
-
-
 from django.utils.timezone import now
 from django.db.models import F
 
+User = get_user_model()
+
+IS_DIGITAL = 0
+IS_FREE_DIGITAL = 1
+
+
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
+
+    @staticmethod
+    def aggregate_is_digital(photo_lines_queryset):
+        """
+        Формирует словари с уникальными PhotoLine и со значением is_digital и is_free_digital для каждого PhotoLine
+        """
+        photo_lines_dict = {}
+        is_digital_by_photo_line_id = {}
+
+        for photo_line in photo_lines_queryset:
+            photo_line_id = photo_line.id
+
+            if photo_line_id not in photo_lines_dict:
+                photo_lines_dict[photo_line_id] = photo_line
+                is_digital_by_photo_line_id[photo_line_id] = [photo_line.is_digital, photo_line.is_free_digital]
+
+            else:
+                # обновляем, если is_digital=True и/или is_free_digital=True
+                if photo_line.is_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_DIGITAL] = True
+                if photo_line.is_free_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_FREE_DIGITAL] = True
+
+        return photo_lines_dict, is_digital_by_photo_line_id
+
+    @staticmethod
+    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id):
+        """
+        Формирует итоговый список объектов.
+        """
+        current_time = now()
+        photo_lines = []
+
+        for photo_line_id, photo_line in photo_lines_dict.items():
+            photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
+
+            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
+            photo_line.is_date_end = extended_date_end < current_time
+
+            photo_lines.append(photo_line)
+        return photo_lines
 
     def get(self, request):
         user = request.user
 
         # Получаем данные из базы
-        photo_lines_queryset = (
-            PhotoLine.objects.filter(
-                kindergarten__in=user.kindergarten.all(),
-                parent=user,
-                orders__status=OrderStatus.paid_for,
-            )
-            .annotate(
-                is_digital=F('orders__is_digital'),
-                is_digital_free=F('orders__is_free_digital'),
-            )
-            .order_by('id', 'photo_theme__date_end')  # Удаляем DISTINCT ON
-        )
+        photo_lines_queryset = PhotoLine.objects.filter(
+            kindergarten__in=user.kindergarten.all(),
+            parent=user,
+            orders__status=OrderStatus.paid_for
+        ).annotate(
+            is_digital=F('orders__is_digital'),
+            is_free_digital=F('orders__is_free_digital'),
+        ).order_by('id', 'photo_theme__date_end')
 
-        photo_lines = []
-        for photo_line in photo_lines_queryset.distinct('id'):
-            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
-            photo_line.is_date_end = extended_date_end < now()
-            photo_lines.append(photo_line)
+        if not photo_lines_queryset.exists():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        photo_lines_dict, is_digital_by_photo_line_id = self.aggregate_is_digital(photo_lines_queryset)
+        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id)
 
         if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
 
     def post(self, request):
         user = request.user
@@ -100,6 +138,7 @@ class OrderAPIView(APIView):
                 user=user,
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
+                is_free_digital=cart_photo_line.is_free_digital,
                 is_photobook=cart_photo_line.is_photobook,
                 is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,

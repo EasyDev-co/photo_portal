@@ -64,7 +64,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         quantity = 0
         for photo_in_cart in photos_in_cart:
             quantity += photo_in_cart.get('quantity')
-        if quantity == 0:
+        if quantity == 0 and not validated_data["is_digital"] and not validated_data["is_photobook"]:
             validated_data.pop('cart').delete()
             return CartPhotoLine()
 
@@ -133,6 +133,9 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
 
         # стоимость фотокниги
         if validated_data['is_photobook']:
+            if not user.kindergarten.first().has_photobook:
+                raise serializers.ValidationError("Детский сад не имеет фотокниг")
+
             photobook_price = region_prices.get(photo_type=PhotoType.photobook).price
             if promo_code and promo_code.discount_photobooks:
                 photobook_price = promo_code.apply_discount(
