@@ -129,9 +129,6 @@ class OrdersPaymentBriefSerializer(serializers.ModelSerializer):
         model = OrdersPayment
         fields = ['id', 'amount', 'created']
 
-from rest_framework import serializers
-from apps.order.models import Order
-
 
 class OrderManagerSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации о заказе"""
