@@ -18,7 +18,7 @@ from apps.user.models import UserRole
 User = get_user_model()
 
 
-def generate_random_password(length=6):
+def generate_random_password(length=5):
     """Генерация случайного пароля из 6 символов (буквы и цифры)"""
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
@@ -36,15 +36,10 @@ def transliterate_to_latin(text):
 def create_photoprice_for_region(sender, instance, created, **kwargs):
     """Сигнал для создания бесплатных айтемов для региона"""
     if created:
-        with transaction.atomic():
-            PhotoPrice.objects.create(
-                region=instance,
-                photo_type=PhotoType.free_calendar
-            )
-            PhotoPrice.objects.create(
-                region=instance,
-                photo_type=PhotoType.digital
-            )
+        PhotoPrice.objects.create(
+            region=instance,
+            photo_type=PhotoType.free_calendar
+        )
 
 
 @receiver(post_save, sender=Kindergarten)

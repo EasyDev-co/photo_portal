@@ -110,7 +110,7 @@ class PhotoPriceAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.exclude(photo_type__in=(PhotoType.free_calendar, PhotoType.digital))
+        return qs.exclude(photo_type=PhotoType.free_calendar)
 
     def save_model(self, request, obj, form, change):
         if not obj.region:
@@ -133,10 +133,9 @@ class PhotoPriceAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         """Исключение подарочных типов продукции из выбора"""
         form = super().get_form(request, obj, **kwargs)
-        restricted_photo_types = [PhotoType.free_calendar, PhotoType.digital]
         form.base_fields['photo_type'].choices = [
             (choice_value, choice_display) for choice_value, choice_display in form.base_fields['photo_type'].choices
-            if choice_value not in restricted_photo_types
+            if choice_value != PhotoType.free_calendar
         ]
         return form
 

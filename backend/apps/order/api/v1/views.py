@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from datetime import timedelta
 
 from apps.cart.models import Cart
+from apps.kindergarten.api.v1.permissions import IsManager
 from apps.kindergarten.models import PhotoType
 from apps.order.api.v1.serializers import (
     OrderSerializer,
@@ -26,7 +27,7 @@ from apps.order.models.const import OrderStatus, PaymentMethod
 from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
-from apps.photo.models import PhotoLine
+from apps.photo.models import PhotoLine, PhotoTheme
 
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
@@ -43,45 +44,83 @@ from config.settings import (
     PAYMENT_OBJECT,
 )
 
-User = get_user_model()
-
-
 from django.utils.timezone import now
 from django.db.models import F
 
+User = get_user_model()
+
+IS_DIGITAL = 0
+IS_FREE_DIGITAL = 1
+
+
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
+
+    @staticmethod
+    def aggregate_is_digital(photo_lines_queryset):
+        """
+        Формирует словари с уникальными PhotoLine и со значением is_digital и is_free_digital для каждого PhotoLine
+        """
+        photo_lines_dict = {}
+        is_digital_by_photo_line_id = {}
+
+        for photo_line in photo_lines_queryset:
+            photo_line_id = photo_line.id
+
+            if photo_line_id not in photo_lines_dict:
+                photo_lines_dict[photo_line_id] = photo_line
+                is_digital_by_photo_line_id[photo_line_id] = [photo_line.is_digital, photo_line.is_free_digital]
+
+            else:
+                # обновляем, если is_digital=True и/или is_free_digital=True
+                if photo_line.is_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_DIGITAL] = True
+                if photo_line.is_free_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_FREE_DIGITAL] = True
+
+        return photo_lines_dict, is_digital_by_photo_line_id
+
+    @staticmethod
+    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id):
+        """
+        Формирует итоговый список объектов.
+        """
+        current_time = now()
+        photo_lines = []
+
+        for photo_line_id, photo_line in photo_lines_dict.items():
+            photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
+
+            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
+            photo_line.is_date_end = extended_date_end < current_time
+
+            photo_lines.append(photo_line)
+        return photo_lines
 
     def get(self, request):
         user = request.user
 
         # Получаем данные из базы
-        photo_lines_queryset = (
-            PhotoLine.objects.filter(
-                kindergarten__in=user.kindergarten.all(),
-                parent=user,
-                orders__status=OrderStatus.paid_for,
-            )
-            .annotate(
-                is_digital=F('orders__is_digital'),
-                is_digital_free=F('orders__is_free_digital'),
-            )
-            .order_by('id', 'photo_theme__date_end')  # Удаляем DISTINCT ON
-        )
+        photo_lines_queryset = PhotoLine.objects.filter(
+            kindergarten__in=user.kindergarten.all(),
+            parent=user,
+            orders__status=OrderStatus.paid_for
+        ).annotate(
+            is_digital=F('orders__is_digital'),
+            is_free_digital=F('orders__is_free_digital'),
+        ).order_by('id', 'photo_theme__date_end')
 
-        photo_lines = []
-        for photo_line in photo_lines_queryset.distinct('id'):
-            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
-            photo_line.is_date_end = extended_date_end < now()
-            photo_lines.append(photo_line)
+        if not photo_lines_queryset.exists():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        photo_lines_dict, is_digital_by_photo_line_id = self.aggregate_is_digital(photo_lines_queryset)
+        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id)
 
         if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
 
     def post(self, request):
         user = request.user
@@ -100,6 +139,7 @@ class OrderAPIView(APIView):
                 user=user,
                 photo_line=cart_photo_line.photo_line,
                 is_digital=cart_photo_line.is_digital,
+                is_free_digital=cart_photo_line.is_free_digital,
                 is_photobook=cart_photo_line.is_photobook,
                 is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,
@@ -122,7 +162,7 @@ class OrderAPIView(APIView):
                         photo_type=photo_in_cart.photo_type,
                         amount=photo_in_cart.quantity,
                         order=order,
-                        photo=photo_in_cart.photo,
+                        photo = photo_in_cart.photo if photo_in_cart and photo_in_cart.photo else None,
                     ) for photo_in_cart in photos_in_cart
                 ]
             )
@@ -144,7 +184,8 @@ class OrderAPIView(APIView):
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.free_calendar,
-                        photo=photos_in_cart.first().photo,
+                        photo=photos_in_cart.first().photo
+                        if photos_in_cart.first() and photos_in_cart.first().photo else None,
                         order=order,
                     ))
 
@@ -301,6 +342,52 @@ class OrdersPaymentAPIView(APIView):
         # Все/некоторые заказы имеют статус отличный от "создан"
         return Response('Невозможно удалить заказ', status=status.HTTP_400_BAD_REQUEST)
 
+
+class OrderManagerListAPIView(APIView):
+    """Получение списка заказов с фильтрацией по статусу, photo_theme и kindergarten"""
+    permission_classes = [IsAuthenticated, IsManager]  # Доступ только для авторизованных пользователей
+
+    def get(self, request, photo_theme_id, kindergarten_id):
+        """
+        Получение списка заказов для определенной фото темы и детского сада
+        ---
+        Args:
+            request: запрос от клиента.
+            photo_theme_id: ID фото темы, по которой нужно отфильтровать заказы.
+            kindergarten_id: ID детского сада, по которому нужно отфильтровать заказы.
+
+        Returns:
+            Response: Список заказов с полями:
+                - order_price
+                - user.first_name
+                - user.last_name
+                - payment_id
+        """
+        try:
+            if not PhotoTheme.objects.filter(id=photo_theme_id, photo_lines__kindergarten_id=kindergarten_id).exists():
+                return Response(
+                    {"error": "Photo theme for the specified kindergarten not found."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            orders = Order.objects.filter(
+                status=OrderStatus.paid_for,
+                photo_line__photo_theme_id=photo_theme_id,
+                photo_line__kindergarten_id=kindergarten_id
+            ).select_related('user', 'photo_line')
+
+            serializer = OrderSerializer(orders, many=True)
+
+            return Response(
+                {"orders": serializer.data},
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class NotificationFiscalizationAPIView(APIView):
     """Вью для получения нотификации о фискализации от т-банка."""

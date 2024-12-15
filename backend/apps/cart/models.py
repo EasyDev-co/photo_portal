@@ -39,6 +39,10 @@ class CartPhotoLine(UUIDMixin):
         default=False,
         verbose_name='Бесплатный календарь'
     )
+    is_free_digital = models.BooleanField(
+        default=False,
+        verbose_name='Бесплатные электронные фотографии'
+    )
     total_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -58,6 +62,8 @@ class PhotoInCart(UUIDMixin):
         on_delete=models.CASCADE,
         related_name='photos_in_cart',
         verbose_name='Фото',
+        null=True,
+        blank=True,
     )
     cart_photo_line = models.ForeignKey(
         'CartPhotoLine',
