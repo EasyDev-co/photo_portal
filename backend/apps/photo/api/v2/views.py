@@ -152,6 +152,7 @@ class PhotoUploadAPIView(APIView):
     )
 
     def post(self, request, *args, **kwargs):
+        logger.info(f"ser_data")
         serializer = PhotoUploadSerializer(data=request.data)
         logger.info("in post")
 
