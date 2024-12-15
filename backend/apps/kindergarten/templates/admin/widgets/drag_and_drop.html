@@ -265,6 +265,7 @@
                 processData: false,
                 {#headers: {'X-CSRFToken': getCookie('csrftoken')},#}
                 success: () => {
+                    console.log("done")
                     hideModal();
                     clearFileList();
                     alert('Все файлы успешно загружены.');
