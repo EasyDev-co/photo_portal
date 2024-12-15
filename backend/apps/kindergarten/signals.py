@@ -18,7 +18,7 @@ from apps.user.models import UserRole
 User = get_user_model()
 
 
-def generate_random_password(length=6):
+def generate_random_password(length=5):
     """Генерация случайного пароля из 6 символов (буквы и цифры)"""
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
