@@ -255,14 +255,17 @@
             formData.append('kindergarten_id', kindergartenId);
 
             // Отправляем все файлы одним запросом
+            console.log("upload_url", uploadUrl)
+            console.log("data", formData)
             $.ajax({
                 url: uploadUrl,
                 type: 'POST',
                 data: formData,
                 contentType: false,
                 processData: false,
-                headers: {'X-CSRFToken': getCookie('csrftoken')},
+                {#headers: {'X-CSRFToken': getCookie('csrftoken')},#}
                 success: () => {
+                    console.log("done")
                     hideModal();
                     clearFileList();
                     alert('Все файлы успешно загружены.');

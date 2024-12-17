@@ -1,8 +1,6 @@
 import requests
 
-from rest_framework.authentication import SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -24,14 +22,14 @@ from django.shortcuts import get_object_or_404
 from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2
 from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
-from apps.user.models.user import User
+from apps.user.models.user import User, UserRole
 from apps.photo.filters import PhotoThemeFilter
 from apps.kindergarten.models import Kindergarten
-from apps_crm.roles.models import UserRole
+from apps_crm.roles.models import UserRole as CRMUserRole
 
 from loguru import logger
 
-from config.settings import PHOTO_LINE_URL
+from config.settings import PHOTO_LINE_URL, UPLOAD_SERVICE_SECRET_KEY, GO_UPLOAD_URL
 from apps.utils.services import generate_qr_code
 from django.core.files.base import ContentFile
 
@@ -136,7 +134,8 @@ class PhotoUploadView(APIView):
 class PhotoUploadAPIView(APIView):
     """Загрузка фотографий"""
 
-    upload_url: str = " https://60ae-45-76-88-92.ngrok-free.app/v1/files/upload/"
+    upload_url: str = GO_UPLOAD_URL
+    secret_key: str = UPLOAD_SERVICE_SECRET_KEY
 
     swagger_auto_schema(
         request_body=openapi.Schema(
@@ -153,8 +152,9 @@ class PhotoUploadAPIView(APIView):
     )
 
     def post(self, request, *args, **kwargs):
+        logger.info(f"ser_data")
         serializer = PhotoUploadSerializer(data=request.data)
-        logger.info("post")
+        logger.info("in post")
 
         if serializer.is_valid():
             logger.info("valid_ser")
@@ -162,7 +162,7 @@ class PhotoUploadAPIView(APIView):
             photos = serializer.validated_data['photos']
             photo_theme = kindergarten.kindergartenphototheme.get(is_active=True).photo_theme
             region = kindergarten.region
-
+            logger.info("upload_photos")
             uploaded_photos = self.get_photos(
                 kindergarten=kindergarten,
                 photos=photos,
@@ -219,10 +219,13 @@ class PhotoUploadAPIView(APIView):
         files_payload = [
             ('files', (photo.name, photo.file)) for photo in photos
         ]
+        logger.info(f"files_payload: {files_payload}")
         try:
+            logger.info("try post")
             response = requests.post(
                 self.upload_url,
                 files=files_payload,
+                headers={"Authorization-Token": self.secret_key},
                 params={"kindergarten": kindergarten.name, "photo_theme": photo_theme.name, "region": region.name}
             )
             logger.info(f"status_code: {response.status_code}")
@@ -272,8 +275,11 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         """Получение фото-линии по номерам фотографий"""
 
         user = request.user
-        numbers_list = request.data.get('numbers', '')  # список из 1 или 6 элементов
-        kindergarten = user.kindergarten.all().first()
+        numbers_list = request.data.get('numbers', '')
+        if user.role == UserRole.parent: # список из 1 или 6 элементов
+            kindergarten = user.kindergarten.all().first()
+        elif user.role == UserRole.manager:
+            kindergarten = user.managed_kindergarten
 
         # Валидация номеров фотографий
         validation_response = self.validate_numbers(numbers_list)
@@ -404,11 +410,17 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
     @staticmethod
     def check_photo_line_permissions(photo_line, user):
         """Проверка, что пользователь имеет доступ к пробнику"""
-        if photo_line.kindergarten not in user.kindergarten.all():
-            return Response(
-                {'message': 'Пробник не относится к вашему детскому саду'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        error_response = Response(
+            {'message': 'Пробник не относится к вашему детскому саду'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+        if user.role == UserRole.parent and photo_line.kindergarten not in user.kindergarten.all():
+            return error_response
+
+        if user.role == UserRole.manager and photo_line.kindergarten != user.managed_kindergarten:
+            return error_response
+
         return None
 
     @staticmethod
@@ -568,7 +580,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
         queryset = super().get_queryset()
 
         # Фильтрация для менеджеров
-        if employee and employee.employee_role == UserRole.MANAGER:
+        if employee and employee.employee_role == CRMUserRole.MANAGER:
             # Получаем детские сады, за которые отвечает менеджер
             kindergartens = Kindergarten.objects.filter(
                 clientcard__responsible_manager=employee
@@ -583,7 +595,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
                 queryset = queryset.filter(kindergarten__region_id=region_id)
 
         # Фильтрация для директоров и РОП
-        elif employee and employee.employee_role in {UserRole.DIRECTOR, UserRole.ROP}:
+        elif employee and employee.employee_role in {CRMUserRole.ROP}:
             # Проверка на указанный регион
             region_id = self.request.query_params.get('region')
             if region_id:
