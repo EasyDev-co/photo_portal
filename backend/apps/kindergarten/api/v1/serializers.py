@@ -3,6 +3,8 @@ from rest_framework import serializers
 from apps.kindergarten.models import PhotoPrice, Kindergarten, Region, Ransom
 from apps.photo.models import PhotoTheme
 
+from apps.photo.api.v1.serializers import PhotoThemeSerializer
+
 
 class RegionSerializer(serializers.ModelSerializer):
     """Сериализатор для получения информации о регионе у пользователя."""
