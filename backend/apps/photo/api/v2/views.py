@@ -22,10 +22,10 @@ from django.shortcuts import get_object_or_404
 from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2
 from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
-from apps.user.models.user import User
+from apps.user.models.user import User, UserRole
 from apps.photo.filters import PhotoThemeFilter
 from apps.kindergarten.models import Kindergarten
-from apps_crm.roles.models import UserRole
+from apps_crm.roles.models import UserRole as CRMUserRole
 
 from loguru import logger
 
@@ -275,8 +275,11 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         """Получение фото-линии по номерам фотографий"""
 
         user = request.user
-        numbers_list = request.data.get('numbers', '')  # список из 1 или 6 элементов
-        kindergarten = user.kindergarten.all().first()
+        numbers_list = request.data.get('numbers', '')
+        if user.role == UserRole.parent: # список из 1 или 6 элементов
+            kindergarten = user.kindergarten.all().first()
+        elif user.role == UserRole.manager:
+            kindergarten = user.managed_kindergarten
 
         # Валидация номеров фотографий
         validation_response = self.validate_numbers(numbers_list)
@@ -571,7 +574,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
         queryset = super().get_queryset()
 
         # Фильтрация для менеджеров
-        if employee and employee.employee_role == UserRole.MANAGER:
+        if employee and employee.employee_role == CRMUserRole.MANAGER:
             # Получаем детские сады, за которые отвечает менеджер
             kindergartens = Kindergarten.objects.filter(
                 clientcard__responsible_manager=employee
@@ -586,7 +589,7 @@ class GetPhotoThemeForCalendarView(viewsets.ReadOnlyModelViewSet):
                 queryset = queryset.filter(kindergarten__region_id=region_id)
 
         # Фильтрация для директоров и РОП
-        elif employee and employee.employee_role in {UserRole.DIRECTOR, UserRole.ROP}:
+        elif employee and employee.employee_role in {CRMUserRole.ROP}:
             # Проверка на указанный регион
             region_id = self.request.query_params.get('region')
             if region_id:
