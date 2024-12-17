@@ -1,4 +1,5 @@
 export function getNearestDate(dates) {
+
     // Парсинг входящего массива дат в объекты с deadline и theme_name
     const dateObjects = dates.map(date => {
         return {
