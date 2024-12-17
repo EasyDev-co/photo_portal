@@ -20,6 +20,10 @@ class HasPermissionCanViewPhotoLine(BasePermission):
             for kindergarten_id in parent_kindergartens.values('id'):
                 if kindergarten_id['id'] == obj.kindergarten.pk:
                     return True
+
+        elif user.role == UserRole.manager:
+            if user.managed_kindergarten.pk == obj.kindergarten.pk:
+                return True
             return False
 
 

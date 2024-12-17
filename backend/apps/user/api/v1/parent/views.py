@@ -31,6 +31,8 @@ from apps.user.models.code import CodePurpose
 from apps.user.models.user import UserRole
 from apps.user.tasks import send_confirm_code
 
+from loguru import logger
+
 User = get_user_model()
 
 
@@ -64,7 +66,7 @@ class ParentRegisterAPIView(CreateAPIView):
 
             if user.is_verified:
                 raise UserRegistered
-
+        logger.info("send confirm code for register parent")
         send_confirm_code.delay(
             user_id=user.pk,
             code_purpose=CodePurpose.CONFIRM_EMAIL
@@ -156,7 +158,7 @@ class ResetPasswordAPIView(APIView):
         email = serializer.validated_data['email']
 
         user = User.objects.get(email=email)
-
+        logger.info("send code to reset password")
         send_confirm_code.delay(
             user_id=user.pk,
             code_purpose=CodePurpose.RESET_PASSWORD,

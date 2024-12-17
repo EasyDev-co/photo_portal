@@ -109,7 +109,6 @@ class PhotoLinesGetByParent(ListAPIView):
     """Получение всех пробников родителя"""
     serializer_class = PhotoLineSerializer
     permission_classes = [IsAuthenticated, HasPermissionCanViewPhotoLine]
-    lookup_field = 'parent'
 
     def get_queryset(self):
         parent = self.request.user
