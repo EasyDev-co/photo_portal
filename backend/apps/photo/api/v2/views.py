@@ -410,11 +410,17 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
     @staticmethod
     def check_photo_line_permissions(photo_line, user):
         """Проверка, что пользователь имеет доступ к пробнику"""
-        if photo_line.kindergarten not in user.kindergarten.all():
-            return Response(
-                {'message': 'Пробник не относится к вашему детскому саду'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        error_response = Response(
+            {'message': 'Пробник не относится к вашему детскому саду'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+        if user.role == UserRole.parent and photo_line.kindergarten not in user.kindergarten.all():
+            return error_response
+
+        if user.role == UserRole.manager and photo_line.kindergarten != user.managed_kindergarten:
+            return error_response
+
         return None
 
     @staticmethod
