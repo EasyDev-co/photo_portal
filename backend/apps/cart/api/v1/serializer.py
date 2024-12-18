@@ -33,6 +33,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
     """Сериализатор для отображения пробника в корзине."""
     id = serializers.UUIDField()
     photos = serializers.SerializerMethodField()
+    photo_line_id = serializers.UUIDField(required=False, allow_null=True)
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     is_free_calendar = serializers.BooleanField(default=False)
@@ -44,6 +45,19 @@ class CartPhotoLineSerializer(serializers.Serializer):
         photos_in_cart = PhotoInCart.objects.filter(cart_photo_line=obj)
         serializer = PhotoInCartSerializer(photos_in_cart, many=True)
         return serializer.data
+
+    def to_representation(self, instance):
+        """
+        Добавляем поле photo_line_id, чтобы извлечь id photo_line из модели CartPhotoLine.
+        """
+        representation = super().to_representation(instance)
+
+        # Получаем photo_line_id из instance напрямую
+        photo_line_id = str(instance.photo_line_id) if instance.photo_line_id else None
+
+        representation['photo_line_id'] = photo_line_id
+
+        return representation
 
 
 class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
