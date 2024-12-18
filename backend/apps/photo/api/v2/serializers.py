@@ -19,3 +19,20 @@ class PhotoThemeSerializerV2(serializers.ModelSerializer):
     class Meta:
         model = PhotoTheme
         fields = '__all__'
+
+
+class DirectPhotoUploadSerializer(serializers.Serializer):
+    kindergarten_id = serializers.PrimaryKeyRelatedField(
+        queryset=Kindergarten.objects.all(),
+        source='kindergarten',
+        write_only=True
+    )
+
+    class PhotoSerializer(serializers.Serializer):
+        original_photo = serializers.URLField(required=True)
+        watermarked_photo = serializers.URLField(required=True)
+
+    photos = serializers.ListField(
+        child=PhotoSerializer(),
+        write_only=True
+    )

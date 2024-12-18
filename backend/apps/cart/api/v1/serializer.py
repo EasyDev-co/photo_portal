@@ -194,3 +194,21 @@ class CartSerializer(serializers.Serializer):
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     is_free_calendar = serializers.BooleanField(default=False)
+    photo_line_id = serializers.UUIDField(required=False, allow_null=True)
+
+    def to_representation(self, instance):
+        """
+        Добавляем поле photo_line_id, чтобы извлечь id photo_line из первой фотографии.
+        """
+        representation = super().to_representation(instance)
+
+        photo_ids = [photo['id'] for photo in representation.get('photos', [])]
+        photo_instances = Photo.objects.filter(id__in=photo_ids)
+
+        photo_line_id = None
+        if photo_instances.exists():
+            photo_line_id = str(photo_instances.first().photo_line_id)
+
+        representation['photo_line_id'] = photo_line_id
+
+        return representation
