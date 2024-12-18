@@ -53,10 +53,12 @@ class KindergartenAdmin(admin.ModelAdmin):
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
+        logger.info("В форме")
         active_theme = obj.kindergartenphototheme.filter(is_active=True)
 
         if not active_theme.exists():
-            return "Добавьте активную фотосессию, чтобы загружать фото"
+            return f"Добавьте активную фотосессию, чтобы загружать фото {obj.id} {active_theme.photo_theme.name} {obj.name} {obj.region.name}"
+
         initial = {
             'kindergarten_id': obj.id,
             'photo_theme': active_theme.photo_theme.name,
