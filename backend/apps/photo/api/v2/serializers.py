@@ -29,8 +29,8 @@ class DirectPhotoUploadSerializer(serializers.Serializer):
     )
 
     class PhotoSerializer(serializers.Serializer):
-        original_photo = serializers.URLField(required=True)
-        watermarked_photo = serializers.URLField(required=True)
+        original_photo = serializers.CharField(required=True)
+        watermarked_photo = serializers.CharField(required=True)
 
     photos = serializers.ListField(
         child=PhotoSerializer(),
