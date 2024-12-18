@@ -36,6 +36,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
     is_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     is_free_calendar = serializers.BooleanField(default=False)
+    is_free_digital = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     @staticmethod
