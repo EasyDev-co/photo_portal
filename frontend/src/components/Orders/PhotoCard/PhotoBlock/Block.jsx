@@ -22,8 +22,13 @@ const Block = ({ setlineLenght, addPhoto, price, priceCalendar, orderValue, setO
         blocks.push(addPhoto.slice(i, i + 6));
       }
       setPhotoBlocks(blocks);
+      // console.log(photoBlocks)
     }
   }, [addPhoto]);
+
+  useEffect(() => {
+    console.log(photoBlocks)
+  }, [photoBlocks])
 
   const handleRemoveBlock = async (indexToRemove, id) => {
     try {

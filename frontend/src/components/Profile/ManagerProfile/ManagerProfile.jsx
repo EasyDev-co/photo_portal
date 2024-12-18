@@ -29,6 +29,9 @@ import 'swiper/css/navigation';
 import {EffectFlip, Pagination, Navigation} from 'swiper/modules';
 import { getPromocode } from "../../../http/getPromocode";
 import ClientModal from "../../../components-crm/ClientCardModal/ClientModal";
+import { getOrdersManager } from "../../../http/order/getOrdersManager";
+// import { fetchOrders } from "../../../http/order/getOrdersManager";
+
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
@@ -37,9 +40,12 @@ const ManagerProfile = () => {
     const [bonus, setBonus] = useState([])
     const [promocode, setPromocode] = useState('');
     const [isOpen, setIsOpen] = useState(false)
-    const refresh = useSelector((state) => state.user.refresh)
-    const kindergartenId = useSelector(state => state.user.kindergarten_id)
-    const photoLineId = useSelector(state => state.user.photoLineId)
+    // const refresh = useSelector((state) => state.user.refresh)
+    // const kindergartenId = useSelector(state => state.user.kindergarten_id)
+    // const photoLineId = useSelector(state => state.user.photoLineId)
+    const photoThemeId = localStorage.getItem('theme_id')
+    const kindergartenId = localStorage.getItem('kindergarten_id')
+    const [orderList, setOrderList] = useState({})
     const [stats, setStats] = useState({
             current_stats: {
                 total_orders: 0,
@@ -87,7 +93,6 @@ const ManagerProfile = () => {
                     if (res.ok) {
                         res.json()
                             .then(data => {
-                                console.log(data)
                                 getNearestDate(data);
                             })
                     }
@@ -147,6 +152,47 @@ const ManagerProfile = () => {
             console.log(error)
         }
     }, [])
+
+    useEffect(() => {
+        try {
+            getOrdersManager(photoThemeId, kindergartenId, accessStor)
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(res => {
+                                console.log(res)
+                                setOrderList(res)
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [])
+
+    //   useEffect(() => {
+    //     // let isMounted = true;
+    //     console.log(photoThemeId, kindergartenId)
+    //     if (photoThemeId && kindergartenId) {
+    //         fetchOrdersManagerWithTokenInterceptor(photoThemeId, kindergartenId, accessStor)
+    //         // fetchOrders(photoThemeId, kindergartenId, accessStor)
+    //         .then(res => {
+    //         //   if (isMounted && res.ok) {
+    //         if (res.ok) {
+    //             res.json()
+    //               .then(data => {
+    //                 console.log(data)
+    //                 setOrderList(data)
+    //                 // dispatch(addPhotos(data));
+    //                 // patchPhotoLine(accessStor, { "parent": idP }, data.id)
+    //               })
+    //           }
+    //         })
+    //       return () => {
+    //         // isMounted = false;
+    //       };
+    //     }
+    //   }, [accessStor, photoThemeId, kindergartenId])
 
     return (
         <div className={styles.profileWrap}>

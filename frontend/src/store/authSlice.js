@@ -119,6 +119,11 @@ const authSlice = createSlice({
             localStorage.setItem('email', action.payload.email);
             localStorage.setItem('phone', action.payload.phone_number === null ? '' : action.payload.phone_number);
 
+            if (action.payload.managed_kindergarten) {
+                localStorage.setItem('theme_id', action.payload.managed_kindergarten.active_photo_theme.id ? '' : action.payload.managed_kindergarten.active_photo_theme.id);
+                localStorage.setItem('kindergarten_id', action.payload.managed_kindergarten.id === null ? '' : action.payload.managed_kindergarten.id);
+            }
+
             action.payload.kindergarten.forEach(elem => {
                 localStorage.setItem('kindergarten_id', elem.id)
                 state.kindergarten_id = elem.id
@@ -169,7 +174,7 @@ const authSlice = createSlice({
             state.total_price = action.payload.reduce((sum, elem) => {
                 return sum + parseFloat(elem.total_price);
             }, 0);
-            console.log(state.cart);
+            // console.log(state.cart);
         },        
         setOrderId(state, action){
             state.order = action.payload

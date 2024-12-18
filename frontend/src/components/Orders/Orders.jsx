@@ -40,6 +40,7 @@ export const Orders = () => {
   const [modalText, setModalText] = useState('')
   const [codeIsActive, setCodeActive] = useState(false);
   const [payOrder, setPayOrder] = useState({});
+
   const [price, setPrice] = useState({
     total_price: ''
   })
@@ -101,7 +102,7 @@ export const Orders = () => {
         if (isMounted && res.ok) {
           res.json()
             .then(data => {
-              console.log(data)
+              console.log(data)       //ЗДЕСЬ ЕСТЬ АЙДИ ФОТОЛИНИИ
               // data[0].photo_theme.id
               getNearestDate(data);
               setlineLenght(data.length);
@@ -198,10 +199,13 @@ export const Orders = () => {
 // Синхронизация корзины с сервером при изменении orderValue
 useEffect(() => {
     if (orderValue.length > 0) {
+      console.log(orderValue)
         const transformedData = transformData(orderValue);
+        console.log(transformedData)
         fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
             .then((res) => res.json())
             .then((data) => {
+              console.log(data)
                 dispatch(setCart(data));
                 localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
             })

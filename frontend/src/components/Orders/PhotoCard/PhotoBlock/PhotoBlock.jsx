@@ -1,11 +1,46 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/display-name */
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
 import galkaSvg from '../../../../assets/icons/galka.svg'
+import { useSelector } from 'react-redux';
 
 const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
+
+  const cart = useSelector(state => state.user.cart);
+
+  const [currentSum, setCurrentSum] = useState(0);
+  const [isDigitalChecked, setIsDigitalChecked] = useState(false);
+
+  const photoLineId = photos[0].photoLineId
+
+  useEffect(() => {
+    console.log(photoLineId)
+  }, [photoLineId])
+
+  // Получаем данные из cart для текущей фотолинии
+  useEffect(() => {
+    const currentPhotoLine = cart.find(item => item.photo_line_id === photoLineId);
+
+    if (currentPhotoLine) {
+      const totalPrice = parseFloat(currentPhotoLine.total_price);
+      setCurrentSum(totalPrice);
+      console.log(currentSum)
+      // Проверяем, должна ли галочка быть активной
+      const shouldActivateCheckbox = totalPrice >= priceCalendar.ransom_amount_for_digital_photos;
+
+      if (shouldActivateCheckbox && !isDigitalChecked) {
+        setIsDigitalChecked(true);
+        handleCheckboxChange({ target: { checked: true, name: 7 } }, blocksId);
+      } else if (!shouldActivateCheckbox && isDigitalChecked) {
+        setIsDigitalChecked(false);
+        handleCheckboxChange({ target: { checked: false, name: 7 } }, blocksId);
+      }
+    }
+  }, [cart]);
+
+  // }, [cart, priceCalendar.ransom_amount_for_digital_photos, handleCheckboxChange, isDigitalChecked]);
 
   return (
     <div style={{
@@ -86,7 +121,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
         <div className={styles.promoStringWrap}>
           {price.total_price >= priceCalendar.ransom_amount_for_digital_photos ?
             <div>
-              <img src={galkaSvg} alt="galka" />
+              {/* <img src={galkaSvg} alt="galka" /> */}
             </div>
             :
             <div className={styles.dot}></div>
