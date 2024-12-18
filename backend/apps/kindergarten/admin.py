@@ -9,8 +9,8 @@ from .models import Ransom
 
 from apps.kindergarten.models.kindergarten import Kindergarten
 
-from config.settings import UPLOAD_URL, JQUERY_CDN
-
+from config.settings import UPLOAD_URL, JQUERY_CDN, UPLOAD_SERVICE_SECRET_KEY
+from loguru import logger
 
 class KindergartenInline(admin.TabularInline):
     model = Kindergarten
@@ -53,17 +53,28 @@ class KindergartenAdmin(admin.ModelAdmin):
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
-        has_active_theme = obj.kindergartenphototheme.filter(is_active=True).exists()
+        active_theme = obj.kindergartenphototheme.filter(is_active=True)
 
-        if not has_active_theme:
+        if not active_theme.exists():
             return "Добавьте активную фотосессию, чтобы загружать фото"
+        initial = {
+            'kindergarten_id': obj.id,
+            'photo_theme': active_theme.photo_theme.name,
+            'kindergarten': obj.name,
+            'region': obj.region.name,
+        }
 
-        form = KindergartenForm(initial={'kindergarten_id': obj.id})
+        logger.info(f"initial: {initial}")
+
+        form = KindergartenForm(
+            initial=initial
+        )
         context = {
             'form': form,
             'upload_url': UPLOAD_URL,
             'object': obj,
-            'jquery_cdn': JQUERY_CDN
+            'jquery_cdn': JQUERY_CDN,
+            'upload_service_secret_key': UPLOAD_SERVICE_SECRET_KEY,
         }
         html = render_to_string('admin/widgets/drag_and_drop.html', context)
         return mark_safe(html)
