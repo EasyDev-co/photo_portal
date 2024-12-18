@@ -19,7 +19,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 
-from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2
+from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2, DirectPhotoUploadSerializer
 from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
 from apps.user.models.user import User, UserRole
@@ -251,6 +251,120 @@ class PhotoUploadAPIView(APIView):
         kindergarten_code = photo_line.kindergarten.code
 
         logger.info(f"photo_num: {photo_numbers}")
+
+        if not photo_numbers:
+            logger.warning("Список номеров фотографий пуст, пропускаем генерацию QR-кода.")
+            return
+
+        qr_code, buffer = generate_qr_code(
+            photo_line_id=photo_line.id,
+            url=PHOTO_LINE_URL,
+            kindergarten_code=kindergarten_code,
+            photo_numbers=photo_numbers,
+        )
+        buffer.seek(0)
+        qr_code_filename = f'{str(photo_line.photo_theme.id)}/{str(photo_line.photo_theme.name)}_qr.png'
+        photo_line.qr_code.save(qr_code_filename, ContentFile(buffer.read()), save=True)
+
+
+class DirectPhotoUploadAPIView(APIView):
+    """Прямая загрузка фотографий"""
+
+    swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'kindergarten_id': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description="ID детского сада"
+                ),
+                'photos': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'original_photo': openapi.Schema(
+                                type=openapi.TYPE_STRING,
+                                description="URL на оригинальное фото в S3"
+                            ),
+                            'watermarked_photo': openapi.Schema(
+                                type=openapi.TYPE_STRING,
+                                description="URL на фото с водяным знаком в S3"
+                            )
+                        },
+                        required=['original_photo', 'watermarked_photo']
+                    ),
+                    description="Список загруженных фотографий"
+                )
+            },
+            required=['kindergarten_id', 'photos']
+        ),
+        responses={200: "Файлы успешно загружены!"},
+    )
+
+    def post(self, request, *args, **kwargs):
+        logger.info("Start DirectPhotoUploadAPIView")
+        serializer = DirectPhotoUploadSerializer(data=request.data)
+
+        if serializer.is_valid():
+            logger.info("Serializer is valid")
+            kindergarten = serializer.validated_data['kindergarten']
+            photos = serializer.validated_data['photos']
+            photo_theme = kindergarten.kindergartenphototheme.get(is_active=True).photo_theme
+
+            logger.info("Calling save_photos")
+            self.save_photos(kindergarten, photos, photo_theme)
+
+            return Response({'detail': 'Файлы успешно загружены!'}, status=status.HTTP_201_CREATED)
+
+        logger.error("Serializer errors", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def save_photos(self, kindergarten, photos, photo_theme):
+        with transaction.atomic():
+            last_photo_number = Photo.objects.filter(
+                photo_line__kindergarten=kindergarten,
+                photo_line__photo_theme=photo_theme
+            ).aggregate(Max('number'))['number__max'] or 6
+            next_photo_number = last_photo_number + 1
+
+            logger.info(f"LAST_PHOTO_NUMBER: {last_photo_number}")
+            logger.info(f"NEXT_PHOTO_NUMBER: {next_photo_number}")
+
+            groups = self._grouper(photos, 6)
+
+            for group in groups:
+                photo_line = PhotoLine.objects.create(
+                    kindergarten=kindergarten,
+                    photo_theme=photo_theme,
+                )
+
+                photo_numbers = []
+
+                for i, photo_data in enumerate(filter(None, group)):
+                    original_url = photo_data.get('original_photo')
+                    watermarked_url = photo_data.get('watermarked_photo')
+
+                    photo = Photo.objects.create(
+                        photo_line=photo_line,
+                        number=next_photo_number,
+                        photo_path=original_url,
+                        watermarked_photo_path=watermarked_url,
+                        serial_number=i + 1,
+                    )
+                    photo_numbers.append(photo.number)
+                    next_photo_number += 1
+
+                self.generate_qr_code_for_photo_line(photo_line, photo_numbers)
+
+    @staticmethod
+    def _grouper(iterable, n, fillvalue=None):
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
+
+    @staticmethod
+    def generate_qr_code_for_photo_line(photo_line, photo_numbers):
+        kindergarten_code = photo_line.kindergarten.code
 
         if not photo_numbers:
             logger.warning("Список номеров фотографий пуст, пропускаем генерацию QR-кода.")
