@@ -55,7 +55,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     photos = PhotoInCartSerializer(many=True)
     is_digital = serializers.BooleanField(default=False)
     is_free_calendar = serializers.BooleanField(default=False)
-    is_free_digital_photo = serializers.BooleanField(default=False)
+    is_free_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     promo_code = serializers.CharField(required=False)
 
