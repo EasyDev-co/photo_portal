@@ -9,7 +9,10 @@ from .models import Ransom
 
 from apps.kindergarten.models.kindergarten import Kindergarten
 
-from config.settings import UPLOAD_URL, JQUERY_CDN
+from config.settings import UPLOAD_URL, JQUERY_CDN, UPLOAD_SERVICE_SECRET_KEY
+from loguru import logger
+
+from ..photo.models import KindergartenPhotoTheme
 
 
 class KindergartenInline(admin.TabularInline):
@@ -53,17 +56,28 @@ class KindergartenAdmin(admin.ModelAdmin):
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
-        has_active_theme = obj.kindergartenphototheme.filter(is_active=True).exists()
+        try:
+            active_theme = obj.kindergartenphototheme.get(is_active=True).photo_theme.name
+        except KindergartenPhotoTheme.DoesNotExist:
+            return f"Добавьте активную фотосессию в разделе Фотосессии, чтобы загружать фото."
+        initial = {
+            'kindergarten_id': obj.id,
+            'photo_theme': active_theme,
+            'kindergarten': obj.name,
+            'region': obj.region.name,
+        }
 
-        if not has_active_theme:
-            return "Добавьте активную фотосессию, чтобы загружать фото"
+        logger.info(f"initial: {initial}")
 
-        form = KindergartenForm(initial={'kindergarten_id': obj.id})
+        form = KindergartenForm(
+            initial=initial
+        )
         context = {
             'form': form,
             'upload_url': UPLOAD_URL,
             'object': obj,
-            'jquery_cdn': JQUERY_CDN
+            'jquery_cdn': JQUERY_CDN,
+            'upload_service_secret_key': UPLOAD_SERVICE_SECRET_KEY,
         }
         html = render_to_string('admin/widgets/drag_and_drop.html', context)
         return mark_safe(html)

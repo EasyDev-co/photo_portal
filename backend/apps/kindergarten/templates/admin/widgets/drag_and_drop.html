@@ -94,6 +94,9 @@
     <div class="drag-and-drop">
         <input type="file" name="{{ widget.name }}" class="drag-and-drop-input" multiple>
         <input type="hidden" id="kindergarten-id" value="{{ form.initial.kindergarten_id }}">
+        <input type="hidden" id="kindergarten-name" value="{{ form.initial.kindergarten }}">
+        <input type="hidden" id="region" value="{{ form.initial.region }}">
+        <input type="hidden" id="photo-theme" value="{{ form.initial.photo_theme }}">
         <div class="drag-and-drop-area">
             <p>Перетащите файлы сюда или нажмите, чтобы выбрать</p>
         </div>
@@ -128,6 +131,7 @@
         const uploadButton = document.querySelector('.upload-button');
         const uploadModal = document.getElementById('upload-modal');
         const uploadUrl = "{{ upload_url }}";
+        const uploadServiceSecretKey = "{{ upload_service_secret_key }}"
 
         let dataTransfer = new DataTransfer();
 
@@ -191,13 +195,11 @@
 
             if (files.length > 0) {
                 if (files.length > maxDisplayCount) {
-                    // Если файлов больше 12, показываем только количество
                     const infoItem = document.createElement('div');
                     infoItem.classList.add('file-info');
                     infoItem.textContent = `Вы выбрали ${files.length} файлов.`;
                     fileList.appendChild(infoItem);
                 } else {
-                    // Если файлов 12 или меньше, показываем полный список
                     for (let i = 0; i < files.length; i++) {
                         const fileItem = document.createElement('div');
                         fileItem.classList.add('file-item');
@@ -245,6 +247,10 @@
             const formData = new FormData();
             const files = Array.from(input.files);
             const kindergartenId = document.getElementById('kindergarten-id').value;
+            const kindergartenName = document.getElementById('kindergarten-name').value;
+            const region = document.getElementById('region').value;
+            const photoTheme = document.getElementById('photo-theme').value;
+
 
             // Добавляем все файлы в FormData
             files.forEach((file) => {
@@ -253,17 +259,20 @@
 
             // Добавляем ID детского сада
             formData.append('kindergarten_id', kindergartenId);
+            formData.append('region', region);
+            formData.append('kindergarten', kindergartenName);
+            formData.append('photo_theme', photoTheme);
 
             // Отправляем все файлы одним запросом
             console.log("upload_url", uploadUrl)
-            console.log("data", formData)
+            console.log("token", uploadServiceSecretKey)
             $.ajax({
                 url: uploadUrl,
                 type: 'POST',
                 data: formData,
                 contentType: false,
                 processData: false,
-                {#headers: {'X-CSRFToken': getCookie('csrftoken')},#}
+                headers: {'Authorization-Token': uploadServiceSecretKey},
                 success: () => {
                     console.log("done")
                     hideModal();

@@ -317,7 +317,7 @@ class DirectPhotoUploadAPIView(APIView):
 
             return Response({'detail': 'Файлы успешно загружены!'}, status=status.HTTP_201_CREATED)
 
-        logger.error("Serializer errors", serializer.errors)
+        logger.error(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def save_photos(self, kindergarten, photos, photo_theme):
