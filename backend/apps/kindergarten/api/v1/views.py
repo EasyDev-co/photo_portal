@@ -93,8 +93,8 @@ class KindergartenStatsAPIView(APIView):
         return Response({
             'current_stats': current_serializer.data,
             'past_stats': ransom_serializer.data,
-            'total_ransom_amount': total_ransom_amount,
-            'average_ransom_amount': round(average_ransom_amount, 2),
+            'total_ransom_amount': total_ransom_amount + current_serializer.validated_data['total_amount'],
+            'average_ransom_amount': round(average_ransom_amount, 2) + average_ransom_amount,
         }, status=status.HTTP_200_OK)
 
 
