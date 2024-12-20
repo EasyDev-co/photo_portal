@@ -21,6 +21,7 @@ from apps.order.api.v1.serializers import (
     OrderSerializer,
     PhotoLineCartSerializer,
     OrdersPaymentSerializer,
+    OrderManagerSerializer,
 )
 from apps.order.models import Order, OrderItem, OrdersPayment
 from apps.order.models.const import OrderStatus, PaymentMethod
@@ -344,7 +345,7 @@ class OrdersPaymentAPIView(APIView):
 
 class OrderManagerListAPIView(APIView):
     """Получение списка заказов с фильтрацией по статусу, photo_theme и kindergarten"""
-    permission_classes = [IsAuthenticated, IsManager]  # Доступ только для авторизованных пользователей
+    permission_classes = [IsAuthenticated, IsManager]
 
     def get(self, request, photo_theme_id, kindergarten_id):
         """
@@ -375,7 +376,7 @@ class OrderManagerListAPIView(APIView):
                 photo_line__kindergarten_id=kindergarten_id
             ).select_related('user', 'photo_line')
 
-            serializer = OrderSerializer(orders, many=True)
+            serializer = OrderManagerSerializer(orders, many=True)
 
             return Response(
                 {"orders": serializer.data},

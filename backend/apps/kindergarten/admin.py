@@ -67,8 +67,6 @@ class KindergartenAdmin(admin.ModelAdmin):
             'region': obj.region.name,
         }
 
-        logger.info(f"initial: {initial}")
-
         form = KindergartenForm(
             initial=initial
         )
