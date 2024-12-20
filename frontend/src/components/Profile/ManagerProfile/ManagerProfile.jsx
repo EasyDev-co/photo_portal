@@ -28,6 +28,7 @@ import 'swiper/css/navigation';
 // import required modules
 import {EffectFlip, Pagination, Navigation} from 'swiper/modules';
 import { getPromocode } from "../../../http/getPromocode";
+import ClientModal from "../../../components-crm/ClientCardModal/ClientModal";
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
@@ -35,6 +36,10 @@ const ManagerProfile = () => {
     const navigate = useNavigate()
     const [bonus, setBonus] = useState([])
     const [promocode, setPromocode] = useState('');
+    const [isOpen, setIsOpen] = useState(false)
+    const refresh = useSelector((state) => state.user.refresh)
+    const kindergartenId = useSelector(state => state.user.kindergarten_id)
+    const photoLineId = useSelector(state => state.user.photoLineId)
     const [stats, setStats] = useState({
             current_stats: {
                 total_orders: 0,
@@ -67,6 +72,14 @@ const ManagerProfile = () => {
         }
     );
 
+    const handleShowModal = () => {
+        setIsOpen(true)
+        // console.log(photoLineId)
+      }
+      const handleCloseModal = () => {
+        setIsOpen(false)
+      }
+
     useEffect(() => {
         try {
             fetchPhotoLineListWithTokenInterceptor(accessStor, '')
@@ -74,6 +87,7 @@ const ManagerProfile = () => {
                     if (res.ok) {
                         res.json()
                             .then(data => {
+                                console.log(data)
                                 getNearestDate(data);
                             })
                     }
@@ -91,6 +105,7 @@ const ManagerProfile = () => {
                     if (res.ok) {
                         res.json()
                             .then(res => {
+                                console.log(res)
                                 setStats(res)
                             })
                     }
@@ -135,6 +150,14 @@ const ManagerProfile = () => {
 
     return (
         <div className={styles.profileWrap}>
+            <ClientModal
+                title="Список оплаченных заказов"
+                show={isOpen}
+                handleClose={handleCloseModal}
+            >
+                Парпым
+                {/* <BasicTaskFormkForm closeModal={handleCloseModal} setTasksList={setTasksList}/> */}
+            </ClientModal>
             <div className={styles.profileWidgetWrap}>
                 <h1 className={styles.profileTitle}>Статистика</h1>
                 <div className={styles.profileWidget}> 
@@ -146,7 +169,6 @@ const ManagerProfile = () => {
                         setIsCopy={setIsCopy}
                         isCopy
                         label={'Промо-код для сотрудников'}
-                        // data={'code20'}
                         data={promocode.code}
                     />
                     <StatisticItem
@@ -186,6 +208,11 @@ const ManagerProfile = () => {
                     <div onClick={() => navigate('/orders_manager')}>
                         <MainButton
                             value={'Заказ для себя'}
+                        />
+                    </div>
+                    <div onClick={handleShowModal}>
+                        <MainButton
+                            value={'Оплаченные заказы'}
                         />
                     </div>
 

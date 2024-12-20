@@ -43,9 +43,19 @@ const authSlice = createSlice({
             {
                 
             }
-        ]
+        ],
+        photoTheme: {
+            date_end: '',
+            date_start: '',
+            id: '',
+            name: '',
+            ransom: '',
+        }
     },
     reducers: {
+        setPhotoTheme: (state, action) => {
+            state.photoTheme = action.payload;
+        },
         setUser: (state, action) => {
             setCookie('refresh', action.payload.refresh);
             localStorage.setItem('access', action.payload.access);

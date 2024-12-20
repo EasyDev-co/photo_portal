@@ -72,6 +72,7 @@ const Verification = () => {
                         <div className={styles.regFormContainer}>
                             <h1 className={styles.formHeader}>Подтверждение регистрации</h1>
                             <form onSubmit={(e) => onSubmitHandler(e)} className={styles.regForm} action="">
+                                <label style={{fontSize: '15px'}}>Код отправлен на почту {email}</label>
                                 <InputField
                                     name={'code'}
                                     onChangeHandler={onChangeHandler}

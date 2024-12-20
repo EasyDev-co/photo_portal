@@ -12,6 +12,9 @@ from apps.kindergarten.models.kindergarten import Kindergarten
 from config.settings import UPLOAD_URL, JQUERY_CDN, UPLOAD_SERVICE_SECRET_KEY
 from loguru import logger
 
+from ..photo.models import KindergartenPhotoTheme
+
+
 class KindergartenInline(admin.TabularInline):
     model = Kindergarten
     extra = 0
@@ -53,15 +56,13 @@ class KindergartenAdmin(admin.ModelAdmin):
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):
-        logger.info("В форме")
-        active_theme = obj.kindergartenphototheme.filter(is_active=True)
-
-        if not active_theme.exists():
-            return f"Добавьте активную фотосессию, чтобы загружать фото {obj.id} {active_theme.photo_theme.name} {obj.name} {obj.region.name}"
-
+        try:
+            active_theme = obj.kindergartenphototheme.get(is_active=True).photo_theme.name
+        except KindergartenPhotoTheme.DoesNotExist:
+            return f"Добавьте активную фотосессию в разделе Фотосессии, чтобы загружать фото."
         initial = {
             'kindergarten_id': obj.id,
-            'photo_theme': active_theme.photo_theme.name,
+            'photo_theme': active_theme,
             'kindergarten': obj.name,
             'region': obj.region.name,
         }

@@ -76,6 +76,7 @@ export const Orders = () => {
 
   useEffect(() => {
     let isMounted = true;
+    console.log(sessionData)
     if (sessionData) {
       fetchWithTokenInterceptor(sessionData, accessStor)
         .then(res => {
@@ -100,9 +101,12 @@ export const Orders = () => {
         if (isMounted && res.ok) {
           res.json()
             .then(data => {
+              console.log(data)
+              // data[0].photo_theme.id
               getNearestDate(data);
               setlineLenght(data.length);
               if (data.length > 0) {
+
                 setPriceCalendar({
                   ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
                   ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
@@ -231,6 +235,7 @@ useEffect(() => {
 
     setOrderValue((prev) => {
       const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
+      console.log('prev:', prev, 'existingItemIndex:', existingItemIndex)
 
       if (existingItemIndex > -1) {
         const updatedItem = { ...prev[existingItemIndex] };
