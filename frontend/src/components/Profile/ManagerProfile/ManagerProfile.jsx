@@ -43,7 +43,7 @@ const ManagerProfile = () => {
     const photoLineId = useSelector(state => state.user.photoLineId)
     const photoThemeId = localStorage.getItem('theme_id')
     const kindergartenId = localStorage.getItem('kindergarten_id')
-    const [orderList, setOrderList] = useState({})
+    const [orderList, setOrderList] = useState([])
     
     const [stats, setStats] = useState({
             current_stats: {
@@ -161,14 +161,15 @@ const ManagerProfile = () => {
                         res.json()
                             .then(res => {
                                 console.log(res)
-                                setOrderList(res)
+                                setOrderList(res?.orders)
+                                console.log(orderList)
                             })
                     }
                 })
         } catch (error) {
             console.log(error)
         }
-    }, [])
+    }, [photoThemeId, kindergartenId, accessStor])
 
     return (
         <div className={styles.profileWrap}>
@@ -177,8 +178,26 @@ const ManagerProfile = () => {
                 show={isOpen}
                 handleClose={handleCloseModal}
             >
-                Парпым
-                {/* <BasicTaskFormkForm closeModal={handleCloseModal} setTasksList={setTasksList}/> */}
+                <div style={{marginBottom: '10px'}}>
+                    <div style={{marginBottom: '15px', fontWeight: 'bold'}} className={styles.grid}>
+                        <p>ФИ</p>
+                        <p>Сумма</p>
+                        <p>ID платежа</p>
+                    </div>
+                    {orderList.length === 0 ? (
+                        <p>Нет оплаченных заказов</p>
+                    ) : (
+                        <ul className={styles.orders_block}>
+                            {orderList.map((item, index) => (
+                                <li className={styles.grid} key={index}>
+                                    <p>{item.user_first_name} {item.user_last_name}</p>
+                                    <p>{item.order_price}</p>
+                                    <p>{item.payment_id}</p>
+                                </li>
+                            ))}
+                        </ul>
+                )}
+            </div>
             </ClientModal>
             <div className={styles.profileWidgetWrap}>
                 <h1 className={styles.profileTitle}>Статистика</h1>

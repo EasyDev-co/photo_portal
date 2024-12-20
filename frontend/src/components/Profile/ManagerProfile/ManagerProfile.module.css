@@ -66,6 +66,19 @@
         padding: 60px 20px 60px 20px;
     }
 }
+.orders_block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.grid {
+    display: grid;
+    /* grid-template-columns: repeat(3, 1fr); */
+    grid-template-columns: 50% 15% 35%;
+    gap: 10px;
+    list-style-type: none;
+    padding: 0;
+}
 .profileWidgetWrap{
     width: 100%;
 }

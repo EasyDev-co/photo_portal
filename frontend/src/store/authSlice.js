@@ -120,7 +120,7 @@ const authSlice = createSlice({
             localStorage.setItem('phone', action.payload.phone_number === null ? '' : action.payload.phone_number);
 
             if (action.payload.managed_kindergarten) {
-                localStorage.setItem('theme_id', action.payload.managed_kindergarten.active_photo_theme.id ? '' : action.payload.managed_kindergarten.active_photo_theme.id);
+                localStorage.setItem('theme_id', action.payload.managed_kindergarten.active_photo_theme.id);
                 localStorage.setItem('kindergarten_id', action.payload.managed_kindergarten.id === null ? '' : action.payload.managed_kindergarten.id);
             }
 
