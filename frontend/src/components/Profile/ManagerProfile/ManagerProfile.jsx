@@ -29,6 +29,7 @@ import 'swiper/css/navigation';
 import {EffectFlip, Pagination, Navigation} from 'swiper/modules';
 import { getPromocode } from "../../../http/getPromocode";
 import ClientModal from "../../../components-crm/ClientCardModal/ClientModal";
+import { getOrdersManager } from "../../../http/order/getOrdersManager";
 
 const ManagerProfile = () => {
     const [copy, setIsCopy] = useState('');
@@ -38,8 +39,12 @@ const ManagerProfile = () => {
     const [promocode, setPromocode] = useState('');
     const [isOpen, setIsOpen] = useState(false)
     const refresh = useSelector((state) => state.user.refresh)
-    const kindergartenId = useSelector(state => state.user.kindergarten_id)
+    // const kindergartenId = useSelector(state => state.user.kindergarten_id)
     const photoLineId = useSelector(state => state.user.photoLineId)
+    const photoThemeId = localStorage.getItem('theme_id')
+    const kindergartenId = localStorage.getItem('kindergarten_id')
+    const [orderList, setOrderList] = useState({})
+    
     const [stats, setStats] = useState({
             current_stats: {
                 total_orders: 0,
@@ -140,6 +145,23 @@ const ManagerProfile = () => {
                         res.json()
                             .then(res => {
                                 setPromocode(res)
+                            })
+                    }
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [])
+
+    useEffect(() => {
+        try {
+            getOrdersManager(photoThemeId, kindergartenId, accessStor)
+                .then(res => {
+                    if (res.ok) {
+                        res.json()
+                            .then(res => {
+                                console.log(res)
+                                setOrderList(res)
                             })
                     }
                 })
