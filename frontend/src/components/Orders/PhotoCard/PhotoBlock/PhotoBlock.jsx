@@ -8,33 +8,29 @@ import { useSelector } from 'react-redux';
 
 const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
   const cart = useSelector(state => state.user.cart);
+  const photoPrice = useSelector(state => state.user.photoPrice);
   const [currentSum, setCurrentSum] = useState(0);
   const [isDigitalChecked, setIsDigitalChecked] = useState(false);
   const currentLineId = photos[0].photoLineId
   const [manualControl, setManualControl] = useState(false); // Новый флаг для ручного управления
+  const [isGalka, setIsGalka] = useState(false);
+  const [digitalPrice, setDigitalPrice] = useState(0);
+  
 
 
-  // useEffect(()=> {
-  //   console.log(blocksId, ':', photos[0].photoLineId)
-  //   console.log(cart)
-  // }, [cart])
+  useEffect(()=> {
+    console.log(cart)
+  }, [cart])
 
   // useEffect(() => {
-  //   cart.forEach(item => {
-  //     if (item.photo_line_id === currentLineId) {
-  //       setCurrentSum(item.total_price);
-  
-  //       if (!manualControl) {
-  //         const shouldActivateCheckbox = item.total_price >= priceCalendar.ransom_amount_for_digital_photos;
-  
-  //         if (isDigitalChecked !== shouldActivateCheckbox) {
-  //           setIsDigitalChecked(shouldActivateCheckbox);
-  //           handleCheckboxChange({ target: { checked: shouldActivateCheckbox, name: 7 } }, currentLineId);
-  //         }
-  //       }
+  //   photoPrice?.forEach(element => {
+  //     if (element.photo_type === 0) {
+  //       setDigitalPrice(element.price)
   //     }
+  //     else return
   //   });
-  // }, [cart, manualControl, priceCalendar.ransom_amount_for_digital_photos, isDigitalChecked]);
+  // }, [])
+
 
   const prevCheckedState = useRef(isDigitalChecked);
 
@@ -45,7 +41,12 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
       setCurrentSum(cartItem.total_price);
   
       const shouldActivateCheckbox = cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos;
-  
+      setIsGalka(shouldActivateCheckbox)
+
+      if (cartItem.total_price) {
+        console.log(cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos)
+      }
+
       // Если состояние изменилось, вызываем обновление
       if (shouldActivateCheckbox !== prevCheckedState.current && !manualControl) {
         setIsDigitalChecked(shouldActivateCheckbox);
@@ -53,8 +54,9 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
         handleCheckboxChange({ target: { checked: shouldActivateCheckbox, name: 7 } }, currentLineId);
       }
     }
+    // else console.log('hui:', currentLineId)
   }, [
-    cart, 
+    cart,
     currentLineId, 
     priceCalendar.ransom_amount_for_digital_photos, 
     manualControl
@@ -159,9 +161,9 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
         </div> */}
         
         <div className={styles.promoStringWrap}>
-          {price.total_price >= priceCalendar.ransom_amount_for_digital_photos ?
+          {isGalka ?
             <div>
-              <img src={galkaSvg} alt="galka" />
+              <img src={galkaSvg} alt="galka" style={{width: '25px', marginRight: '5px'}}/>
             </div>
             :
             <div className={styles.dot}></div>
@@ -169,9 +171,9 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
           <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_digital_photos} рублей, вы получите все фото в электронном виде</span>
         </div>
         <div className={styles.promoStringWrap}>
-          {price.total_price >= priceCalendar.ransom_amount_for_calendar ?
+        {isGalka ?
             <div>
-              <img src={oke} alt="" />
+              <img src={galkaSvg} alt="galka" style={{width: '25px', marginRight: '5px'}}/>
             </div>
             :
             <div className={styles.dot}></div>

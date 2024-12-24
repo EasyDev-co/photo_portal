@@ -235,7 +235,6 @@ useEffect(() => {
 
     setOrderValue((prev) => {
       const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
-      console.log('prev:', prev, 'existingItemIndex:', existingItemIndex)
 
       if (existingItemIndex > -1) {
         const updatedItem = { ...prev[existingItemIndex] };
