@@ -243,7 +243,7 @@ class RetryEmailCodeAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
 
-        email_in_redis = redis_client.get("email")
+        email_in_redis = redis_client.get(email)
 
         if email_in_redis:
             return Response(
