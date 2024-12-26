@@ -7,6 +7,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.oauth.api.v1.utils import create_or_get_user
 from requests.exceptions import RequestException
 
+from apps.utils.services.generate_tokens_for_user import generate_tokens_for_user
+
 
 @api_view(['POST'])
 def oauth_token_login(request):
@@ -40,13 +42,7 @@ def oauth_token_login(request):
             # Создание или получение пользователя
             user, created = create_or_get_user(email, first_name, last_name)
 
-            # Генерация JWT токенов
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_200_OK)
+            return Response(generate_tokens_for_user(user), status=status.HTTP_200_OK)
         except RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -68,12 +64,7 @@ def oauth_token_login(request):
 
             user, created = create_or_get_user(email, first_name, last_name)
 
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_200_OK)
+            return Response(data=generate_tokens_for_user(user), status=status.HTTP_200_OK)
         except RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -95,12 +86,7 @@ def oauth_token_login(request):
 
             user, created = create_or_get_user(email, first_name, last_name)
 
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_200_OK)
+            return Response(data=generate_tokens_for_user(user), status=status.HTTP_200_OK)
         except RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     else:

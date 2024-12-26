@@ -14,6 +14,7 @@ from apps.promocode.models import Promocode
 from apps.user.models import User
 from apps.user.models.manager_bonus import ManagerBonus
 from apps.user.validators import validate_cyrillic
+from apps.utils.services.generate_tokens_for_user import generate_tokens_for_user
 from apps_crm.roles.models import Employee
 
 
@@ -32,14 +33,7 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not user.is_verified:
             raise ValidationError('Email не подтвержден.')
 
-        refresh = RefreshToken.for_user(user)
-        refresh['email'] = user.email
-        refresh['role'] = user.role
-
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
+        return generate_tokens_for_user(user)
 
 
 class UserSerializer(serializers.ModelSerializer):
