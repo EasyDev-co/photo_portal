@@ -7,6 +7,7 @@ import { addPhotos, setUser } from '../../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { getOnePhoto } from '../../../http/photo/getOnePhoto';
 import { patchPhotoLine } from '../../../http/photo/patchPhotoLine';
+import { parentRetryEmailCode } from '../../../http/parent/parentRetryEmailCode';
 
 const Verification = () => {
     const initialState = {
@@ -16,6 +17,8 @@ const Verification = () => {
     const dispatch = useDispatch();
     const [inputValue, setInputValue] = useState(initialState);
     const [error, setError] = useState(null);
+    const [message, setMessage] = useState(''); // Для отображения сообщений
+    const [isCooldown, setIsCooldown] = useState(false); // Для контроля таймера
     const email = useSelector(action => action.user.email);
     const navigation = useNavigate();
     const photoNumbers = useSelector(action => action.user.photoNumbers);
@@ -64,6 +67,25 @@ const Verification = () => {
         setInputValue(initialState);
     }
 
+    const handleResendCode = async () => {
+        setMessage(''); // Сбросить предыдущее сообщение
+        setError(null);
+        setIsCooldown(true); // Установить таймер
+        try {
+            const response = await parentRetryEmailCode(email || localStorage.getItem('email'));
+            if (response.ok) {
+                setMessage('Код успешно отправлен повторно!');
+            } else {
+                const data = await response.json();
+                setError(data.detail || 'Ошибка при отправке кода.');
+            }
+        } catch (error) {
+            setError('Ошибка при отправке кода.');
+        } finally {
+            setTimeout(() => setIsCooldown(false), 60000); // Разблокировать кнопку через 60 секунд
+        }
+    };
+
     return (
         <>
             <div className={styles.login}>
@@ -82,6 +104,19 @@ const Verification = () => {
                                     isNone
                                     value={inputValue.code}
                                 />
+
+                                <p>
+                                <button
+                                    type="button"
+                                    onClick={handleResendCode}
+                                    disabled={isCooldown} // Блокировать кнопку на время таймера
+                                    style={{color: 'rgba(17, 187, 209, 1)', fontSize: '15px'}}
+                                >
+                                    Отправить код повторно
+                                </button>
+                            </p>
+                            {message && <p style={{ color: 'green', fontSize: '12px' }}>{message}</p>}
+                            {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}
                                 <button className={styles.authButton}>Продолжить</button>
                             </form>
                         </div>
