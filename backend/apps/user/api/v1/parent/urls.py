@@ -7,9 +7,9 @@ from apps.user.api.v1.parent.views import (ParentRegisterAPIView,
                                            EmailVerificationCodeAPIView,
                                            ResetPasswordAPIView,
                                            ResetPasswordVerificationCodeAPIView,
-                                           PasswordChangeAPIView
+                                           PasswordChangeAPIView,
+                                           RetryEmailCodeAPIView
                                            )
-
 
 urlpatterns = [
     path('register/', ParentRegisterAPIView.as_view(), name='parent_register'),
@@ -20,4 +20,5 @@ urlpatterns = [
     path('verify_reset_code/', ResetPasswordVerificationCodeAPIView.as_view(), name='reset_password_code'),
     path('change_password/', PasswordChangeAPIView.as_view(), name='change_password'),
     path('token_refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('retry_email_code/', RetryEmailCodeAPIView.as_view(), name='retry_email_code'),
 ]

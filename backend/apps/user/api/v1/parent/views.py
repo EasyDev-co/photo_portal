@@ -31,6 +31,8 @@ from apps.user.models.code import CodePurpose
 from apps.user.models.user import UserRole
 from apps.user.tasks import send_confirm_code
 
+from apps.utils.services.redis_client import redis_client
+
 from loguru import logger
 
 User = get_user_model()
@@ -231,3 +233,29 @@ class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
             {"message": "Пароль успешно изменен."},
             status=status.HTTP_200_OK
         )
+
+class RetryEmailCodeAPIView(APIView):
+    """Представление для восстановления пароля."""
+    email_serializer = EmailSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.email_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+
+        email_in_redis = redis_client.get("email")
+
+        if email_in_redis:
+            return Response(
+                {"message": "Превыше временной лимит запроса кода"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        redis_client.set(key=email, value=email, ex=60)
+
+        user = User.objects.filter(email=email).first()
+
+        send_confirm_code.delay(
+            user_id=user.pk,
+            code_purpose=CodePurpose.CONFIRM_EMAIL
+        )
+        return Response({"message": "Код повторно отправлен"}, status=status.HTTP_200_OK)
