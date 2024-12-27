@@ -35,6 +35,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://0.0.0.0:8080",
     "http://172.18.0.4:3000",
     "http://0.0.0.0:3000",
+    "https://upload.photodetstvo.ru:8081",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -55,8 +56,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://stage.photodetstvo.ru",
     "http://172.18.0.4:3000",
     "http://0.0.0.0:3000",
+    "https://upload.photodetstvo.ru:8081",
 ]
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -287,7 +288,6 @@ SIMPLE_JWT = {
     "SIGNING_KEY": os.environ.get('SIGNING_KEY'),
 }
 
-
 DJANGO_FILE_FORM_TUS_ENDPOINT = '/tus-upload/'
 
 CORS_ALLOW_CREDENTIALS = True
@@ -340,11 +340,11 @@ YC_S3_ENDPOINT = os.environ.get("YC_S3_ENDPOINT")
 UPLOAD_URL = os.getenv('UPLOAD_URL')
 JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js')
 
-YAD_OAUTH_TOKEN=os.getenv('YAD_OAUTH_TOKEN')
+YAD_OAUTH_TOKEN = os.getenv('YAD_OAUTH_TOKEN')
 YAD_CLIENT_ID = os.getenv("YAD_CLIENT_ID")
 YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")
 
-UNISENER_TOKEN=os.getenv('UNISENER_TOKEN')
+UNISENER_TOKEN = os.getenv('UNISENER_TOKEN')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
 
 GALLERY_URL = "https://stage.photodetstvo.ru/gallery"
