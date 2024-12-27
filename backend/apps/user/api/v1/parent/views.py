@@ -35,6 +35,8 @@ from apps.utils.services.redis_client import redis_client
 
 from loguru import logger
 
+from apps.utils.services.generate_tokens_for_user import generate_tokens_for_user
+
 User = get_user_model()
 
 
@@ -138,12 +140,12 @@ class EmailVerificationCodeAPIView(ConfirmCodeMixin, APIView):
 
             ConfirmCode.objects.filter(code=code).update(is_used=True)
 
-        refresh_token = RefreshToken.for_user(user)
+        tokens_dict = generate_tokens_for_user(user)
         return Response(
             {
                 'user': str(user.id),
-                'refresh': str(refresh_token),
-                'access': str(refresh_token.access_token)
+                'refresh': tokens_dict['refresh'],
+                'access': tokens_dict['access']
             }, status=status.HTTP_201_CREATED
         )
 

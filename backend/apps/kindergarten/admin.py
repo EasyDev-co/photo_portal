@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
@@ -9,10 +10,12 @@ from .models import Ransom
 
 from apps.kindergarten.models.kindergarten import Kindergarten
 
-from config.settings import UPLOAD_URL, JQUERY_CDN, UPLOAD_SERVICE_SECRET_KEY
-from loguru import logger
+from config.settings import UPLOAD_URL, JQUERY_CDN
 
 from ..photo.models import KindergartenPhotoTheme
+from ..utils.services.generate_tokens_for_user import generate_tokens_for_user
+
+User = get_user_model()
 
 
 class KindergartenInline(admin.TabularInline):
@@ -75,7 +78,7 @@ class KindergartenAdmin(admin.ModelAdmin):
             'upload_url': UPLOAD_URL,
             'object': obj,
             'jquery_cdn': JQUERY_CDN,
-            'upload_service_secret_key': UPLOAD_SERVICE_SECRET_KEY,
+            'token': generate_tokens_for_user(user=User.objects.filter(is_superuser=True).first()).get('access'),
         }
         html = render_to_string('admin/widgets/drag_and_drop.html', context)
         return mark_safe(html)

@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from itertools import zip_longest
 
@@ -19,6 +19,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 
+from apps.user.permissions import IsSuperUser
 from .serializers import PhotoUploadSerializer, PhotoThemeSerializerV2, DirectPhotoUploadSerializer
 from apps.photo.models import Photo, PhotoLine, UserPhotoCount, PhotoTheme
 from apps.photo.permissions import HasPermissionCanViewPhotoLine
@@ -33,8 +34,10 @@ from config.settings import PHOTO_LINE_URL, UPLOAD_SERVICE_SECRET_KEY, GO_UPLOAD
 from apps.utils.services import generate_qr_code
 from django.core.files.base import ContentFile
 
+
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
+
     # permission_classes = [IsAuthenticated]
     # authentication_classes = [SessionAuthentication]
 
@@ -122,7 +125,6 @@ class PhotoUploadView(APIView):
         buffer.seek(0)
         qr_code_filename = f'{str(photo_line.photo_theme.id)}/{str(photo_line.photo_theme.name)}_qr.png'
         photo_line.qr_code.save(qr_code_filename, ContentFile(buffer.read()), save=True)
-
 
     @staticmethod
     def _grouper(iterable, n, fillvalue=None):
@@ -302,6 +304,8 @@ class DirectPhotoUploadAPIView(APIView):
         responses={200: "Файлы успешно загружены!"},
     )
 
+    permission_classes = [IsAuthenticated, IsSuperUser, IsAdminUser]
+
     def post(self, request, *args, **kwargs):
         logger.info("Start DirectPhotoUploadAPIView")
         serializer = DirectPhotoUploadSerializer(data=request.data)
@@ -390,7 +394,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
 
         user = request.user
         numbers_list = request.data.get('numbers', '')
-        if user.role == UserRole.parent: # список из 1 или 6 элементов
+        if user.role == UserRole.parent:  # список из 1 или 6 элементов
             kindergarten = user.kindergarten.all().first()
         elif user.role == UserRole.manager:
             kindergarten = user.managed_kindergarten

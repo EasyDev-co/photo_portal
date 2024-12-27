@@ -131,7 +131,7 @@
         const uploadButton = document.querySelector('.upload-button');
         const uploadModal = document.getElementById('upload-modal');
         const uploadUrl = "{{ upload_url }}";
-        const uploadServiceSecretKey = "{{ upload_service_secret_key }}"
+        const jwtToken = "{{ token|safe }}";
 
         let dataTransfer = new DataTransfer();
 
@@ -264,15 +264,15 @@
             formData.append('photo_theme', photoTheme);
 
             // Отправляем все файлы одним запросом
-            console.log("upload_url", uploadUrl)
-            console.log("token", uploadServiceSecretKey)
             $.ajax({
                 url: uploadUrl,
                 type: 'POST',
                 data: formData,
                 contentType: false,
                 processData: false,
-                headers: {'Authorization-Token': uploadServiceSecretKey},
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                },
                 success: () => {
                     console.log("done")
                     hideModal();
