@@ -1,6 +1,6 @@
 import styles from '../Registration.module.css';
 import InputField from '../../InputField/InputField';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { parentEmailVerification } from '../../../http/parent/parentEmailVerification';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPhotos, setUser } from '../../../store/authSlice';
@@ -19,6 +19,7 @@ const Verification = () => {
     const [error, setError] = useState(null);
     const [message, setMessage] = useState(''); // Для отображения сообщений
     const [isCooldown, setIsCooldown] = useState(false); // Для контроля таймера
+    const [timer, setTimer] = useState(60);
     const email = useSelector(action => action.user.email);
     const navigation = useNavigate();
     const photoNumbers = useSelector(action => action.user.photoNumbers);
@@ -71,6 +72,7 @@ const Verification = () => {
         setMessage(''); // Сбросить предыдущее сообщение
         setError(null);
         setIsCooldown(true); // Установить таймер
+        setTimer(60);
         try {
             const response = await parentRetryEmailCode(email || localStorage.getItem('email'));
             if (response.ok) {
@@ -81,10 +83,28 @@ const Verification = () => {
             }
         } catch (error) {
             setError('Ошибка при отправке кода.');
-        } finally {
-            setTimeout(() => setIsCooldown(false), 60000); // Разблокировать кнопку через 60 секунд
-        }
+        } 
+        // finally {
+        //     setTimeout(() => setIsCooldown(false), 60000); // Разблокировать кнопку через 60 секунд
+        // }
     };
+
+    useEffect(() => {
+        if (isCooldown) {
+            const interval = setInterval(() => {
+                setTimer((prevTimer) => {
+                    if (prevTimer <= 1) {
+                        clearInterval(interval); // Остановить таймер
+                        setIsCooldown(false); // Разблокировать кнопку
+                        return 0;
+                    }
+                    return prevTimer - 1; // Уменьшать таймер каждую секунду
+                });
+            }, 1000);
+
+            return () => clearInterval(interval); // Очистить таймер при размонтировании
+        }
+    }, [isCooldown]);
 
     return (
         <>
@@ -106,13 +126,25 @@ const Verification = () => {
                                 />
 
                                 <p>
-                                <button
+                                {/* <button
                                     type="button"
                                     onClick={handleResendCode}
                                     disabled={isCooldown} // Блокировать кнопку на время таймера
                                     style={{color: 'rgba(17, 187, 209, 1)', fontSize: '15px'}}
                                 >
                                     Отправить код повторно
+                                </button> */}
+                                <button
+                                    type="button"
+                                    onClick={handleResendCode}
+                                    disabled={isCooldown} // Блокировать кнопку на время таймера
+                                    style={{
+                                        color: isCooldown ? 'gray' : 'rgba(17, 187, 209, 1)',
+                                        fontSize: '15px',
+                                        cursor: isCooldown ? 'not-allowed' : 'pointer',
+                                    }}
+                                >
+                                    {isCooldown ? `Отправить повторно через ${timer}s` : 'Отправить код повторно'}
                                 </button>
                             </p>
                             {message && <p style={{ color: 'green', fontSize: '12px' }}>{message}</p>}
