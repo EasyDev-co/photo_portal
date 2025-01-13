@@ -5,10 +5,11 @@ from pathlib import PurePosixPath
 
 import yadisk
 
-from apps.kindergarten.models import PhotoType
+from apps.kindergarten.models import PhotoType, Kindergarten
 from apps.order.models import Order
+from apps.photo.models import KindergartenPhotoTheme, PhotoTheme
 from apps.photo.models.const import MONTHS_RU
-from config.settings import YAD_OAUTH_TOKEN, YAD_CLIENT_ID, YAD_CLIENT_SECRET
+from config.settings import YAD_OAUTH_TOKEN, YAD_CLIENT_ID, YAD_CLIENT_SECRET, YAD_URL
 from dataclasses import dataclass
 
 from loguru import logger
@@ -69,6 +70,15 @@ def generate_random_string(length=10) -> str:
     """Функция для генерации строки для названия файла"""
     return ''.join(random.choices(string.ascii_letters, k=length))
 
+def save_link_to_model(yadisk_base_path: str, kindergarten: Kindergarten, photo_theme: PhotoTheme):
+    instance = KindergartenPhotoTheme.objects.get(
+        kindergarten=kindergarten,
+        photo_theme=photo_theme,
+    )
+    if instance.ya_disk_link is None:
+        instance.ya_disk_link = f'{YAD_URL}{yadisk_base_path}'
+        instance.save()
+
 
 def create_file_dtos_from_order(order: Order) -> list[FileDTO]:
     """Создание списка FileDTO из заказа."""
@@ -78,6 +88,8 @@ def create_file_dtos_from_order(order: Order) -> list[FileDTO]:
     month = MONTHS_RU.get(order.photo_line.photo_theme.date_end.strftime("%B"))
 
     yadisk_base_path = f"/{year}/{month}/{kindergarten}"
+
+    save_link_to_model(yadisk_base_path, order.photo_line.kindergarten, order.photo_line.photo_theme)
 
     files = []
     for order_item in order.order_items.all():
