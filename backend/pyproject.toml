@@ -4,12 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["timofejkazakov <t.kazakov@agora.ru>"]
 
-[[tool.poetry.source]]
-name = "tuna"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-default = true
-
-
 [tool.poetry.dependencies]
 python = "^3.11"
 django = "^5.0.2"
