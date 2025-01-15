@@ -22,6 +22,12 @@ class KindergartenPhotoTheme(models.Model):
         verbose_name='Активно',
         default=False
     )
+    ya_disk_link = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Ссылка на ЯДиск'
+    )
 
     def __str__(self):
         return self.photo_theme.name
