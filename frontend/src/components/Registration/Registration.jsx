@@ -275,7 +275,7 @@ export const Registration = () => {
                   <p>
                     Даю согласие на обработку своих персональных данных. {' '}
                     {/* <span> С соглашением ознакомлен.</span> */}
-                    <span 
+                    <span
                       style={{ cursor: 'pointer', color: 'blue', }}
                       role="button" 
                       tabIndex={0} 

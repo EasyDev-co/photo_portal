@@ -11,6 +11,18 @@
   padding: 0 40px 80px 40px;
 }
 
+.details {
+  cursor: pointer;
+  color: #090909;
+  font-family: "Nunito";
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 20px;
+  margin-left: 100px;
+  padding: 60px 40px 40px;
+  text-decoration: underline;
+}
+
 @media screen and (max-width: 768px) {
   .list {
     margin-left: 0;
