@@ -18,8 +18,9 @@ COPY pyproject.toml pyproject.toml
 RUN mkdir -p /opt/src/static/ && \
     mkdir -p /opt/src/media/ && \
     pip install --upgrade pip --index-url https://pypi.tuna.tsinghua.edu.cn/simple --default-timeout=100 && \
-    pip install 'poetry>=1.4.2' --index-url https://pypi.tuna.tsinghua.edu.cn/simple --default-timeout=100 && \
-    poetry config virtualenvs.create false && \
+    pip install poetry==2.0.1 --index-url https://pypi.tuna.tsinghua.edu.cn/simple --default-timeout=100 && \
+    poetry config repositories.tuna ${POETRY_REPOSITORIES_TUNA_URL} && \
+    poetry config installer.parallel false && \
     poetry install --no-root --only main
 
 COPY . .
