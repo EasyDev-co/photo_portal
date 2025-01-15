@@ -343,6 +343,7 @@ JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jque
 YAD_OAUTH_TOKEN = os.getenv('YAD_OAUTH_TOKEN')
 YAD_CLIENT_ID = os.getenv("YAD_CLIENT_ID")
 YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")
+YAD_URL = os.getenv('YAD_URL')
 
 UNISENER_TOKEN = os.getenv('UNISENER_TOKEN')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
@@ -350,3 +351,5 @@ FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
 GALLERY_URL = "https://stage.photodetstvo.ru/gallery"
 UPLOAD_SERVICE_SECRET_KEY = os.getenv('UPLOAD_SERVICE_SECRET_KEY')
 GO_UPLOAD_URL = os.getenv('GO_UPLOAD_URL')
+
+PRINTER_EMAIL= os.getenv('PRINTER_EMAIL')
