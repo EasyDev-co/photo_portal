@@ -38,7 +38,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
   
     if (cartItem) {
-      setCurrentSum(cartItem.total_price);
+      setCurrentSum(cartItem.total_price); 
   
       const shouldActivateCheckbox = cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos;
       setIsGalka(shouldActivateCheckbox)
@@ -61,9 +61,6 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
     priceCalendar.ransom_amount_for_digital_photos, 
     manualControl
   ]);
-  
-  
-  
 
   // Обработчик изменения чекбокса
   const handleDigitalCheckboxChange = (e, photoLineId) => {
