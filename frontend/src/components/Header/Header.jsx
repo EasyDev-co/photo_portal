@@ -204,7 +204,7 @@ export const Header = () => {
           )}
         </div>
         {windowWidth <= 768 && navBarState && (
-          <NavBar localStorageValue={localStorageValue} onClose={toggleNavBar} navBarState={navBarState} />
+          <NavBar managedKindergarten={managedKindergarten} localStorageValue={localStorageValue} onClose={toggleNavBar} navBarState={navBarState} />
         )}
       </header>
     </>

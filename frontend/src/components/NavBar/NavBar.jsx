@@ -1,5 +1,5 @@
-import styles from "./NavBar.module.css";
-import React, { useEffect } from "react";
+import styles from './NavBar.module.css'
+import React, { useEffect } from 'react'
 import {
   bagIcon,
   imageIcon,
@@ -11,39 +11,64 @@ import {
   whatsAppIcon,
   telegramIcon,
   userInfo,
-} from "../../constants/constants";
-import { HeaderUserInfoItem } from "../HeaderUserInfoItem/HeaderUserInfoItem";
-import { NavBarItem } from "./NavBarItem/NavBarItem";
-import { SocialItem } from "../SocialItem/SocialItem";
-import { useAuth } from "../../utils/useAuth";
-import { Link } from "react-router-dom";
+} from '../../constants/constants'
+import { HeaderUserInfoItem } from '../HeaderUserInfoItem/HeaderUserInfoItem'
+import { NavBarItem } from './NavBarItem/NavBarItem'
+import { SocialItem } from '../SocialItem/SocialItem'
+import { useAuth } from '../../utils/useAuth'
+import { Link } from 'react-router-dom'
 
-export const NavBar = ({ localStorageValue, onClose }) => {
-
-  const { isAuth } = useAuth();
+export const NavBar = ({ localStorageValue, onClose, managedKindergarten }) => {
+  const { isAuth } = useAuth()
   useEffect(() => {
     //обработчик для клавиши "Esc"
     const handleEsc = (e) => {
       //проверка на нажатие клавиши Esc (код клавиши 27)
       if (e.keyCode === 27) {
-        onClose(); // вызывается функция закрытия попапа
+        onClose() // вызывается функция закрытия попапа
       }
-    };
+    }
     //слушатель события при монтировании компонента
-    document.addEventListener("keydown", handleEsc);
+    document.addEventListener('keydown', handleEsc)
     //убираем слушатель события при размонтировании компонента
     return () => {
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, [onClose]);
+      document.removeEventListener('keydown', handleEsc)
+    }
+  }, [onClose])
 
   return (
     <div className={styles.navBar}>
       <div className={styles.container}>
-        {isAuth ?
+        {isAuth ? (
           <>
             <ul className={styles.userInfoList}>
               <HeaderUserInfoItem
+                top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
+                              ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')} 
+                              ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
+                bottom={localStorage.getItem('phone')}
+              />
+
+              {[2, 3].includes(parseInt(localStorage.getItem('role'))) &&
+              managedKindergarten ? (
+                <HeaderUserInfoItem
+                  isKindergarten
+                  top={`${managedKindergarten.region.country}, ${managedKindergarten.region.name}`}
+                  bottom={managedKindergarten.name}
+                />
+              ) : (
+                <HeaderUserInfoItem
+                  isKindergarten
+                  top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')}, 
+                                      ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
+                  bottom={
+                    localStorage.getItem('kindergarten') === null
+                      ? ''
+                      : localStorage.getItem('kindergarten')
+                  }
+                />
+              )}
+              {/* <HeaderUserInfoItem
                 top={`${localStorage.getItem('last_name') === null ? '' : localStorage.getItem('last_name')} 
                ${localStorage.getItem('first_name') === null ? '' : localStorage.getItem('first_name')}
                ${localStorage.getItem('second_name') === null ? '' : localStorage.getItem('second_name')}`}
@@ -54,7 +79,7 @@ export const NavBar = ({ localStorageValue, onClose }) => {
                 top={`${localStorage.getItem('country') === null ? '' : localStorage.getItem('country')},
                   ${localStorage.getItem('regionName') === null ? '' : localStorage.getItem('regionName')}`}
                 bottom={localStorage.getItem('kindergarten') === null ? '' : localStorage.getItem('kindergarten')}
-              />
+              /> */}
             </ul>
             <ul className={styles.navList}>
               <NavBarItem
@@ -102,7 +127,7 @@ export const NavBar = ({ localStorageValue, onClose }) => {
               />
             </ul>
           </>
-          :
+        ) : (
           <ul className={styles.navList}>
             <NavBarItem
               router="/about-us"
@@ -122,7 +147,7 @@ export const NavBar = ({ localStorageValue, onClose }) => {
               <Link to={'/sign-in'}>Войти</Link>
             </div>
           </ul>
-        }
+        )}
 
         <ul className={styles.socialList}>
           <SocialItem
@@ -143,5 +168,5 @@ export const NavBar = ({ localStorageValue, onClose }) => {
         </ul>
       </div>
     </div>
-  );
-};
+  )
+}
