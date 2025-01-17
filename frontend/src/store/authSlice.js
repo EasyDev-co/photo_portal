@@ -21,7 +21,8 @@ const authSlice = createSlice({
             kindergarten: [{
                 name:'',
                 country:'',
-                region:''
+                region:'',
+                has_photobook: '',
             }],
             phone_number: '',
         },
