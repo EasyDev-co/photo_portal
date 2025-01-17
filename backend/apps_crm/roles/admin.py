@@ -6,13 +6,13 @@ from apps_crm.roles.models import (
 from django.conf import settings
 
 
+@admin.register(Employee)
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'status')
+    list_filter = ('status',)
+
+
 if settings.SHOW_IN_ADMIN:
-    @admin.register(Employee)
-    class EmployeeAdmin(admin.ModelAdmin):
-        list_display = ('id', 'user', 'status')
-        list_filter = ('status', )
-
-
     @admin.register(Role)
     class RoleAdmin(admin.ModelAdmin):
         list_display = ('name', 'department', 'parent_role')
