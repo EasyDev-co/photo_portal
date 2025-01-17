@@ -29,6 +29,7 @@ import CreateEmployee from '../../components-crm/CreateEmployee/CreateEmployee'
 import EditEmployee from '../../components-crm/EditEmployee/EditEmployee'
 import Tasks from '../../pages-crm/Tasks/Tasks'
 import { LoginCrm } from '../../pages-crm/LoginCrm/LoginCrm'
+import { Details } from '../Details/Details'
 
 export const App = () => {
   const location = useLocation();
@@ -67,6 +68,7 @@ export const App = () => {
         {/* <Route path="/" element={<Navigate to="/about-us" />} /> */}
         <Route path="/" element={<Navigate to={isAuth ? "/orders" : "/about-us"} />} />
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/about-us/details" element={<Details />} />
         <Route path="/rules" element={<Rules />} />
         {isAuth ? (
           <>

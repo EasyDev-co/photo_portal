@@ -65,7 +65,6 @@ export const Header = () => {
         if (res.ok) {
           res.json()
             .then(res => {
-              console.log(res);
               dispatch(addUserData(res));
               setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
             });

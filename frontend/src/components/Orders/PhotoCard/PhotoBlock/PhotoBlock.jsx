@@ -15,12 +15,13 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
   const [manualControl, setManualControl] = useState(false); // Новый флаг для ручного управления
   const [isGalka, setIsGalka] = useState(false);
   const [digitalPrice, setDigitalPrice] = useState(0);
+  const userData = useSelector(state => state.user.userData);
   
 
 
   useEffect(()=> {
-    console.log(cart)
-  }, [cart])
+    console.log(userData.kindergarten[0].has_photobook)
+  }, [])
 
   // useEffect(() => {
   //   photoPrice?.forEach(element => {
@@ -102,22 +103,24 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
             {index === 5 &&
               <div className={styles.widgetDelete}>
                 <div className={styles.checkboxInputWrap}>
-                  <div className={styles.bookCheckbox}>
-                    <div className={styles.bookDescr}>Фотокнига</div>
-                    <label className={styles.custom_checkbox}>
-                      <input
-                        className=''
-                        id={blocksId}
-                        name={6}
-                        type="checkbox"
-                        // onChange={(e)=>onChangeHandler(e.target.name, 0 ,  photo.photoLineId, e.target.checked , photo.photoLineId, blocksId)}
-                        onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
-                      />
-                      <div className={styles.checkbox}>
-                        <div className={styles.checkmark}></div>
-                      </div>
-                    </label>
-                  </div>
+                  {userData.kindergarten?.[0]?.has_photobook && (
+                    <div className={styles.bookCheckbox}>
+                      <div className={styles.bookDescr}>Фотокнига</div>
+                      <label className={styles.custom_checkbox}>
+                        <input
+                          className=''
+                          id={blocksId}
+                          name={6}
+                          type="checkbox"
+                          // onChange={(e)=>onChangeHandler(e.target.name, 0 ,  photo.photoLineId, e.target.checked , photo.photoLineId, blocksId)}
+                          onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
+                        />
+                        <div className={styles.checkbox}>
+                          <div className={styles.checkmark}></div>
+                        </div>
+                      </label>
+                    </div>
+                  )}
                   <div className={styles.bookCheckbox}>
                     <div className={styles.bookDescr}>В электронном виде</div>
                     <label className={styles.custom_checkbox}>
