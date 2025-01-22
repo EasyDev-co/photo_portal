@@ -21,5 +21,9 @@ jobs:
           script: |
             cd /home/photo_portal
             git pull origin main
-            docker-compose down
-            docker-compose -f "docker-compose.stage.yaml" up -d
+            
+            docker-compose -f docker-compose.stage.yaml down
+          
+            docker-compose -f docker-compose.stage.yaml build --no-cache
+          
+            docker-compose -f docker-compose.stage.yaml up -d

@@ -28,6 +28,7 @@ from apps.user.api.v1.parent.serializers import (
 
 from apps.user.models import ConfirmCode
 from apps.user.models.code import CodePurpose
+from apps.user.models.email_error_log import EmailErrorLog
 from apps.user.models.user import UserRole
 from apps.user.tasks import send_confirm_code
 
@@ -70,12 +71,33 @@ class ParentRegisterAPIView(CreateAPIView):
 
             if user.is_verified:
                 raise UserRegistered
-        logger.info("send confirm code for register parent")
-        send_confirm_code.delay(
-            user_id=user.pk,
-            code_purpose=CodePurpose.CONFIRM_EMAIL
+
+        code = self._generate_numeric_code()  # тут у вас может быть своя реализация
+
+        confirm_code = ConfirmCode.objects.create(
+            user=user,
+            code=code,
+            purpose=CodePurpose.CONFIRM_EMAIL,
         )
+
+        error_log = EmailErrorLog.objects.create(
+            confirm_code=confirm_code,
+            user=user,
+            message='Scheduled send confirm code',  # или пустая строка
+            is_sent=False
+        )
+
+        send_confirm_code.delay(confirm_code_id=confirm_code.id)
+
         return user
+
+    @staticmethod
+    def _generate_numeric_code(length=6) -> str:
+        # Здесь любая ваша логика генерации кода
+        from random import randint
+        code = randint(10**(length-1), 10**length - 1)
+        return str(code)
+
 
 
 class ParentLogoutAPIView(APIView):
