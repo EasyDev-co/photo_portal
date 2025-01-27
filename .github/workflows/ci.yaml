@@ -23,7 +23,7 @@ jobs:
             git pull origin main
             
             docker-compose -f docker-compose.stage.yaml down
-          
+            
             docker-compose -f docker-compose.stage.yaml build --no-cache
-          
+            
             docker-compose -f docker-compose.stage.yaml up -d
