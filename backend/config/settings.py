@@ -211,6 +211,9 @@ CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_CELERY}'
 CELERY_TIMEZONE = "Europe/Moscow"
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
+CELERY_TASK_TIME_LIMIT = 240
+CELERY_TASK_SOFT_TIME_LIMIT = 180
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.yandex.ru')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)

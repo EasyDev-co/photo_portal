@@ -42,16 +42,59 @@ services:
     ports:
       - "8000:8000"
 
-  celery:
+  celery-worker:
     <<: *base_web
     build:
       context: ./backend
       dockerfile: celery.dockerfile
-    container_name: ${PROJECT_SLUG}_celery
+    container_name: ${PROJECT_SLUG}_celery_worker
     volumes:
       - ./backend/:/opt/backend/:rw
       - static_dir:/opt/backend/static/
       - media_dir:/opt/backend/media/
+    command: >
+      sh -c "
+      python manage.py migrate --no-input &&
+      celery -A config.celery worker --loglevel=info --max-tasks-per-child=300 -P prefork
+      "
+    restart: always
+
+  celery-beat:
+    <<: *base_web
+    build:
+      context: ./backend
+      dockerfile: celery.dockerfile
+    container_name: ${PROJECT_SLUG}_celery_beat
+    volumes:
+      - ./backend/:/opt/backend/:rw
+      - static_dir:/opt/backend/static/
+      - media_dir:/opt/backend/media/
+    command: >
+      sh -c "
+      python manage.py migrate --no-input &&
+      celery -A config.celery beat -S django --loglevel=info
+      "
+    restart: always
+
+  celery-flower:
+    <<: *base_web
+    build:
+      context: ./backend
+      dockerfile: celery.dockerfile
+    container_name: ${PROJECT_SLUG}_celery_flower
+    volumes:
+      - ./backend/:/opt/backend/:rw
+      - static_dir:/opt/backend/static/
+      - media_dir:/opt/backend/media/
+    command: >
+      sh -c "
+      python manage.py migrate --no-input &&
+      celery -A config.celery flower --loglevel=info --port=5555 --basic_auth=${FLOWER_USER}:${FLOWER_PASSWORD}
+      "
+    ports:
+      - "5555:5555"
+    restart: always
+
 
   frontend:
     build:
