@@ -34,6 +34,8 @@ class SendConfirmCodeTask(BaseTask):
     name = "send_confirm_code"
 
     def process(self, confirm_code_id, *args, **kwargs):
+        logger.info("send confirm code")
+
         confirm_code = ConfirmCode.objects.get(id=confirm_code_id)
         user = confirm_code.user
         code_purpose = confirm_code.purpose
@@ -47,6 +49,7 @@ class SendConfirmCodeTask(BaseTask):
             raise ValueError('Неизвестный code_purpose.')
 
         try:
+            logger.info(f"send {confirm_code} for user {user.email}")
             with SyncClient.setup(UNISENER_TOKEN):
                 request = SendRequest(
                     message={
@@ -61,7 +64,7 @@ class SendConfirmCodeTask(BaseTask):
                     },
                 )
                 request.send()
-
+            logger.info("code was send")
         except Exception as e:
             logger.error(f"Error send email confirm code: {e}")
 
@@ -69,12 +72,13 @@ class SendConfirmCodeTask(BaseTask):
                 message=str(e),
                 is_sent=False
             )
-
         else:
             EmailErrorLog.objects.filter(confirm_code=confirm_code).update(
                 is_sent=True,
                 message='Sent successfully'
             )
+        logger.info("send confirm code done")
+
 
     @staticmethod
     def generate_numeric_code():
@@ -83,6 +87,8 @@ class SendConfirmCodeTask(BaseTask):
 
 class ResendConfirmCodeTask(BaseTask):
     def process(self, *args, **kwargs):
+        logger.info("start resend code")
+
         email_error_logs = EmailErrorLog.objects.filter(
             confirm_code__is_used=False,
             is_sent=False,
@@ -101,6 +107,7 @@ class ResendConfirmCodeTask(BaseTask):
             code = confirm_code.code
 
             try:
+                logger.info(f"send code: {code} for email {email_error_log.user.email}")
                 with SyncClient.setup(UNISENER_TOKEN):
                     request = SendRequest(
                         message={
@@ -115,9 +122,11 @@ class ResendConfirmCodeTask(BaseTask):
                         },
                     )
                     request.send()
+                logger.info(f"email send")
 
             except Exception as e:
                 logger.error(f"Error send email confirm code: {e}")
+        logger.info("end resend code and mark email")
         email_error_logs.update(is_sent=True)
 
 
