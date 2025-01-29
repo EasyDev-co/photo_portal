@@ -85,8 +85,13 @@ class User(UUIDMixin, AbstractUser):
         verbose_name="Скидка заведующей",
         decimal_places=2,
         max_digits=3,
-        default=3000,
+        default=0,
     )
+    manager_discount_balance = models.PositiveIntegerField(
+        default=3000,
+        verbose_name="Баланс заведующей на бесплатный заказ",
+    )
+
     manager_percent = models.DecimalField(
         verbose_name="Процент заведующей",
         decimal_places=2,
