@@ -195,10 +195,10 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                 instance.cart.bonus_coupon = initial_total_price - total_price
 
         if user.role == UserRole.manager:
-            manager_discount = user.manager_discount
+            manager_discount = user.manager_discount_balance
             if total_price > 0 and manager_discount > 0:
                 if total_price <= manager_discount:
-                    user.manager_discount -= total_price
+                    user.manager_discount_balance -= total_price
                     total_price = Decimal(0)
                     user.save()
                 else:
