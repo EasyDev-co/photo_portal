@@ -90,6 +90,8 @@ class User(UUIDMixin, AbstractUser):
     manager_discount_balance = models.PositiveIntegerField(
         default=3000,
         verbose_name="Баланс заведующей на бесплатный заказ",
+        null=True,
+        blank=True,
     )
 
     manager_percent = models.DecimalField(
