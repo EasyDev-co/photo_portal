@@ -198,9 +198,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
             manager_discount = user.manager_discount_balance
             if total_price > 0 and manager_discount > 0:
                 if total_price <= manager_discount:
-                    user.manager_discount_balance -= total_price
                     total_price = Decimal(0)
-                    user.save()
                 else:
                     total_price -= manager_discount
         try:

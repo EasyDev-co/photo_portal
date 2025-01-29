@@ -268,6 +268,10 @@ class PaymentAPIView(APIView):
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
+        total_price = 0
+        for item in order_items:
+            total_price += item.price
+
         payment_data['Token'] = token
         response = requests.post(
             url=PAYMENT_INIT_URL,
@@ -280,6 +284,8 @@ class PaymentAPIView(APIView):
                     payment_id=response.json()['PaymentId'],
                     status=OrderStatus.payment_awaiting
                 )
+                user.manager_discount_balance =- total_price
+
                 return Response(payment_url, status=status.HTTP_200_OK)
             return Response(
                 f"{response.json()['Message']} {response.json()['Details']}",
