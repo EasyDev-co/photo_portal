@@ -20,7 +20,6 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
 
 
   useEffect(()=> {
-    console.log(userData.kindergarten[0].has_photobook)
   }, [])
 
   // useEffect(() => {
