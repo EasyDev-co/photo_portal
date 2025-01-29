@@ -11,6 +11,7 @@ from apps.promocode.models import Promocode
 from apps.promocode.models.bonus_coupon import BonusCoupon
 from apps.user.models import UserRole
 
+from loguru import logger
 
 class PhotoInCartSerializer(serializers.ModelSerializer):
     """Сериализатор для Фото в корзине."""
@@ -75,6 +76,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     promo_code = serializers.CharField(required=False)
 
     def create(self, validated_data):
+        logger.info("create")
         photos_in_cart = validated_data.pop('photos')
 
         quantity = 0
