@@ -49,6 +49,7 @@ class CartPhotoLine(UUIDMixin):
         default=0,
         verbose_name='Итоговая стоимость',
     )
+    child_number = models.IntegerField(default=1, verbose_name="Номер ребенка", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания", null=True, blank=True)
 
     class Meta:
