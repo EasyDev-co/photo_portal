@@ -49,12 +49,14 @@ class CartAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        logger.info(f"data: {request.data}")
+
         carts = Cart.objects.filter(user=request.user)
         if carts.count() > 1:
             carts.exclude(id=carts.first().id).delete()
 
         cart = carts.first()
-        logger.info("cart: {cart}")
+        logger.info(f"cart: {cart}")
         if not cart:
             cart = Cart.objects.create(user=request.user)
 
