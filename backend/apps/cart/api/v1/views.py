@@ -66,11 +66,13 @@ class CartAPIView(APIView):
         child_num = 1
 
         for data in validated_data:
-            logger.info(f"data: {data}")
-
             data['cart'] = cart.id
+
             data['child_number'] = child_num
             child_num += 1
+
+            logger.info(f"data: {data}")
+
 
         serializer = CartPhotoLineCreateUpdateSerializer(
             data=validated_data, context={'request': request}, many=True
@@ -80,6 +82,6 @@ class CartAPIView(APIView):
         instance = serializer.save()
 
         for data in instance:
-            logger.info(f"data: {data}")
+            logger.info(f"data_instance: {data}")
 
         return Response(CartPhotoLineSerializer(instance, many=True).data)
