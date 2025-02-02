@@ -56,7 +56,7 @@ class CartAPIView(APIView):
             carts.exclude(id=carts.first().id).delete()
 
         cart = carts.first()
-        logger.info("cart: {cart}")
+        logger.info(f"cart: {cart}")
         if not cart:
             cart = Cart.objects.create(user=request.user)
 
