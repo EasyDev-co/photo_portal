@@ -28,6 +28,28 @@ class Region(UUIDMixin):
         blank=True
     )
 
+    ransom_amount_for_digital_photos_second = models.PositiveSmallIntegerField(
+        verbose_name='Сумма выкупа для электронных фотографий второго ребенка',
+        null=True,
+        blank=True
+    )
+    ransom_amount_for_calendar_second = models.PositiveSmallIntegerField(
+        verbose_name='Сумма выкупа для календаря второго ребенка',
+        null=True,
+        blank=True
+    )
+
+    ransom_amount_for_digital_photos_third = models.PositiveSmallIntegerField(
+        verbose_name='Сумма выкупа для электронных фотографий третьего ребенка',
+        null=True,
+        blank=True
+    )
+    ransom_amount_for_calendar_third = models.PositiveSmallIntegerField(
+        verbose_name='Сумма выкупа для календаря третьего ребенка',
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return self.name
 

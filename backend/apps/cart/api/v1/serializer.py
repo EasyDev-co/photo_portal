@@ -40,6 +40,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
     is_free_calendar = serializers.BooleanField(default=False)
     is_free_digital = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    child_num = serializers.IntegerField(required=False, allow_null=True)
 
     @staticmethod
     def get_photos(obj):
@@ -74,6 +75,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
     is_free_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     promo_code = serializers.CharField(required=False)
+    child_number = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
         logger.info("create")
