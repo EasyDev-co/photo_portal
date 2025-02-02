@@ -163,15 +163,17 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                 )
             total_price += photobook_price
 
-        # стоимость электронных фото
+        # # стоимость электронных фото
         if ransom_amount_for_digital_photos:
-
-            if not validated_data['is_digital'] and total_price >= ransom_amount_for_digital_photos:
-                instance.is_digital = True
-                instance.is_free_digital = True
-                instance.save()
-
-            elif validated_data['is_digital'] and total_price < ransom_amount_for_digital_photos:
+        #
+        #     if not validated_data['is_digital'] and total_price >= ransom_amount_for_digital_photos:
+        #         if self.child_number == 1:
+        #             instance.is_digital = True
+        #             instance.is_free_digital = True
+        #             instance.save()
+        #
+        #
+            if validated_data['is_digital'] and total_price < ransom_amount_for_digital_photos:
                 digital_price = region_prices.get(photo_type=PhotoType.digital).price
 
                 if promo_code and promo_code.discount_services:
@@ -180,11 +182,11 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                     )
 
                 total_price += digital_price
-
-        # выкуп для бесплатного календаря
-        if ransom_amount_for_calendar and total_price >= ransom_amount_for_calendar:
-            instance.is_free_calendar = True
-            instance.save()
+        #
+        # # выкуп для бесплатного календаря
+        # if ransom_amount_for_calendar and total_price >= ransom_amount_for_calendar:
+        #     instance.is_free_calendar = True
+        #     instance.save()
 
         # применение купона и промокода
         if bonus_coupon:
