@@ -93,7 +93,7 @@ class CartAPIView(APIView):
         ransom_amount_for_calendar_third = None
 
         if len(instance) > 0:
-            cart_photo_line = instance[0]
+            cart_photo_line = cart.cart_photo_lines.all().first()
             if cart_photo_line:
                 ransom_amount_for_digital_photos = (
                     cart_photo_line
