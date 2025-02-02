@@ -83,7 +83,79 @@ class CartAPIView(APIView):
 
         instance = serializer.save()
 
+        ransom_amount_for_digital_photos = None
+        ransom_amount_for_calendar = None
+
+        ransom_amount_for_digital_photos_second = None
+        ransom_amount_for_calendar_second = None
+
+        ransom_amount_for_digital_photos_third = None
+        ransom_amount_for_calendar_third = None
+
+        if len(instance) > 0:
+            photo_line = instance[0]
+            if photo_line:
+                ransom_amount_for_digital_photos = (
+                    photo_line
+                    .kindergarten
+                    .region
+                    .ransom_amount_for_digital_photos
+                )
+                ransom_amount_for_calendar = (
+                    photo_line
+                    .kindergarten
+                    .region
+                    .ransom_amount_for_calendar
+                )
+
+                ransom_amount_for_digital_photos_second = (
+                    photo_line
+                    .kindergarten
+                    .region
+                    .ransom_amount_for_digital_photos_second
+                )
+                ransom_amount_for_calendar_second = (
+                    photo_line
+                    .kindergarten
+                    .region
+                    .ransom_amount_for_calendar_second
+                )
+
+                ransom_amount_for_digital_photos_third = (
+                    photo_line
+                    .kindergarten
+                    .region
+                    .ransom_amount_for_digital_photos_third
+                )
+                ransom_amount_for_calendar_third = (
+                    photo_line
+                    .kindergarten
+                    .region
+                    .ransom_amount_for_calendar_third
+                )
+
+        all_price = 0
         for data in instance:
-            logger.info(f"data_instance: {data}")
+            all_price += data.total_price
+
+            if ransom_amount_for_digital_photos:
+                if data.child_number == 1 and all_price >= ransom_amount_for_digital_photos:
+                    data.is_free_digital = True
+            if ransom_amount_for_digital_photos_second:
+                if data.child_number == 2 and all_price >= ransom_amount_for_digital_photos_second:
+                    data.is_free_digital = True
+            if ransom_amount_for_digital_photos_third:
+                if data.child_number == 3 and all_price >= ransom_amount_for_digital_photos_third:
+                    data.is_free_digital = True
+
+            if ransom_amount_for_calendar:
+                if data.child_number == 1 and all_price >= ransom_amount_for_calendar:
+                    data.is_free_calendar = True
+            if ransom_amount_for_calendar_second:
+                if data.child_number == 2 and all_price >= ransom_amount_for_calendar_second:
+                    data.is_free_calendar = True
+            if ransom_amount_for_calendar_third:
+                if data.child_number == 3 and all_price >= ransom_amount_for_calendar_third:
+                    data.is_free_calendar = True
 
         return Response(CartPhotoLineSerializer(instance, many=True).data)
