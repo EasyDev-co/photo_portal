@@ -62,10 +62,24 @@ class CartAPIView(APIView):
         cart_photo_lines.delete()
 
         validated_data = request.data
-        for data in validated_data:
-            data['cart'] = cart.id
 
-        serializer = CartPhotoLineCreateUpdateSerializer(data=validated_data, context={'request': request}, many=True)
+        child_num = 1
+
+        for data in validated_data:
+            logger.info(f"data: {data}")
+
+            data['cart'] = cart.id
+            data['child_number'] = child_num
+            child_num += 1
+
+        serializer = CartPhotoLineCreateUpdateSerializer(
+            data=validated_data, context={'request': request}, many=True
+        )
         serializer.is_valid(raise_exception=True)
+
         instance = serializer.save()
+
+        for data in instance:
+            logger.info(f"data: {data}")
+
         return Response(CartPhotoLineSerializer(instance, many=True).data)

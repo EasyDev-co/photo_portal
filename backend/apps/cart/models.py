@@ -49,10 +49,12 @@ class CartPhotoLine(UUIDMixin):
         default=0,
         verbose_name='Итоговая стоимость',
     )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания", null=True, blank=True)
 
     class Meta:
         verbose_name = 'Пробник в корзине'
         verbose_name_plural = 'Пробники в корзине'
+        ordering = ('created_at',)
 
 
 class PhotoInCart(UUIDMixin):
