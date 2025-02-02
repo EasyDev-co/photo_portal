@@ -93,42 +93,48 @@ class CartAPIView(APIView):
         ransom_amount_for_calendar_third = None
 
         if len(instance) > 0:
-            photo_line = instance[0]
-            if photo_line:
+            cart_photo_line = instance[0]
+            if cart_photo_line:
                 ransom_amount_for_digital_photos = (
-                    photo_line
+                    cart_photo_line
+                    .photo_line
                     .kindergarten
                     .region
                     .ransom_amount_for_digital_photos
                 )
                 ransom_amount_for_calendar = (
-                    photo_line
+                    cart_photo_line
+                    .photo_line
                     .kindergarten
                     .region
                     .ransom_amount_for_calendar
                 )
 
                 ransom_amount_for_digital_photos_second = (
-                    photo_line
+                    cart_photo_line
+                    .photo_line
                     .kindergarten
                     .region
                     .ransom_amount_for_digital_photos_second
                 )
                 ransom_amount_for_calendar_second = (
-                    photo_line
+                    cart_photo_line
+                    .photo_line
                     .kindergarten
                     .region
                     .ransom_amount_for_calendar_second
                 )
 
                 ransom_amount_for_digital_photos_third = (
-                    photo_line
+                    cart_photo_line
+                    .photo_line
                     .kindergarten
                     .region
                     .ransom_amount_for_digital_photos_third
                 )
                 ransom_amount_for_calendar_third = (
-                    photo_line
+                    cart_photo_line
+                    .photo_line
                     .kindergarten
                     .region
                     .ransom_amount_for_calendar_third
