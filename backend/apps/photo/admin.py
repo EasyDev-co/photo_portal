@@ -21,7 +21,7 @@ from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
     calculate_popularity
 )
-from apps.utils.services.update_photo_theme_kindergartens import update_photo_theme_kindergartens
+from apps.utils.services.update_photo_theme_kindergartens import update_photo_theme_kindergarten
 
 
 class CustomMessageMixin:
@@ -55,9 +55,11 @@ class PhotoThemeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'season',
+        'get_kindergarten_name',
+        'get_kindergarten_region',
         'date_start',
         'date_end',
-        'ongoing'
+        'ongoing',
     )
     fields = (
         'photo_theme_name',
@@ -74,7 +76,7 @@ class PhotoThemeAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
 
-        result = update_photo_theme_kindergartens(form, obj)
+        result = update_photo_theme_kindergarten(form, obj)
         if isinstance(result, dict):
             self.message_user(
                 request,
