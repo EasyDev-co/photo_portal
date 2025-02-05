@@ -28,4 +28,4 @@ class PhotoThemeForm(forms.ModelForm):
                 kindergartenphototheme__photo_theme=self.instance,
                 kindergartenphototheme__is_active=True
             )
-            self.fields['kindergarten'].initial = qs
+            self.fields['kindergarten'].initial = qs.first()

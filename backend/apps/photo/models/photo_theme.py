@@ -79,6 +79,32 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
     def ongoing(self) -> bool:
         return self.date_end > timezone.now()
 
+    def get_kindergarten(self):
+        """
+        Возвращает единственный активный детский сад, связанный с этой фотосессией.
+        Если сада нет, вернёт None.
+        """
+        kpt = self.kindergartenphototheme.filter(is_active=True).first()
+        return kpt.kindergarten if kpt else None
+
+    def get_kindergarten_name(self):
+        """
+        Возвращает название детского сада или '—' если не найден.
+        """
+        kindergarten = self.get_kindergarten()
+        return kindergarten.name if kindergarten else '—'
+
+    get_kindergarten_name.short_description = 'Детский сад'  # заголовок в админке
+
+    def get_kindergarten_region(self):
+        """
+        Возвращает регион детского сада или '—' если не найден.
+        """
+        kindergarten = self.get_kindergarten()
+        return kindergarten.region.name if (kindergarten and kindergarten.region) else '—'
+
+    get_kindergarten_region.short_description = 'Регион'
+
     ongoing.fget.short_description = "Сейчас активна"
     ongoing.fget.boolean = True
 
