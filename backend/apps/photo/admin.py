@@ -62,7 +62,7 @@ class PhotoThemeAdmin(admin.ModelAdmin):
     fields = (
         'photo_theme_name',
         'season',
-        'kindergartens',
+        'kindergarten',
         'date_start',
         'date_end',
         'are_qrs_removed',
