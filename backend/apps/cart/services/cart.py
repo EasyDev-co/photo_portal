@@ -5,12 +5,13 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
-from apps.kindergarten.models import  PhotoPrice, PhotoType
+from apps.kindergarten.models import PhotoPrice, PhotoType
 from apps.promocode.models import Promocode, BonusCoupon
 
 User = get_user_model()
 
 from loguru import logger
+
 
 class CartService:
     """Сервис корзины"""
@@ -66,7 +67,7 @@ class CartService:
 
                 # Обрабатываем фотографии
                 photo_instances, total_price = self._process_photo_items(photos_in_cart_data, region_prices,
-                                                                                promo_code, instance)
+                                                                         promo_code, instance)
                 if photo_instances:
                     PhotoInCart.objects.bulk_create(photo_instances)
 
@@ -75,7 +76,7 @@ class CartService:
 
                 # Обрабатываем цифровые фото
                 total_price = self._apply_digital_price(data, region_prices, promo_code, total_price,
-                                                               ransom_amount_for_digital, instance)
+                                                        ransom_amount_for_digital, instance)
 
                 # Применяем бесплатный календарь
                 total_price = self._apply_free_calendar(total_price, ransom_amount_for_calendar, instance)

@@ -145,6 +145,7 @@ class OrderAPIView(APIView):
                 is_free_calendar=cart_photo_line.is_free_calendar,
                 order_price=cart_photo_line.total_price,
                 order_payment=orders_payment,
+                original_price=cart_photo_line.original_price
             ) for cart_photo_line in cart_photo_lines
         ]
         orders = Order.objects.bulk_create(orders)
@@ -204,9 +205,9 @@ class OrderAPIView(APIView):
                 coupon_amount=coupon_amount
             )
 
-        # сетим в последний order_item 1, тк сумма заказа не может быть равна 0
+        # сетим в первый order_item 1, тк сумма заказа не может быть равна 0
         if cart.order_fully_paid_by_coupon:
-            order_items[-1].price = Decimal(1)
+            order_items[0].price = Decimal(1)
 
         if cart.promocode:
             promocode = cart.promocode
@@ -284,7 +285,11 @@ class PaymentAPIView(APIView):
                     payment_id=response.json()['PaymentId'],
                     status=OrderStatus.payment_awaiting
                 )
-                user.manager_discount_balance =- total_price
+
+                # обновляем баланс бонусного купона, после его использования
+                total_original_price = sum(order.original_price for order in orders.all())
+                user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
+                user.save()
 
                 return Response(payment_url, status=status.HTTP_200_OK)
             return Response(
