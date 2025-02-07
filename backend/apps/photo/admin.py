@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.safestring import mark_safe
 from django.contrib import messages
+from django.urls import reverse
 
 from apps.kindergarten.models import Region
 from apps.photo.form import PhotoThemeForm
@@ -54,9 +55,10 @@ class PhotoThemeAdmin(admin.ModelAdmin):
     form = PhotoThemeForm
     list_display = (
         'name',
-        'season',
-        'get_kindergarten_name',
+        'get_kindergarten_name_link',
         'get_kindergarten_region',
+        'get_kindergarten_locality',
+        'season',
         'date_start',
         'date_end',
         'ongoing',
@@ -88,6 +90,20 @@ class PhotoThemeAdmin(admin.ModelAdmin):
         return obj.photo_theme_name.season if obj.photo_theme_name else '-'
 
     season.short_description = 'Сезон'
+
+    def get_kindergarten_name_link(self, obj):
+        kindergarten = obj.get_kindergarten()
+        if kindergarten:
+            url = reverse(
+                'admin:kindergarten_kindergarten_change',
+                args=[kindergarten.id]
+            )
+            return format_html(
+                '<a href="{url}">{name}</a>'.format(url=url, name=obj.get_kindergarten_name())
+            )
+        return "-"
+
+    get_kindergarten_name_link.short_description = 'Детский сад'
 
 
 @admin.register(PhotoThemeName)
