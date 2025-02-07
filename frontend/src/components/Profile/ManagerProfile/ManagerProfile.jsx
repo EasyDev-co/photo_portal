@@ -180,7 +180,7 @@ const ManagerProfile = () => {
             >
                 <div style={{marginBottom: '10px'}}>
                     <div style={{marginBottom: '15px', fontWeight: 'bold'}} className={styles.grid}>
-                        <p>ФИ</p>
+                        <p>Имя Фамилия</p>
                         <p>Сумма</p>
                         <p>ID платежа</p>
                     </div>
@@ -190,7 +190,7 @@ const ManagerProfile = () => {
                         <ul className={styles.orders_block}>
                             {orderList.map((item, index) => (
                                 <li className={styles.grid} key={index}>
-                                    <p>{item.user_first_name} {item.user_last_name}</p>
+                                    <p>{item.user_last_name} {item.user_first_name}</p>
                                     <p>{item.order_price}</p>
                                     <p>{item.payment_id}</p>
                                 </li>

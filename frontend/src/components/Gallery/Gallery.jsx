@@ -128,7 +128,7 @@ export const Gallery = () => {
           Фотосессия: {paidOrders[0].photo_theme_name},{' '}
           {paidOrders[0].photo_theme_date}
           <br />
-          Дедлайн фотосессии: {formattedDate}
+          Все фотографии в электронном виде будут представлены здесь {formattedDate} года
         </div>
         {/* <p>Дождитесь окончания фотосессии</p> */}
       </div>
