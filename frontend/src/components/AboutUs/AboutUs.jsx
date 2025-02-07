@@ -16,6 +16,7 @@ export const AboutUs = () => {
         })}
       </ul>
       <button
+        type="button"
         className={styles.details}
         onClick={() => navigate("/about-us/details")}
       >
