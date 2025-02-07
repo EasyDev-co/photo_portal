@@ -105,6 +105,15 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
 
     get_kindergarten_region.short_description = 'Регион'
 
+    def get_kindergarten_locality(self):
+        """
+        Возвращает город детского сада или '—' если не найден.
+        """
+        kindergarten = self.get_kindergarten()
+        return kindergarten.locality if (kindergarten and kindergarten.locality) else '—'
+
+    get_kindergarten_locality.short_description = 'Город'
+
     ongoing.fget.short_description = "Сейчас активна"
     ongoing.fget.boolean = True
 
