@@ -93,7 +93,6 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True,
     )
-
     manager_percent = models.DecimalField(
         verbose_name="Процент заведующей",
         decimal_places=2,

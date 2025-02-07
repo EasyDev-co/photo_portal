@@ -13,6 +13,7 @@ from apps.user.models import UserRole
 
 from loguru import logger
 
+
 class PhotoInCartSerializer(serializers.ModelSerializer):
     """Сериализатор для Фото в корзине."""
     id = serializers.PrimaryKeyRelatedField(source='photo', queryset=Photo.objects.all())
@@ -40,6 +41,7 @@ class CartPhotoLineSerializer(serializers.Serializer):
     is_free_calendar = serializers.BooleanField(default=False)
     is_free_digital = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    original_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     child_number = serializers.IntegerField(required=False, allow_null=True)
 
     @staticmethod
@@ -109,6 +111,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         bonus_coupon = BonusCoupon.objects.filter(user=user, is_active=True, balance__gt=0).first()
 
         total_price = Decimal(0)
+        original_price = Decimal(0)
 
         photo_list = []
 
@@ -148,6 +151,7 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                 )
             )
             total_price += discount_price * photo['quantity']
+            original_price += discount_price * photo['quantity']
         PhotoInCart.objects.bulk_create(photo_list)
 
         # стоимость фотокниги
@@ -162,17 +166,17 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                     is_photobook=True
                 )
             total_price += photobook_price
+            original_price += photobook_price
 
         # # стоимость электронных фото
         if ransom_amount_for_digital_photos:
-        #
-        #     if not validated_data['is_digital'] and total_price >= ransom_amount_for_digital_photos:
-        #         if self.child_number == 1:
-        #             instance.is_digital = True
-        #             instance.is_free_digital = True
-        #             instance.save()
-        #
-        #
+
+            # if not validated_data['is_digital'] and total_price >= ransom_amount_for_digital_photos:
+            #     if self.child_number == 1:
+            #         instance.is_digital = True
+            #         instance.is_free_digital = True
+            #         instance.save()
+
             if validated_data['is_digital'] and total_price < ransom_amount_for_digital_photos:
                 digital_price = region_prices.get(photo_type=PhotoType.digital).price
 
@@ -182,8 +186,9 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
                     )
 
                 total_price += digital_price
-        #
-        # # выкуп для бесплатного календаря
+                original_price += digital_price
+
+        # выкуп для бесплатного календаря
         # if ransom_amount_for_calendar and total_price >= ransom_amount_for_calendar:
         #     instance.is_free_calendar = True
         #     instance.save()
@@ -201,12 +206,16 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
             manager_discount = user.manager_discount_balance
             if total_price > 0 and manager_discount > 0:
                 if total_price <= manager_discount:
-                    total_price = Decimal(0)
+                    total_price = Decimal(1)
+                    instance.cart.order_fully_paid_by_coupon = True
                 else:
                     total_price -= manager_discount
+                    instance.cart.order_fully_paid_by_coupon = False
         try:
+            instance.original_price = original_price
             instance.total_price = total_price
             instance.cart.promocode = promo_code
+            instance.cart.bonus_coupon = user.manager_discount_balance
             with transaction.atomic():
                 instance.cart.save()
                 instance.save()
