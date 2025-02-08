@@ -13,7 +13,8 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
   const [isDigitalChecked, setIsDigitalChecked] = useState(false);
   const currentLineId = photos[0].photoLineId
   const [manualControl, setManualControl] = useState(false); // Новый флаг для ручного управления
-  const [isGalka, setIsGalka] = useState(false);
+  const [isGalkaPhoto, setIsGalkaPhoto] = useState(false);
+  const [isGalkaCalendar, setIsGalkaCalendar] = useState(false);
   const [digitalPrice, setDigitalPrice] = useState(0);
   const userData = useSelector(state => state.user.userData);
   
@@ -41,7 +42,9 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
       setCurrentSum(cartItem.total_price); 
   
       const shouldActivateCheckbox = cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos;
-      setIsGalka(shouldActivateCheckbox)
+      const shouldActivateCheckboxCalendar = cartItem.total_price >= priceCalendar.ransom_amount_for_calendar;
+      setIsGalkaPhoto(shouldActivateCheckbox)
+      setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
       if (cartItem.total_price) {
         console.log(cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos)
@@ -160,7 +163,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
         </div> */}
         
         <div className={styles.promoStringWrap}>
-          {isGalka ?
+          {isGalkaPhoto ?
             <div>
               <img src={galkaSvg} alt="galka" style={{width: '25px', marginRight: '5px'}}/>
             </div>
@@ -170,7 +173,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
           <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_digital_photos} рублей, вы получите все фото в электронном виде</span>
         </div>
         <div className={styles.promoStringWrap}>
-        {isGalka ?
+        {isGalkaCalendar ?
             <div>
               <img src={galkaSvg} alt="galka" style={{width: '25px', marginRight: '5px'}}/>
             </div>
