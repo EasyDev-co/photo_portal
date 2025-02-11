@@ -63,7 +63,8 @@ class PhotoTheme(UUIDMixin, TimeStampedMixin):
 
     class Meta:
         verbose_name = 'Фотосессия'
-        verbose_name_plural = 'Фотосессии'
+        # используем пробел как простейший способ поднять приложение наверх в списке в админке
+        verbose_name_plural = ' Фотосессии'
         ordering = ("-created",)
 
     def clean(self):
