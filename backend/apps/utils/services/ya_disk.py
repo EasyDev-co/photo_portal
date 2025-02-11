@@ -70,6 +70,7 @@ def generate_random_string(length=10) -> str:
     """Функция для генерации строки для названия файла"""
     return ''.join(random.choices(string.ascii_letters, k=length))
 
+
 def save_link_to_model(yadisk_base_path: str, kindergarten: Kindergarten, photo_theme: PhotoTheme):
     instance = KindergartenPhotoTheme.objects.get(
         kindergarten=kindergarten,
