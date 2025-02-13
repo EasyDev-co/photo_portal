@@ -11,7 +11,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
 from apps.exceptions.api_exceptions import (
     MissingKindergartenCode,
     KindergartenCodeNotFound,
@@ -95,9 +94,8 @@ class ParentRegisterAPIView(CreateAPIView):
     def _generate_numeric_code(length=6) -> str:
         # Здесь любая ваша логика генерации кода
         from random import randint
-        code = randint(10**(length-1), 10**length - 1)
+        code = randint(10 ** (length - 1), 10 ** length - 1)
         return str(code)
-
 
 
 class ParentLogoutAPIView(APIView):
@@ -258,6 +256,7 @@ class PasswordChangeAPIView(ConfirmCodeMixin, APIView):
             status=status.HTTP_200_OK
         )
 
+
 class RetryEmailCodeAPIView(APIView):
     """Представление для восстановления пароля."""
     email_serializer = EmailSerializer
@@ -277,9 +276,15 @@ class RetryEmailCodeAPIView(APIView):
         redis_client.set(key=email, value=email, ex=60)
 
         user = User.objects.filter(email=email).first()
+        confirm_code_id = ConfirmCode.objects.filter(
+            user_id=user.pk,
+            purpose=CodePurpose.CONFIRM_EMAIL,
+            is_used=False
+        ).first().id
 
         send_confirm_code.delay(
             user_id=user.pk,
-            code_purpose=CodePurpose.CONFIRM_EMAIL
+            code_purpose=CodePurpose.CONFIRM_EMAIL,
+            confirm_code_id=confirm_code_id
         )
         return Response({"message": "Код повторно отправлен"}, status=status.HTTP_200_OK)

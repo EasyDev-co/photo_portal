@@ -31,6 +31,7 @@ from config.settings import (
     TAXATION,
     FFD_VERSION,
     GALLERY_URL,
+    LOGO_FOR_NOTIFICATION_PATH,
 )
 from config.settings import UNISENER_TOKEN, FROM_EMAIL
 
@@ -53,24 +54,24 @@ class DigitalPhotosNotificationTask(BaseTask):
     def process(self, user_id, *args, **kwargs):
         user = get_object_or_404(User, id=user_id)
         if user:
-            html_message = f"""
-                        <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
-                            <div style="background-color: #007BFF; color: white; text-align: center; padding: 20px 0;">
-                                <h1 style="margin: 0;">ФотоДетство</h1>
-                            </div>
-                            <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
-                                <p style="font-size: 18px; color: #333;">
-                                   Ваши электронные фото готовы
-                                </p>
-                                <p style="font-size: 16px; color: #555; line-height: 1.5;">
-                                    Вы можете скачать электронные фото в личном кабинете.
-                                </p>
-                                <p style="font-size: 16px; color: #555; line-height: 1.5; margin-top: 20px;">
-                                    С уважением,<br>Администрация Фото-портала
-                                </p>
-                            </div>
-                        </div>
-                        """
+            html_message = """
+            <div style="text-align: center;">
+                <img src="{logo}" alt="Логотип" style="max-width: 250px; height: auto; display: block; margin: 0 auto;">
+                <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+                    <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
+                        <p style="font-size: 18px; color: #333;">
+                           Ваши электронные фото готовы
+                        </p>
+                        <p style="font-size: 16px; color: #555; line-height: 1.5;">
+                            Вы можете скачать электронные фото в личном кабинете.
+                        </p>
+                        <p style="font-size: 16px; color: #555; line-height: 1.5; margin-top: 20px;">
+                            С уважением,<br>Администрация Фото-портала
+                        </p>
+                    </div>
+                </div>
+            </div>
+            """
             subject = f"Ваши электронные фото готовы."
             try:
                 with SyncClient.setup(UNISENER_TOKEN):
@@ -78,7 +79,7 @@ class DigitalPhotosNotificationTask(BaseTask):
                         message={
                             "recipients": [{"email": user.email}],
                             "body": {
-                                "html": html_message,
+                                "html": html_message.format(logo=LOGO_FOR_NOTIFICATION_PATH),
                             },
                             "subject": subject,
                             "from_email": FROM_EMAIL,
@@ -133,11 +134,10 @@ class SendDeadLineNotificationTask(BaseTask):
 
     def process(self, recipients, *args, **kwargs):
         subject = f"До истечения срока фото-темы осталось менее 24 часов."
-        html_message = f"""
+        html_message = """
+        <div style="text-align: center;">
+            <img src="{logo}" alt="Логотип" style="max-width: 250px; height: auto; display: block; margin: 0 auto;">
             <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
-                <div style="background-color: #007BFF; color: white; text-align: center; padding: 20px 0;">
-                    <h1 style="margin: 0;">ФотоДетство</h1>
-                </div>
                 <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
                     <p style="font-size: 18px; color: #333;">
                        Осталось менее 24 часов до завершения заказа.
@@ -150,7 +150,8 @@ class SendDeadLineNotificationTask(BaseTask):
                     </p>
                 </div>
             </div>
-            """
+        </div>
+        """
 
         try:
             with SyncClient.setup(UNISENER_TOKEN):
@@ -158,7 +159,7 @@ class SendDeadLineNotificationTask(BaseTask):
                     message={
                         "recipients": recipients,
                         "body": {
-                            "html": html_message,
+                            "html": html_message.format(logo=LOGO_FOR_NOTIFICATION_PATH),
                         },
                         "subject": subject,
                         "from_email": FROM_EMAIL,
@@ -303,6 +304,7 @@ class CheckIfOrdersPaid(BaseTask):
                 price=price,
                 deadline=deadline,
                 base_url=GALLERY_URL,
+                logo=LOGO_FOR_NOTIFICATION_PATH,
             )
         elif order.is_free_digital:
             return message_is_digital_free.format(
@@ -311,6 +313,7 @@ class CheckIfOrdersPaid(BaseTask):
                 price=price,
                 deadline=deadline,
                 base_url=GALLERY_URL,
+                logo=LOGO_FOR_NOTIFICATION_PATH,
             )
         elif order.is_digital:
             return message_digital_photo.format(
@@ -318,6 +321,7 @@ class CheckIfOrdersPaid(BaseTask):
                 last_name=order.user.last_name,
                 deadline=deadline,
                 base_url=GALLERY_URL,
+                logo=LOGO_FOR_NOTIFICATION_PATH,
             )
 
 
