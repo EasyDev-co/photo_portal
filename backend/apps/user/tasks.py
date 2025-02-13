@@ -9,25 +9,28 @@ from apps.user.models.code import CodePurpose
 from apps.user.models.email_error_log import EmailErrorLog
 
 from config.celery import BaseTask, app
-from config.settings import UNISENER_TOKEN, FROM_EMAIL
+from config.settings import (
+    UNISENER_TOKEN,
+    FROM_EMAIL,
+    LOGO_FOR_NOTIFICATION_PATH
+)
 
 from loguru import logger
 
 User = get_user_model()
 
 html_msg = """
-                       <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
-                           <div style="background-color: #007BFF; color: white; text-align: center; padding: 20px 0;">
-                               <h1 style="margin: 0; color: #000;">ФотоДетство</h1>
-                           </div>
-                           <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
-                               <p style="font-size: 18px; color: #333;">{message}</p>
-                               <div style="display: inline-block; background-color: #e0e0e0; padding: 20px 40px; border-radius: 5px;">
-                                   <span style="font-size: 24px; font-weight: bold; color: #000;">{code}</span>
-                               </div>
-                           </div>
-                       </div>
-                       """
+<div style="text-align: center;">
+    <img src="{logo}" alt="Логотип" style="max-width: 250px; height: auto; display: block; margin: 0 auto;">
+    <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+       <p style="font-size: 18px; color: #333;">{message}</p>
+       <div style="display: inline-block; background-color: #e0e0e0; padding: 20px 40px; border-radius: 5px;">
+           <span style="font-size: 24px; font-weight: bold; color: #000;">{code}</span>
+       </div>
+       </div>
+    </div>
+</div>
+"""
 
 
 class SendConfirmCodeTask(BaseTask):
@@ -57,7 +60,11 @@ class SendConfirmCodeTask(BaseTask):
                             {"email": user.email},
                         ],
                         "body": {
-                            "html": html_msg.format(message=message, code=code),
+                            "html": html_msg.format(
+                                message=message,
+                                code=code,
+                                logo=LOGO_FOR_NOTIFICATION_PATH
+                            ),
                         },
                         "subject": "Код подтверждения",
                         "from_email": FROM_EMAIL,
@@ -78,7 +85,6 @@ class SendConfirmCodeTask(BaseTask):
                 message='Sent successfully'
             )
         logger.info("send confirm code done")
-
 
     @staticmethod
     def generate_numeric_code():
@@ -115,7 +121,11 @@ class ResendConfirmCodeTask(BaseTask):
                                 {"email": email_error_log.user.email},
                             ],
                             "body": {
-                                "html": html_msg.format(message=message, code=code),
+                                "html": html_msg.format(
+                                    message=message,
+                                    code=code,
+                                    logo=LOGO_FOR_NOTIFICATION_PATH
+                                ),
                             },
                             "subject": "Код подтверждения",
                             "from_email": FROM_EMAIL,
