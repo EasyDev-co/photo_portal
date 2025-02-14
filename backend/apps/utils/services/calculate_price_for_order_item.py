@@ -4,6 +4,7 @@ from apps.exceptions.api_exceptions import PhotoPriceDoesNotExist
 from apps.kindergarten.models import PhotoType
 from apps.order.models import OrderItem
 from apps.promocode.models import Promocode
+from apps.user.models import UserRole
 
 
 def calculate_price_for_order_item(
@@ -11,7 +12,8 @@ def calculate_price_for_order_item(
         prices_dict: dict,
         ransom_amount_for_digital_photos: Decimal,
         promocode: Promocode = None,
-        coupon_amount: list = None  # передаем через список, чтобы можно было изменять coupon_amount снаружи
+        coupon_amount: list = None,  # передаем через список, чтобы можно было изменять coupon_amount снаружи
+        user_role: UserRole = None,
 ):
     """Подсчет стоимости позиции заказа с учетом промокода и суммы выкупа."""
     try:
@@ -28,7 +30,7 @@ def calculate_price_for_order_item(
             else:
                 price = promocode.apply_discount(Decimal(price), is_photobook=False)
 
-        if len(coupon_amount) != 0 and coupon_amount[0] != 0:
+        if user_role == UserRole.manager and len(coupon_amount) != 0 and coupon_amount[0] != 0:
             coupon_amount[0] -= price
             if coupon_amount[0] >= 0:
                 price = Decimal(0)
