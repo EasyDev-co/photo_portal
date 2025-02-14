@@ -202,7 +202,8 @@ class OrderAPIView(APIView):
                 prices_dict=prices_dict,
                 ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
                 promocode=cart.promocode,
-                coupon_amount=coupon_amount
+                coupon_amount=coupon_amount,
+                user_role=user.role
             )
 
         # сетим в первый order_item 1, тк сумма заказа не может быть равна 0

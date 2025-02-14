@@ -41,12 +41,10 @@ class PhotoPriceInline(admin.TabularInline):
 
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
-    list_display = ('name', 'region', 'code', "id", 'has_photobook', 'locality', 'active_photo_theme',
-                    'orig_folder_url', 'watermarked_folder_url')
+    list_display = ('name', 'region', 'code', "id", 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
-    readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info', 'active_photo_theme',
-                       'orig_folder_url', 'watermarked_folder_url')
+    readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info', 'active_photo_theme')
     raw_id_fields = ('region',)
     ordering = ('name',)
 
@@ -57,7 +55,7 @@ class KindergartenAdmin(admin.ModelAdmin):
     def get_fields(self, request, obj=None):
         if obj:
             return ('region', 'locality', 'name', 'code', 'has_photobook', 'qr_image', 'qr_code', 'file_upload',
-                    'manager_info', 'active_photo_theme', 'orig_folder_url', 'watermarked_folder_url')
+                    'manager_info', 'active_photo_theme')
         return 'region', 'locality', 'name', 'code', 'has_photobook'
 
     def file_upload(self, obj):

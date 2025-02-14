@@ -75,7 +75,6 @@ class CartAPIView(APIView):
 
             logger.info(f"data: {data}")
 
-
         serializer = CartPhotoLineCreateUpdateSerializer(
             data=validated_data, context={'request': request}, many=True
         )
