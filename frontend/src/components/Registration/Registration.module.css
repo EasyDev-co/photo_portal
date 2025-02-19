@@ -14,9 +14,11 @@
 .container {
   min-width: 100vw;
   width: 100%;
-  min-height: 99.93vh;
+  /* min-height: 99.94vh; */
+  min-height: 100vh;
   height: 100%;
-  background-image: url("../../assets/images/logInBg.jpg");
+  /* background-image: url("../../assets/images/logInBg.jpg"); */
+  background-image: url("../../assets/images/logInBg2.jpg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -316,9 +318,9 @@
   top: 50px;
   position: absolute;
 }
-#privacy{
+/* #privacy{
   
-}
+} */
 .privacyInput{
   margin-top: 2px;
 }
