@@ -318,7 +318,6 @@ class DirectPhotoUploadAPIView(APIView):
 
             logger.info("Calling save_photos")
             self.save_photos(kindergarten, photos, photo_theme)
-            self.save_folder_url_to_kindergarten(kindergarten, photos[0])
 
             return Response({'detail': 'Файлы успешно загружены!'}, status=status.HTTP_201_CREATED)
 
@@ -384,23 +383,6 @@ class DirectPhotoUploadAPIView(APIView):
         buffer.seek(0)
         qr_code_filename = f'{str(photo_line.photo_theme.id)}/{str(photo_line.photo_theme.name)}_qr.png'
         photo_line.qr_code.save(qr_code_filename, ContentFile(buffer.read()), save=True)
-
-    @staticmethod
-    def save_folder_url_to_kindergarten(kindergarten: Kindergarten, photo: dict):
-        orig_folder: str = photo.get("original_photo").rsplit('/', 1)[0]
-        wm_folder: str = photo.get("watermarked_photo").rsplit('/', 1)[0]
-
-        should_update = (
-                orig_folder
-                and wm_folder
-                and kindergarten.orig_folder_url != orig_folder
-                and kindergarten.watermarked_folder_url != wm_folder
-        )
-
-        if should_update:
-            kindergarten.orig_folder_url = orig_folder
-            kindergarten.watermarked_folder_url = wm_folder
-            kindergarten.save()
 
 
 class PhotoLineGetByPhotoNumberAPIView(APIView):

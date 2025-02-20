@@ -41,16 +41,6 @@ class Kindergarten(UUIDMixin):
         max_length=255,
         verbose_name='Населенный пункт'
     )
-    orig_folder_url = models.URLField(
-        verbose_name="Папка с оригиналами фото",
-        blank=True,
-        null=True
-    )
-    watermarked_folder_url = models.URLField(
-        verbose_name="Папка с фото с вотермарками",
-        blank=True,
-        null=True
-    )
 
     def __str__(self):
         return f'{self.name} ({self.code})'
