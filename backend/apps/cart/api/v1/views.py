@@ -162,6 +162,8 @@ class CartAPIView(APIView):
             if ransom_amount_for_calendar_third:
                 if data.child_number == 3 and all_price >= ransom_amount_for_calendar_third:
                     data.is_free_calendar = True
-            data.save()
+
+            if data.cart_id and Cart.objects.filter(id=data.cart_id).exists():
+                data.save()
 
         return Response(CartPhotoLineSerializer(instance, many=True).data)
