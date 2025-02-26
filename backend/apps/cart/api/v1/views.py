@@ -79,8 +79,12 @@ class CartAPIView(APIView):
             data=validated_data, context={'request': request}, many=True
         )
         serializer.is_valid(raise_exception=True)
-
         instance = serializer.save()
+
+        if instance is None:
+            return Response({"message": "Нет товаров для добавления в корзину"}, status=400)
+
+        logger.info(f"instance: {instance}")
 
         ransom_amount_for_digital_photos = None
         ransom_amount_for_calendar = None

@@ -85,9 +85,9 @@ class CartPhotoLineCreateUpdateSerializer(serializers.Serializer):
         quantity = 0
         for photo_in_cart in photos_in_cart:
             quantity += photo_in_cart.get('quantity')
+
         if quantity == 0 and not validated_data["is_digital"] and not validated_data["is_photobook"]:
-            validated_data.pop('cart').delete()
-            return CartPhotoLine()
+            return None
 
         promo_code_data = validated_data.pop('promo_code', None)
         instance = CartPhotoLine.objects.create(**validated_data)
