@@ -82,7 +82,7 @@ class CartAPIView(APIView):
         instance = serializer.save()
 
         if instance is None:
-            return Response({"message": "Нет товаров для добавления в корзину"}, status=400)
+            return Response({"message": "Нет товаров для добавления в корзину"}, status=204)
 
         logger.info(f"instance: {instance}")
 
@@ -149,9 +149,11 @@ class CartAPIView(APIView):
         for data in instance:
 
             if not data:
-                return Response({"message": "Нет товаров для добавления в корзину"}, status=400)
+                return Response({"message": "Нет товаров для добавления в корзину"}, status=204)
 
             all_price += data.total_price
+
+            logger.info(f"all_price: {all_price}")
 
             if ransom_amount_for_digital_photos:
                 if data.child_number == 1 and all_price >= ransom_amount_for_digital_photos:
