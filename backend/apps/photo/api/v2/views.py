@@ -493,12 +493,22 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         logger.info(f"photo_num: {photo_numbers}")
         logger.info(f"active_photo_theme: {active_photo_theme}")
         logger.info(f"kindergarten: {kindergarten}")
+
+        logger.info(f"type phot theme: {type(active_photo_theme)}")
+        logger.info(f"type kindergarten: {type(kindergarten)}")
+
         if len(photo_numbers) == 1:
-            photo_line = Photo.objects.get(
+            photo = Photo.objects.filter(
                 number=photo_numbers[0],
                 photo_line__photo_theme=active_photo_theme,
                 photo_line__kindergarten=kindergarten,
-            ).photo_line
+            ).first()
+            if not photo:
+                return Response(
+                    {'message': 'Некоторые из указанных номеров фотографий не найдены.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            photo_line = photo.photo_line
             return photo_line
 
         photos = Photo.objects.filter(
