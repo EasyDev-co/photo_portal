@@ -153,6 +153,8 @@ class CartAPIView(APIView):
 
             all_price += data.total_price
 
+            logger.info(f"all_price: {all_price}")
+
             if ransom_amount_for_digital_photos:
                 if data.child_number == 1 and all_price >= ransom_amount_for_digital_photos:
                     data.is_free_digital = True
