@@ -145,29 +145,30 @@ class CartAPIView(APIView):
 
         all_price = 0
         for data in instance:
-            all_price += data.total_price
+            if data:
+                all_price += data.total_price
 
-            if ransom_amount_for_digital_photos:
-                if data.child_number == 1 and all_price >= ransom_amount_for_digital_photos:
-                    data.is_free_digital = True
-            if ransom_amount_for_digital_photos_second:
-                if data.child_number == 2 and all_price >= ransom_amount_for_digital_photos_second:
-                    data.is_free_digital = True
-            if ransom_amount_for_digital_photos_third:
-                if data.child_number == 3 and all_price >= ransom_amount_for_digital_photos_third:
-                    data.is_free_digital = True
+                if ransom_amount_for_digital_photos:
+                    if data.child_number == 1 and all_price >= ransom_amount_for_digital_photos:
+                        data.is_free_digital = True
+                if ransom_amount_for_digital_photos_second:
+                    if data.child_number == 2 and all_price >= ransom_amount_for_digital_photos_second:
+                        data.is_free_digital = True
+                if ransom_amount_for_digital_photos_third:
+                    if data.child_number == 3 and all_price >= ransom_amount_for_digital_photos_third:
+                        data.is_free_digital = True
 
-            if ransom_amount_for_calendar:
-                if data.child_number == 1 and all_price >= ransom_amount_for_calendar:
-                    data.is_free_calendar = True
-            if ransom_amount_for_calendar_second:
-                if data.child_number == 2 and all_price >= ransom_amount_for_calendar_second:
-                    data.is_free_calendar = True
-            if ransom_amount_for_calendar_third:
-                if data.child_number == 3 and all_price >= ransom_amount_for_calendar_third:
-                    data.is_free_calendar = True
+                if ransom_amount_for_calendar:
+                    if data.child_number == 1 and all_price >= ransom_amount_for_calendar:
+                        data.is_free_calendar = True
+                if ransom_amount_for_calendar_second:
+                    if data.child_number == 2 and all_price >= ransom_amount_for_calendar_second:
+                        data.is_free_calendar = True
+                if ransom_amount_for_calendar_third:
+                    if data.child_number == 3 and all_price >= ransom_amount_for_calendar_third:
+                        data.is_free_calendar = True
 
-            if data.cart_id and Cart.objects.filter(id=data.cart_id).exists():
-                data.save()
+                if data.cart_id and Cart.objects.filter(id=data.cart_id).exists():
+                    data.save()
 
         return Response(CartPhotoLineSerializer(instance, many=True).data)
