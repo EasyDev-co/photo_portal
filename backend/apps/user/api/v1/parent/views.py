@@ -30,6 +30,7 @@ from apps.user.models.code import CodePurpose
 from apps.user.models.email_error_log import EmailErrorLog
 from apps.user.models.user import UserRole
 from apps.user.tasks import send_confirm_code
+from random import randint
 
 from apps.utils.services.redis_client import redis_client
 
@@ -79,7 +80,7 @@ class ParentRegisterAPIView(CreateAPIView):
             purpose=CodePurpose.CONFIRM_EMAIL,
         )
 
-        error_log = EmailErrorLog.objects.create(
+        EmailErrorLog.objects.create(
             confirm_code=confirm_code,
             user=user,
             message='Scheduled send confirm code',  # или пустая строка
@@ -92,8 +93,6 @@ class ParentRegisterAPIView(CreateAPIView):
 
     @staticmethod
     def _generate_numeric_code(length=6) -> str:
-        # Здесь любая ваша логика генерации кода
-        from random import randint
         code = randint(10 ** (length - 1), 10 ** length - 1)
         return str(code)
 
@@ -183,16 +182,27 @@ class ResetPasswordAPIView(APIView):
 
         user = User.objects.get(email=email)
         logger.info("send code to reset password")
-        send_confirm_code.delay(
-            user_id=user.pk,
-            code_purpose=CodePurpose.RESET_PASSWORD,
+
+        code = self._generate_numeric_code()
+
+        confirm_code = ConfirmCode.objects.create(
+            user=user,
+            code=code,
+            purpose=CodePurpose.CONFIRM_EMAIL,
         )
+
+        send_confirm_code.delay(confirm_code_id=confirm_code.id)
 
         return Response(
             data={"message": "Код для восстановления пароля был отправлен на указанный email."},
             status=status.HTTP_200_OK
         )
 
+    @staticmethod
+    def _generate_numeric_code(length=6) -> str:
+        # Здесь любая ваша логика генерации кода
+        code = randint(10 ** (length - 1), 10 ** length - 1)
+        return str(code)
 
 class ResetPasswordVerificationCodeAPIView(ConfirmCodeMixin, APIView):
     """Представление для верификации кода восстановления пароля."""
@@ -283,8 +293,6 @@ class RetryEmailCodeAPIView(APIView):
         ).first().id
 
         send_confirm_code.delay(
-            user_id=user.pk,
-            code_purpose=CodePurpose.CONFIRM_EMAIL,
             confirm_code_id=confirm_code_id
         )
         return Response({"message": "Код повторно отправлен"}, status=status.HTTP_200_OK)
