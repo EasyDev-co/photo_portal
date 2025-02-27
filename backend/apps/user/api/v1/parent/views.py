@@ -188,7 +188,7 @@ class ResetPasswordAPIView(APIView):
         confirm_code = ConfirmCode.objects.create(
             user=user,
             code=code,
-            purpose=CodePurpose.CONFIRM_EMAIL,
+            purpose=CodePurpose.RESET_PASSWORD,
         )
 
         send_confirm_code.delay(confirm_code_id=confirm_code.id)
