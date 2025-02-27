@@ -6,6 +6,23 @@ from apps.cart.api.v1.serializer import PhotoInCartSerializer
 from rest_framework.serializers import ModelSerializer
 
 
+class PhotoInCartV2Serializer(serializers.ModelSerializer):
+    """Сериализатор для Фото в корзине."""
+    id = serializers.PrimaryKeyRelatedField(source='photo', queryset=Photo.objects.all())
+    price_per_piece = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    discount_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+
+    class Meta:
+        model = PhotoInCart
+        fields = (
+            'id',
+            'photo_type',
+            'quantity',
+            'price_per_piece',
+            'discount_price',
+        )
+
+
 class CartPhotoLineCreateUpdateV2Serializer(serializers.Serializer):
     """
     Сериализатор для создания/обновления позиции корзины.
@@ -16,22 +33,13 @@ class CartPhotoLineCreateUpdateV2Serializer(serializers.Serializer):
         source='photo_line',
         queryset=PhotoLine.objects.all()
     )
-    photos = PhotoInCartSerializer(many=True)
+    photos = PhotoInCartV2Serializer(many=True)
     is_digital = serializers.BooleanField(default=False)
     is_free_calendar = serializers.BooleanField(default=False)
     is_free_digital = serializers.BooleanField(default=False)
     is_photobook = serializers.BooleanField(default=False)
     promo_code = serializers.CharField(required=False, allow_blank=True)
     child_number = serializers.IntegerField(required=False)
-
-    def create(self, validated_data):
-        request = self.context.get('request')
-        if isinstance(validated_data, list):
-            cart = validated_data[0]['cart']
-            return CartService.create_cart_photo_lines(cart, validated_data, request)
-        else:
-            cart = validated_data.get('cart')
-            return CartService.create_cart_photo_line(cart, validated_data, request.user)
 
 
 class CartPhotoLineV2Serializer(ModelSerializer):
