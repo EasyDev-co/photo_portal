@@ -114,7 +114,7 @@ class UserAdmin(BaseUserAdmin):
                              "date_joined"
                          )}),
                     )
-                case UserRole.parent | UserRole.staff:
+                case UserRole.parent:
                     return (
                         (None, {"fields": ("email", "password")}),
                         (_("Personal info"),
@@ -132,6 +132,33 @@ class UserAdmin(BaseUserAdmin):
                              "date_joined"
                          )}),
                     )
+                case UserRole.staff:
+                    fieldsets = (
+                        (None, {"fields": ("email", "password")}),
+                        (_("Personal info"),
+                         {"fields": (
+                             'role',
+                             "first_name",
+                             'second_name',
+                             "last_name",
+                             'phone_number',
+                             'is_verified',
+                         )}),
+                        (_("Permissions"),
+                         {"fields": (
+                             "groups",
+                             "user_permissions",
+                             "is_superuser",
+                             "is_staff"
+                         )}),
+                        (_("Important dates"),
+                         {"fields": (
+                             "last_login",
+                             "date_joined"
+                         )}),
+                    )
+                    return fieldsets
+
         return super().get_fieldsets(request, obj)
 
     def get_inlines(self, request, obj=None):
