@@ -64,12 +64,11 @@ class CartV2APIView(APIView, DiscountMixin):
 
         logger.info(f"request data: {request.data}")
 
-        if request_data:
-            kindergarten_id = request_data[0].get("kindergarten_id")
-
-            logger.info(f"kindergarten_id: {kindergarten_id}")
-        else:
+        if not request_data:
             return Response({"message": "Запрос пустой"}, status=status.HTTP_400_BAD_REQUEST)
+
+        kindergarten_id = request_data[0].get("kindergarten_id")
+        logger.info(f"kindergarten_id: {kindergarten_id}")
 
         kindergarten = self._validate_kindergarten(
             kindergarten_id,
@@ -91,10 +90,10 @@ class CartV2APIView(APIView, DiscountMixin):
         if cart_photo_lines:
             cart_photo_lines.delete()
 
-        ransom_amounts = self._get_ransom_amount(kindergarten)
+        ransom_amounts = self._get_ransom_amount(kindergarten=kindergarten)
         logger.info(f"ransom_amounts: {ransom_amounts}")
 
-        prices = self._get_prices(kindergarten)
+        prices = self._get_prices(kindergarten=kindergarten)
         logger.info(f"prices: {prices}")
 
         if not prices:
@@ -253,7 +252,7 @@ class CartV2APIView(APIView, DiscountMixin):
         cart_photo_line.save()
 
     @staticmethod
-    def _get_prices(kindergarten):
+    def _get_prices(kindergarten) -> dict:
         prices_by_type = {}
         region = kindergarten.region
 
@@ -298,16 +297,18 @@ class CartV2APIView(APIView, DiscountMixin):
     def _validate_kindergarten(kindergarten_id, user, user_role):
         kindergarten = Kindergarten.objects.filter(id=kindergarten_id)
 
-        if not kindergarten:
-            return Response(
-                {"message": "Нет детского сада"},
-            status=status.HTTP_400_BAD_REQUEST
-            )
+        logger.info(f"kindergarten: {kindergarten}")
+        logger.info(f"user: {user_role}")
 
-        if user_role == UserRole.manager:
+        if not kindergarten:
+            return None
+
+        if user_role == UserRole.parent:
             user_kindergarten = user.kindergarten.filter(id=kindergarten_id).exists()
+            logger.info(f"user_kindergarten: {user_kindergarten}")
         elif user_role == UserRole.manager:
             user_kindergarten = user.managed_kindergarten.filter(id=kindergarten_id).exists()
+            logger.info(f"user_kindergarten: {user_kindergarten}")
         else:
             user_kindergarten = False
 
