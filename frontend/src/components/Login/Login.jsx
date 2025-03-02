@@ -142,18 +142,18 @@ export const Login = () => {
               </form>
               <div className={styles.loginLinkWrap}>
                 <p>Еще не успели создать аккаунт <Link to={'/sign-up'}><span className={styles.loginEnter}> Зарегистрируйтесь!</span> </Link></p>
-                <div className={styles.socialList}>
-                  <span>Войти через</span>
-                  <div className={styles.socialWrap}>
-                    {OAuthItems.map(elem => {
-                      return (
-                        <div key={elem.id} onClick={() => { createOAuthConnect(elem.name) }}>
-                          <img className={styles.socialIcon} src={elem.image} alt="" />
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
+                {/*<div className={styles.socialList}>*/}
+                {/*  <span>Войти через</span>*/}
+                {/*  <div className={styles.socialWrap}>*/}
+                {/*    {OAuthItems.map(elem => {*/}
+                {/*      return (*/}
+                {/*        <div key={elem.id} onClick={() => { createOAuthConnect(elem.name) }}>*/}
+                {/*          <img className={styles.socialIcon} src={elem.image} alt="" />*/}
+                {/*        </div>*/}
+                {/*      )*/}
+                {/*    })}*/}
+                {/*  </div>*/}
+                {/*</div>*/}
               </div>
             </div>
           </div>

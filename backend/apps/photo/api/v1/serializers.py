@@ -81,6 +81,15 @@ class PhotoLineSerializer(serializers.ModelSerializer):
     photos = WatermarkedPhotoSerializer(many=True, read_only=True)
     ransom_amount_for_digital_photos = serializers.SerializerMethodField()
     ransom_amount_for_calendar = serializers.SerializerMethodField()
+
+    ransom_amount_for_digital_photos_second = serializers.SerializerMethodField()
+    ransom_amount_for_calendar_second = serializers.SerializerMethodField()
+
+    ransom_amount_for_digital_photos_third = serializers.SerializerMethodField()
+    ransom_amount_for_calendar_third = serializers.SerializerMethodField()
+
+    child_number = serializers.SerializerMethodField()
+
     photo_theme = PhotoThemeSerializer(read_only=True, required=False)
 
     class Meta:
@@ -92,6 +101,11 @@ class PhotoLineSerializer(serializers.ModelSerializer):
             'deadline',
             'ransom_amount_for_digital_photos',
             'ransom_amount_for_calendar',
+            'ransom_amount_for_digital_photos_second',
+            'ransom_amount_for_calendar_second',
+            'ransom_amount_for_digital_photos_third',
+            'ransom_amount_for_calendar_third',
+            'child_number',
             'photo_theme'
         )
 
@@ -103,6 +117,33 @@ class PhotoLineSerializer(serializers.ModelSerializer):
 
     def get_ransom_amount_for_calendar(self, obj):
         return obj.kindergarten.region.ransom_amount_for_calendar
+
+    def get_ransom_amount_for_digital_photos_second(self, obj):
+        return obj.kindergarten.region.ransom_amount_for_digital_photos_second
+
+    def get_ransom_amount_for_calendar_second(self, obj):
+        return obj.kindergarten.region.ransom_amount_for_calendar_second
+
+    def get_ransom_amount_for_digital_photos_third(self, obj):
+        return obj.kindergarten.region.ransom_amount_for_digital_photos_third
+
+    def get_ransom_amount_for_calendar_third(self, obj):
+        return obj.kindergarten.region.ransom_amount_for_calendar_third
+
+    def get_child_number(self, obj):
+        """
+        Возвращает порядковый номер PhotoLine для данного родителя,
+        учитывая только активные фото-темы.
+        """
+        all_lines = PhotoLine.objects.filter(
+            parent=obj.parent,
+            photo_theme__kindergartenphototheme__is_active=True
+        ).order_by('id')
+
+        line_ids = list(all_lines.values_list('id', flat=True))
+
+        index = line_ids.index(obj.id) + 1
+        return index
 
 
 class PaidPhotoLineSerializer(serializers.ModelSerializer):
