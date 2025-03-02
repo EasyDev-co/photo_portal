@@ -104,7 +104,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
         child_number = 1
 
-        promo_code = self.get_promo_code(user, user_role, request_data.get("promo_code"))
+        promo_code = self.get_promo_code(user, user_role, request_data[0].get("promo_code"))
         logger.info(f"promo_code: {promo_code}")
 
         cart_photo_lines_list = []
