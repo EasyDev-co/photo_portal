@@ -17,6 +17,7 @@ export function transformData(data) {
                     photos: [],
                     is_photobook: is_photobook,
                     is_digital: is_digital,
+                    kindergarten_id: localStorage.getItem('kindergarten_id'),
                     promo_code: promo_code
                 };
             } else {

@@ -189,7 +189,7 @@ export const Orders = () => {
         fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
             .then((res) => res.json())
             .then((data) => {
-                dispatch(setCart(data)); // Обновляем Redux корзину с сервера
+                dispatch(setCart(data));
             })
             .catch((err) => console.error("Ошибка загрузки корзины:", err));
     }
