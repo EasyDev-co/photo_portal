@@ -28,6 +28,8 @@ class CartPhotoLine(UUIDMixin):
         on_delete=models.CASCADE,
         related_name='cart_photo_lines',
         verbose_name='Пробник',
+        null=True,
+        blank=True,
     )
     is_digital = models.BooleanField(
         default=False,

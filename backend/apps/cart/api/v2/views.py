@@ -20,8 +20,18 @@ from loguru import logger
 
 class DiscountMixin:
 
-    def apply_kindergarten_manager_bonus(self):
-        ...
+    @staticmethod
+    def apply_kindergarten_manager_bonus(total_price, user, cart):
+        manager_discount = user.manager_discount_balance
+        if total_price > 0 and manager_discount > 0:
+            if total_price <= manager_discount:
+                total_price = Decimal(1)
+                cart.order_fully_paid_by_coupon = True
+            else:
+                total_price -= manager_discount
+                cart.order_fully_paid_by_coupon = False
+        return total_price
+
 
     @staticmethod
     def get_promo_code(user, user_role, promo_code_data):
@@ -107,6 +117,7 @@ class CartV2APIView(APIView, DiscountMixin):
         logger.info(f"promo_code: {promo_code}")
 
         cart_photo_lines_list = []
+        all_prices = 0
 
         for data in request_data:
             logger.info(f"for_data: {data}")
@@ -123,12 +134,40 @@ class CartV2APIView(APIView, DiscountMixin):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            self._update_photos_in_cart(
+            total_price = self._update_photos_in_cart(
                 cart_photo_line=cart_photo_line,
                 photos_data=data.get("photos"),
                 prices=prices,
                 promo_code=promo_code,
+                user_role=user_role,
+                user=user,
+                cart=cart,
             )
+
+            all_prices += total_price
+
+            digital_thresholds = {
+                1: "ransom_amount_for_digital_photos",
+                2: "ransom_amount_for_digital_photos_second",
+                3: "ransom_amount_for_digital_photos_third",
+            }
+
+            calendar_thresholds = {
+                1: "ransom_amount_for_calendar",
+                2: "ransom_amount_for_calendar_second",
+                3: "ransom_amount_for_calendar_third",
+            }
+
+            digital_key = digital_thresholds.get(cart_photo_line.child_number)
+            calendar_key = calendar_thresholds.get(cart_photo_line.child_number)
+
+            if digital_key and all_prices > ransom_amounts.get(digital_key):
+                cart_photo_line.is_free_digital = True
+
+            if calendar_key and all_prices > ransom_amounts.get(calendar_key):
+                cart_photo_line.is_free_calendar = True
+
+            cart_photo_line.save()
             cart_photo_lines_list.append(cart_photo_line)
 
         return Response(CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data)
@@ -153,9 +192,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
         logger.info(f"photo_line: {photo_line}")
 
-        if not photo_line:
-            return None
-
         cart_photo_line = CartPhotoLine.objects.create(
             cart=cart,
             photo_line=photo_line,
@@ -172,6 +208,9 @@ class CartV2APIView(APIView, DiscountMixin):
         photos_data,
         prices,
         promo_code,
+        user_role,
+        user,
+        cart,
     ):
         total_price = Decimal(0)
         original_price = Decimal(0)
@@ -250,9 +289,14 @@ class CartV2APIView(APIView, DiscountMixin):
                     photo_type=photo_type_int
                 ).delete()
 
+        if user_role == UserRole.manager:
+            total_price = self.apply_kindergarten_manager_bonus(total_price, user, cart)
+
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
         cart_photo_line.save()
+
+        return total_price
 
     @staticmethod
     def _get_prices(kindergarten) -> dict:
