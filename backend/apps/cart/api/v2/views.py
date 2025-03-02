@@ -149,6 +149,8 @@ class CartV2APIView(APIView, DiscountMixin):
             all_prices += total_price
             logger.info(f"total_price: {total_price}")
 
+            logger.info(f"all_price: {all_prices}")
+
             digital_thresholds = {
                 1: "ransom_amount_for_digital_photos",
                 2: "ransom_amount_for_digital_photos_second",
@@ -166,6 +168,9 @@ class CartV2APIView(APIView, DiscountMixin):
 
             logger.info(f"digital_thresholds: {digital_key}")
             logger.info(f"calendar_key: {calendar_key}")
+
+            logger.info(f"value_digital_key: {ransom_amounts.get(digital_key)}")
+            logger.info(f"value_calendar_key: {ransom_amounts.get(calendar_key)}")
 
             if digital_key and all_prices > ransom_amounts.get(digital_key):
                 cart_photo_line.is_free_digital = True
