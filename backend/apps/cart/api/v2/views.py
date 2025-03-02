@@ -13,7 +13,7 @@ from apps.cart.api.v2.serializers import (
 from apps.promocode.models import Promocode
 from apps.user.models import UserRole
 from apps.kindergarten.models import Kindergarten, PhotoType
-from apps.photo.models import KindergartenPhotoTheme, PhotoTheme, Photo, PhotoLine
+from apps.photo.models import Photo, PhotoLine
 
 from loguru import logger
 
@@ -111,7 +111,7 @@ class CartV2APIView(APIView, DiscountMixin):
         if not ransom_amounts:
             return Response({"message": "Суммы выкупа не заданы"}, status=status.HTTP_400_BAD_REQUEST)
 
-        child_number = 1
+        child_number = 0
 
         promo_code = self.get_promo_code(user, user_role, request_data[0].get("promo_code"))
         logger.info(f"promo_code: {promo_code}")
@@ -121,6 +121,8 @@ class CartV2APIView(APIView, DiscountMixin):
 
         for data in request_data:
             logger.info(f"for_data: {data}")
+
+            child_number += 1
 
             cart_photo_line = self._create_cart_photo_lines(
                 cart=cart,
