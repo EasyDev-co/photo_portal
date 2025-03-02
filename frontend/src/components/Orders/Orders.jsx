@@ -22,8 +22,6 @@ import { setCookie } from "../../utils/setCookie";
 import { getNearestDate } from "./utils/utils";
 import plus from '../../assets/icons/plus.svg'
 
-// TODO Достать детский сад и фото тему и передать в data
-
 export const Orders = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()

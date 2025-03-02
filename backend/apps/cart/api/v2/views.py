@@ -64,11 +64,12 @@ class CartV2APIView(APIView, DiscountMixin):
 
         logger.info(f"request data: {request.data}")
 
-        kindergarten_id = request.data.get("kindergarten_id")
-        photo_theme_id = request.data.get("photo_theme_id")
+        if request_data:
+            kindergarten_id = request_data[0].get("kindergarten_id")
 
-        logger.info(f"kindergarten_id: {kindergarten_id}")
-        logger.info(f"photo_theme_id: {photo_theme_id}")
+            logger.info(f"kindergarten_id: {kindergarten_id}")
+        else:
+            return Response({"message": "Запрос пустой"}, status=status.HTTP_400_BAD_REQUEST)
 
         kindergarten = self._validate_kindergarten(
             kindergarten_id,
