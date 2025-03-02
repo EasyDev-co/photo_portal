@@ -147,6 +147,7 @@ class CartV2APIView(APIView, DiscountMixin):
             )
 
             all_prices += total_price
+            logger.info(f"total_price: {total_price}")
 
             digital_thresholds = {
                 1: "ransom_amount_for_digital_photos",
@@ -162,6 +163,9 @@ class CartV2APIView(APIView, DiscountMixin):
 
             digital_key = digital_thresholds.get(cart_photo_line.child_number)
             calendar_key = calendar_thresholds.get(cart_photo_line.child_number)
+
+            logger.info(f"digital_thresholds: {digital_key}")
+            logger.info(f"calendar_key: {calendar_key}")
 
             if digital_key and all_prices > ransom_amounts.get(digital_key):
                 cart_photo_line.is_free_digital = True
@@ -184,7 +188,6 @@ class CartV2APIView(APIView, DiscountMixin):
     @staticmethod
     def _create_cart_photo_lines(cart, data, child_number):
         photo_ids = [photo_id.get('id') for photo_id in data.get("photos")]
-        logger.info(f"photo_ids: {photo_ids}")
         if not photo_ids:
             return None
 
