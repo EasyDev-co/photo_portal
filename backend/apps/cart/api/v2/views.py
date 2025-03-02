@@ -8,7 +8,6 @@ from rest_framework import status
 
 from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
 from apps.cart.api.v2.serializers import (
-    CartPhotoLineCreateUpdateV2Serializer,
     CartPhotoLineV2Serializer,
 )
 from apps.promocode.models import Promocode
@@ -178,7 +177,10 @@ class CartV2APIView(APIView, DiscountMixin):
         original_price = Decimal(0)
 
         photo_book_price = prices.get(PhotoType.photobook.label)
-        digital_photo_price = prices.get(PhotoType.photobook.digital)
+        digital_photo_price = prices.get(PhotoType.digital.label)
+
+        logger.info(f"photo_book_price: {photo_book_price}")
+        logger.info(f"digital_photo_price: {digital_photo_price}")
 
         if cart_photo_line.is_photobook:
             discount_price_photo_book = self.appy_discount(promo_code, photo_book_price)
