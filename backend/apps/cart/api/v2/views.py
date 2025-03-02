@@ -295,7 +295,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
     @staticmethod
     def _validate_kindergarten(kindergarten_id, user, user_role):
-        kindergarten = Kindergarten.objects.filter(id=kindergarten_id)
+        kindergarten = Kindergarten.objects.filter(id=kindergarten_id).first()
 
         logger.info(f"kindergarten: {kindergarten}")
         logger.info(f"user: {user_role}")
