@@ -70,6 +70,10 @@ export const Orders = () => {
     }, []);
 
     useEffect(() => {
+      if (cart.length === 0 || localStorage.getItem('cart') === null) {
+        // не добавлять данные, если cart пустой или localStorage уже очищен
+        return;
+      }
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
@@ -164,26 +168,11 @@ export const Orders = () => {
     setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
   };
 
-  // useEffect(() => {
-  //   const transformedData = transformData(orderValue);
-  //   fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-  //     .then(res => {
-  //       if (res.ok) {
-  //         res.json()
-  //           .then(res => {
-  //             setPrice({
-  //               total_price: res[0]?.total_price || ''
-  //             })
-  //             dispatch(setCart(res))
-  //           })
-  //       }
-  //     })
-  // }, [orderValue])
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart'));
     
     if (savedCart && savedCart.length > 0) {
-        dispatch(setCart(savedCart)); // Используем localStorage если данные есть
+        dispatch(setCart(savedCart));
     } else {
         // Запрос данных корзины с сервера
         fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
