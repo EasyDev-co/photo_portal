@@ -173,6 +173,8 @@ class CartV2APIView(APIView, DiscountMixin):
             logger.info(f"value_calendar_key: {ransom_amounts.get(calendar_key)}")
 
             if digital_key and all_prices > ransom_amounts.get(digital_key):
+                total_price -= prices.get(PhotoType.digital.label)
+                cart_photo_line.total_price = total_price
                 cart_photo_line.is_free_digital = True
 
             if calendar_key and all_prices > ransom_amounts.get(calendar_key):
