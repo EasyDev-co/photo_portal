@@ -4,7 +4,7 @@ import { tokenRefreshCreate } from "../parent/tokenRefreshCreate";
 
 
 export const cartCreate = async (access, cart) => {
-    const url = `${localUrl}/api/v1/cart/`;
+    const url = `${localUrl}/api/v2/cart/`;
     const response = await fetch(url,{
         method:'POST',
         credentials: 'include',
