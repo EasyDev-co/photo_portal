@@ -143,7 +143,8 @@ class CartV2APIView(APIView, DiscountMixin):
 
     @staticmethod
     def _create_cart_photo_lines(cart, data, child_number):
-        photo_ids = [photo_id for photo_id in data.get("photos")]
+        photo_ids = [photo_id.get('id') for photo_id in data.get("photos")]
+        logger.info(f"photo_ids: {photo_ids}")
         if not photo_ids:
             return None
 
