@@ -3,6 +3,7 @@ from apps.cart.models import Cart, PhotoInCart
 from apps.photo.models import PhotoLine
 from apps.cart.services.cart import CartService
 from apps.cart.api.v1.serializer import PhotoInCartSerializer
+from apps.photo.models import Photo
 from rest_framework.serializers import ModelSerializer
 
 
