@@ -99,7 +99,6 @@ class User(UUIDMixin, AbstractUser):
         max_digits=3,
         default=0,
     )
-
     objects = UserManager()
 
     USERNAME_FIELD = 'email'

@@ -1,9 +1,8 @@
 from rest_framework import serializers
 from apps.cart.models import Cart, PhotoInCart
 from apps.photo.models import PhotoLine
-from apps.cart.services.cart import CartService
 from apps.cart.api.v1.serializer import PhotoInCartSerializer
-from rest_framework.serializers import ModelSerializer
+from apps.photo.models import Photo
 
 
 class PhotoInCartV2Serializer(serializers.ModelSerializer):
@@ -42,7 +41,7 @@ class CartPhotoLineCreateUpdateV2Serializer(serializers.Serializer):
     child_number = serializers.IntegerField(required=False)
 
 
-class CartPhotoLineV2Serializer(ModelSerializer):
+class CartPhotoLineV2Serializer(serializers.Serializer):
     """Сериализатор для отображения пробника в корзине."""
     id = serializers.UUIDField()
     photos = serializers.SerializerMethodField()
