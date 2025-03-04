@@ -94,7 +94,7 @@ const aboutUsItems = [
 ];
 
 // const localUrl = `http://77.232.37.60:8000`
-const localUrl = `https://stage.photodetstvo.ru`
+const localUrl = `https://photodetstvo.ru`
 // const localUrl = `http://0.0.0.0:8000`;
 
 // const localUrl = `https://photodetstvo.easydev-program.com`;
