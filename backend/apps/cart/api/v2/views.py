@@ -202,7 +202,7 @@ class CartV2APIView(APIView, DiscountMixin):
         ).first()
 
         logger.info(f"photo_line: {photo_line}")
-        if not photo_line:
+        if photo_line:
             cart_photo_line = CartPhotoLine.objects.create(
                 cart=cart,
                 photo_line=photo_line,
