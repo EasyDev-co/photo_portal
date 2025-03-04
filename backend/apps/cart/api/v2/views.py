@@ -197,9 +197,6 @@ class CartV2APIView(APIView, DiscountMixin):
     @staticmethod
     def _create_cart_photo_lines(cart, data, child_number):
         photo_ids = [photo_id.get('id') for photo_id in data.get("photos")]
-        if not photo_ids:
-            return None
-
         photo_line = PhotoLine.objects.filter(
             photos__id__in=photo_ids
         ).first()
