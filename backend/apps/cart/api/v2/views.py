@@ -130,11 +130,14 @@ class CartV2APIView(APIView, DiscountMixin):
                 child_number=child_number,
             )
 
-            if not cart_photo_lines:
-                return Response(
-                    {"message": "Не удалось найти или создать CartPhotoLines"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            is_digital = data.get("is_digital")
+            is_photobook = data.get("is_photobook")
+
+            # if not cart_photo_lines:
+            #     return Response(
+            #         {"message": "Не удалось найти или создать CartPhotoLines"},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
 
             total_price = self._update_photos_in_cart(
                 cart_photo_line=cart_photo_line,
@@ -182,10 +185,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
             cart_photo_line.save()
             cart_photo_lines_list.append(cart_photo_line)
-        data = {
-            "all_prices": all_prices,
-            "photo_data": CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data
-        }
         return Response(CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -246,63 +245,64 @@ class CartV2APIView(APIView, DiscountMixin):
             total_price += discount_price_digital_photo
             original_price += discount_price_digital_photo
 
-        for photo_info in photos_data:
-            photo_uuid = photo_info.get("id")
-            photo_type_int = photo_info.get("photo_type")
-            quantity = photo_info.get("quantity", 0)
+        if not cart_photo_line:
+            for photo_info in photos_data:
+                photo_uuid = photo_info.get("id")
+                photo_type_int = photo_info.get("photo_type")
+                quantity = photo_info.get("quantity", 0)
 
-            if not photo_uuid or photo_type_int is None:
-                continue
+                if not photo_uuid or photo_type_int is None:
+                    continue
 
-            photo_obj = Photo.objects.filter(id=photo_uuid).first()
+                photo_obj = Photo.objects.filter(id=photo_uuid).first()
 
-            logger.info(f"photo_uuid: {photo_uuid}")
-            logger.info(f"photo_obj: {photo_obj}")
+                logger.info(f"photo_uuid: {photo_uuid}")
+                logger.info(f"photo_obj: {photo_obj}")
 
-            if not photo_obj:
-                logger.info(f"error: photo not found: {photo_uuid}")
-                photo_obj = None
+                if not photo_obj:
+                    logger.info(f"error: photo not found: {photo_uuid}")
+                    photo_obj = None
 
-            try:
-                photo_type_label = PhotoType(photo_type_int).label
-            except ValueError:
-                logger.info(f"error: photo type: {photo_type_int}")
-                continue
+                try:
+                    photo_type_label = PhotoType(photo_type_int).label
+                except ValueError:
+                    logger.info(f"error: photo type: {photo_type_int}")
+                    continue
 
-            price_per_piece = prices.get(photo_type_label)
+                price_per_piece = prices.get(photo_type_label)
 
-            if not price_per_piece:
-                continue
+                if not price_per_piece:
+                    continue
 
-            if quantity > 0:
-                discount_price = self.appy_discount(
-                    promo_code=promo_code,
-                    price_per_piece=price_per_piece
-                )
-                logger.info(f"discount_price: {discount_price}")
-                total_price += discount_price * quantity
-                original_price += discount_price * quantity
+                if quantity > 0:
+                    discount_price = self.appy_discount(
+                        promo_code=promo_code,
+                        price_per_piece=price_per_piece
+                    )
+                    logger.info(f"discount_price: {discount_price}")
+                    total_price += discount_price * quantity
+                    original_price += discount_price * quantity
 
-                pic, created = PhotoInCart.objects.get_or_create(
-                    cart_photo_line=cart_photo_line,
-                    photo=photo_obj,
-                    photo_type=photo_type_int,
-                    defaults={
-                        'quantity': quantity,
-                        'price_per_piece': price_per_piece,
-                        'discount_price': discount_price
-                    }
-                )
-                if not created:
-                    pic.quantity = quantity
-                    pic.price_per_piece = price_per_piece
-                    pic.save()
-            else:
-                PhotoInCart.objects.filter(
-                    cart_photo_line=cart_photo_line,
-                    photo=photo_obj,
-                    photo_type=photo_type_int
-                ).delete()
+                    pic, created = PhotoInCart.objects.get_or_create(
+                        cart_photo_line=cart_photo_line,
+                        photo=photo_obj,
+                        photo_type=photo_type_int,
+                        defaults={
+                            'quantity': quantity,
+                            'price_per_piece': price_per_piece,
+                            'discount_price': discount_price
+                        }
+                    )
+                    if not created:
+                        pic.quantity = quantity
+                        pic.price_per_piece = price_per_piece
+                        pic.save()
+                else:
+                    PhotoInCart.objects.filter(
+                        cart_photo_line=cart_photo_line,
+                        photo=photo_obj,
+                        photo_type=photo_type_int
+                    ).delete()
 
         if user_role == UserRole.manager:
             total_price = self.apply_kindergarten_manager_bonus(total_price, user, cart)
