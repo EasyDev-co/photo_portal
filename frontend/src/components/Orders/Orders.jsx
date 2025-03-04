@@ -46,6 +46,10 @@ export const Orders = () => {
   const [priceCalendar, setPriceCalendar] = useState({
     ransom_amount_for_digital_photos: '',
     ransom_amount_for_calendar: '',
+    ransom_amount_for_digital_photos_second: '',
+    ransom_amount_for_calendar_second: '',
+    ransom_amount_for_digital_photos_third: '',
+    ransom_amount_for_calendar_third: '',
   })
   const [inputValue, setInputValue] = useState({
     "10x15": 0,
@@ -114,6 +118,10 @@ export const Orders = () => {
                 setPriceCalendar({
                   ransom_amount_for_digital_photos: data[0].ransom_amount_for_digital_photos,
                   ransom_amount_for_calendar: data[0].ransom_amount_for_calendar,
+                  ransom_amount_for_digital_photos_second: data[0].ransom_amount_for_digital_photos_second,
+                  ransom_amount_for_calendar_second: data[0].ransom_amount_for_calendar_second,
+                  ransom_amount_for_digital_photos_third: data[0].ransom_amount_for_digital_photos_third,
+                  ransom_amount_for_calendar_third: data[0].ransom_amount_for_calendar_third,
                 });
               } else {
                 // Handle the case where data is empty
@@ -191,6 +199,7 @@ useEffect(() => {
         fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
             .then((res) => res.json())
             .then((data) => {
+              console.log(orderValue)
                 dispatch(setCart(data));
                 localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
             })

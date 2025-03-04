@@ -5,9 +5,11 @@ import styles from "../../Orders.module.css";
 import PhotoCard from '../PhotoCard';
 import galkaSvg from '../../../../assets/icons/galka.svg'
 import { useSelector } from 'react-redux';
+import { use } from 'react';
 
-const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
+const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
   const cart = useSelector(state => state.user.cart);
+  const allPrice = useSelector(state => state.user.total_price);
   const photoPrice = useSelector(state => state.user.photoPrice);
   const [currentSum, setCurrentSum] = useState(0);
   const [isDigitalChecked, setIsDigitalChecked] = useState(false);
@@ -17,11 +19,39 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
   const [isGalkaCalendar, setIsGalkaCalendar] = useState(false);
   const [digitalPrice, setDigitalPrice] = useState(0);
   const userData = useSelector(state => state.user.userData);
-  
+  const [ransomDigitalPhotos, setRansomDigitalPhotos] = useState(0)
+  const [ransomCalendar, setRansomCalendar] = useState(0)
 
+  useEffect(() => {
+    console.log('childNumber:', childNumber,'ransom:', ransomDigitalPhotos, ransomCalendar)}, [cart])
 
   useEffect(()=> {
-  }, [])
+    const calculateValues = () => {
+
+      // Пример расчета значений в зависимости от childNumber
+      switch (childNumber) {
+        case 1:
+          setRansomDigitalPhotos(priceCalendar.ransom_amount_for_digital_photos) // Пример значения
+          setRansomCalendar(priceCalendar.ransom_amount_for_calendar) // Пример значения
+          break;
+        case 2:
+          setRansomDigitalPhotos(priceCalendar.ransom_amount_for_digital_photos_second) // Пример значения
+          setRansomCalendar(priceCalendar.ransom_amount_for_calendar_second) // Пример значения
+          break;
+        case 3:
+          setRansomDigitalPhotos(priceCalendar.ransom_amount_for_digital_photos_third) // Пример значения
+          setRansomCalendar(priceCalendar.ransom_amount_for_calendar_third) // Пример значения
+          break;
+        default:
+          setRansomDigitalPhotos(0)
+          setRansomCalendar(0)
+          console.warn('Invalid childNumber');
+      }
+
+    };
+
+    calculateValues();
+  }, [childNumber])
 
   // useEffect(() => {
   //   photoPrice?.forEach(element => {
@@ -34,20 +64,22 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
 
 
   const prevCheckedState = useRef(isDigitalChecked);
-
+//Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
+// и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
   useEffect(() => {
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
+    console.log(cartItem)
   
     if (cartItem) {
       setCurrentSum(cartItem.total_price); 
   
-      const shouldActivateCheckbox = cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos;
-      const shouldActivateCheckboxCalendar = cartItem.total_price >= priceCalendar.ransom_amount_for_calendar;
+      const shouldActivateCheckbox = allPrice >= ransomDigitalPhotos;
+      const shouldActivateCheckboxCalendar = allPrice >= ransomCalendar;
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
-      if (cartItem.total_price) {
-        console.log(cartItem.total_price >= priceCalendar.ransom_amount_for_digital_photos)
+      if (allPrice) {
+        console.log(allPrice >= ransomDigitalPhotos)
       }
 
       // Если состояние изменилось, вызываем обновление
@@ -61,7 +93,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
   }, [
     cart,
     currentLineId, 
-    priceCalendar.ransom_amount_for_digital_photos, 
+    ransomDigitalPhotos, 
     manualControl
   ]);
 
@@ -75,7 +107,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
     handleCheckboxChange(e, photoLineId);
   
     // Сбрасываем ручное управление, если сумма достигает порога
-    if (!checked && currentSum >= priceCalendar.ransom_amount_for_digital_photos) {
+    if (!checked && allPrice >= ransomDigitalPhotos) {
       setManualControl(false);
     }
   };
@@ -170,7 +202,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
             :
             <div className={styles.dot}></div>
           }
-          <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_digital_photos} рублей, вы получите все фото в электронном виде</span>
+          <span className={styles.promoString}>При заказе от {ransomDigitalPhotos} рублей, вы получите все фото в электронном виде</span>
         </div>
         <div className={styles.promoStringWrap}>
         {isGalkaCalendar ?
@@ -180,7 +212,7 @@ const PhotoBlock = memo(({ blocksId, index, photos, price, oke, priceCalendar, h
             :
             <div className={styles.dot}></div>
           }
-          <span className={styles.promoString}>При заказе от {priceCalendar.ransom_amount_for_calendar} рублей, эл. версия всех фотографий календаря в подарок</span>
+          <span className={styles.promoString}>При заказе от {ransomCalendar} рублей, эл. версия всех фотографий календаря в подарок</span>
         </div>
       </div>
     </div>
