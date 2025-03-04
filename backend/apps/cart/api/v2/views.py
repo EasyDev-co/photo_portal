@@ -186,7 +186,7 @@ class CartV2APIView(APIView, DiscountMixin):
             "all_prices": all_prices,
             "photo_data": CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data
         }
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data, status=status.HTTP_200_OK)
 
     @staticmethod
     def _get_or_create_cart(user):
