@@ -125,6 +125,8 @@ class CartV2APIView(APIView, DiscountMixin):
 
             cart_photo_line = self._create_cart_photo_lines(
                 cart=cart,
+                kindergarten=kindergarten,
+                user=user,
                 data=data,
                 child_number=child_number,
             )
@@ -184,7 +186,7 @@ class CartV2APIView(APIView, DiscountMixin):
         return cart
 
     @staticmethod
-    def _create_cart_photo_lines(cart, data, child_number):
+    def _create_cart_photo_lines(cart, data, child_number, kindergarten, user):
         photo_ids = [photo_id.get('id') for photo_id in data.get("photos")]
         photo_line = PhotoLine.objects.filter(
             photos__id__in=photo_ids
@@ -195,6 +197,8 @@ class CartV2APIView(APIView, DiscountMixin):
         cart_photo_line = CartPhotoLine.objects.create(
             cart=cart,
             photo_line=photo_line,
+            kindergarten=kindergarten,
+            user=user,
             child_number=child_number,
             is_digital=data.get("is_digital"),
             is_photobook=data.get("is_photobook"),
