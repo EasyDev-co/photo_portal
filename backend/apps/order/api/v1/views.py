@@ -263,8 +263,7 @@ class OrderAPIView(APIView):
         orders_payment.save()
 
         serializer = OrdersPaymentSerializer(orders_payment)
-        cart_photo_lines.delete()
-
+        # cart_photo_lines.delete()
         return Response(serializer.data)
 
 
