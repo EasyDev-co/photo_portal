@@ -34,6 +34,8 @@ class Order(TimeStampedMixin):
         on_delete=models.PROTECT,
         related_name="orders",
         verbose_name="Пробник",
+        null=True,
+        blank=True,
     )
     is_digital = models.BooleanField(
         default=False,
