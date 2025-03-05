@@ -121,7 +121,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
         for data in request_data:
             logger.info(f"for_data: {data}")
-
             child_number += 1
 
             cart_photo_line = self._create_cart_photo_lines(
@@ -129,16 +128,6 @@ class CartV2APIView(APIView, DiscountMixin):
                 data=data,
                 child_number=child_number,
             )
-
-            is_digital = data.get("is_digital")
-            is_photobook = data.get("is_photobook")
-
-            # if not cart_photo_lines:
-            #     return Response(
-            #         {"message": "Не удалось найти или создать CartPhotoLines"},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
-
             total_price = self._update_photos_in_cart(
                 cart_photo_line=cart_photo_line,
                 photos_data=data.get("photos"),
@@ -202,22 +191,14 @@ class CartV2APIView(APIView, DiscountMixin):
         ).first()
 
         logger.info(f"photo_line: {photo_line}")
-        if photo_line:
-            cart_photo_line = CartPhotoLine.objects.create(
-                cart=cart,
-                photo_line=photo_line,
-                child_number=child_number,
-                is_digital=data.get("is_digital"),
-                is_photobook=data.get("is_photobook"),
-            )
-        else:
-            cart_photo_line = CartPhotoLine.objects.create(
-                cart=cart,
-                photo_line=None,
-                child_number=child_number,
-                is_digital=data.get("is_digital"),
-                is_photobook=data.get("is_photobook"),
-            )
+
+        cart_photo_line = CartPhotoLine.objects.create(
+            cart=cart,
+            photo_line=photo_line,
+            child_number=child_number,
+            is_digital=data.get("is_digital"),
+            is_photobook=data.get("is_photobook"),
+        )
         return cart_photo_line
 
     def _update_photos_in_cart(
