@@ -81,6 +81,9 @@ export const Orders = () => {
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
+    window.onload= function() {
+      setOrderValue([]);
+  };
 
   useEffect(() => {
     let isMounted = true;
