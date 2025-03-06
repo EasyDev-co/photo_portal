@@ -119,6 +119,18 @@ class CartV2APIView(APIView, DiscountMixin):
         cart_photo_lines_list = []
         all_prices = 0
 
+        digital_thresholds = {
+            1: "ransom_amount_for_digital_photos",
+            2: "ransom_amount_for_digital_photos_second",
+            3: "ransom_amount_for_digital_photos_third",
+        }
+
+        calendar_thresholds = {
+            1: "ransom_amount_for_calendar",
+            2: "ransom_amount_for_calendar_second",
+            3: "ransom_amount_for_calendar_third",
+        }
+
         for data in request_data:
             logger.info(f"for_data: {data}")
             child_number += 1
@@ -145,18 +157,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
             logger.info(f"all_price: {all_prices}")
 
-            digital_thresholds = {
-                1: "ransom_amount_for_digital_photos",
-                2: "ransom_amount_for_digital_photos_second",
-                3: "ransom_amount_for_digital_photos_third",
-            }
-
-            calendar_thresholds = {
-                1: "ransom_amount_for_calendar",
-                2: "ransom_amount_for_calendar_second",
-                3: "ransom_amount_for_calendar_third",
-            }
-
             digital_key = digital_thresholds.get(cart_photo_line.child_number)
             calendar_key = calendar_thresholds.get(cart_photo_line.child_number)
 
@@ -180,6 +180,14 @@ class CartV2APIView(APIView, DiscountMixin):
             cart_photo_lines_list.append(cart_photo_line)
 
         logger.info(f"all_prices: {all_prices}")
+
+        for cart_photo_line in cart_photo_lines_list:
+
+            if cart_photo_line.is_free_digital:
+                digital_price = prices.get(PhotoType.digital.label)
+                cart_photo_line.total_price -= digital_price
+                cart_photo_line.save()
+
         return Response(CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data, status=status.HTTP_200_OK)
 
     @staticmethod
