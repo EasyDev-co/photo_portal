@@ -179,12 +179,12 @@ class CartV2APIView(APIView, DiscountMixin):
             cart_photo_line.save()
             cart_photo_lines_list.append(cart_photo_line)
 
-        logger.info(f"all_prices: {all_prices}")
-
         for cart_photo_line in cart_photo_lines_list:
-
             if cart_photo_line.is_free_digital:
                 digital_price = prices.get(PhotoType.digital.label)
+                logger.info(f"all_price_in_for: {digital_price}")
+                logger.info(f"all_price_in_for: {all_prices}")
+
                 cart_photo_line.total_price -= digital_price
                 cart_photo_line.save()
 
@@ -231,9 +231,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
         photo_book_price = prices.get(PhotoType.photobook.label)
         digital_photo_price = prices.get(PhotoType.digital.label)
-
-        logger.info(f"photo_book_price: {photo_book_price}")
-        logger.info(f"digital_photo_price: {digital_photo_price}")
 
         if cart_photo_line.is_photobook:
             discount_price_photo_book = self.appy_discount(promo_code, photo_book_price)
