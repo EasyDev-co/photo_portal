@@ -29,7 +29,6 @@ from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine, PhotoTheme
-from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
@@ -55,105 +54,74 @@ IS_DIGITAL = 0
 IS_FREE_DIGITAL = 1
 
 
-from django.utils.timezone import now
-from django.db.models import Q
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
 class OrderAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @staticmethod
-    def aggregate_is_digital(orders_queryset):
+    def aggregate_is_digital(photo_lines_queryset):
         """
-        Собираем уникальные PhotoLine из заказов и
-        агрегируем булевы поля is_digital, is_free_digital.
+        Формирует словари с уникальными PhotoLine и со значением is_digital и is_free_digital для каждого PhotoLine
         """
-        photo_lines_dict = {}  # photo_line.id -> сам photo_line
-        is_digital_by_photo_line_id = {}  # photo_line.id -> [is_digital, is_free_digital]
+        photo_lines_dict = {}
+        is_digital_by_photo_line_id = {}
 
-        for order in orders_queryset:
-            # Берём photo_line либо напрямую, либо через cart_photo_line
-            if order.photo_line is not None:
-                pl = order.photo_line
-            else:
-                # Может быть заказ purely "digital" без "photo_line",
-                # но с "cart_photo_line.photo_line"
-                if not order.cart_photo_line or not order.cart_photo_line.photo_line:
-                    # нет вообще никакого photo_line — пропускаем
-                    continue
-                pl = order.cart_photo_line.photo_line
+        for photo_line in photo_lines_queryset:
+            photo_line_id = photo_line.id
 
-            photo_line_id = pl.id
-
-            # Если мы первый раз встречаем этот photo_line
             if photo_line_id not in photo_lines_dict:
-                photo_lines_dict[photo_line_id] = pl
-                # Запоминаем, что, возможно, он «цифровой»
-                is_digital_by_photo_line_id[photo_line_id] = [
-                    order.is_digital,
-                    order.is_free_digital
-                ]
+                photo_lines_dict[photo_line_id] = photo_line
+                is_digital_by_photo_line_id[photo_line_id] = [photo_line.is_digital, photo_line.is_free_digital]
+
             else:
-                # Если уже встречали, то «поднимаем» флаги в True, если где-то встретился True
-                if order.is_digital:
-                    is_digital_by_photo_line_id[photo_line_id][0] = True
-                if order.is_free_digital:
-                    is_digital_by_photo_line_id[photo_line_id][1] = True
+                # обновляем, если is_digital=True и/или is_free_digital=True
+                if photo_line.is_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_DIGITAL] = True
+                if photo_line.is_free_digital:
+                    is_digital_by_photo_line_id[photo_line_id][IS_FREE_DIGITAL] = True
 
         return photo_lines_dict, is_digital_by_photo_line_id
 
     @staticmethod
     def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id):
         """
-        Проставляем итоговые булевы флаги
-        и добавляем поле is_date_end (просрочен ли фото-период).
+        Формирует итоговый список объектов.
         """
         current_time = now()
         photo_lines = []
 
         for photo_line_id, photo_line in photo_lines_dict.items():
-            # Распаковываем собранные is_digital / is_free_digital
             photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
 
-            # Признак истечения срока
             extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
             photo_line.is_date_end = extended_date_end < current_time
 
             photo_lines.append(photo_line)
-
         return photo_lines
 
     def get(self, request):
         user = request.user
 
-        orders_queryset = (
-            Order.objects
-            .filter(
-                user=user,
-                status=OrderStatus.paid_for,
-            )
-            # Чтобы не гонять запросы к БД в цикле
-            .select_related('photo_line', 'photo_line__photo_theme',
-                            'cart_photo_line', 'cart_photo_line__photo_line', 'cart_photo_line__photo_line__photo_theme')
-        )
+        # Получаем данные из базы
+        photo_lines_queryset = PhotoLine.objects.filter(
+            kindergarten__in=user.kindergarten.all(),
+            parent=user,
+            orders__status=OrderStatus.paid_for
+        ).annotate(
+            is_digital=F('orders__is_digital'),
+            is_free_digital=F('orders__is_free_digital'),
+        ).order_by('id', 'photo_theme__date_end')
 
-        if not orders_queryset.exists():
+        if not photo_lines_queryset.exists():
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # Собираем все уникальные photo_line, которые действительно есть в этих заказах
-        photo_lines_dict, is_digital_map = self.aggregate_is_digital(orders_queryset)
-        if not photo_lines_dict:
+        photo_lines_dict, is_digital_by_photo_line_id = self.aggregate_is_digital(photo_lines_queryset)
+        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id)
+
+        if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # Проставляем флаги и is_date_end
-        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_map)
-
-        # Сериализуем
         serializer = PaidPhotoLineSerializer(photo_lines, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         user = request.user
@@ -167,13 +135,10 @@ class OrderAPIView(APIView):
         for photo_price in photo_prices:
             prices_dict[photo_price.photo_type] = photo_price.price
 
-        logger.info(cart_photo_lines)
-
         orders = [
             Order(
                 user=user,
                 photo_line=cart_photo_line.photo_line,
-                cart_photo_line=cart_photo_line,
                 is_digital=cart_photo_line.is_digital,
                 is_free_digital=cart_photo_line.is_free_digital,
                 is_photobook=cart_photo_line.is_photobook,
@@ -184,26 +149,27 @@ class OrderAPIView(APIView):
             ) for cart_photo_line in cart_photo_lines
         ]
         orders = Order.objects.bulk_create(orders)
-        logger.info(f"orders: {orders}")
+
         order_ids = []
         for order in orders:
             order_ids.append(order.id)
         orders = Order.objects.filter(id__in=order_ids)
         order_items = []
         for cart_photo_line in cart_photo_lines:
-            order = orders.get(cart_photo_line__id=cart_photo_line.id)
-            if order.photo_line:
-                photos_in_cart = cart_photo_line.photos_in_cart.select_related('cart_photo_line')
-                order_items.extend(
-                    [
-                        OrderItem(
-                            photo_type=photo_in_cart.photo_type,
-                            amount=photo_in_cart.quantity,
-                            order=order,
-                            photo=photo_in_cart.photo,
-                        ) for photo_in_cart in photos_in_cart
-                    ]
-                )
+            order = orders.get(photo_line__id=cart_photo_line.photo_line.id)
+            photos_in_cart = cart_photo_line.photos_in_cart.select_related('cart_photo_line')
+            order_items.extend(
+                [
+                    OrderItem(
+                        photo_type=photo_in_cart.photo_type,
+                        amount=photo_in_cart.quantity,
+                        order=order,
+                        photo=photo_in_cart.photo,
+                    ) for photo_in_cart in photos_in_cart
+                ]
+            )
+
+            # добавляем э/ф, фотокнигу и бесплатный календарь как order_item, если они есть
             if order.is_digital:
                 order_items.append(
                     OrderItem(
@@ -263,7 +229,8 @@ class OrderAPIView(APIView):
         orders_payment.save()
 
         serializer = OrdersPaymentSerializer(orders_payment)
-        # cart_photo_lines.delete()
+        cart_photo_lines.delete()
+
         return Response(serializer.data)
 
 
