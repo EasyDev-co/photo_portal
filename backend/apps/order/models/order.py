@@ -40,7 +40,7 @@ class Order(TimeStampedMixin):
     )
     cart_photo_line = models.ForeignKey(
         CartPhotoLine,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         related_name="cart_orders",
         verbose_name="Пробник в корзине",
         null=True,
