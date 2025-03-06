@@ -6,9 +6,7 @@ from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
 
 from apps.photo.models import Photo, PhotoLine
-
-from apps.photo.models import Photo
-from apps.kindergarten.models import PhotoType
+from apps.kindergarten.models import PhotoType, Kindergarten
 
 User = get_user_model()
 
@@ -28,6 +26,22 @@ class CartPhotoLine(UUIDMixin):
         on_delete=models.CASCADE,
         related_name='cart_photo_lines',
         verbose_name='Пробник',
+        null=True,
+        blank=True,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_cart_photo_lines',
+        verbose_name="Пользователь",
+        null=True,
+        blank=True,
+    )
+    kindergarten = models.ForeignKey(
+        Kindergarten,
+        verbose_name="Детский сад",
+        on_delete=models.CASCADE,
+        related_name='kindergarten_cart_photo_lines',
         null=True,
         blank=True,
     )

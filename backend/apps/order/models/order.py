@@ -1,3 +1,4 @@
+from apps.cart.models import CartPhotoLine
 from apps.order.models.orders_payment import OrdersPayment
 from apps.photo.models import PhotoLine
 from apps.utils.models_mixins.models_mixins import TimeStampedMixin
@@ -34,6 +35,16 @@ class Order(TimeStampedMixin):
         on_delete=models.PROTECT,
         related_name="orders",
         verbose_name="Пробник",
+        null=True,
+        blank=True,
+    )
+    cart_photo_line = models.ForeignKey(
+        CartPhotoLine,
+        on_delete=models.SET_NULL,
+        related_name="cart_orders",
+        verbose_name="Пробник в корзине",
+        null=True,
+        blank=True,
     )
     is_digital = models.BooleanField(
         default=False,

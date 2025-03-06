@@ -119,26 +119,29 @@ class CartV2APIView(APIView, DiscountMixin):
         cart_photo_lines_list = []
         all_prices = 0
 
+        digital_thresholds = {
+            1: "ransom_amount_for_digital_photos",
+            2: "ransom_amount_for_digital_photos_second",
+            3: "ransom_amount_for_digital_photos_third",
+        }
+
+        calendar_thresholds = {
+            1: "ransom_amount_for_calendar",
+            2: "ransom_amount_for_calendar_second",
+            3: "ransom_amount_for_calendar_third",
+        }
+
         for data in request_data:
             logger.info(f"for_data: {data}")
-
             child_number += 1
 
             cart_photo_line = self._create_cart_photo_lines(
                 cart=cart,
+                kindergarten=kindergarten,
+                user=user,
                 data=data,
                 child_number=child_number,
             )
-
-            is_digital = data.get("is_digital")
-            is_photobook = data.get("is_photobook")
-
-            # if not cart_photo_lines:
-            #     return Response(
-            #         {"message": "Не удалось найти или создать CartPhotoLines"},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
-
             total_price = self._update_photos_in_cart(
                 cart_photo_line=cart_photo_line,
                 photos_data=data.get("photos"),
@@ -154,18 +157,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
             logger.info(f"all_price: {all_prices}")
 
-            digital_thresholds = {
-                1: "ransom_amount_for_digital_photos",
-                2: "ransom_amount_for_digital_photos_second",
-                3: "ransom_amount_for_digital_photos_third",
-            }
-
-            calendar_thresholds = {
-                1: "ransom_amount_for_calendar",
-                2: "ransom_amount_for_calendar_second",
-                3: "ransom_amount_for_calendar_third",
-            }
-
             digital_key = digital_thresholds.get(cart_photo_line.child_number)
             calendar_key = calendar_thresholds.get(cart_photo_line.child_number)
 
@@ -176,8 +167,10 @@ class CartV2APIView(APIView, DiscountMixin):
             logger.info(f"value_calendar_key: {ransom_amounts.get(calendar_key)}")
 
             if digital_key and all_prices > ransom_amounts.get(digital_key):
+                digital_price = prices.get(PhotoType.digital.label)
+                logger.info(f"digital_price: {digital_price}")
                 # total_price -= prices.get(PhotoType.digital.label)
-                cart_photo_line.total_price = total_price
+                # cart_photo_line.total_price = total_price
                 cart_photo_line.is_free_digital = True
 
             if calendar_key and all_prices > ransom_amounts.get(calendar_key):
@@ -185,6 +178,16 @@ class CartV2APIView(APIView, DiscountMixin):
 
             cart_photo_line.save()
             cart_photo_lines_list.append(cart_photo_line)
+
+        for cart_photo_line in cart_photo_lines_list:
+            if cart_photo_line.is_free_digital:
+                digital_price = prices.get(PhotoType.digital.label)
+                logger.info(f"all_price_in_for: {digital_price}")
+                logger.info(f"all_price_in_for: {all_prices}")
+
+                cart_photo_line.total_price -= digital_price
+                cart_photo_line.save()
+
         return Response(CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -195,29 +198,22 @@ class CartV2APIView(APIView, DiscountMixin):
         return cart
 
     @staticmethod
-    def _create_cart_photo_lines(cart, data, child_number):
-        photo_ids = [photo_id.get('id') for photo_id in data.get("photos")]
+    def _create_cart_photo_lines(cart, data, child_number, kindergarten, user):
         photo_line = PhotoLine.objects.filter(
-            photos__id__in=photo_ids
+            id=data.get("id")
         ).first()
 
         logger.info(f"photo_line: {photo_line}")
-        if photo_line:
-            cart_photo_line = CartPhotoLine.objects.create(
-                cart=cart,
-                photo_line=photo_line,
-                child_number=child_number,
-                is_digital=data.get("is_digital"),
-                is_photobook=data.get("is_photobook"),
-            )
-        else:
-            cart_photo_line = CartPhotoLine.objects.create(
-                cart=cart,
-                photo_line=None,
-                child_number=child_number,
-                is_digital=data.get("is_digital"),
-                is_photobook=data.get("is_photobook"),
-            )
+
+        cart_photo_line = CartPhotoLine.objects.create(
+            cart=cart,
+            photo_line=photo_line,
+            kindergarten=kindergarten,
+            user=user,
+            child_number=child_number,
+            is_digital=data.get("is_digital"),
+            is_photobook=data.get("is_photobook"),
+        )
         return cart_photo_line
 
     def _update_photos_in_cart(
@@ -235,9 +231,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
         photo_book_price = prices.get(PhotoType.photobook.label)
         digital_photo_price = prices.get(PhotoType.digital.label)
-
-        logger.info(f"photo_book_price: {photo_book_price}")
-        logger.info(f"digital_photo_price: {digital_photo_price}")
 
         if cart_photo_line.is_photobook:
             discount_price_photo_book = self.appy_discount(promo_code, photo_book_price)

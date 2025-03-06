@@ -70,8 +70,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
     console.log(cartItem)
   
-    if (cartItem) {
-      setCurrentSum(cartItem.total_price); 
+    // if (cartItem) {
+      // setCurrentSum(cartItem.total_price);
   
       const shouldActivateCheckbox = allPrice >= ransomDigitalPhotos;
       const shouldActivateCheckboxCalendar = allPrice >= ransomCalendar;
@@ -88,13 +88,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
         prevCheckedState.current = shouldActivateCheckbox;
         handleCheckboxChange({ target: { checked: shouldActivateCheckbox, name: 7 } }, currentLineId);
       }
-    }
+    // }
     // else console.log('hui:', currentLineId)
   }, [
-    cart,
-    currentLineId, 
-    ransomDigitalPhotos, 
-    manualControl
+    allPrice,
   ]);
 
   // Обработчик изменения чекбокса
