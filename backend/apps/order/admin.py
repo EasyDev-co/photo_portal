@@ -62,7 +62,9 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
     def kindergarten(self, instance):
-        return instance.photo_line.kindergarten
+        if instance.kindergarten:
+            return instance.photo_line.kindergarten
+        return "Нет детского сада"
 
 if settings.SHOW_IN_ADMIN:
     @admin.register(OrderItem)
