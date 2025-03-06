@@ -71,14 +71,16 @@ class OrderAPIView(APIView):
 
             if photo_line_id not in photo_lines_dict:
                 photo_lines_dict[photo_line_id] = photo_line
-                is_digital_by_photo_line_id[photo_line_id] = [photo_line.is_digital, photo_line.is_free_digital]
-
+                is_digital_by_photo_line_id[photo_line_id] = [
+                    photo_line.is_digital,
+                    photo_line.is_free_digital
+                ]
             else:
                 # обновляем, если is_digital=True и/или is_free_digital=True
                 if photo_line.is_digital:
-                    is_digital_by_photo_line_id[photo_line_id][IS_DIGITAL] = True
+                    is_digital_by_photo_line_id[photo_line_id][0] = True  # IS_DIGITAL
                 if photo_line.is_free_digital:
-                    is_digital_by_photo_line_id[photo_line_id][IS_FREE_DIGITAL] = True
+                    is_digital_by_photo_line_id[photo_line_id][1] = True  # IS_FREE_DIGITAL
 
         return photo_lines_dict, is_digital_by_photo_line_id
 
@@ -91,6 +93,7 @@ class OrderAPIView(APIView):
         photo_lines = []
 
         for photo_line_id, photo_line in photo_lines_dict.items():
+            # восстанавливаем is_digital и is_free_digital
             photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
 
             extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
@@ -102,7 +105,6 @@ class OrderAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        # Получаем данные из базы
         photo_lines_queryset = PhotoLine.objects.filter(
             kindergarten__in=user.kindergarten.all(),
             parent=user,
@@ -126,12 +128,19 @@ class OrderAPIView(APIView):
 
     def post(self, request):
         user = request.user
+
+        # Создаём общий OrdersPayment (платёж)
         orders_payment = OrdersPayment.objects.create()
+
+        # Достаём корзину пользователя
         cart = get_object_or_404(Cart, user=user)
         cart_photo_lines = cart.cart_photo_lines.select_related('cart')
+
+        # Допустим, регион берём из первого photo_line'а (как было в вашем коде)
         region = cart.photo_lines.first().kindergarten.region
         photo_prices = region.photo_prices.all()
 
+        # Готовим словарь цен по типам фото
         prices_dict = {}
         for photo_price in photo_prices:
             prices_dict[photo_price.photo_type] = photo_price.price
@@ -141,68 +150,93 @@ class OrderAPIView(APIView):
         for cart_photo_line in cart_photo_lines:
             logger.info(f"photo_line: {cart_photo_line.photo_line}")
 
+        # Создаём объекты Order на основе строк корзины
         orders = [
             Order(
                 user=user,
                 photo_line=cart_photo_line.photo_line,
+                # Переносим флаги из корзины:
                 is_digital=cart_photo_line.is_digital,
                 is_free_digital=cart_photo_line.is_free_digital,
                 is_photobook=cart_photo_line.is_photobook,
                 is_free_calendar=cart_photo_line.is_free_calendar,
+                # Берём цены из самой строки
                 order_price=cart_photo_line.total_price,
+                original_price=cart_photo_line.original_price,
                 order_payment=orders_payment,
-                original_price=cart_photo_line.original_price
-            ) for cart_photo_line in cart_photo_lines
+            )
+            for cart_photo_line in cart_photo_lines
         ]
         orders = Order.objects.bulk_create(orders)
 
-        order_ids = []
-        for order in orders:
-            order_ids.append(order.id)
-        orders = Order.objects.filter(id__in=order_ids)
+        # Собираем order_items
+        order_ids = [order.id for order in orders]
+        orders_map = {o.photo_line.id: o for o in Order.objects.filter(id__in=order_ids)}
+
         order_items = []
         for cart_photo_line in cart_photo_lines:
-            order = orders.get(photo_line__id=cart_photo_line.photo_line.id)
+            order = orders_map[cart_photo_line.photo_line.id]
+
+            # Берём все фото, которые выбрал пользователь
             photos_in_cart = cart_photo_line.photos_in_cart.select_related('cart_photo_line')
             order_items.extend(
-                [
-                    OrderItem(
-                        photo_type=photo_in_cart.photo_type,
-                        amount=photo_in_cart.quantity,
-                        order=order,
-                        photo=photo_in_cart.photo,
-                    ) for photo_in_cart in photos_in_cart
-                ]
+                OrderItem(
+                    photo_type=photo_in_cart.photo_type,
+                    amount=photo_in_cart.quantity,
+                    order=order,
+                    photo=photo_in_cart.photo,
+                )
+                for photo_in_cart in photos_in_cart
             )
 
-            # добавляем э/ф, фотокнигу и бесплатный календарь как order_item, если они есть
+            # Если пользователь заказал «электронные фото» (is_digital), добавляем отдельный OrderItem
             if order.is_digital:
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.digital,
+                        amount=1,  # обычно 1 позиция
                         order=order,
-                    ))
+                    )
+                )
+
+            # Фотокнига (если была выбрана)
             if order.is_photobook:
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.photobook,
+                        amount=1,
                         order=order,
-                    ))
+                    )
+                )
+
+            # Бесплатный календарь
             if order.is_free_calendar:
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.free_calendar,
+                        amount=1,
                         photo=cart_photo_line.photo_line.photos.order_by('?').first(),
                         order=order,
-                    ))
+                    )
+                )
 
-        # пересчитываем стоимость позиции с учетом промокода и купона
+        # Теперь пересчитываем стоимость каждого OrderItem, учитывая промокод, купон, и (ВНИМАНИЕ!) флаг is_free_digital
+        coupon_amount = [Decimal(cart.bonus_coupon) if cart.bonus_coupon else Decimal(0)]
 
-        coupon_amount = [Decimal(cart.bonus_coupon) if cart.bonus_coupon else 0]
         for order_item in order_items:
+            order_ref = order_item.order  # сам заказ
+
+            # 1) Если для всего заказа (или корзины) стоит флаг "заказ полностью куплен купоном"
             if cart.order_fully_paid_by_coupon:
                 order_item.price = Decimal(0)
                 continue
+
+            # 2) Если это цифровое фото, а у заказа проставлено is_free_digital=True – ставим 0
+            if order_ref.is_free_digital and order_item.photo_type == PhotoType.digital:
+                order_item.price = Decimal(0)
+                continue
+
+            # 3) Иначе – обычный расчёт цены
             calculate_price_for_order_item(
                 order_item=order_item,
                 prices_dict=prices_dict,
@@ -212,32 +246,35 @@ class OrderAPIView(APIView):
                 user_role=user.role
             )
 
-        # сетим в первый order_item 1, тк сумма заказа не может быть равна 0
-        if cart.order_fully_paid_by_coupon:
+        # Важно: если всё было оплачено купоном, вы где-то ставите price=1 на самый первый OrderItem
+        # (чтобы сумма не была = 0; по логике вашей платёжной системы).
+        # Оставим это, как есть у вас сейчас:
+        if cart.order_fully_paid_by_coupon and order_items:
             order_items[0].price = Decimal(1)
 
+        # Промокод: увеличиваем счётчик активаций и записываем пользователя
         if cart.promocode:
             promocode = cart.promocode
-
             promocode.used_by = promocode.used_by or []
-
-            # Добавление информации о пользователе, использующем промокод
             promocode.used_by.append({'id': str(user.id), 'email': user.email})
-
-            # Обновление счетчика активаций
             promocode.activate_count += 1
-
             promocode.save()
 
+        # Сохраняем все OrderItem
         OrderItem.objects.bulk_create(order_items)
 
+        # Обновляем сумму общего платёжного объекта
         orders_payment.amount = sum(order.order_price for order in orders)
         orders_payment.save()
 
+        # Сериализуем и возвращаем
         serializer = OrdersPaymentSerializer(orders_payment)
+
+        # Очищаем корзину
         cart_photo_lines.delete()
 
         return Response(serializer.data)
+
 
 
 class PaymentAPIView(APIView):
