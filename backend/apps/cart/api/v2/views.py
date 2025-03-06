@@ -182,7 +182,7 @@ class CartV2APIView(APIView, DiscountMixin):
         for cart_photo_line in cart_photo_lines_list:
             if cart_photo_line.is_free_digital:
                 digital_price = prices.get(PhotoType.digital.label)
-                logger.info(f"all_price_in_for: {digital_price}")
+                logger.info(f"digital_in_for: {digital_price}")
                 logger.info(f"all_price_in_for: {all_prices}")
 
                 cart_photo_line.total_price -= digital_price
