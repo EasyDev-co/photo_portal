@@ -60,6 +60,7 @@ const Cart = () => {
                                 console.log(error)
                             }
                             navigate('/orders');
+                            window.location.reload();
                         }, 100)
                     })
 
