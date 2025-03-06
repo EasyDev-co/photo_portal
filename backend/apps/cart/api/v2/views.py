@@ -192,7 +192,12 @@ class CartV2APIView(APIView, DiscountMixin):
             photos__id__in=photo_ids
         ).first()
 
+        photo_line_2 = PhotoLine.objects.filter(
+            id=data.get("id")
+        ).first()
+
         logger.info(f"photo_line: {photo_line}")
+        logger.info(f"photo_line_2: {photo_line_2}")
 
         cart_photo_line = CartPhotoLine.objects.create(
             cart=cart,
