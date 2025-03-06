@@ -29,6 +29,7 @@ from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine, PhotoTheme
+from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
 from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
@@ -134,6 +135,11 @@ class OrderAPIView(APIView):
         prices_dict = {}
         for photo_price in photo_prices:
             prices_dict[photo_price.photo_type] = photo_price.price
+
+        logger.info(f"cart_photo_lines: {cart_photo_lines}")
+
+        for cart_photo_line in cart_photo_lines:
+            logger.info(f"photo_line: {cart_photo_line.photo_line}")
 
         orders = [
             Order(
