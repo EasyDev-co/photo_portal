@@ -167,8 +167,10 @@ class CartV2APIView(APIView, DiscountMixin):
             logger.info(f"value_calendar_key: {ransom_amounts.get(calendar_key)}")
 
             if digital_key and all_prices > ransom_amounts.get(digital_key):
+                digital_price = prices.get(PhotoType.digital.label)
+                logger.info(f"digital_price: {digital_price}")
                 # total_price -= prices.get(PhotoType.digital.label)
-                cart_photo_line.total_price = total_price
+                # cart_photo_line.total_price = total_price
                 cart_photo_line.is_free_digital = True
 
             if calendar_key and all_prices > ransom_amounts.get(calendar_key):
@@ -176,6 +178,8 @@ class CartV2APIView(APIView, DiscountMixin):
 
             cart_photo_line.save()
             cart_photo_lines_list.append(cart_photo_line)
+
+        logger.info(f"all_prices: {all_prices}")
         return Response(CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data, status=status.HTTP_200_OK)
 
     @staticmethod
