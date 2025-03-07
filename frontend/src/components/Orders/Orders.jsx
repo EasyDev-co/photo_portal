@@ -80,7 +80,9 @@ export const Orders = () => {
       }
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
-
+    window.onload= function() {
+      setOrderValue([]);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -146,6 +148,10 @@ export const Orders = () => {
   }, [blocks.length]);
 
   const [currentPromoCode, setCurrentPromoCode] = useState("");
+
+  useEffect(() => {
+    console.log(isChecked)
+  }, [isChecked])
 
   
   const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
@@ -230,6 +236,8 @@ useEffect(() => {
 
   const handleCheckboxChange = (event, photoLineId) => {
     const { checked, name } = event.target;
+
+    console.log('checked:', checked)
 
     setOrderValue((prev) => {
       const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
