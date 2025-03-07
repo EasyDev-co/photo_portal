@@ -17,10 +17,10 @@ const Block = ({ setlineLenght, addPhoto, price, priceCalendar, orderValue, setO
     setlineLenght(photoBlocks.length)
   }, [photoBlocks])
 
-  useEffect(() => {
-    console.log('photoBlocks', photoBlocks)
-    console.log('orderValue', orderValue)
-  }, [photoBlocks, orderValue])
+  // useEffect(() => {
+  //   console.log('photoBlocks', photoBlocks)
+  //   console.log('orderValue', orderValue)
+  // }, [photoBlocks, orderValue])
 
   useEffect(() => {
     if (addPhoto && addPhoto.length > 0) {
