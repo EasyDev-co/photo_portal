@@ -94,10 +94,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
 //Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
 // и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
   useEffect(() => {
-    if (ransomDigitalPhotos === 0 || ransomCalendar === 0) {
-      console.log('ransomDigitalPhotos or ransomCalendar not loaded yet');
-      return; // Прекращаем выполнение, если данные не загружены
-    }
+    // if (ransomDigitalPhotos === 0 || ransomCalendar === 0) {
+    //   console.log('ransomDigitalPhotos or ransomCalendar not loaded yet');
+    //   return; // Прекращаем выполнение, если данные не загружены
+    // }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
     // console.log(cartItem)
   
