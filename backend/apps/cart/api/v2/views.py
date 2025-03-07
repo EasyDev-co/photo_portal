@@ -98,9 +98,9 @@ class CartV2APIView(APIView, DiscountMixin):
         logger.info(f"cart: {cart}")
 
         # Удаляем предыдущие позиции, если они были
-        cart_photo_lines = cart.cart_photo_lines.select_related('cart')
-        if cart_photo_lines:
-            cart_photo_lines.delete()
+        cart_photo_lines_qs = cart.cart_photo_lines.select_related('cart')
+        if cart_photo_lines_qs.exists():
+            cart_photo_lines_qs.delete()
 
         # Получаем пороги сумм выкупа
         ransom_amounts = self._get_ransom_amount(kindergarten=kindergarten)
@@ -116,9 +116,6 @@ class CartV2APIView(APIView, DiscountMixin):
         if not ransom_amounts:
             return Response({"message": "Суммы выкупа не заданы"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Счётчик детей (child_number = 1, 2, 3, ...)
-        child_number = 0
-
         # Промокод (если есть)
         promo_code = self.get_promo_code(
             user=user,
@@ -127,12 +124,7 @@ class CartV2APIView(APIView, DiscountMixin):
         )
         logger.info(f"promo_code: {promo_code}")
 
-        # Собираем новые строки корзины (для вывода в ответ)
-        cart_photo_lines_list = []
-        # Общая сумма всех позиций (учитывая любые бесплатные фото)
-        all_prices = Decimal(0)
-
-        # Карты, указывающие, для какого ребёнка какие пороги:
+        # Карты, указывающие, для какого ребёнка какие пороги
         digital_thresholds = {
             1: "ransom_amount_for_digital_photos",
             2: "ransom_amount_for_digital_photos_second",
@@ -144,12 +136,19 @@ class CartV2APIView(APIView, DiscountMixin):
             3: "ransom_amount_for_calendar_third",
         }
 
-        # Проходим по всем данным, которые пришли от фронта
+        # -----------------------------
+        #   ПЕРВЫЙ ПРОХОД: считаем «грязные» цены
+        # -----------------------------
+        child_number = 0
+        cart_photo_lines_list = []
+        all_prices = Decimal(0)
+
         for data in request_data:
             logger.info(f"for_data: {data}")
             child_number += 1
 
-            # Создаём CartPhotoLine (строку корзины)
+            # 1) Создаём CartPhotoLine (строку корзины).
+            #    Пока НЕ ставим is_free_digital / is_free_calendar.
             cart_photo_line = self._create_cart_photo_lines(
                 cart=cart,
                 kindergarten=kindergarten,
@@ -158,7 +157,7 @@ class CartV2APIView(APIView, DiscountMixin):
                 child_number=child_number,
             )
 
-            # Считаем стоимость данной строки (без учёта «бесплатности»)
+            # 2) Считаем базовую стоимость данной строки
             total_price = self._update_photos_in_cart(
                 cart_photo_line=cart_photo_line,
                 photos_data=data.get("photos"),
@@ -168,36 +167,70 @@ class CartV2APIView(APIView, DiscountMixin):
                 user=user,
                 cart=cart,
             )
-            logger.info(f"total_price (до проверки порогов): {total_price}")
+            logger.info(f"total_price (без учёта бесплатности): {total_price}")
 
-            # Узнаём, какой порог для бесплатной цифры/календаря относится к этому ребёнку
-            digital_key = digital_thresholds.get(cart_photo_line.child_number)
-            calendar_key = calendar_thresholds.get(cart_photo_line.child_number)
-
-            # Если есть порог для цифровых фото, проверяем
-            if digital_key and (all_prices + total_price) > ransom_amounts.get(digital_key, Decimal('Infinity')):
-                cart_photo_line.is_free_digital = True
-                digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
-                logger.info(f"Subtracting digital photo price {digital_price} from total_price")
-
-                if promo_code:
-                    digital_price = self.appy_discount(promo_code, digital_price)
-
-                total_price -= digital_price
-
-            # Аналогично для календаря (если у вас есть отдельная цена календаря)
-            if calendar_key and (all_prices + total_price) > ransom_amounts.get(calendar_key, Decimal('Infinity')):
-                cart_photo_line.is_free_calendar = True
-            # Обновляем total_price в самой строке корзины, чтобы фронт видел уже «чистую» цену
             cart_photo_line.total_price = total_price
             cart_photo_line.save()
 
-            # Добавляем эту строку в общий список и прибавляем её стоимость в all_prices
             cart_photo_lines_list.append(cart_photo_line)
             all_prices += total_price
-            logger.info(f"all_prices (после строки {child_number}): {all_prices}")
 
-        # Возвращаем сериализованные данные по созданным/обновлённым строкам корзины
+        logger.info(f"Итоговая сумма по всем детям до бесплатностей: {all_prices}")
+
+        # -----------------------------
+        #   ВТОРОЙ ПРОХОД: проверяем пороги и даём «бесплатное»
+        # -----------------------------
+        # Здесь у нас несколько вариантов логики.
+        # 1) Если хотим, чтобы «пробой» порога для N-го ребёнка означал,
+        #    что и у 1-го ребёнка тоже бесплатная цифра, — значит,
+        #    мы просто смотрим, что для каждого ребёнка свой ransom-ключ.
+        #
+        # 2) Если же у нас логика «один общий порог» на всех детей, то можно
+        #    проверить один раз: if all_prices > X -> все дети с цифрой бесплатны.
+        #
+        # Ниже — пример, в котором "у каждого ребёнка свой порог".
+        # И мы всё равно сначала смотрим на ВЕСЬ all_prices. Если он больше
+        # порога соответствующего ребёнка — делаем для него is_free_digital.
+
+        for cart_photo_line in cart_photo_lines_list:
+            child_num = cart_photo_line.child_number
+
+            # Получаем ключи, соответствующие этому ребёнку
+            digital_key = digital_thresholds.get(child_num)
+            calendar_key = calendar_thresholds.get(child_num)
+
+            # Проверяем «цифру»
+            if digital_key:
+                threshold_value = ransom_amounts.get(digital_key)  # например, ransom_amount_for_digital_photos
+                if threshold_value and all_prices > threshold_value:
+                    # Значит, для этого ребёнка цифровые фото бесплатны
+                    cart_photo_line.is_free_digital = True
+
+                    # Нужно вычесть стоимость цифры из total_price
+                    digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
+
+                    # Если есть промокод, учитываем скидку (как в вашем коде)
+                    if promo_code:
+                        digital_price = self.appy_discount(promo_code, digital_price)
+
+                    # Вычитаем
+                    cart_photo_line.total_price = cart_photo_line.total_price - digital_price
+
+            # Проверяем «календарь»
+            if calendar_key:
+                threshold_value = ransom_amounts.get(calendar_key)
+                if threshold_value and all_prices > threshold_value:
+                    cart_photo_line.is_free_calendar = True
+                    # Если вы хотите прямо сейчас уменьшать total_price за календарь,
+                    # нужно знать его цену. В примере не показано, как хранится цена
+                    # календаря, но логика аналогичная.
+                    # calendar_price = ...
+                    # cart_photo_line.total_price -= calendar_price
+
+            # Сохраняем изменения строки
+            cart_photo_line.save()
+
+        # Возвращаем сериализованные данные
         return Response(
             CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data,
             status=status.HTTP_200_OK

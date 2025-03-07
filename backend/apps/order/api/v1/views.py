@@ -236,6 +236,10 @@ class OrderAPIView(APIView):
                 order_item.price = Decimal(0)
                 continue
 
+            if order_ref.is_free_calendar and order_item.photo_type == PhotoType.free_calendar:
+                order_item.price = Decimal(0)
+                continue
+
             # 3) Иначе – обычный расчёт цены
             calculate_price_for_order_item(
                 order_item=order_item,
