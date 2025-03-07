@@ -182,6 +182,8 @@ class CartV2APIView(APIView, DiscountMixin):
         # И мы всё равно сначала смотрим на ВЕСЬ all_prices. Если он больше
         # порога соответствующего ребёнка — делаем для него is_free_digital.
 
+        logger.info(f"digital_key: {all_prices}")
+
         for cart_photo_line in cart_photo_lines_list:
             child_num = cart_photo_line.child_number
 
@@ -197,6 +199,8 @@ class CartV2APIView(APIView, DiscountMixin):
                 if threshold_value and all_prices >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
                     cart_photo_line.is_free_digital = True
+
+                    logger.info(f"total_price: {cart_photo_line.total_price}")
 
                     # Нужно вычесть стоимость цифры из total_price
                     digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
