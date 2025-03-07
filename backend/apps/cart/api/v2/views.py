@@ -79,8 +79,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
         # Берём ID детского сада из первого элемента массива
         kindergarten_id = request_data[0].get("kindergarten_id")
-        logger.info(f"kindergarten_id: {kindergarten_id}")
-
         # Валидируем доступ к детскому саду
         kindergarten = self._validate_kindergarten(
             kindergarten_id=kindergarten_id,
@@ -95,8 +93,6 @@ class CartV2APIView(APIView, DiscountMixin):
 
         # Берём/создаём корзину
         cart = self._get_or_create_cart(user)
-        logger.info(f"cart: {cart}")
-
         # Удаляем предыдущие позиции, если они были
         cart_photo_lines_qs = cart.cart_photo_lines.select_related('cart')
         if cart_photo_lines_qs.exists():
@@ -104,12 +100,8 @@ class CartV2APIView(APIView, DiscountMixin):
 
         # Получаем пороги сумм выкупа
         ransom_amounts = self._get_ransom_amount(kindergarten=kindergarten)
-        logger.info(f"ransom_amounts: {ransom_amounts}")
-
         # Получаем прайсы (цены по типам фото) для региона
         prices = self._get_prices(kindergarten=kindergarten)
-        logger.info(f"prices: {prices}")
-
         if not prices:
             return Response({"message": "Сумма не задана"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -122,8 +114,6 @@ class CartV2APIView(APIView, DiscountMixin):
             user_role=user_role,
             promo_code_data=request_data[0].get("promo_code")
         )
-        logger.info(f"promo_code: {promo_code}")
-
         # Карты, указывающие, для какого ребёнка какие пороги
         digital_thresholds = {
             1: "ransom_amount_for_digital_photos",
@@ -192,8 +182,12 @@ class CartV2APIView(APIView, DiscountMixin):
         # И мы всё равно сначала смотрим на ВЕСЬ all_prices. Если он больше
         # порога соответствующего ребёнка — делаем для него is_free_digital.
 
+        logger.info(f"digital_key: {all_prices}")
+
         for cart_photo_line in cart_photo_lines_list:
             child_num = cart_photo_line.child_number
+
+            logger.info(f"child_num: {child_num}")
 
             # Получаем ключи, соответствующие этому ребёнку
             digital_key = digital_thresholds.get(child_num)
@@ -202,9 +196,11 @@ class CartV2APIView(APIView, DiscountMixin):
             # Проверяем «цифру»
             if digital_key:
                 threshold_value = ransom_amounts.get(digital_key)  # например, ransom_amount_for_digital_photos
-                if threshold_value and all_prices > threshold_value:
+                if threshold_value and all_prices >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
                     cart_photo_line.is_free_digital = True
+
+                    logger.info(f"total_price: {cart_photo_line.total_price}")
 
                     # Нужно вычесть стоимость цифры из total_price
                     digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
@@ -213,19 +209,16 @@ class CartV2APIView(APIView, DiscountMixin):
                     if promo_code:
                         digital_price = self.appy_discount(promo_code, digital_price)
 
-                    # Вычитаем
-                    cart_photo_line.total_price = cart_photo_line.total_price - digital_price
+                    if cart_photo_line.total_price > 0:
+                        new_total_price = cart_photo_line.total_price - digital_price
+                        logger.info(f"new_total_price: {new_total_price}")
+                        cart_photo_line.total_price = new_total_price
 
             # Проверяем «календарь»
             if calendar_key:
                 threshold_value = ransom_amounts.get(calendar_key)
-                if threshold_value and all_prices > threshold_value:
+                if threshold_value and all_prices >= threshold_value:
                     cart_photo_line.is_free_calendar = True
-                    # Если вы хотите прямо сейчас уменьшать total_price за календарь,
-                    # нужно знать его цену. В примере не показано, как хранится цена
-                    # календаря, но логика аналогичная.
-                    # calendar_price = ...
-                    # cart_photo_line.total_price -= calendar_price
 
             # Сохраняем изменения строки
             cart_photo_line.save()
@@ -248,8 +241,6 @@ class CartV2APIView(APIView, DiscountMixin):
         photo_line = PhotoLine.objects.filter(
             id=data.get("id")
         ).first()
-
-        logger.info(f"photo_line: {photo_line}")
 
         cart_photo_line = CartPhotoLine.objects.create(
             cart=cart,
@@ -321,7 +312,6 @@ class CartV2APIView(APIView, DiscountMixin):
                     promo_code=promo_code,
                     price_per_piece=price_per_piece
                 )
-                logger.info(f"discount_price: {discount_price}")
                 total_price += discount_price * quantity
                 original_price += discount_price * quantity
 
@@ -401,18 +391,13 @@ class CartV2APIView(APIView, DiscountMixin):
     def _validate_kindergarten(kindergarten_id, user, user_role):
         kindergarten = Kindergarten.objects.filter(id=kindergarten_id).first()
 
-        logger.info(f"kindergarten: {kindergarten}")
-        logger.info(f"user: {user_role}")
-
         if not kindergarten:
             return None
 
         if user_role == UserRole.parent:
             user_kindergarten = user.kindergarten.filter(id=kindergarten_id).exists()
-            logger.info(f"user_kindergarten: {user_kindergarten}")
         elif user_role == UserRole.manager:
             user_kindergarten = user.managed_kindergarten.filter(id=kindergarten_id).exists()
-            logger.info(f"user_kindergarten: {user_kindergarten}")
         else:
             user_kindergarten = False
 
