@@ -182,12 +182,12 @@ class CartV2APIView(APIView, DiscountMixin):
         # И мы всё равно сначала смотрим на ВЕСЬ all_prices. Если он больше
         # порога соответствующего ребёнка — делаем для него is_free_digital.
 
-        logger.info(f"digital_key: {all_prices}")
+        logger.info(f"start_with_all_price: {all_prices}")
 
         for cart_photo_line in cart_photo_lines_list:
             child_num = cart_photo_line.child_number
 
-            logger.info(f"child_num: {child_num}")
+            logger.info(f"------------------------------------------------child_num: {child_num}-------------------------------------------------")
 
             # Получаем ключи, соответствующие этому ребёнку
             digital_key = digital_thresholds.get(child_num)
@@ -195,12 +195,15 @@ class CartV2APIView(APIView, DiscountMixin):
 
             # Проверяем «цифру»
             if digital_key:
-                threshold_value = ransom_amounts.get(digital_key)  # например, ransom_amount_for_digital_photos
+                threshold_value = ransom_amounts.get(digital_key)
+
+                logger.info(f"BEFORE IF: child_num: {child_num} total_price: {cart_photo_line.total_price} threshold_value: {threshold_value}")
+
                 if threshold_value and all_prices >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
                     cart_photo_line.is_free_digital = True
 
-                    logger.info(f"total_price: {cart_photo_line.total_price}")
+                    logger.info(f"child_num: {child_num} total_price: {cart_photo_line.total_price}")
 
                     # Нужно вычесть стоимость цифры из total_price
                     digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
@@ -211,8 +214,9 @@ class CartV2APIView(APIView, DiscountMixin):
 
                     if cart_photo_line.total_price > 0:
                         new_total_price = cart_photo_line.total_price - digital_price
-                        logger.info(f"new_total_price: {new_total_price}")
                         cart_photo_line.total_price = new_total_price
+
+                    logger.info(f"AFTER IF: child_num: {child_num} total_price: {cart_photo_line.total_price} threshold_value: {threshold_value}")
 
             # Проверяем «календарь»
             if calendar_key:
@@ -221,6 +225,7 @@ class CartV2APIView(APIView, DiscountMixin):
                     cart_photo_line.is_free_calendar = True
 
             # Сохраняем изменения строки
+            logger.info(f"------------------------------------------------end child_num: {child_num}-------------------------------------------------")
             cart_photo_line.save()
 
         # Возвращаем сериализованные данные
