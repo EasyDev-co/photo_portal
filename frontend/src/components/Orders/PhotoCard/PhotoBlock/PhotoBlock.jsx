@@ -23,7 +23,11 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const [ransomCalendar, setRansomCalendar] = useState(0)
 
   useEffect(() => {
-    console.log('childNumber:', childNumber,'ransom:', ransomDigitalPhotos, ransomCalendar)}, [cart])
+    console.log(isDigitalChecked)}, [isDigitalChecked, setIsDigitalChecked])
+
+  // useEffect(() => {
+  //   console.log(allPrice)}, [allPrice])
+
 
   useEffect(()=> {
     const calculateValues = () => {
@@ -64,11 +68,14 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
 
 
   const prevCheckedState = useRef(isDigitalChecked);
+  useEffect(() => {
+    console.log('prevCheckedState:', prevCheckedState)
+  }, [prevCheckedState])
 //Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
 // и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
   useEffect(() => {
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
-    console.log(cartItem)
+    // console.log(cartItem)
   
     // if (cartItem) {
       // setCurrentSum(cartItem.total_price);
@@ -88,11 +95,12 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
         prevCheckedState.current = shouldActivateCheckbox;
         handleCheckboxChange({ target: { checked: shouldActivateCheckbox, name: 7 } }, currentLineId);
       }
+
     // }
     // else console.log('hui:', currentLineId)
   }, [
-    allPrice,
-  ]);
+    allPrice, ransomDigitalPhotos, handleCheckboxChange
+]);
 
   // Обработчик изменения чекбокса
   const handleDigitalCheckboxChange = (e, photoLineId) => {
