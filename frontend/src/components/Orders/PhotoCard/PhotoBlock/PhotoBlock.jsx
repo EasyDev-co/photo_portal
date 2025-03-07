@@ -21,17 +21,37 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const userData = useSelector(state => state.user.userData);
   const [ransomDigitalPhotos, setRansomDigitalPhotos] = useState(0)
   const [ransomCalendar, setRansomCalendar] = useState(0)
+  const [isLoading, setIsLoading] = useState(true); // Новое состояние для лоадера
 
   useEffect(() => {
     console.log(isDigitalChecked)}, [isDigitalChecked, setIsDigitalChecked])
 
   // useEffect(() => {
   //   console.log(allPrice)}, [allPrice])
-
+  useEffect(() => {
+    if (!priceCalendar) {
+      console.error('priceCalendar is not provided');
+      setIsLoading(true)
+    } else {
+      console.log('priceCalendar:', priceCalendar);
+      setIsLoading(false)
+    }
+  
+    if (!ransomDigitalPhotos) {
+      console.error('ransomDigitalPhotos is not provided');
+      setIsLoading(true)
+    } else {
+      console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
+      setIsLoading(false)
+    }
+  }, [priceCalendar, ransomDigitalPhotos]);
 
   useEffect(()=> {
     const calculateValues = () => {
-
+      if (!priceCalendar) {
+        console.error('priceCalendar is not provided');
+        return;
+      }
       // Пример расчета значений в зависимости от childNumber
       switch (childNumber) {
         case 1:
@@ -55,7 +75,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     };
 
     calculateValues();
-  }, [childNumber])
+  }, [childNumber, priceCalendar])
 
   // useEffect(() => {
   //   photoPrice?.forEach(element => {
@@ -74,6 +94,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
 //Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
 // и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
   useEffect(() => {
+    if (ransomDigitalPhotos === 0 || ransomCalendar === 0) {
+      console.log('ransomDigitalPhotos or ransomCalendar not loaded yet');
+      return; // Прекращаем выполнение, если данные не загружены
+    }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
     // console.log(cartItem)
   
@@ -99,7 +123,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // }
     // else console.log('hui:', currentLineId)
   }, [
-    allPrice, ransomDigitalPhotos, handleCheckboxChange
+    // allPrice, ransomDigitalPhotos, handleCheckboxChange
+    allPrice, ransomDigitalPhotos, ransomCalendar, handleCheckboxChange, manualControl, cart, currentLineId
 ]);
 
   // Обработчик изменения чекбокса
@@ -117,7 +142,9 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     }
   };
   
-
+  if (isLoading) {
+    return <h1>Загрузка...</h1>; // Компонент лоадера
+  }
 
   return (
     <div style={{
