@@ -210,7 +210,9 @@ class CartV2APIView(APIView, DiscountMixin):
                         digital_price = self.appy_discount(promo_code, digital_price)
 
                     if cart_photo_line.total_price > 0:
-                        cart_photo_line.total_price = cart_photo_line.total_price - digital_price
+                        new_total_price = cart_photo_line.total_price - digital_price
+                        logger.info(f"new_total_price: {new_total_price}")
+                        cart_photo_line.total_price = new_total_price
 
             # Проверяем «календарь»
             if calendar_key:
