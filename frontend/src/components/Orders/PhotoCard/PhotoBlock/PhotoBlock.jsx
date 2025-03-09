@@ -104,8 +104,18 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // if (cartItem) {
       // setCurrentSum(cartItem.total_price);
   
-      const shouldActivateCheckbox = allPrice >= ransomDigitalPhotos;
-      const shouldActivateCheckboxCalendar = allPrice >= ransomCalendar;
+    const shouldActivateCheckbox =
+        (ransomDigitalPhotos !== undefined &&
+            ransomDigitalPhotos !== null &&
+            ransomDigitalPhotos !== '') &&
+        (allPrice >= ransomDigitalPhotos);
+
+    // Аналогично для ransomCalendar
+    const shouldActivateCheckboxCalendar =
+        (ransomCalendar !== undefined &&
+            ransomCalendar !== null &&
+            ransomCalendar !== '') &&
+        (allPrice >= ransomCalendar);
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
