@@ -116,6 +116,13 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
             ransomCalendar !== null &&
             ransomCalendar !== '') &&
         (allPrice >= ransomCalendar);
+    
+    // console.log('allPrice:', allPrice, 'ransomDigitalPhotos:', ransomDigitalPhotos, 'ransomCalendar:', ransomCalendar)
+    // console.log("check", allPrice >= ransomDigitalPhotos)
+    // const shouldActivateCheckbox = allPrice >= ransomDigitalPhotos;
+    //   const shouldActivateCheckboxCalendar = allPrice >= ransomCalendar;
+
+
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
