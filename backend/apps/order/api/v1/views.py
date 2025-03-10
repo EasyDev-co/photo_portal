@@ -80,7 +80,9 @@ class OrderAPIView(APIView):
                 if photo_line.is_digital:
                     is_digital_by_photo_line_id[photo_line_id][0] = True  # IS_DIGITAL
                 if photo_line.is_free_digital:
-                    is_digital_by_photo_line_id[photo_line_id][1] = True  # IS_FREE_DIGITAL
+                    is_digital_by_photo_line_id[photo_line_id][1] = True # IS_FREE_DIGITAL
+
+        logger.info(f"photo_lines_dict: {photo_lines_dict}")
 
         return photo_lines_dict, is_digital_by_photo_line_id
 
@@ -94,6 +96,9 @@ class OrderAPIView(APIView):
 
         for photo_line_id, photo_line in photo_lines_dict.items():
             # восстанавливаем is_digital и is_free_digital
+            logger.info(f"photo_line_id: {photo_line_id}")
+            logger.info(f"photo_line: {photo_line}")
+
             photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
 
             extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)

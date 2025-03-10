@@ -15,7 +15,7 @@ import { fetchCartCreateWithTokenInterceptor } from "../../http/cart/cartCreate"
 import { fetchPhotoLineListWithTokenInterceptor } from "../../http/photo/photoLineList";
 import danger from '../../../src/assets/images/Auth/DangerCircle.svg'
 import { fetchWithTokenInterceptor } from "../../http/photo/getPhotoLine";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { fetchOrderCreateWithTokenInterceptor } from "../../http/order/orderCreate";
 import Modal from "../Modal/Modlal";
 import { setCookie } from "../../utils/setCookie";
@@ -24,6 +24,7 @@ import plus from '../../assets/icons/plus.svg'
 
 export const Orders = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const navigate = useNavigate()
 
   const [lineLenght, setlineLenght] = useState(0)
@@ -83,6 +84,19 @@ export const Orders = () => {
     window.onload= function() {
       setOrderValue([]);
   };
+    useEffect(() => {
+    // Создаем объект для работы с параметрами URL
+    const params = new URLSearchParams(location.search);
+    // Если параметра "reloaded" нет, добавляем его и перезагружаем страницу
+    if (!params.get('reloaded')) {
+      params.set('reloaded', 'true');
+      // Обновляем URL, чтобы добавить параметр, без создания новой записи в истории браузера
+      navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+      // Перезагружаем страницу
+      window.location.reload();
+    }
+  }, [location.search, location.pathname, navigate]);
+
 
   useEffect(() => {
     let isMounted = true;
