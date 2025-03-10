@@ -84,18 +84,18 @@ export const Orders = () => {
     window.onload= function() {
       setOrderValue([]);
   };
-    useEffect(() => {
-    // Создаем объект для работы с параметрами URL
-    const params = new URLSearchParams(location.search);
-    // Если параметра "reloaded" нет, добавляем его и перезагружаем страницу
-    if (!params.get('reloaded')) {
-      params.set('reloaded', 'true');
-      // Обновляем URL, чтобы добавить параметр, без создания новой записи в истории браузера
-      navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-      // Перезагружаем страницу
-      window.location.reload();
-    }
-  }, [location.search, location.pathname, navigate]);
+  //   useEffect(() => {
+  //   // Создаем объект для работы с параметрами URL
+  //   const params = new URLSearchParams(location.search);
+  //   // Если параметра "reloaded" нет, добавляем его и перезагружаем страницу
+  //   if (!params.get('reloaded')) {
+  //     params.set('reloaded', 'true');
+  //     // Обновляем URL, чтобы добавить параметр, без создания новой записи в истории браузера
+  //     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  //     // Перезагружаем страницу
+  //     window.location.reload();
+  //   }
+  // }, [location.search, location.pathname, navigate]);
 
 
   useEffect(() => {
