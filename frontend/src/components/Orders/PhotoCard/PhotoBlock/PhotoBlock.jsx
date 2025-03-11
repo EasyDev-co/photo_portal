@@ -23,9 +23,6 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const [ransomCalendar, setRansomCalendar] = useState(0)
   const [isLoading, setIsLoading] = useState(true); // Новое состояние для лоадера
 
-  useEffect(() => {
-    console.log(isDigitalChecked)}, [isDigitalChecked, setIsDigitalChecked])
-
   // useEffect(() => {
   //   console.log(allPrice)}, [allPrice])
   useEffect(() => {
@@ -104,21 +101,19 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // if (cartItem) {
       // setCurrentSum(cartItem.total_price);
   
-    const shouldActivateCheckbox =
-        (ransomDigitalPhotos !== undefined &&
-            ransomDigitalPhotos !== null &&
-            ransomDigitalPhotos !== '') &&
-        (allPrice >= ransomDigitalPhotos);
+      const shouldActivateCheckbox =
+    ransomDigitalPhotos !== undefined &&
+    ransomDigitalPhotos !== null &&
+    ransomDigitalPhotos !== '' &&
+    ransomDigitalPhotos !== 0 &&
+    allPrice >= ransomDigitalPhotos;
 
-    // Аналогично для ransomCalendar
-    const shouldActivateCheckboxCalendar =
-        (ransomCalendar !== undefined &&
-            ransomCalendar !== null &&
-            ransomCalendar !== '') &&
-        (allPrice >= ransomCalendar);
-    
-    // console.log('allPrice:', allPrice, 'ransomDigitalPhotos:', ransomDigitalPhotos, 'ransomCalendar:', ransomCalendar)
-    // console.log("check", allPrice >= ransomDigitalPhotos)
+  const shouldActivateCheckboxCalendar =
+    ransomCalendar !== undefined &&
+    ransomCalendar !== null &&
+    ransomCalendar !== '' &&
+    ransomCalendar !== 0 &&
+    allPrice >= ransomCalendar;
     // const shouldActivateCheckbox = allPrice >= ransomDigitalPhotos;
     //   const shouldActivateCheckboxCalendar = allPrice >= ransomCalendar;
 
@@ -126,8 +121,11 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
+      console.log("all_price", allPrice)
+      console.log("ransomDigitalPhotos", ransomDigitalPhotos)
+
       if (allPrice) {
-        console.log(allPrice >= ransomDigitalPhotos)
+        console.log("check", allPrice >= ransomDigitalPhotos)
       }
 
       // Если состояние изменилось, вызываем обновление
