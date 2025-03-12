@@ -388,8 +388,8 @@ class CartV2APIView(APIView, DiscountMixin):
         # if manager_bonus <= 0 and total_price <= 0:
         #     total_price = Decimal(1)
 
-        if total_price <= 0:
-            total_price = Decimal(0)
+        if total_price <= 0 and user_role == UserRole.manager:
+            total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
