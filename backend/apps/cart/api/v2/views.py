@@ -404,7 +404,7 @@ class CartV2APIView(APIView, DiscountMixin):
         if user_role == UserRole.parent:
             user_kindergarten = user.kindergarten.filter(id=kindergarten_id).exists()
         elif user_role == UserRole.manager:
-            user_kindergarten = user.managed_kindergarten.exists()
+            user_kindergarten = user.managed_kindergarten
         else:
             user_kindergarten = False
 
