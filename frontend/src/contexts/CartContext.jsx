@@ -8,6 +8,9 @@ export const CartProvider = ({ children }) => {
     const [photoCounts, setPhotoCounts] = useState({});
     const [totalPrice, setTotalPrice] = useState(0);
 
+    // useEffect(() => {console.log('totalPrice in context:', totalPrice)}, [totalPrice]);
+    // useEffect(() => {console.log('photoCounts in context:', photoCounts)}, [photoCounts]);
+
     const updatePhotoCount = (photoId, name, count) => {
         setPhotoCounts(prev => ({
             ...prev,
@@ -25,6 +28,10 @@ export const CartProvider = ({ children }) => {
     const updateTotalPrice = (newPrice) => {
         setTotalPrice(newPrice);
     };
+
+    // const getTotalPrice = () => {
+    //     return totalPrice;
+    // };
 
     return (
         <CartContext.Provider value={{ photoCounts, updatePhotoCount, getPhotoCount, totalPrice, updateTotalPrice }}>

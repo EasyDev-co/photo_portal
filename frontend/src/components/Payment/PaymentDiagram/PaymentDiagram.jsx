@@ -1,30 +1,32 @@
 import { useEffect, useState } from 'react';
 import styles from './PaymentDiagram.module.css'
 import { useSelector } from 'react-redux';
+import { useCart } from '../../../contexts/CartContext';
 
 
 const PaymentDiagram = ({ text, amount, label, bonus }) => {
+    // const { totalPrice } = useCart();
     const [count, setCount] = useState(0)
     const cart = useSelector(state => state.user.cart);
 
-    useEffect(() => {
-        const sumTotalPrice = cart?.reduce((sum, item) => {
-            return sum + parseFloat(item.total_price);
-        }, 0);
-        setCount(sumTotalPrice);
-    }, [cart]);
-    
-    
     // useEffect(() => {
-    //     try {
-    //         const sumTotalPrice = cart?.reduce((sum, item) => {
-    //             return sum + parseFloat(item.total_price);
-    //         }, 0);
-    //         setCount(sumTotalPrice);
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
+    //     const sumTotalPrice = cart?.reduce((sum, item) => {
+    //         return sum + parseFloat(item.total_price);
+    //     }, 0);
+    //     setCount(sumTotalPrice);
     // }, [cart]);
+    
+    
+    useEffect(() => {
+        try {
+            const sumTotalPrice = cart?.reduce((sum, item) => {
+                return sum + parseFloat(item.total_price);
+            }, 0);
+            setCount(sumTotalPrice);
+        } catch (error) {
+            console.log(error)
+        }
+    }, [cart]);
     return (
         <div className={styles.diagramWrap}>
             <span>{cart.length ? text : label}</span>

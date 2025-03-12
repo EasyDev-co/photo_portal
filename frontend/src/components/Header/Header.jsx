@@ -67,7 +67,7 @@ export const Header = () => {
             .then(res => {
               dispatch(addUserData(res));
               setManagedKindergarten(res.managed_kindergarten); // сохраняем managed_kindergarten
-              console.log(res)
+              // console.log(res)
             });
         }
       });

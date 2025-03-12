@@ -168,33 +168,68 @@ export const Orders = () => {
   }, [isChecked])
 
   
+  // const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
+  //   const newValue = {
+  //     blockId: blockId,
+  //     quantity: count,
+  //     id: photoId,
+  //     photo_type: Number(name),
+  //     is_photobook: isChecked,
+  //     is_digital: false,
+  //     photoLineId: photoLineId,
+  //     promo_code: currentPromoCode // Используем текущий промокод из state
+  //   };
+  
+  //   setOrderValue((prev) => {
+  //     const updatedState = [...prev];
+  //     const existingIndex = updatedState.findIndex(
+  //       item => item.id === photoId && item.photo_type === newValue.photo_type
+  //     );
+  //     if (existingIndex !== -1) {
+  //       updatedState[existingIndex] = newValue;
+  //     } else {
+  //       updatedState.push(newValue);
+  //     }
+  //     return updatedState;
+  //   });
+  
+  //   setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
+  // };
+
   const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
-    const newValue = {
-      blockId: blockId,
-      quantity: count,
-      id: photoId,
-      photo_type: Number(name),
-      is_photobook: isChecked,
-      is_digital: false,
-      photoLineId: photoLineId,
-      promo_code: currentPromoCode // Используем текущий промокод из state
-    };
-  
-    setOrderValue((prev) => {
-      const updatedState = [...prev];
-      const existingIndex = updatedState.findIndex(
-        item => item.id === photoId && item.photo_type === newValue.photo_type
-      );
-      if (existingIndex !== -1) {
-        updatedState[existingIndex] = newValue;
-      } else {
-        updatedState.push(newValue);
-      }
-      return updatedState;
-    });
-  
+    const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Находим нужную фотолинию
+    let photoLineIndex = cartFromLocalStorage.findIndex(item => item.photo_line_id === photoLineId);
+
+    // Если фотолиния не найдена, создаем новую
+    if (photoLineIndex === -1) {
+        const newPhotoLine = {
+            id: photoLineId,
+            photo_line_id: photoLineId,
+            photos: [],
+            is_photobook: isChecked,
+            is_digital: false,
+            kindergarten_id: localStorage.getItem('kindergarten_id'),
+        };
+        cartFromLocalStorage.push(newPhotoLine);
+        photoLineIndex = cartFromLocalStorage.length - 1;
+        console.log('Создана новая фотолиния в localStorage:', newPhotoLine);
+    }
+
+    // Находим нужное фото в фотолинии
+    const photoIndex = cartFromLocalStorage[photoLineIndex].photos.findIndex(photo => photo.id === photoId && photo.photo_type === Number(name));
+
+    // Обновляем количество у существующего фото
+    cartFromLocalStorage[photoLineIndex].photos[photoIndex].quantity = count;
+    console.log('Количество обновлено в localStorage:', count);
+
+    // Сохраняем обновленные данные в localStorage
+    localStorage.setItem('cart', JSON.stringify(cartFromLocalStorage));
+
+    // Обновляем состояние inputValue (если это необходимо)
     setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
-  };
+};
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart'));
@@ -213,19 +248,38 @@ export const Orders = () => {
 }, [dispatch, accessStor]);
 
 // Синхронизация корзины с сервером при изменении orderValue
+// useEffect(() => {
+//     if (orderValue.length > 0) {
+//         const transformedData = transformData(orderValue);
+//         console.log('orderValue:', orderValue);
+//         fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
+//             .then((res) => res.json())
+//             .then((data) => {
+//               console.log
+//                 dispatch(setCart(data));
+//                 localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
+//             })
+//             .catch((err) => console.error("Ошибка синхронизации корзины:", err));
+//     }
+// }, [orderValue, accessStor, dispatch]);
+
 useEffect(() => {
-    if (orderValue.length > 0) {
-        const transformedData = transformData(orderValue);
-        fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-            .then((res) => res.json())
-            .then((data) => {
-              console.log
-                dispatch(setCart(data));
-                localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
-            })
-            .catch((err) => console.error("Ошибка синхронизации корзины:", err));
-    }
-}, [orderValue, accessStor, dispatch]);
+  const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || [];
+  if (cartFromLocalStorage.length > 0) {
+      const transformedData = transformData(cartFromLocalStorage);
+      console.log('Данные для отправки на сервер:', transformedData);
+
+      fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
+          .then((res) => res.json())
+          .then((data) => {
+              console.log('Ответ от сервера:', data);
+              dispatch(setCart(data));
+              localStorage.setItem('cart', JSON.stringify(data)); // Обновляем localStorage
+          })
+          .catch((err) => console.error("Ошибка синхронизации корзины:", err));
+  }
+  else {console.log('rrr')}
+}, [accessStor, dispatch]);
 
 
   const onSubmitHandler = async (e) => {
