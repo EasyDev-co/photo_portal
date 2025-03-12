@@ -33,15 +33,29 @@ class DiscountMixin:
     #     return total_price
 
     @staticmethod
-    def apply_kindergarten_manager_bonus(price_per_price, manager_discount, cart):
-        if price_per_price > 0 and manager_discount > 0:
-            if price_per_price <= manager_discount:
-                cart.order_fully_paid_by_coupon = True
-            else:
-                price_per_price -= manager_discount
-                cart.order_fully_paid_by_coupon = False
-        return price_per_price
+    def apply_kindergarten_manager_bonus(price, discount, cart):
+        """
+        Применяет бонус менеджера к цене заказа.
 
+        Если цена и скидка положительные:
+          - Если цена больше или равна скидке, то:
+              - Устанавливаем флаг, что заказ полностью оплачен купоном.
+              - Вычитаем скидку из цены и возвращаем остаток.
+          - Если скидка больше цены, то:
+              - Устанавливаем флаг, что заказ не полностью оплачен купоном.
+              - Возвращаем 0.
+        Если цена или скидка не положительные, возвращаем исходную цену.
+        """
+        if price <= 0 or discount <= 0:
+            return price
+
+        if price >= discount:
+            cart.order_fully_paid_by_coupon = True
+            return price - discount
+        else:
+            cart.order_fully_paid_by_coupon = False
+            discount -= price
+            return 0
 
     @staticmethod
     def get_promo_code(user, user_role, promo_code_data):
@@ -147,7 +161,7 @@ class CartV2APIView(APIView, DiscountMixin):
             manager_bonus = user.manager_discount_balance
         else:
             manager_bonus = None
-
+        logger.info(f"manager_bonus: {manager_bonus}")
         for data in request_data:
             logger.info(f"for_data: {data}")
             child_number += 1
@@ -337,7 +351,11 @@ class CartV2APIView(APIView, DiscountMixin):
                     price_per_piece=price_per_piece
                 )
                 if manager_bonus:
+                    logger.info(f"apply_manager_bonus")
+                    logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
                     discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart)
+                    logger.info(f"discount_price_with_apply_manager_bonus: {discount_price}")
+                    logger.info(f"manager_bonus_after: {manager_bonus}--------------------------------------------------")
 
                 total_price += discount_price * quantity
                 original_price += discount_price * quantity
