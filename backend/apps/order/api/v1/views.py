@@ -340,7 +340,10 @@ class PaymentAPIView(APIView):
 
                 # обновляем баланс бонусного купона, после его использования
                 total_original_price = sum(order.original_price for order in orders.all())
-                user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
+                # user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
+                discount_balance = user.manager_discount_balance
+                if discount_balance <= 0:
+                    user.manager_discount_balance_empty = True
                 user.save()
 
                 return Response(payment_url, status=status.HTTP_200_OK)
