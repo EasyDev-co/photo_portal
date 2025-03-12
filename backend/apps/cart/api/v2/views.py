@@ -411,7 +411,4 @@ class CartV2APIView(APIView, DiscountMixin):
         if not user_kindergarten:
             return None
 
-        if not user.kindergarten.filter(id=kindergarten_id).exists():
-            return None
-
         return kindergarten
