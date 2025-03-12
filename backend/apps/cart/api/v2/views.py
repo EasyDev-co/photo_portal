@@ -341,7 +341,7 @@ class CartV2APIView(APIView, DiscountMixin):
             if not price_per_piece:
                 continue
 
-            if user_role == UserRole.manager and not user.manager_discount_balance_empty:
+            if user_role == UserRole.manager:
                 manager_bonus = user.manager_discount_balance
             else:
                 manager_bonus = None
@@ -354,7 +354,7 @@ class CartV2APIView(APIView, DiscountMixin):
                 if manager_bonus:
                     logger.info(f"apply_manager_bonus")
                     logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
-                    discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart)
+                    discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart, user)
                     logger.info(f"discount_price_with_apply_manager_bonus: {discount_price}")
                     logger.info(f"manager_bonus_after: {manager_bonus}--------------------------------------------------")
 
@@ -388,8 +388,8 @@ class CartV2APIView(APIView, DiscountMixin):
         # if manager_bonus <= 0 and total_price <= 0:
         #     total_price = Decimal(1)
 
-        if total_price <= 0:
-            total_price = Decimal(0)
+        if total_price <= 0 and user_role == UserRole.manager:
+            total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
