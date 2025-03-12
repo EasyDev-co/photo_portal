@@ -322,9 +322,8 @@ class PaymentAPIView(APIView):
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
-        total_price = 0
-        for item in order_items:
-            total_price += item.price
+
+        logger.info(f"payment_data: {payment_data}")
 
         payment_data['Token'] = token
         response = requests.post(
