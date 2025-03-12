@@ -93,6 +93,7 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True,
     )
+    manager_discount_balance_empty = models.BooleanField(default=False, verbose_name="Доступность бонуса заведующей")
     manager_percent = models.DecimalField(
         verbose_name="Процент заведующей",
         decimal_places=2,
