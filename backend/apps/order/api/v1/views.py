@@ -29,6 +29,7 @@ from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine, PhotoTheme
+from apps.user.models import UserRole
 from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
@@ -341,10 +342,14 @@ class PaymentAPIView(APIView):
                 # обновляем баланс бонусного купона, после его использования
                 total_original_price = sum(order.original_price for order in orders.all())
                 # user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
-                discount_balance = user.manager_discount_balance
-                if discount_balance <= 0:
-                    user.manager_discount_balance_empty = True
-                user.save()
+                if request.user.role == UserRole.manager:
+                    discount_balance = user.manager_discount_balance
+                    if discount_balance <= 0:
+                        user.manager_discount_intermediate_balance = 0
+                        user.manager_discount_balance_empty = True
+                    else:
+                        user.manager_discount_intermediate_balance = user.manager_discount_balance
+                    user.save()
 
                 return Response(payment_url, status=status.HTTP_200_OK)
             return Response(
