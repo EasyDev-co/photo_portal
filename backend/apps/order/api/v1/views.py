@@ -191,6 +191,7 @@ class OrderAPIView(APIView):
                     amount=photo_in_cart.quantity,
                     order=order,
                     photo=photo_in_cart.photo,
+                    price=photos_in_cart.discount_price,
                 )
                 for photo_in_cart in photos_in_cart
             )
@@ -247,14 +248,14 @@ class OrderAPIView(APIView):
                 continue
 
             # 3) Иначе – обычный расчёт цены
-            calculate_price_for_order_item(
-                order_item=order_item,
-                prices_dict=prices_dict,
-                ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
-                promocode=cart.promocode,
-                coupon_amount=coupon_amount,
-                user_role=user.role
-            )
+            # calculate_price_for_order_item(
+            #     order_item=order_item,
+            #     prices_dict=prices_dict,
+            #     ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
+            #     promocode=cart.promocode,
+            #     coupon_amount=coupon_amount,
+            #     user_role=user.role
+            # )
 
         # Важно: если всё было оплачено купоном, вы где-то ставите price=1 на самый первый OrderItem
         # (чтобы сумма не была = 0; по логике вашей платёжной системы).
