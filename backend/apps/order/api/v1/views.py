@@ -191,7 +191,7 @@ class OrderAPIView(APIView):
                     amount=photo_in_cart.quantity,
                     order=order,
                     photo=photo_in_cart.photo,
-                    price=photos_in_cart.discount_price,
+                    price=photo_in_cart.discount_price,
                 )
                 for photo_in_cart in photos_in_cart
             )
