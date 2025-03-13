@@ -94,7 +94,7 @@ class User(UUIDMixin, AbstractUser):
         blank=True,
     )
     manager_discount_intermediate_balance = models.PositiveIntegerField(
-        default=0,
+        default=3000,
         verbose_name="Промежуточная таблица с бонусным балансом",
     )
     manager_discount_balance_empty = models.BooleanField(default=False, verbose_name="Доступность бонуса заведующей")

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -17,20 +18,9 @@ from apps.photo.models import Photo, PhotoLine
 
 from loguru import logger
 
+User = get_user_model()
 
 class DiscountMixin:
-
-    # @staticmethod
-    # def apply_kindergarten_manager_bonus(total_price, user, cart):
-    #     manager_discount = user.manager_discount_balance
-    #     if total_price > 0 and manager_discount > 0:
-    #         if total_price <= manager_discount:
-    #             total_price = Decimal(1)
-    #             cart.order_fully_paid_by_coupon = True
-    #         else:
-    #             total_price -= manager_discount
-    #             cart.order_fully_paid_by_coupon = False
-    #     return total_price
 
     @staticmethod
     def apply_kindergarten_manager_bonus(price, bonus, cart, user):
@@ -54,7 +44,7 @@ class DiscountMixin:
         else:
             cart.order_fully_paid_by_coupon = False
             new_price = 0
-            user.manager_discount_balance = bonus - price
+            user.manager_discount_balance =- price
 
         user.save()
         cart.save()
@@ -98,6 +88,11 @@ class CartV2APIView(APIView, DiscountMixin):
         request_data = request.data
         user = request.user
         user_role = request.user.role
+
+        if user_role == UserRole.manager and not user.manager_discount_balance_empty:
+            if user.manager_discount_balance > 0:
+                user.manager_discount_balance = user.manager_discount_intermediate_balance
+                user.save()
 
         logger.info(f"request data: {request.data}")
 
@@ -342,7 +337,7 @@ class CartV2APIView(APIView, DiscountMixin):
                 continue
 
             if user_role == UserRole.manager:
-                manager_bonus = user.manager_discount_balance
+                manager_bonus = User.objects.get(id=user.id).manager_discount_balance
             else:
                 manager_bonus = None
 
