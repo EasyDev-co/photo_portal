@@ -23,7 +23,7 @@ User = get_user_model()
 class DiscountMixin:
 
     @staticmethod
-    def apply_kindergarten_manager_bonus(price, bonus, cart, user):
+    def apply_kindergarten_manager_bonus(price, bonus, cart, user, quantity):
         """
         Применяет бонус менеджера к цене заказа и возвращает обновленную цену.
 
@@ -44,7 +44,7 @@ class DiscountMixin:
         else:
             cart.order_fully_paid_by_coupon = False
             new_price = 0
-            user.manager_discount_balance -= price
+            user.manager_discount_balance -= price * quantity
 
         user.save()
         cart.save()
@@ -350,7 +350,7 @@ class CartV2APIView(APIView, DiscountMixin):
                 if manager_bonus:
                     logger.info(f"apply_manager_bonus")
                     logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
-                    discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart, user)
+                    discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart, user, quantity)
                     logger.info(f"discount_price_with_apply_manager_bonus: {discount_price}")
                     logger.info(f"manager_bonus_after: {manager_bonus}--------------------------------------------------")
 
@@ -380,12 +380,12 @@ class CartV2APIView(APIView, DiscountMixin):
 
         if user_role == UserRole.manager:
             manager_bonus = User.objects.get(id=user.id).manager_discount_balance
-            logger.info(f"in if manager_bonus: {manager_bonus}")
+            logger.info(f"in if manager_bonus_2: {manager_bonus}")
         else:
             manager_bonus = None
 
         if manager_bonus:
-            if total_price <= 0 and user_role == UserRole.manager and manager_bonus <= 0:
+            if total_price <= 0 < manager_bonus and user_role == UserRole.manager:
                 total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
