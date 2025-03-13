@@ -335,9 +335,10 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if not price_per_piece:
                 continue
-
+            logger.info(f"user_role: {user_role}")
             if user_role == UserRole.manager:
                 manager_bonus = User.objects.get(id=user.id).manager_discount_balance
+                logger.info(f"in if manager_bonus: {manager_bonus}")
             else:
                 manager_bonus = None
 
