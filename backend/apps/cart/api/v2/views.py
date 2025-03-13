@@ -378,14 +378,15 @@ class CartV2APIView(APIView, DiscountMixin):
                     photo_type=photo_type_int
                 ).delete()
 
-        # if user_role == UserRole.manager:
-        #     total_price = self.apply_kindergarten_manager_bonus(total_price, user, cart)
+        if user_role == UserRole.manager:
+            manager_bonus = User.objects.get(id=user.id).manager_discount_balance
+            logger.info(f"in if manager_bonus: {manager_bonus}")
+        else:
+            manager_bonus = None
 
-        # if manager_bonus <= 0 and total_price <= 0:
-        #     total_price = Decimal(1)
-
-        if total_price <= 0 and user_role == UserRole.manager:
-            total_price = Decimal(1)
+        if manager_bonus:
+            if total_price <= 0 and user_role == UserRole.manager and manager_bonus <= 0:
+                total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
