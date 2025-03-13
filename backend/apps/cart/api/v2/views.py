@@ -44,7 +44,7 @@ class DiscountMixin:
         else:
             cart.order_fully_paid_by_coupon = False
             new_price = 0
-            user.manager_discount_balance =- price
+            user.manager_discount_balance -= price
 
         user.save()
         cart.save()
