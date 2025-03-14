@@ -203,6 +203,7 @@ class OrderAPIView(APIView):
                         photo_type=PhotoType.digital,
                         amount=1,  # обычно 1 позиция
                         order=order,
+                        price=prices_dict.get(PhotoType.digital.value),
                     )
                 )
 
@@ -213,6 +214,7 @@ class OrderAPIView(APIView):
                         photo_type=PhotoType.photobook,
                         amount=1,
                         order=order,
+                        price=prices_dict.get(PhotoType.photobook.value),
                     )
                 )
 
@@ -224,28 +226,40 @@ class OrderAPIView(APIView):
                         amount=1,
                         photo=cart_photo_line.photo_line.photos.order_by('?').first(),
                         order=order,
+                        price=1,
+                    )
+                )
+
+            if order.is_free_digital:
+                order_items.append(
+                    OrderItem(
+                        photo_type=PhotoType.photobook,
+                        amount=1,
+                        photo=None,
+                        order=order,
+                        price=1,
                     )
                 )
 
         # Теперь пересчитываем стоимость каждого OrderItem, учитывая промокод, купон, и (ВНИМАНИЕ!) флаг is_free_digital
         coupon_amount = [Decimal(cart.bonus_coupon) if cart.bonus_coupon else Decimal(0)]
 
-        for order_item in order_items:
-            order_ref = order_item.order  # сам заказ
-
-            # 1) Если для всего заказа (или корзины) стоит флаг "заказ полностью куплен купоном"
-            if cart.order_fully_paid_by_coupon:
-                order_item.price = Decimal(0)
-                continue
-
-            # 2) Если это цифровое фото, а у заказа проставлено is_free_digital=True – ставим 0
-            if order_ref.is_free_digital and order_item.photo_type == PhotoType.digital:
-                order_item.price = Decimal(0)
-                continue
-
-            if order_ref.is_free_calendar and order_item.photo_type == PhotoType.free_calendar:
-                order_item.price = Decimal(0)
-                continue
+        # for order_item in order_items:
+        #     order_ref = order_item.order  # сам заказ
+        #
+        #     # 1) Если для всего заказа (или корзины) стоит флаг "заказ полностью куплен купоном"
+        #     if cart.order_fully_paid_by_coupon:
+        #         order_item.price = Decimal(0)
+        #         continue
+        #
+        #     # 2) Если это цифровое фото, а у заказа проставлено is_free_digital=True – ставим 0
+        #     if order_ref.is_free_digital and order_item.photo_type == PhotoType.digital:
+        #         order_item.price = Decimal(0)
+        #         continue
+        #
+        #     if order_ref.is_free_calendar and order_item.photo_type == PhotoType.free_calendar:
+        #         order_item.price = Decimal(0)
+        #         continue
 
             # 3) Иначе – обычный расчёт цены
             # calculate_price_for_order_item(
@@ -260,8 +274,8 @@ class OrderAPIView(APIView):
         # Важно: если всё было оплачено купоном, вы где-то ставите price=1 на самый первый OrderItem
         # (чтобы сумма не была = 0; по логике вашей платёжной системы).
         # Оставим это, как есть у вас сейчас:
-        if cart.order_fully_paid_by_coupon and order_items:
-            order_items[0].price = Decimal(1)
+        # if cart.order_fully_paid_by_coupon and order_items:
+        #     order_items[0].price = Decimal(1)
                         
         # Промокод: увеличиваем счётчик активаций и записываем пользователя
         if cart.promocode:
