@@ -394,6 +394,9 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
 
         user = request.user
         numbers_list = request.data.get('numbers', '')
+
+        logger.info(f"numbers_list: {numbers_list}")
+
         if user.role == UserRole.parent:  # список из 1 или 6 элементов
             kindergarten = user.kindergarten.all().first()
         elif user.role == UserRole.manager:

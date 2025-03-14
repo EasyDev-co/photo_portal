@@ -262,7 +262,7 @@ class OrderAPIView(APIView):
         # Оставим это, как есть у вас сейчас:
         if cart.order_fully_paid_by_coupon and order_items:
             order_items[0].price = Decimal(1)
-
+                        
         # Промокод: увеличиваем счётчик активаций и записываем пользователя
         if cart.promocode:
             promocode = cart.promocode
