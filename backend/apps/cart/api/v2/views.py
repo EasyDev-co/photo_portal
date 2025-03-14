@@ -43,7 +43,7 @@ class DiscountMixin:
             user.manager_discount_balance = 0
         else:
             cart.order_fully_paid_by_coupon = False
-            new_price = 0
+            new_price = 1
             user.manager_discount_balance -= price * quantity
 
         user.save()
@@ -418,17 +418,17 @@ class CartV2APIView(APIView, DiscountMixin):
                     pic.price_per_piece = price_per_piece
                     pic.save()
 
-        if user_role == UserRole.manager:
-            manager_bonus = User.objects.get(id=user.id).manager_discount_balance
-            logger.info(f"in if manager_bonus_2: {manager_bonus}")
-        else:
-            manager_bonus = None
-
-        logger.info(f"item_count: {item_count}")
-
-        if manager_bonus:
-            if total_price <= 0 < item_count and user_role == UserRole.manager:
-                total_price = Decimal(1)
+        # if user_role == UserRole.manager:
+        #     manager_bonus = User.objects.get(id=user.id).manager_discount_balance
+        #     logger.info(f"in if manager_bonus_2: {manager_bonus}")
+        # else:
+        #     manager_bonus = None
+        #
+        # logger.info(f"item_count: {item_count}")
+        #
+        # if manager_bonus:
+        #     if total_price <= 0 < item_count and user_role == UserRole.manager:
+        #         total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
