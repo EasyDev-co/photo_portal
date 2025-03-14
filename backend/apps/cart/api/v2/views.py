@@ -209,6 +209,8 @@ class CartV2APIView(APIView, DiscountMixin):
         for cart_photo_line in cart_photo_lines_list:
             child_num = cart_photo_line.child_number
 
+            digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
+
             logger.info(f"------------------------------------------------child_num: {child_num}-------------------------------------------------")
 
             # Получаем ключи, соответствующие этому ребёнку
@@ -219,17 +221,18 @@ class CartV2APIView(APIView, DiscountMixin):
             if digital_key:
                 threshold_value = ransom_amounts.get(digital_key)
 
-                logger.info(f"BEFORE IF: child_num: {child_num} total_price: {cart_photo_line.total_price} threshold_value: {threshold_value}")
+                logger.info(
+                    f"BEFORE IF: child_num: {child_num} total_price:"
+                    f" {cart_photo_line.total_price} threshold_value: {threshold_value}"
+                )
 
-                if threshold_value and all_prices >= threshold_value:
+                if threshold_value and all_prices - digital_price >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
                     cart_photo_line.is_free_digital = True
 
                     logger.info(f"child_num: {child_num} total_price: {cart_photo_line.total_price}")
 
                     # Нужно вычесть стоимость цифры из total_price
-                    digital_price = prices.get(PhotoType.digital.label) or Decimal(0)
-
                     # Если есть промокод, учитываем скидку (как в вашем коде)
                     if promo_code:
                         digital_price = self.appy_discount(promo_code, digital_price)
@@ -298,13 +301,44 @@ class CartV2APIView(APIView, DiscountMixin):
         photo_book_price = prices.get(PhotoType.photobook.label)
         digital_photo_price = prices.get(PhotoType.digital.label)
 
+        item_count = 0
+
+        if user_role == UserRole.manager:
+            manager_bonus = User.objects.get(id=user.id).manager_discount_balance
+        else:
+            manager_bonus = None
+
         if cart_photo_line.is_photobook:
+            item_count += 1
+
             discount_price_photo_book = self.appy_discount(promo_code, photo_book_price)
+
+            if manager_bonus:
+                discount_price_photo_book = self.apply_kindergarten_manager_bonus(
+                    discount_price_photo_book,
+                    manager_bonus,
+                    cart,
+                    user,
+                    1,
+                )
+
             total_price += discount_price_photo_book
             original_price += discount_price_photo_book
 
         if cart_photo_line.is_digital:
+            item_count += 1
+
             discount_price_digital_photo = self.appy_discount(promo_code, digital_photo_price)
+
+            if manager_bonus:
+                discount_price_digital_photo = self.apply_kindergarten_manager_bonus(
+                    discount_price_digital_photo,
+                    manager_bonus,
+                    cart,
+                    user,
+                    1,
+                )
+
             total_price += discount_price_digital_photo
             original_price += discount_price_digital_photo
 
@@ -343,6 +377,8 @@ class CartV2APIView(APIView, DiscountMixin):
                 manager_bonus = None
 
             if quantity > 0:
+                item_count += 1
+
                 discount_price = self.appy_discount(
                     promo_code=promo_code,
                     price_per_piece=price_per_piece
@@ -350,7 +386,13 @@ class CartV2APIView(APIView, DiscountMixin):
                 if manager_bonus:
                     logger.info(f"apply_manager_bonus")
                     logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
-                    discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart, user, quantity)
+                    discount_price = self.apply_kindergarten_manager_bonus(
+                        discount_price,
+                        manager_bonus,
+                        cart,
+                        user,
+                        quantity,
+                    )
                     logger.info(f"discount_price_with_apply_manager_bonus: {discount_price}")
                     logger.info(f"manager_bonus_after: {manager_bonus}--------------------------------------------------")
 
@@ -371,12 +413,6 @@ class CartV2APIView(APIView, DiscountMixin):
                     pic.quantity = quantity
                     pic.price_per_piece = price_per_piece
                     pic.save()
-            else:
-                PhotoInCart.objects.filter(
-                    cart_photo_line=cart_photo_line,
-                    photo=photo_obj,
-                    photo_type=photo_type_int
-                ).delete()
 
         if user_role == UserRole.manager:
             manager_bonus = User.objects.get(id=user.id).manager_discount_balance
@@ -385,7 +421,7 @@ class CartV2APIView(APIView, DiscountMixin):
             manager_bonus = None
 
         if manager_bonus:
-            if total_price <= 0 < manager_bonus and user_role == UserRole.manager:
+            if total_price <= 0 < item_count and user_role == UserRole.manager:
                 total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
