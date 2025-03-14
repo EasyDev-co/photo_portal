@@ -21,6 +21,7 @@ import Modal from "../Modal/Modlal";
 import { setCookie } from "../../utils/setCookie";
 import { getNearestDate } from "./utils/utils";
 import plus from '../../assets/icons/plus.svg'
+import { fetchGetOrderWithTokenInterceptor } from "../../http/cart/getOrder";
 
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -65,6 +66,9 @@ export const Orders = () => {
   const blurRef = useRef(null);
   const timeoutId = useRef(null);
   const [isActiveForm, setIsActiveForm] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false); // Флаг для отслеживания изменений
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
   const cart = useSelector(state => state.user.cart);
 
   useEffect(() => {
@@ -125,7 +129,7 @@ export const Orders = () => {
         if (isMounted && res.ok) {
           res.json()
             .then(data => {
-              console.log(data)
+              // console.log(data)
               // data[0].photo_theme.id
               getNearestDate(data);
               setlineLenght(data.length);
@@ -168,6 +172,35 @@ export const Orders = () => {
   }, [isChecked])
 
   
+  // const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
+  //   const newValue = {
+  //     blockId: blockId,
+  //     quantity: count,
+  //     id: photoId,
+  //     photo_type: Number(name),
+  //     is_photobook: isChecked,
+  //     is_digital: false,
+  //     photoLineId: photoLineId,
+  //     promo_code: currentPromoCode // Используем текущий промокод из state
+  //   };
+  //   console.log('изменение было')
+  
+  //   setOrderValue((prev) => {
+  //     const updatedState = [...prev];
+  //     const existingIndex = updatedState.findIndex(
+  //       item => item.id === photoId && item.photo_type === newValue.photo_type
+  //     );
+  //     if (existingIndex !== -1) {
+  //       updatedState[existingIndex] = newValue;
+  //     } else {
+  //       updatedState.push(newValue);
+  //     }
+  //     return updatedState;
+  //   });
+  
+  //   setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
+  // };
+
   const onChangeHandler = (name, count, photoId, isChecked, photoLineId, blockId) => {
     const newValue = {
       blockId: blockId,
@@ -177,9 +210,10 @@ export const Orders = () => {
       is_photobook: isChecked,
       is_digital: false,
       photoLineId: photoLineId,
-      promo_code: currentPromoCode // Используем текущий промокод из state
+      promo_code: currentPromoCode
     };
-  
+    console.log('Изменение было:', newValue);
+
     setOrderValue((prev) => {
       const updatedState = [...prev];
       const existingIndex = updatedState.findIndex(
@@ -192,40 +226,130 @@ export const Orders = () => {
       }
       return updatedState;
     });
-  
+
     setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
+    setHasChanges(true); // Устанавливаем флаг изменений
   };
 
-  useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem('cart'));
-    
-    if (savedCart && savedCart.length > 0) {
-        dispatch(setCart(savedCart));
-    } else {
-        // Запрос данных корзины с сервера
-        fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
-            .then((res) => res.json())
-            .then((data) => {
-                dispatch(setCart(data));
-            })
-            .catch((err) => console.error("Ошибка загрузки корзины:", err));
+  const transformCartToOrderValue = (cart) => {
+    // Преобразуем обычные фото
+    const photosArray = cart.flatMap((photoLine, blockId) => {
+      return photoLine.photos.map(photo => ({
+        blockId: blockId, // Используем индекс блока как blockId
+        id: photo.id,
+        is_digital: photoLine.is_digital, // Берем из фотолинии
+        is_photobook: photoLine.is_photobook, // Берем из фотолинии
+        photoLineId: photoLine.photo_line_id,
+        photo_type: photo.photo_type,
+        promo_code: photoLine.promo_code || "", // Берем из фотолинии (если есть)
+        quantity: photo.quantity
+      }));
+    });
+  
+    // Добавляем электронные фото (если is_digital: true)
+    const digitalPhotosArray = cart
+      .filter(photoLine => photoLine.is_digital) // Фильтруем фотолинии с is_digital: true
+      .map(photoLine => ({
+        id: photoLine.photo_line_id, // Используем photo_line_id как id
+        is_digital: true,
+        is_photobook: false,
+        photos: [] // Пустой массив, так как это электронные фото
+      }));
+      
+      const photobookPhotosArray = cart
+      .filter(photoLine => photoLine.is_photobook) // Фильтруем фотолинии с is_photobook: true
+      .map(photoLine => ({
+        id: photoLine.photo_line_id, // Используем photo_line_id как id
+        is_digital: false,
+        is_photobook: true,
+        photos: [] // Пустой массив, так как это фотокниги
+      }));
+    // Объединяем обычные и электронные фото
+    return [...photosArray, ...digitalPhotosArray, ...photobookPhotosArray];
+  };
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      if (hasChanges) {
+        // Если есть изменения, отправляем POST запрос
+        const transformedData = transformData(orderValue);
+        const response = await fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData);
+        if (response.ok) {
+          console.log('пост запрос случился')
+          const data = await response.json();
+          // console.log('Корзина обновлена:', data);
+          dispatch(setCart(data));
+          console.log('orderValue', orderValue)
+          localStorage.setItem('cart', JSON.stringify(data));
+          setHasChanges(false); // Сбрасываем флаг изменений
+        } else {
+          console.error('Ошибка при обновлении корзины:', response.statusText);
+        }
+      } else {
+        // Если изменений не было, делаем GET запрос
+        const response = await fetchGetOrderWithTokenInterceptor(accessStor);
+        if (response.ok) {
+          console.log('гет запрос случился')
+          const data = await response.json();
+          console.log('Корзина получена:', data);
+          dispatch(setCart(data));
+          // setOrderValue(data)
+          localStorage.setItem('cart', JSON.stringify(data));
+
+          if (isInitialLoad) {
+            const newOrderValue = transformCartToOrderValue(data);
+            setOrderValue(newOrderValue);
+            console.log('orderValue после гет', orderValue)
+            console.log('newOrderValue после гет', newOrderValue)
+            setIsInitialLoad(false); // Сбрасываем флаг начальной загрузки
+          }
+        } else {
+          console.error('Ошибка при получении корзины:', response.statusText);
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении запроса:', error);
     }
-}, [dispatch, accessStor]);
+  };
+
+  fetchData();
+}, [orderValue, accessStor, dispatch]);
+
+useEffect(() => {
+  console.log('isInitialLoad', isInitialLoad)
+}, [isInitialLoad])
 
 // Синхронизация корзины с сервером при изменении orderValue
+// useEffect(() => {
+//     if (orderValue.length > 0) {
+//         const transformedData = transformData(orderValue);
+//         fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
+//             .then((res) => res.json())
+//             .then((data) => {
+//               console.log
+//                 dispatch(setCart(data));
+//                 localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
+//             })
+//             .catch((err) => console.error("Ошибка синхронизации корзины:", err));
+//     }
+// }, [orderValue, accessStor, dispatch]);
+
 useEffect(() => {
-    if (orderValue.length > 0) {
-        const transformedData = transformData(orderValue);
-        fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-            .then((res) => res.json())
-            .then((data) => {
-              console.log
-                dispatch(setCart(data));
-                localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
-            })
-            .catch((err) => console.error("Ошибка синхронизации корзины:", err));
-    }
-}, [orderValue, accessStor, dispatch]);
+  const savedCart = JSON.parse(localStorage.getItem('cart'));
+  
+  if (savedCart && savedCart.length > 0) {
+      dispatch(setCart(savedCart));
+  } else {
+      // Запрос данных корзины с сервера
+      fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
+          .then((res) => res.json())
+          .then((data) => {
+              dispatch(setCart(data));
+          })
+          .catch((err) => console.error("Ошибка загрузки корзины:", err));
+  }
+}, [dispatch, accessStor]);
 
 
   const onSubmitHandler = async (e) => {
@@ -251,7 +375,7 @@ useEffect(() => {
   const handleCheckboxChange = (event, photoLineId) => {
     const { checked, name } = event.target;
 
-    console.log('checked:', checked)
+    console.log('изменение было, checked:', checked)
 
     setOrderValue((prev) => {
       const existingItemIndex = prev.findIndex(item => item.id === photoLineId);
@@ -260,8 +384,10 @@ useEffect(() => {
         const updatedItem = { ...prev[existingItemIndex] };
         if (name == 6) {
           updatedItem.is_photobook = checked;
+          setHasChanges(true);
         } else if (name == 7) {
           updatedItem.is_digital = checked;
+          setHasChanges(true);
         }
         return [
           ...prev.slice(0, existingItemIndex),
@@ -275,6 +401,7 @@ useEffect(() => {
           is_photobook: name == 6 ? checked : false,
           is_digital: name == 7 ? checked : false
         };
+        // setHasChanges(true);
         return [...prev, newItem];
       }
     });

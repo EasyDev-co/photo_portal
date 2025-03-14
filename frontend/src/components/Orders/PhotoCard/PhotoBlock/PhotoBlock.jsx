@@ -27,18 +27,18 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   //   console.log(allPrice)}, [allPrice])
   useEffect(() => {
     if (!priceCalendar) {
-      console.error('priceCalendar is not provided');
+      // console.error('priceCalendar is not provided');
       setIsLoading(true)
     } else {
-      console.log('priceCalendar:', priceCalendar);
+      // console.log('priceCalendar:', priceCalendar);
       setIsLoading(false)
     }
   
     if (!ransomDigitalPhotos) {
-      console.error('ransomDigitalPhotos is not provided');
+      // console.error('ransomDigitalPhotos is not provided');
       setIsLoading(true)
     } else {
-      console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
+      // console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
       setIsLoading(false)
     }
   }, [priceCalendar, ransomDigitalPhotos]);
@@ -121,12 +121,12 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
-      console.log("all_price", allPrice)
-      console.log("ransomDigitalPhotos", ransomDigitalPhotos)
+      // console.log("all_price", allPrice)
+      // console.log("ransomDigitalPhotos", ransomDigitalPhotos)
 
-      if (allPrice) {
-        console.log("check", allPrice >= ransomDigitalPhotos)
-      }
+      // if (allPrice) {
+      //   console.log("check", allPrice >= ransomDigitalPhotos)
+      // }
 
       // Если состояние изменилось, вызываем обновление
       if (shouldActivateCheckbox !== prevCheckedState.current && !manualControl) {
