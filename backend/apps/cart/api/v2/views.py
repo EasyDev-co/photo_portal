@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -17,21 +18,37 @@ from apps.photo.models import Photo, PhotoLine
 
 from loguru import logger
 
+User = get_user_model()
 
 class DiscountMixin:
 
     @staticmethod
-    def apply_kindergarten_manager_bonus(total_price, user, cart):
-        manager_discount = user.manager_discount_balance
-        if total_price > 0 and manager_discount > 0:
-            if total_price <= manager_discount:
-                total_price = Decimal(1)
-                cart.order_fully_paid_by_coupon = True
-            else:
-                total_price -= manager_discount
-                cart.order_fully_paid_by_coupon = False
-        return total_price
+    def apply_kindergarten_manager_bonus(price, bonus, cart, user, quantity):
+        """
+        Применяет бонус менеджера к цене заказа и возвращает обновленную цену.
 
+        Если цена и бонус положительные:
+          - Если цена больше или равна бонусу, то заказ считается полностью оплаченным купоном
+            и возвращается (price - bonus).
+          - Если бонус больше цены, то заказ не считается полностью оплаченным купоном
+            и возвращается 0.
+        Если цена или бонус не положительные, возвращается исходная цена.
+        """
+        if price <= 0 or bonus <= 0:
+            return price
+
+        if price >= bonus:
+            cart.order_fully_paid_by_coupon = True
+            new_price = price - bonus
+            user.manager_discount_balance = 0
+        else:
+            cart.order_fully_paid_by_coupon = False
+            new_price = 0
+            user.manager_discount_balance -= price * quantity
+
+        user.save()
+        cart.save()
+        return new_price
 
     @staticmethod
     def get_promo_code(user, user_role, promo_code_data):
@@ -71,6 +88,11 @@ class CartV2APIView(APIView, DiscountMixin):
         request_data = request.data
         user = request.user
         user_role = request.user.role
+
+        if user_role == UserRole.manager and not user.manager_discount_balance_empty:
+            if user.manager_discount_balance > 0:
+                user.manager_discount_balance = user.manager_discount_intermediate_balance
+                user.save()
 
         logger.info(f"request data: {request.data}")
 
@@ -313,12 +335,25 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if not price_per_piece:
                 continue
+            logger.info(f"user_role: {user_role}")
+            if user_role == UserRole.manager:
+                manager_bonus = User.objects.get(id=user.id).manager_discount_balance
+                logger.info(f"in if manager_bonus: {manager_bonus}")
+            else:
+                manager_bonus = None
 
             if quantity > 0:
                 discount_price = self.appy_discount(
                     promo_code=promo_code,
                     price_per_piece=price_per_piece
                 )
+                if manager_bonus:
+                    logger.info(f"apply_manager_bonus")
+                    logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
+                    discount_price = self.apply_kindergarten_manager_bonus(discount_price, manager_bonus, cart, user, quantity)
+                    logger.info(f"discount_price_with_apply_manager_bonus: {discount_price}")
+                    logger.info(f"manager_bonus_after: {manager_bonus}--------------------------------------------------")
+
                 total_price += discount_price * quantity
                 original_price += discount_price * quantity
 
@@ -344,7 +379,14 @@ class CartV2APIView(APIView, DiscountMixin):
                 ).delete()
 
         if user_role == UserRole.manager:
-            total_price = self.apply_kindergarten_manager_bonus(total_price, user, cart)
+            manager_bonus = User.objects.get(id=user.id).manager_discount_balance
+            logger.info(f"in if manager_bonus_2: {manager_bonus}")
+        else:
+            manager_bonus = None
+
+        if manager_bonus:
+            if total_price <= 0 < manager_bonus and user_role == UserRole.manager:
+                total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
@@ -404,14 +446,11 @@ class CartV2APIView(APIView, DiscountMixin):
         if user_role == UserRole.parent:
             user_kindergarten = user.kindergarten.filter(id=kindergarten_id).exists()
         elif user_role == UserRole.manager:
-            user_kindergarten = user.managed_kindergarten.filter(id=kindergarten_id).exists()
+            user_kindergarten = user.managed_kindergarten
         else:
             user_kindergarten = False
 
         if not user_kindergarten:
-            return None
-
-        if not user.kindergarten.filter(id=kindergarten_id).exists():
             return None
 
         return kindergarten

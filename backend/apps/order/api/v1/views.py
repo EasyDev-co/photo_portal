@@ -29,6 +29,7 @@ from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine, PhotoTheme
+from apps.user.models import UserRole
 from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
@@ -190,6 +191,7 @@ class OrderAPIView(APIView):
                     amount=photo_in_cart.quantity,
                     order=order,
                     photo=photo_in_cart.photo,
+                    price=photo_in_cart.discount_price,
                 )
                 for photo_in_cart in photos_in_cart
             )
@@ -246,14 +248,14 @@ class OrderAPIView(APIView):
                 continue
 
             # 3) Иначе – обычный расчёт цены
-            calculate_price_for_order_item(
-                order_item=order_item,
-                prices_dict=prices_dict,
-                ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
-                promocode=cart.promocode,
-                coupon_amount=coupon_amount,
-                user_role=user.role
-            )
+            # calculate_price_for_order_item(
+            #     order_item=order_item,
+            #     prices_dict=prices_dict,
+            #     ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
+            #     promocode=cart.promocode,
+            #     coupon_amount=coupon_amount,
+            #     user_role=user.role
+            # )
 
         # Важно: если всё было оплачено купоном, вы где-то ставите price=1 на самый первый OrderItem
         # (чтобы сумма не была = 0; по логике вашей платёжной системы).
@@ -322,9 +324,8 @@ class PaymentAPIView(APIView):
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
-        total_price = 0
-        for item in order_items:
-            total_price += item.price
+
+        logger.info(f"payment_data: {payment_data}")
 
         payment_data['Token'] = token
         response = requests.post(
@@ -341,8 +342,15 @@ class PaymentAPIView(APIView):
 
                 # обновляем баланс бонусного купона, после его использования
                 total_original_price = sum(order.original_price for order in orders.all())
-                user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
-                user.save()
+                # user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
+                if request.user.role == UserRole.manager:
+                    discount_balance = user.manager_discount_balance
+                    if discount_balance <= 0:
+                        user.manager_discount_intermediate_balance = 0
+                        user.manager_discount_balance_empty = True
+                    else:
+                        user.manager_discount_intermediate_balance = user.manager_discount_balance
+                    user.save()
 
                 return Response(payment_url, status=status.HTTP_200_OK)
             return Response(
