@@ -326,6 +326,7 @@ class CartV2APIView(APIView, DiscountMixin):
                     user,
                     1,
                 )
+            cart_photo_line.photo_book_price = discount_price_photo_book
 
             total_price += discount_price_photo_book
             original_price += discount_price_photo_book
@@ -343,6 +344,7 @@ class CartV2APIView(APIView, DiscountMixin):
                     user,
                     1,
                 )
+            cart_photo_line.digital_price = discount_price_digital_photo
 
             total_price += discount_price_digital_photo
             original_price += discount_price_digital_photo

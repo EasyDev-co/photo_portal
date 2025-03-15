@@ -203,7 +203,7 @@ class OrderAPIView(APIView):
                         photo_type=PhotoType.digital,
                         amount=1,  # обычно 1 позиция
                         order=order,
-                        price=prices_dict.get(PhotoType.digital.value),
+                        price=cart_photo_line.digital_price,
                     )
                 )
 
@@ -214,7 +214,7 @@ class OrderAPIView(APIView):
                         photo_type=PhotoType.photobook,
                         amount=1,
                         order=order,
-                        price=prices_dict.get(PhotoType.photobook.value),
+                        price=cart_photo_line.photo_book_price,
                     )
                 )
 
