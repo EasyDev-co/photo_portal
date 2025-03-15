@@ -111,11 +111,20 @@ class OrderAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        photo_lines_queryset = PhotoLine.objects.filter(
-            kindergarten__in=user.kindergarten.all(),
-            parent=user,
-            orders__status=OrderStatus.paid_for
-        ).annotate(
+        if user.role == UserRole.manager:
+            photo_lines_kd_queryset = PhotoLine.objects.filter(
+                kindergarten=user.managed_kindergarten,
+                parent=user,
+                orders__status=OrderStatus.paid_for
+            )
+        else:
+            photo_lines_kd_queryset = PhotoLine.objects.filter(
+                kindergarten__in=user.kindergarten.all(),
+                parent=user,
+                orders__status=OrderStatus.paid_for
+            )
+
+        photo_lines_queryset = photo_lines_kd_queryset.annotate(
             is_digital=F('orders__is_digital'),
             is_free_digital=F('orders__is_free_digital'),
         ).order_by('id', 'photo_theme__date_end')
