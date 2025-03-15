@@ -9,6 +9,7 @@ import { use } from 'react';
 
 const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
   const cart = useSelector(state => state.user.cart);
+  // const photoPrice = useSelector(state => state.photoPrice);
   const allPrice = useSelector(state => state.user.total_price);
   const photoPrice = useSelector(state => state.user.photoPrice);
   const [currentSum, setCurrentSum] = useState(0);
@@ -22,6 +23,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const [ransomDigitalPhotos, setRansomDigitalPhotos] = useState(0)
   const [ransomCalendar, setRansomCalendar] = useState(0)
   const [isLoading, setIsLoading] = useState(true); // Новое состояние для лоадера
+  
+  const roleHasPhotobook = userData?.role === 1 ? userData?.kindergarten?.[0]?.has_photobook : userData?.managed_kindergarten?.has_photobook
 
   // useEffect(() => {
   //   console.log(allPrice)}, [allPrice])
@@ -29,6 +32,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     if (!priceCalendar) {
       // console.error('priceCalendar is not provided');
       setIsLoading(true)
+      console.log(userData)
     } else {
       // console.log('priceCalendar:', priceCalendar);
       setIsLoading(false)
@@ -37,9 +41,11 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     if (!ransomDigitalPhotos) {
       // console.error('ransomDigitalPhotos is not provided');
       setIsLoading(true)
+      console.log(userData)
     } else {
       // console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
       setIsLoading(false)
+      console.log(userData)
     }
   }, [priceCalendar, ransomDigitalPhotos]);
 
@@ -87,6 +93,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const prevCheckedState = useRef(isDigitalChecked);
   useEffect(() => {
     console.log('prevCheckedState:', prevCheckedState)
+    console.log('has_photobook:', roleHasPhotobook);
+    console.log('photoPrice:', photoPrice);
   }, [prevCheckedState])
 //Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
 // и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
@@ -161,6 +169,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     return <h1>Загрузка...</h1>; // Компонент лоадера
   }
 
+  // console.log('has_photobook:', userData.kindergarten?.[0]?.has_photobook)
+  // useEffect(() => {
+  //   console.log('has_photobook:', userData.kindergarten?.[0]?.has_photobook)
+  // }, [isGalkaPhoto])
   return (
     <div style={{
       display: 'flex',
@@ -184,7 +196,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
             {index === 5 &&
               <div className={styles.widgetDelete}>
                 <div className={styles.checkboxInputWrap}>
-                  {userData.kindergarten?.[0]?.has_photobook && (
+                  {roleHasPhotobook && (
                     <div className={styles.bookCheckbox}>
                       <div className={styles.bookDescr}>Фотокнига</div>
                       <label className={styles.custom_checkbox}>
