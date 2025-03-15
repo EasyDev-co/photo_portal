@@ -106,6 +106,9 @@ class UserAdmin(BaseUserAdmin):
                              'phone_number',
                              'is_verified',
                              'managed_kindergarten',
+                             "manager_discount_balance",
+                             "manager_discount_intermediate_balance",
+                             "manager_discount_balance_empty",
                              'un_hashed_password'
                          )}),
                         (_("Important dates"),

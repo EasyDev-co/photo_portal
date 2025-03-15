@@ -42,7 +42,12 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, 
     }
 
     const onSubmitHandler = async (e) => {
-        const arr = inputValue.addKids.split(/[-,\sи]+/).map(Number);
+        const arr = inputValue.addKids.
+        split(/[и\s\-.;,]+|jpg|jpeg/i).map(Number)
+        .filter(Boolean)
+        .map(Number)
+        .filter(num => !isNaN(num));
+        
         e.preventDefault();
         const regex = /^(\d+|(\d+(([-,\s]| и? )\d+){5}))$/;
         // Проверяем соответствие значения регулярному выражению

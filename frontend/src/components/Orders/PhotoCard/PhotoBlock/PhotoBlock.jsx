@@ -9,6 +9,7 @@ import { use } from 'react';
 
 const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
   const cart = useSelector(state => state.user.cart);
+  // const photoPrice = useSelector(state => state.photoPrice);
   const allPrice = useSelector(state => state.user.total_price);
   const photoPrice = useSelector(state => state.user.photoPrice);
   const [currentSum, setCurrentSum] = useState(0);
@@ -22,27 +23,29 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const [ransomDigitalPhotos, setRansomDigitalPhotos] = useState(0)
   const [ransomCalendar, setRansomCalendar] = useState(0)
   const [isLoading, setIsLoading] = useState(true); // Новое состояние для лоадера
-
-  useEffect(() => {
-    console.log(isDigitalChecked)}, [isDigitalChecked, setIsDigitalChecked])
+  
+  const roleHasPhotobook = userData?.role === 1 ? userData?.kindergarten?.[0]?.has_photobook : userData?.managed_kindergarten?.has_photobook
 
   // useEffect(() => {
   //   console.log(allPrice)}, [allPrice])
   useEffect(() => {
     if (!priceCalendar) {
-      console.error('priceCalendar is not provided');
+      // console.error('priceCalendar is not provided');
       setIsLoading(true)
+      console.log(userData)
     } else {
-      console.log('priceCalendar:', priceCalendar);
+      // console.log('priceCalendar:', priceCalendar);
       setIsLoading(false)
     }
   
     if (!ransomDigitalPhotos) {
-      console.error('ransomDigitalPhotos is not provided');
+      // console.error('ransomDigitalPhotos is not provided');
       setIsLoading(true)
+      console.log(userData)
     } else {
-      console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
+      // console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
       setIsLoading(false)
+      console.log(userData)
     }
   }, [priceCalendar, ransomDigitalPhotos]);
 
@@ -90,6 +93,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const prevCheckedState = useRef(isDigitalChecked);
   useEffect(() => {
     console.log('prevCheckedState:', prevCheckedState)
+    console.log('has_photobook:', roleHasPhotobook);
+    console.log('photoPrice:', photoPrice);
   }, [prevCheckedState])
 //Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
 // и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
@@ -99,29 +104,36 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     //   return; // Прекращаем выполнение, если данные не загружены
     // }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
-    // console.log(cartItem)
   
-    // if (cartItem) {
-      // setCurrentSum(cartItem.total_price);
-  
-    const shouldActivateCheckbox =
-        (ransomDigitalPhotos !== undefined &&
-            ransomDigitalPhotos !== null &&
-            ransomDigitalPhotos !== '') &&
-        (allPrice >= ransomDigitalPhotos);
+    if (!cartItem?.is_free_digitals && allPrice >= 25) {
+      setCurrentSum(allPrice - 25);
+    }
+    else {
+      setCurrentSum(allPrice);
+    }
+    console.log('is_free_digitals', cartItem?.is_free_digital)
+    console.log('currentSum', currentSum)
 
-    // Аналогично для ransomCalendar
-    const shouldActivateCheckboxCalendar =
-        (ransomCalendar !== undefined &&
-            ransomCalendar !== null &&
-            ransomCalendar !== '') &&
-        (allPrice >= ransomCalendar);
+  
+      const shouldActivateCheckbox =
+    ransomDigitalPhotos !== undefined &&
+    ransomDigitalPhotos !== null &&
+    ransomDigitalPhotos !== '' &&
+    ransomDigitalPhotos !== 0 &&
+    // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)
+    allPrice >= ransomDigitalPhotos;
+
+  const shouldActivateCheckboxCalendar =
+    ransomCalendar !== undefined &&
+    ransomCalendar !== null &&
+    ransomCalendar !== '' &&
+    ransomCalendar !== 0 &&
+    // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_calendar)
+    allPrice >= ransomCalendar;
+
+
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
-
-      if (allPrice) {
-        console.log(allPrice >= ransomDigitalPhotos)
-      }
 
       // Если состояние изменилось, вызываем обновление
       if (shouldActivateCheckbox !== prevCheckedState.current && !manualControl) {
@@ -133,14 +145,13 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // }
     // else console.log('hui:', currentLineId)
   }, [
-    // allPrice, ransomDigitalPhotos, handleCheckboxChange
     allPrice, ransomDigitalPhotos, ransomCalendar, handleCheckboxChange, manualControl, cart, currentLineId
 ]);
 
   // Обработчик изменения чекбокса
   const handleDigitalCheckboxChange = (e, photoLineId) => {
     const { checked } = e.target;
-  
+    const cartItem = cart.find(item => item.photo_line_id === photoLineId);
     // Флаг ручного управления включается только при ручных действиях
     setManualControl(true);
     setIsDigitalChecked(checked);
@@ -148,6 +159,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   
     // Сбрасываем ручное управление, если сумма достигает порога
     if (!checked && allPrice >= ransomDigitalPhotos) {
+      // if (!checked && (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)) {
       setManualControl(false);
     }
   };
@@ -179,7 +191,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
             {index === 5 &&
               <div className={styles.widgetDelete}>
                 <div className={styles.checkboxInputWrap}>
-                  {userData.kindergarten?.[0]?.has_photobook && (
+                  {roleHasPhotobook && (
                     <div className={styles.bookCheckbox}>
                       <div className={styles.bookDescr}>Фотокнига</div>
                       <label className={styles.custom_checkbox}>

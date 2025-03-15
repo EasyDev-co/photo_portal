@@ -12,6 +12,10 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
     const accessStor = localStorage.getItem('access');
     const country = localStorage.getItem('regionName');
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        console.log('country', country)
+    }, [])
     
     useEffect(() => {
         fetchPhotoPriceWithTokenInterceptor(accessStor, country)
