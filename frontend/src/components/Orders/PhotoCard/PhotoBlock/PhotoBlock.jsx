@@ -104,16 +104,23 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     //   return; // Прекращаем выполнение, если данные не загружены
     // }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
-    // console.log(cartItem)
   
-    // if (cartItem) {
-      // setCurrentSum(cartItem.total_price);
+    if (!cartItem?.is_free_digitals && allPrice >= 25) {
+      setCurrentSum(allPrice - 25);
+    }
+    else {
+      setCurrentSum(allPrice);
+    }
+    console.log('is_free_digitals', cartItem?.is_free_digital)
+    console.log('currentSum', currentSum)
+
   
       const shouldActivateCheckbox =
     ransomDigitalPhotos !== undefined &&
     ransomDigitalPhotos !== null &&
     ransomDigitalPhotos !== '' &&
     ransomDigitalPhotos !== 0 &&
+    // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)
     allPrice >= ransomDigitalPhotos;
 
   const shouldActivateCheckboxCalendar =
@@ -121,20 +128,12 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     ransomCalendar !== null &&
     ransomCalendar !== '' &&
     ransomCalendar !== 0 &&
+    // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_calendar)
     allPrice >= ransomCalendar;
-    // const shouldActivateCheckbox = allPrice >= ransomDigitalPhotos;
-    //   const shouldActivateCheckboxCalendar = allPrice >= ransomCalendar;
 
 
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
-
-      // console.log("all_price", allPrice)
-      // console.log("ransomDigitalPhotos", ransomDigitalPhotos)
-
-      // if (allPrice) {
-      //   console.log("check", allPrice >= ransomDigitalPhotos)
-      // }
 
       // Если состояние изменилось, вызываем обновление
       if (shouldActivateCheckbox !== prevCheckedState.current && !manualControl) {
@@ -146,14 +145,13 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // }
     // else console.log('hui:', currentLineId)
   }, [
-    // allPrice, ransomDigitalPhotos, handleCheckboxChange
     allPrice, ransomDigitalPhotos, ransomCalendar, handleCheckboxChange, manualControl, cart, currentLineId
 ]);
 
   // Обработчик изменения чекбокса
   const handleDigitalCheckboxChange = (e, photoLineId) => {
     const { checked } = e.target;
-  
+    const cartItem = cart.find(item => item.photo_line_id === photoLineId);
     // Флаг ручного управления включается только при ручных действиях
     setManualControl(true);
     setIsDigitalChecked(checked);
@@ -161,6 +159,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   
     // Сбрасываем ручное управление, если сумма достигает порога
     if (!checked && allPrice >= ransomDigitalPhotos) {
+      // if (!checked && (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)) {
       setManualControl(false);
     }
   };
@@ -169,10 +168,6 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     return <h1>Загрузка...</h1>; // Компонент лоадера
   }
 
-  // console.log('has_photobook:', userData.kindergarten?.[0]?.has_photobook)
-  // useEffect(() => {
-  //   console.log('has_photobook:', userData.kindergarten?.[0]?.has_photobook)
-  // }, [isGalkaPhoto])
   return (
     <div style={{
       display: 'flex',
