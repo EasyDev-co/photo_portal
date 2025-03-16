@@ -228,7 +228,10 @@ class CartV2APIView(APIView, DiscountMixin):
                 logger.info(f"all_price_without_digital_pirce: {all_prices - digital_price}")
                 logger.info(f"test: {all_prices - digital_price >= threshold_value}")
 
-                if threshold_value and all_prices - digital_price >= threshold_value:
+                if cart_photo_line.is_digital:
+                    all_prices -= digital_price
+
+                if threshold_value and all_prices >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
                     cart_photo_line.is_free_digital = True
 
@@ -245,7 +248,7 @@ class CartV2APIView(APIView, DiscountMixin):
                         new_total_price = cart_photo_line.total_price - digital_price
                         cart_photo_line.total_price = new_total_price
 
-                        all_prices -= digital_price
+                        # all_prices -= digital_price
 
                     logger.info(
                         f"AFTER IF: child_num: {child_num}"
