@@ -51,7 +51,7 @@ class CartPhotoLineV2Serializer(serializers.Serializer):
     is_free_digital = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     child_number = serializers.IntegerField(required=False, allow_null=True)
-    all_price = serializers.SerializerMethodField()  # Новое поле
+    all_price = serializers.IntegerField(required=False, allow_null=True)  # Новое поле
 
     @staticmethod
     def get_photos(obj):
