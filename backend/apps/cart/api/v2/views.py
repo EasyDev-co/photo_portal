@@ -252,6 +252,7 @@ class CartV2APIView(APIView, DiscountMixin):
                         f" total_price: {cart_photo_line.total_price}"
                         f" threshold_value: {threshold_value}"
                     )
+                    logger.info(f"all_price_after: {all_prices}")
 
             # Проверяем «календарь»
             if calendar_key:
@@ -265,7 +266,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
         # Возвращаем сериализованные данные
         return Response(
-            CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data,
+            CartPhotoLineV2Serializer(cart_photo_lines_list, many=True, context={"all_price": all_prices}).data,
             status=status.HTTP_200_OK
         )
 
