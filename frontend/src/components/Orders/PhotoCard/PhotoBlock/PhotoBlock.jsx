@@ -12,7 +12,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   // const photoPrice = useSelector(state => state.photoPrice);
   const allPrice = useSelector(state => state.user.total_price);
   const photoPrice = useSelector(state => state.user.photoPrice);
-  const [currentSum, setCurrentSum] = useState(0);
+  const currentSum = cart.length > 0 ? cart[cart.length - 1].all_price : null;
+  // const [currentSum, setCurrentSum] = useState(0);
   const [isDigitalChecked, setIsDigitalChecked] = useState(false);
   const currentLineId = photos[0].photoLineId
   const [manualControl, setManualControl] = useState(false); // Новый флаг для ручного управления
@@ -91,28 +92,31 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
 
 
   const prevCheckedState = useRef(isDigitalChecked);
+  // useEffect(() => {
+  //   console.log('prevCheckedState:', prevCheckedState)
+  //   console.log('has_photobook:', roleHasPhotobook);
+  //   console.log('photoPrice:', photoPrice);
+  // }, [prevCheckedState])
+//Из-за того что стоит if (cartItem) мы не затрагиваем нется бесконечный рендер
   useEffect(() => {
-    console.log('prevCheckedState:', prevCheckedState)
-    console.log('has_photobook:', roleHasPhotobook);
-    console.log('photoPrice:', photoPrice);
-  }, [prevCheckedState])
-//Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
-// и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
-  useEffect(() => {
-    // if (ransomDigitalPhotos === 0 || ransomCalendar === 0) {
+    // if (ransomDigitalPhotos === 0 || ransomCalendar ==второго и третьего ребенка, 
+// и на них не ставятся галочки, если if убрать, ьто нач= 0) {
     //   console.log('ransomDigitalPhotos or ransomCalendar not loaded yet');
     //   return; // Прекращаем выполнение, если данные не загружены
     // }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
+
+    // console.log('allPrice', allPrice)
+    // console.log('условие', !cartItem?.is_free_digitals && allPrice >= 25)
   
-    if (!cartItem?.is_free_digitals && allPrice >= 25) {
-      setCurrentSum(allPrice - 25);
-    }
-    else {
-      setCurrentSum(allPrice);
-    }
-    console.log('is_free_digitals', cartItem?.is_free_digital)
-    console.log('currentSum', currentSum)
+    // if (cartItem?.is_free_digitals == false && allPrice > 25) {
+    //   setCurrentSum(allPrice - 25);
+    // }
+    // else {
+    //   setCurrentSum(allPrice);
+    // }
+    // console.log('is_free_digitals', cartItem?.is_free_digital)
+    // console.log('currentSum', currentSum)
 
   
       const shouldActivateCheckbox =
@@ -121,7 +125,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     ransomDigitalPhotos !== '' &&
     ransomDigitalPhotos !== 0 &&
     // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)
-    allPrice >= ransomDigitalPhotos;
+    currentSum >= ransomDigitalPhotos;
 
   const shouldActivateCheckboxCalendar =
     ransomCalendar !== undefined &&
@@ -129,7 +133,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     ransomCalendar !== '' &&
     ransomCalendar !== 0 &&
     // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_calendar)
-    allPrice >= ransomCalendar;
+    currentSum >= ransomCalendar;
 
 
       setIsGalkaPhoto(shouldActivateCheckbox)
@@ -147,18 +151,24 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   }, [
     allPrice, ransomDigitalPhotos, ransomCalendar, handleCheckboxChange, manualControl, cart, currentLineId
 ]);
-
+// useEffect(() => {
+//   console.log('manualControl', manualControl);
+//   // Здесь можно выполнить дополнительные действия, которые зависят от manualControl
+// }, [manualControl, currentLineId]);
   // Обработчик изменения чекбокса
   const handleDigitalCheckboxChange = (e, photoLineId) => {
     const { checked } = e.target;
+    console.log('checked manual in pb', checked)
     const cartItem = cart.find(item => item.photo_line_id === photoLineId);
     // Флаг ручного управления включается только при ручных действиях
     setManualControl(true);
     setIsDigitalChecked(checked);
-    handleCheckboxChange(e, photoLineId);
+    console.log('manualControl', manualControl)
   
+    handleCheckboxChange(e, photoLineId);
+
     // Сбрасываем ручное управление, если сумма достигает порога
-    if (!checked && allPrice >= ransomDigitalPhotos) {
+    if (!checked && currentSum >= ransomDigitalPhotos) {
       // if (!checked && (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)) {
       setManualControl(false);
     }
