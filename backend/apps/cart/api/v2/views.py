@@ -231,6 +231,8 @@ class CartV2APIView(APIView, DiscountMixin):
                 if cart_photo_line.is_digital:
                     all_prices -= digital_price
 
+                cart_photo_line.all_price = all_prices
+
                 if threshold_value and all_prices >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
                     cart_photo_line.is_free_digital = True
@@ -269,7 +271,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
         # Возвращаем сериализованные данные
         return Response(
-            CartPhotoLineV2Serializer(cart_photo_lines_list, many=True, context={"all_price": all_prices}).data,
+            CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data,
             status=status.HTTP_200_OK
         )
 

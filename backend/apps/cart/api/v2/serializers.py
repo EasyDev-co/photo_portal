@@ -59,10 +59,6 @@ class CartPhotoLineV2Serializer(serializers.Serializer):
         serializer = PhotoInCartSerializer(photos_in_cart, many=True)
         return serializer.data
 
-    def get_all_price(self, obj):
-        # Предполагаем, что значение передаётся через context
-        return self.context.get('all_price')
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         photo_line_id = str(instance.photo_line_id) if instance.photo_line_id else None
