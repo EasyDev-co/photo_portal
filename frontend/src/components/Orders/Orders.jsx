@@ -278,7 +278,7 @@ useEffect(() => {
         if (response.ok) {
           console.log('пост запрос случился')
           const data = await response.json();
-          // console.log('Корзина обновлена:', data);
+          console.log('Корзина обновлена:', data);
           dispatch(setCart(data));
           console.log('orderValue', orderValue)
           localStorage.setItem('cart', JSON.stringify(data));
@@ -401,6 +401,8 @@ useEffect(() => {
           is_photobook: name == 6 ? checked : false,
           is_digital: name == 7 ? checked : false
         };
+        setHasChanges(true);
+        console.log('newItem', newItem)
         // setHasChanges(true);
         return [...prev, newItem];
       }
