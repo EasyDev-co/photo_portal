@@ -225,11 +225,8 @@ class CartV2APIView(APIView, DiscountMixin):
                     f"BEFORE IF: child_num: {child_num} total_price:"
                     f" {cart_photo_line.total_price} threshold_value: {threshold_value}"
                 )
-
-
                 logger.info(f"all_price_without_digital_pirce: {all_prices - digital_price}")
                 logger.info(f"test: {all_prices - digital_price >= threshold_value}")
-
 
                 if threshold_value and all_prices - digital_price >= threshold_value:
                     # Значит, для этого ребёнка цифровые фото бесплатны
@@ -243,12 +240,18 @@ class CartV2APIView(APIView, DiscountMixin):
                         digital_price = self.appy_discount(promo_code, digital_price)
 
                     if cart_photo_line.total_price > 0 and cart_photo_line.is_digital:
+                        cart_photo_line.digital_price = 0
+
                         new_total_price = cart_photo_line.total_price - digital_price
                         cart_photo_line.total_price = new_total_price
 
                         all_prices -= digital_price
 
-                    logger.info(f"AFTER IF: child_num: {child_num} total_price: {cart_photo_line.total_price} threshold_value: {threshold_value}")
+                    logger.info(
+                        f"AFTER IF: child_num: {child_num}"
+                        f" total_price: {cart_photo_line.total_price}"
+                        f" threshold_value: {threshold_value}"
+                    )
 
             # Проверяем «календарь»
             if calendar_key:
@@ -420,18 +423,6 @@ class CartV2APIView(APIView, DiscountMixin):
                     pic.quantity = quantity
                     pic.price_per_piece = price_per_piece
                     pic.save()
-
-        # if user_role == UserRole.manager:
-        #     manager_bonus = User.objects.get(id=user.id).manager_discount_balance
-        #     logger.info(f"in if manager_bonus_2: {manager_bonus}")
-        # else:
-        #     manager_bonus = None
-        #
-        # logger.info(f"item_count: {item_count}")
-        #
-        # if manager_bonus:
-        #     if total_price <= 0 < item_count and user_role == UserRole.manager:
-        #         total_price = Decimal(1)
 
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price

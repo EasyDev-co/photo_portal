@@ -242,7 +242,7 @@ class OrderAPIView(APIView):
             if order.is_free_digital:
                 order_items.append(
                     OrderItem(
-                        photo_type=PhotoType.photobook,
+                        photo_type=PhotoType.digital,
                         amount=1,
                         photo=None,
                         order=order,
