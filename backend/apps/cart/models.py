@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from apps.promocode.models import Promocode
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
-
 from apps.photo.models import Photo, PhotoLine
 from apps.kindergarten.models import PhotoType, Kindergarten
 
@@ -61,16 +60,22 @@ class CartPhotoLine(UUIDMixin):
         default=False,
         verbose_name='Бесплатные электронные фотографии'
     )
-    digital_price = models.IntegerField(
+    digital_price = models.DecimalField(
         default=0,
+        max_digits=10,
+        decimal_places=2,
         verbose_name="Цена за эл. фото",
     )
-    all_price = models.IntegerField(
+    all_price = models.DecimalField(
         default=0,
+        max_digits=10,
+        decimal_places=2,
         verbose_name="Цена с пересчетом id_digital"
     )
-    photo_book_price = models.IntegerField(
+    photo_book_price = models.DecimalField(
         default=0,
+        max_digits=10,
+        decimal_places=2,
         verbose_name="Цена за фото книгу"
     )
     total_price = models.DecimalField(
