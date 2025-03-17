@@ -61,15 +61,15 @@ class CartPhotoLine(UUIDMixin):
         default=False,
         verbose_name='Бесплатные электронные фотографии'
     )
-    digital_price = models.PositiveIntegerField(
+    digital_price = models.IntegerField(
         default=0,
         verbose_name="Цена за эл. фото",
     )
-    all_price = models.PositiveIntegerField(
+    all_price = models.IntegerField(
         default=0,
         verbose_name="Цена с пересчетом id_digital"
     )
-    photo_book_price = models.PositiveIntegerField(
+    photo_book_price = models.IntegerField(
         default=0,
         verbose_name="Цена за фото книгу"
     )
