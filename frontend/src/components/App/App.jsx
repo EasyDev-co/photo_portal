@@ -42,9 +42,9 @@ export const App = () => {
     if (!isAuth && location.pathname.startsWith('/crm') && location.pathname !== '/crm/sign-in') {
       navigate('/crm/sign-in');
     }
-    if (!isAuth && !location.pathname.startsWith('/crm') && location.pathname !== '/sign-in') {
-      navigate('/sign-in');
-    }
+    // if (!isAuth && !location.pathname.startsWith('/crm') && location.pathname !== '/sign-in') {
+    //   navigate('/sign-in');
+    // }
   }, [isAuth, location.pathname, navigate]);
 
   const CRMProtectedRoute = ({ children }) => {
