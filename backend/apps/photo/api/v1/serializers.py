@@ -140,10 +140,11 @@ class PhotoLineSerializer(serializers.ModelSerializer):
             photo_theme__kindergartenphototheme__is_active=True
         ).order_by('id')
 
-        line_ids = list(all_lines.values_list('id', flat=True))
+        if not all_lines.filter(id=obj.id).exists():
+            return 1
 
-        index = line_ids.index(obj.id) + 1
-        return index
+        line_ids = list(all_lines.values_list('id', flat=True))
+        return line_ids.index(obj.id) + 1
 
 
 class PaidPhotoLineSerializer(serializers.ModelSerializer):

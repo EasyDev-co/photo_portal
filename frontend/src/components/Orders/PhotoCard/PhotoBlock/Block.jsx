@@ -11,9 +11,16 @@ const Block = ({ setlineLenght, addPhoto, price, priceCalendar, orderValue, setO
   const dispatch = useDispatch();
   const accessStor = localStorage.getItem('access');
 
+
+
   useEffect(() => {
     setlineLenght(photoBlocks.length)
   }, [photoBlocks])
+
+  // useEffect(() => {
+  //   console.log('photoBlocks', photoBlocks)
+  //   console.log('orderValue', orderValue)
+  // }, [photoBlocks, orderValue])
 
   useEffect(() => {
     if (addPhoto && addPhoto.length > 0) {
@@ -45,6 +52,7 @@ const Block = ({ setlineLenght, addPhoto, price, priceCalendar, orderValue, setO
     <div className={styles.block}>
       {photoBlocks?.map((block, index) => (
         <PhotoBlock
+          childNumber={index+1}
           price={price}
           priceCalendar={priceCalendar}
           blocksId={index}

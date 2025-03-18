@@ -34,7 +34,7 @@ class OrderAdmin(admin.ModelAdmin):
         'payment_id',
         'order_price',
         'user',
-        'kindergarten',
+        # 'kindergarten',
         'photo_line',
         'status',
         'is_digital',
@@ -61,8 +61,10 @@ class OrderAdmin(admin.ModelAdmin):
         OrderItemInline
     ]
 
-    def kindergarten(self, instance):
-        return instance.photo_line.kindergarten
+    # def kindergarten(self, instance):
+    #     if instance.kindergarten:
+    #         return instance.photo_line.kindergarten
+    #     return "Нет детского сада"
 
 if settings.SHOW_IN_ADMIN:
     @admin.register(OrderItem)

@@ -4,11 +4,8 @@ from django.contrib.auth import get_user_model
 from apps.promocode.models import Promocode
 from apps.utils.models_mixins.models_mixins import UUIDMixin, TimeStampedMixin
 
-
 from apps.photo.models import Photo, PhotoLine
-
-from apps.photo.models import Photo
-from apps.kindergarten.models import PhotoType
+from apps.kindergarten.models import PhotoType, Kindergarten
 
 User = get_user_model()
 
@@ -31,6 +28,22 @@ class CartPhotoLine(UUIDMixin):
         null=True,
         blank=True,
     )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_cart_photo_lines',
+        verbose_name="Пользователь",
+        null=True,
+        blank=True,
+    )
+    kindergarten = models.ForeignKey(
+        Kindergarten,
+        verbose_name="Детский сад",
+        on_delete=models.CASCADE,
+        related_name='kindergarten_cart_photo_lines',
+        null=True,
+        blank=True,
+    )
     is_digital = models.BooleanField(
         default=False,
         verbose_name='Электронные фотографии',
@@ -46,6 +59,24 @@ class CartPhotoLine(UUIDMixin):
     is_free_digital = models.BooleanField(
         default=False,
         verbose_name='Бесплатные электронные фотографии'
+    )
+    digital_price = models.DecimalField(
+        default=0,
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена за эл. фото",
+    )
+    all_price = models.DecimalField(
+        default=0,
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена с пересчетом id_digital"
+    )
+    photo_book_price = models.DecimalField(
+        default=0,
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена за фото книгу"
     )
     total_price = models.DecimalField(
         max_digits=10,

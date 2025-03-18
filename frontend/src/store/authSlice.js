@@ -67,7 +67,6 @@ const authSlice = createSlice({
             state.email = null;
             localStorage.clear();
             window.location.reload();
-
         },
         setPhotoNumbers(state, action){
             state.photoNumbers = action.payload
@@ -121,8 +120,9 @@ const authSlice = createSlice({
             localStorage.setItem('phone', action.payload.phone_number === null ? '' : action.payload.phone_number);
 
             if (action.payload.managed_kindergarten) {
-                localStorage.setItem('theme_id', action.payload.managed_kindergarten.active_photo_theme.id);
+                localStorage.setItem('theme_id', action.payload.managed_kindergarten.active_photo_theme === null ? 'Нет активной фототемы' : action.payload.managed_kindergarten.active_photo_theme.id );
                 localStorage.setItem('kindergarten_id', action.payload.managed_kindergarten.id === null ? '' : action.payload.managed_kindergarten.id);
+                localStorage.setItem('regionName', action.payload.managed_kindergarten.region.name === null ? '' : action.payload.managed_kindergarten.region.name);
             }
 
             action.payload.kindergarten.forEach(elem => {
@@ -171,6 +171,10 @@ const authSlice = createSlice({
         //     })
         // },
         setCart(state, action) {
+            if (localStorage.getItem('cart') === null) {
+                // не сохранять данные, если localStorage уже очищен
+                return;
+            }
             state.cart = action.payload;
             state.total_price = action.payload.reduce((sum, elem) => {
                 return sum + parseFloat(elem.total_price);
