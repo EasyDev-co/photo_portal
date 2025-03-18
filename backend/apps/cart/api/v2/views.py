@@ -59,14 +59,21 @@ class DiscountMixin:
         return None
 
     @staticmethod
-    def appy_discount(promo_code, price_per_piece):
+    def appy_discount(user, promo_code, price_per_piece):
         discount_price = price_per_piece
         if promo_code and promo_code.discount_services:
             discount_price = promo_code.apply_discount(
                 price=price_per_piece
             )
+            # TODO прописать логику пересчета попыток применения
+            #  и возвращать ошибку, если не получилось применить промокод
+            user.use_manager_coupon = True
+            user.save()
         return discount_price
 
+    @staticmethod
+    def apply_manager_discount(price_per_piece):
+        return price_per_piece / 2
 
 class CartV2APIView(APIView, DiscountMixin):
     """
@@ -241,8 +248,10 @@ class CartV2APIView(APIView, DiscountMixin):
 
                     # Нужно вычесть стоимость цифры из total_price
                     # Если есть промокод, учитываем скидку (как в вашем коде)
-                    if promo_code:
-                        digital_price = self.appy_discount(promo_code, digital_price)
+                    if promo_code and user_role != UserRole.manager:
+                        digital_price = self.appy_discount(user, promo_code, digital_price)
+                    elif user_role == UserRole.manager and user.manager_discount_balance <= 0:
+                        digital_price = self.apply_manager_discount(digital_price)
 
                     if cart_photo_line.total_price > 0 and cart_photo_line.is_digital:
                         cart_photo_line.digital_price = 0
@@ -325,7 +334,12 @@ class CartV2APIView(APIView, DiscountMixin):
         if cart_photo_line.is_photobook:
             item_count += 1
 
-            discount_price_photo_book = self.appy_discount(promo_code, photo_book_price)
+            discount_price_photo_book = photo_book_price
+
+            if user_role == UserRole.manager and user.manager_discount_balance <= 0:
+                discount_price_photo_book = self.apply_manager_discount(photo_book_price)
+            elif user_role == UserRole.parent:
+                discount_price_photo_book = self.appy_discount(user, promo_code, photo_book_price)
 
             if manager_bonus:
                 discount_price_photo_book = self.apply_kindergarten_manager_bonus(
@@ -343,7 +357,12 @@ class CartV2APIView(APIView, DiscountMixin):
         if cart_photo_line.is_digital:
             item_count += 1
 
-            discount_price_digital_photo = self.appy_discount(promo_code, digital_photo_price)
+            discount_price_digital_photo = digital_photo_price
+
+            if user_role == UserRole.manager and user.manager_discount_balance <= 0:
+                discount_price_digital_photo = self.apply_manager_discount(digital_photo_price)
+            elif user_role == UserRole.parent:
+                discount_price_digital_photo = self.appy_discount(user, promo_code, digital_photo_price)
 
             if manager_bonus:
                 discount_price_digital_photo = self.apply_kindergarten_manager_bonus(
@@ -395,10 +414,16 @@ class CartV2APIView(APIView, DiscountMixin):
             if quantity > 0:
                 item_count += 1
 
-                discount_price = self.appy_discount(
-                    promo_code=promo_code,
-                    price_per_piece=price_per_piece
-                )
+                discount_price = price_per_piece
+
+                if user_role == UserRole.manager and user.manager_discount_balance <= 0:
+                    discount_price = self.apply_manager_discount(price_per_piece)
+                elif user_role == UserRole.parent:
+                    discount_price = self.appy_discount(
+                        user=user,
+                        promo_code=promo_code,
+                        price_per_piece=price_per_piece
+                    )
                 if manager_bonus:
                     logger.info(f"apply_manager_bonus")
                     logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
