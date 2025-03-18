@@ -68,6 +68,7 @@ export const Orders = () => {
   const [isActiveForm, setIsActiveForm] = useState(false);
   const [hasChanges, setHasChanges] = useState(false); // Флаг для отслеживания изменений
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const role = localStorage.getItem('role');
 
   const cart = useSelector(state => state.user.cart);
 
@@ -458,17 +459,19 @@ useEffect(() => {
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} setModalText={setModalText} />
           <Modal active={modalActive} setActive={setModalActive} text={modalText} />
-          <div className={styles.orderPromoWrap}>
-            <div className={styles.orderPromoPromocode}>
-              <div className={styles.promoInputWrap}>
-                <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
-                  placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
-                  type="text"
-                  name="digital"
-                />
+          {role == 1 &&
+            <div className={styles.orderPromoWrap}>
+              <div className={styles.orderPromoPromocode}>
+                <div className={styles.promoInputWrap}>
+                  <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
+                    placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
+                    type="text"
+                    name="digital"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          }
           {lineLenght >= 3 ?
             <div className={styles.buttonAddKidsWrap}>
               <div className={styles.promoButtonWrap}>

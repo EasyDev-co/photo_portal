@@ -24,6 +24,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const [ransomDigitalPhotos, setRansomDigitalPhotos] = useState(0)
   const [ransomCalendar, setRansomCalendar] = useState(0)
   const [isLoading, setIsLoading] = useState(true); // Новое состояние для лоадера
+  const [isLoading2, setIsLoading2] = useState(true);
   
   const roleHasPhotobook = userData?.role === 1 ? userData?.kindergarten?.[0]?.has_photobook : userData?.managed_kindergarten?.has_photobook
 
@@ -81,22 +82,29 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     calculateValues();
   }, [childNumber, priceCalendar])
 
-  // useEffect(() => {
-  //   photoPrice?.forEach(element => {
-  //     if (element.photo_type === 0) {
-  //       setDigitalPrice(element.price)
-  //     }
-  //     else return
-  //   });
-  // }, [])
+  useEffect(() => {
+    // Проверяем, есть ли данные в photoPrice
+    if (photoPrice && photoPrice.length > 0) {
+      // Если данные есть, выполняем ваш код
+      photoPrice.forEach(element => {
+        if (element.photo_type === 0) {
+          setDigitalPrice(element.price);
+        }
+      });
+      setIsLoading2(false); // Выключаем загрузку
+    } else {
+      // Если данных нет, включаем загрузку
+      setIsLoading2(true);
+    }
+  }, [photoPrice]); // Добавляем photoPrice в зависимости, чтобы эффект срабатывал при его изменении
 
 
   const prevCheckedState = useRef(isDigitalChecked);
-  // useEffect(() => {
-  //   console.log('prevCheckedState:', prevCheckedState)
-  //   console.log('has_photobook:', roleHasPhotobook);
-  //   console.log('photoPrice:', photoPrice);
-  // }, [prevCheckedState])
+  useEffect(() => {
+    console.log('prevCheckedState:', prevCheckedState)
+    console.log('has_photobook:', roleHasPhotobook);
+    console.log('photoPrice:', photoPrice);
+  }, [prevCheckedState])
 //Из-за того что стоит if (cartItem) мы не затрагиваем нется бесконечный рендер
   useEffect(() => {
     // if (ransomDigitalPhotos === 0 || ransomCalendar ==второго и третьего ребенка, 
@@ -177,6 +185,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   if (isLoading) {
     return <h1>Загрузка...</h1>; // Компонент лоадера
   }
+  if (isLoading2) {
+    return <h1>Загрузка...</h1>; // Компонент лоадера
+  }
+
 
   return (
     <div style={{
@@ -220,7 +232,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
                     </div>
                   )}
                   <div className={styles.bookCheckbox}>
-                    <div className={styles.bookDescr}>В электронном виде</div>
+                    <div className={styles.bookDescr}>В электронном виде: {digitalPrice.length > 3 ? digitalPrice.slice(0, -3) : digitalPrice} рублей</div>
                     <label className={styles.custom_checkbox}>
                       <input
                         className=''
