@@ -42,7 +42,6 @@ class CartPhotoLineCreateUpdateV2Serializer(serializers.Serializer):
 
 
 class CartPhotoLineV2Serializer(serializers.Serializer):
-    """Сериализатор для отображения пробника в корзине."""
     id = serializers.UUIDField()
     photos = serializers.SerializerMethodField()
     photo_line_id = serializers.UUIDField(required=False, allow_null=True)
@@ -52,6 +51,7 @@ class CartPhotoLineV2Serializer(serializers.Serializer):
     is_free_digital = serializers.BooleanField(default=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     child_number = serializers.IntegerField(required=False, allow_null=True)
+    all_price = serializers.IntegerField(required=False, allow_null=True)  # Новое поле
 
     @staticmethod
     def get_photos(obj):
@@ -60,14 +60,8 @@ class CartPhotoLineV2Serializer(serializers.Serializer):
         return serializer.data
 
     def to_representation(self, instance):
-        """
-        Добавляем поле photo_line_id, чтобы извлечь id photo_line из модели CartPhotoLine.
-        """
         representation = super().to_representation(instance)
-
-        # Получаем photo_line_id из instance напрямую
         photo_line_id = str(instance.photo_line_id) if instance.photo_line_id else None
-
         representation['photo_line_id'] = photo_line_id
-
         return representation
+

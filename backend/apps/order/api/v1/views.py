@@ -235,18 +235,18 @@ class OrderAPIView(APIView):
                         amount=1,
                         photo=cart_photo_line.photo_line.photos.order_by('?').first(),
                         order=order,
-                        price=1,
+                        price=0,
                     )
                 )
 
             if order.is_free_digital:
                 order_items.append(
                     OrderItem(
-                        photo_type=PhotoType.photobook,
+                        photo_type=PhotoType.digital,
                         amount=1,
                         photo=None,
                         order=order,
-                        price=1,
+                        price=0,
                     )
                 )
 
