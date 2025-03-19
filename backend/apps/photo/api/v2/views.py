@@ -458,8 +458,8 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Проверка, что указано ровно 6 номеров
-        if len(photo_numbers) != 6 and len(photo_numbers) != 1:
+        # Проверка, что указано не больше 6 символов
+        if len(photo_numbers) > 6:
             return Response(
                 {'message': 'Необходимо указать 1 или 6 номеров фотографий.'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -500,32 +500,11 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         logger.info(f"type phot theme: {type(active_photo_theme)}")
         logger.info(f"type kindergarten: {type(kindergarten)}")
 
-        if len(photo_numbers) == 1:
-            photo = Photo.objects.filter(
-                number=photo_numbers[0],
-                photo_line__photo_theme=active_photo_theme,
-                photo_line__kindergarten=kindergarten,
-            ).first()
-            if not photo:
-                return Response(
-                    {'message': 'Некоторые из указанных номеров фотографий не найдены.'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            photo_line = photo.photo_line
-            return photo_line
-
         photos = Photo.objects.filter(
             number__in=photo_numbers,
             photo_line__photo_theme=active_photo_theme,
             photo_line__kindergarten=kindergarten,
         )
-
-        # Проверка, что найдены все 6 фотографий
-        if photos.count() != 6:
-            return Response(
-                {'message': 'Некоторые из указанных номеров фотографий не найдены.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
 
         # Проверка, что все фотографии принадлежат одному пробнику
         photo_line_ids = photos.values_list('photo_line', flat=True).distinct()
@@ -564,7 +543,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             photo_line.photos.values_list('number', flat=True)
         )
 
-        if set(photo_numbers) != set(numbers_in_photo_line):
+        if not set(photo_numbers).issubset(set(numbers_in_photo_line)):
             return Response(
                 {'message': 'Пробник с указанными фотографиями не найден.'},
                 status=status.HTTP_404_NOT_FOUND
