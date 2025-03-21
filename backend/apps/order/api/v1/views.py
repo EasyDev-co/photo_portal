@@ -291,7 +291,7 @@ class OrderAPIView(APIView):
             promocode = cart.promocode
             promocode.used_by = promocode.used_by or []
             promocode.used_by.append({'id': str(user.id), 'email': user.email})
-            promocode.activate_count += 1
+            promocode.activate_count -= 1
             promocode.save()
 
         # Сохраняем все OrderItem
