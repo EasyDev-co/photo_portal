@@ -177,7 +177,7 @@ export const SideBar = ({ scrollY, innerHeight }) => {
           </ul>
         </nav>
       </div>
-      <ul className={styles.socialList}>
+      {/* <ul className={styles.socialList}>
         <SocialItem
           href="https://vk.com"
           icon={vkIcon}
@@ -193,7 +193,7 @@ export const SideBar = ({ scrollY, innerHeight }) => {
           icon={telegramIcon}
           alt="иконка telegram"
         />
-      </ul>
+      </ul> */}
     </div>
   );
 };

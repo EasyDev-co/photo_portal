@@ -57,3 +57,14 @@ class Region(UUIDMixin):
         verbose_name = 'Регион'
         verbose_name_plural = 'Регионы'
         ordering = ['name']
+
+
+class RegionPriceSettings(Region):
+    """
+    Прокси-модель для управления массовыми настройками (ransom, цены).
+    Никакой новой таблицы в БД не создаётся, это "виртуальный" класс.
+    """
+    class Meta:
+        proxy = True
+        verbose_name = "Настройка цен и выкупа"
+        verbose_name_plural = "Глобальные настройки цен"

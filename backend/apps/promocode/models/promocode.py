@@ -61,7 +61,7 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         verbose_name="Скидка на фотокниги (%)"
     )
     activate_count = models.PositiveSmallIntegerField(
-        default=1,
+        default=8,
         verbose_name="Кол-во активаций промо кода",
     )
     used_by = models.JSONField(

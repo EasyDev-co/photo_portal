@@ -220,7 +220,7 @@ export const Registration = () => {
               <InputField
                 name={'pictureNumbers'}
                 onChangeHandler={onChangeHandler}
-                placeholder={'Номера кадров'}
+                placeholder={'Укажите любой номер кадра'}
                 isQuestions
                 isAuthForm
                 value={inputValue.pictureNumbers}
