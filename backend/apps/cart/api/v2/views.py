@@ -143,6 +143,13 @@ class CartV2APIView(APIView, DiscountMixin):
             user_role=user_role,
             promo_code_data=request_data[0].get("promo_code")
         )
+
+        cart_error = None
+        if promo_code.activate_count <= 0:
+            cart_error = "Попытки активации промокода исчерпаны"
+
+        cart.promocode = promo_code
+
         # Карты, указывающие, для какого ребёнка какие пороги
         digital_thresholds = {
             1: "ransom_amount_for_digital_photos",
@@ -278,9 +285,14 @@ class CartV2APIView(APIView, DiscountMixin):
             logger.info(f"------------------------------------------------end child_num: {child_num}-------------------------------------------------")
             cart_photo_line.save()
 
+        cart.save()
         # Возвращаем сериализованные данные
         return Response(
-            CartPhotoLineV2Serializer(cart_photo_lines_list, many=True).data,
+            CartPhotoLineV2Serializer(
+                cart_photo_lines_list,
+                many=True,
+                context={"cart_error": cart_error}
+            ).data,
             status=status.HTTP_200_OK
         )
 
@@ -338,7 +350,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if user_role == UserRole.manager and user.manager_discount_balance <= 0:
                 discount_price_photo_book = self.apply_manager_discount(photo_book_price)
-            elif user_role == UserRole.parent:
+            elif user_role == UserRole.parent and promo_code.activate_count > 0:
                 discount_price_photo_book = self.appy_discount(user, promo_code, photo_book_price)
 
             if manager_bonus:
@@ -361,7 +373,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if user_role == UserRole.manager and user.manager_discount_balance <= 0:
                 discount_price_digital_photo = self.apply_manager_discount(digital_photo_price)
-            elif user_role == UserRole.parent:
+            elif user_role == UserRole.parent and promo_code.activate_count > 0:
                 discount_price_digital_photo = self.appy_discount(user, promo_code, digital_photo_price)
 
             if manager_bonus:
