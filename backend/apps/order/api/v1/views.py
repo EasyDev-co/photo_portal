@@ -88,7 +88,7 @@ class OrderAPIView(APIView):
         return photo_lines_dict, is_digital_by_photo_line_id
 
     @staticmethod
-    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id):
+    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id, user):
         """
         Формирует итоговый список объектов.
         """
@@ -100,10 +100,13 @@ class OrderAPIView(APIView):
             logger.info(f"photo_line_id: {photo_line_id}")
             logger.info(f"photo_line: {photo_line}")
 
-            photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
+            if user.role == UserRole.manager:
+                photo_line.is_date_end = True
+            else:
+                photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
 
-            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
-            photo_line.is_date_end = extended_date_end < current_time
+                extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
+                photo_line.is_date_end = extended_date_end < current_time
 
             photo_lines.append(photo_line)
         return photo_lines
@@ -133,7 +136,7 @@ class OrderAPIView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         photo_lines_dict, is_digital_by_photo_line_id = self.aggregate_is_digital(photo_lines_queryset)
-        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id)
+        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id, user)
 
         if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
