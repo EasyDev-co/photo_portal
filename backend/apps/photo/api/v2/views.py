@@ -461,7 +461,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         # Проверка, что указано не больше 6 символов
         if len(photo_numbers) > 6:
             return Response(
-                {'message': 'Необходимо указать 1 или 6 номеров фотографий.'},
+                {'message': 'Необходимо указать от 1 до 6 номеров фотографий.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
