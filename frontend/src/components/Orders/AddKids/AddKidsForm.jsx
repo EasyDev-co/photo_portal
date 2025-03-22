@@ -42,73 +42,77 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, 
     }
 
     const onSubmitHandler = async (e) => {
-        const arr = inputValue.addKids.
-        split(/[и\s\-.;,]+|jpg|jpeg/i).map(Number)
-        .filter(Boolean)
-        .map(Number)
-        .filter(num => !isNaN(num));
-        e.preventDefault();
-        const regex = /^\d+(\.jpeg|\.jpg)?([и\s\-.;,]+(\d+(\.jpeg|\.jpg)?)){0,5}([и\s\-.;,]+)?$/i;
-        // Проверяем соответствие значения регулярному выражению
-        if (regex.test(inputValue.addKids)) {
-            setError("");
-            if (compareArrayWithString([...addPhoto, ...photosLine], inputValue.addKids) === true) {
-                setInputValue({
-                    addKids: ''
-                });
-                setError(true);
-                return;
-            }
-            tokenRefreshCreate()
-                .then(res => res.json())
-                .then(res => {
-                    if (res.refresh) {
-                        setCookie('refresh', res.refresh);
-                        dispatch(
-                            setAccessToken(res.access)
-                        )
-                    }
-                    return res.access
-                })
-                .then(access => {
-                    getOnePhoto(arr, access)
-                        .then(res => {
-                            if (res.ok) {
-                                res.json()
-                                    .then(res => {
-                                        dispatch(addPhotos(res))
-                                        patchPhotoLine(access, {
-                                            "parent": idP
-                                        }, res.id)
+        // Получаем массив номеров фотографий из введенной строки
+        const arr = inputValue.addKids
+            .split(/[и\s\-.;,]+|jpg|jpeg/i)
+            .map(Number)
+            .filter(Boolean)
+            .map(Number)
+            .filter(num => !isNaN(num));
 
-                                    })
-                            } else {
-                                setError('Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номер!');
-                                res.json()
-                                    .then(res => {
-                                        console.log(res)
-                                        setModalActive(true)
-                                        setModalText(
-                                        < p >
-                                            Вы превысили лимит добавления детей.Если у вас четверо детей, то напишите нам на
-                                            < span > fotodetstvo1@yandex.ru </span >
-                                            и мы проверим информацию
-                                        </p >)
-                                    })
-                            }
-                        })
-                    setError('');
-                })
-            setInputValue({
-                addKids: ''
-            });
-            setIsActiveForm(false)
-        } else {
-            setError("Неправильный формат ввода. " +
-                "Введите 1 или 6 номеров фото через дефис, пробел, запятую или ' и '.")
+        e.preventDefault();
+
+        // Регулярное выражение для проверки формата ввода
+        const regex = /^\d+(\.jpeg|\.jpg)?([и\s\-.;,]+(\d+(\.jpeg|\.jpg)?)){0,5}([и\s\-.;,]+)?$/i;
+
+        // Если больше 6 номеров — выводим ошибку
+        if (arr.length > 6) {
+            setError("Вы добавили номера кадров двух детей. Пожалуйста, укажите номера только одного ребёнка.");
+            return;
         }
 
-    }
+        if (regex.test(inputValue.addKids)) {
+            setError("");  // Очистка ошибки при корректном формате
+
+            // Проверяем, если фотографии уже добавлены
+            if (arr.every(item => [...addPhoto, ...photosLine].some(photo => photo.number === item))) {
+                setInputValue({ addKids: '' });
+                setError("Фотографии уже добавлены.");
+                return; // Останавливаем дальнейшее выполнение, чтобы не закрылась форма
+            }
+
+            // Получаем обновленный токен и делаем запрос на добавление фотографий
+            try {
+                const res = await tokenRefreshCreate();
+                const data = await res.json();
+                if (data.refresh) {
+                    setCookie('refresh', data.refresh);
+                    dispatch(setAccessToken(data.access));
+                }
+
+                const access = data.access;
+                const photoRes = await getOnePhoto(arr, access);
+                const photoData = await photoRes.json();
+
+                if (photoRes.ok) {
+                    dispatch(addPhotos(photoData));
+                    patchPhotoLine(access, { "parent": idP }, photoData.id);
+                    setError('');
+                    setInputValue({ addKids: '' });
+                    setIsActiveForm(false);
+                } else {
+                    if (photoData.message && photoData.message.includes("Вы достигли лимита")) {
+                        setIsActiveForm(false);
+                        setModalActive(true);
+                        setModalText(
+                            <p>
+                                Вы превысили лимит добавления детей. Если у вас четверо детей, то напишите нам на
+                                <span> fotodetstvo1@yandex.ru </span>
+                                и мы проверим информацию.
+                            </p>
+                        );
+                    } else {
+                        setError(photoData.message || 'Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номера!');
+                    }
+                }
+            } catch (err) {
+                console.error('Ошибка:', err);
+                setError('Произошла непредвиденная ошибка. Пожалуйста, попробуйте снова.');
+            }
+        } else {
+            setError("Введены недопустимые символы. Пожалуйста, используйте только цифры, дефисы (-), запятые (,) или пробелы. Если вы укажите только один номер кадра, будут подтянуты все номера кадров этого ребенка.");
+        }
+    };
 
     return (
         <form ref={activeRef} onSubmit={(e) => onSubmitHandler(e)} className={isActiveForm ? styles.addKidsFormActive : styles.addKidsForm} action="">
