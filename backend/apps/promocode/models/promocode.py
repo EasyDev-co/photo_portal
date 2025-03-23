@@ -60,7 +60,7 @@ class Promocode(UUIDMixin, TimeStampedMixin):
         validators=(MaxValueValidator(100),),
         verbose_name="Скидка на фотокниги (%)"
     )
-    activate_count = models.PositiveSmallIntegerField(
+    activate_count = models.IntegerField(
         default=8,
         verbose_name="Кол-во активаций промо кода",
     )
