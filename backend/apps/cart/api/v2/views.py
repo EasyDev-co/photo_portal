@@ -464,7 +464,7 @@ class CartV2APIView(APIView, DiscountMixin):
                     pic.quantity = quantity
                     pic.price_per_piece = price_per_piece
                     pic.save()
-
+        logger.info(f"total_price_finaly: {total_price}")
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
         cart_photo_line.save()
