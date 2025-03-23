@@ -65,8 +65,6 @@ class DiscountMixin:
             discount_price = promo_code.apply_discount(
                 price=price_per_piece
             )
-            # TODO прописать логику пересчета попыток применения
-            #  и возвращать ошибку, если не получилось применить промокод
             user.use_manager_coupon = True
             user.save()
         return discount_price
@@ -145,8 +143,9 @@ class CartV2APIView(APIView, DiscountMixin):
         )
 
         cart_error = None
-        if promo_code.activate_count <= 0:
-            cart_error = "Попытки активации промокода исчерпаны"
+        if promo_code:
+            if promo_code.activate_count <= 0:
+                cart_error = "Попытки активации промокода исчерпаны"
 
         cart.promocode = promo_code
 
@@ -350,7 +349,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if user_role == UserRole.manager and user.manager_discount_balance <= 0:
                 discount_price_photo_book = self.apply_manager_discount(photo_book_price)
-            elif user_role == UserRole.parent and promo_code.activate_count > 0:
+            elif user_role == UserRole.parent and promo_code and promo_code.activate_count > 0:
                 discount_price_photo_book = self.appy_discount(user, promo_code, photo_book_price)
 
             if manager_bonus:
@@ -373,7 +372,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if user_role == UserRole.manager and user.manager_discount_balance <= 0:
                 discount_price_digital_photo = self.apply_manager_discount(digital_photo_price)
-            elif user_role == UserRole.parent and promo_code.activate_count > 0:
+            elif user_role == UserRole.parent and promo_code and promo_code.activate_count > 0:
                 discount_price_digital_photo = self.appy_discount(user, promo_code, digital_photo_price)
 
             if manager_bonus:
@@ -430,7 +429,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
                 if user_role == UserRole.manager and user.manager_discount_balance <= 0:
                     discount_price = self.apply_manager_discount(price_per_piece)
-                elif user_role == UserRole.parent:
+                elif user_role == UserRole.parent and promo_code and promo_code.activate_count > 0:
                     discount_price = self.appy_discount(
                         user=user,
                         promo_code=promo_code,

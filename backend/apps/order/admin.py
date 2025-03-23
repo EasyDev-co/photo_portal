@@ -34,7 +34,6 @@ class OrderAdmin(admin.ModelAdmin):
         'payment_id',
         'order_price',
         'user',
-        # 'kindergarten',
         'photo_line',
         'status',
         'is_digital',
@@ -42,7 +41,7 @@ class OrderAdmin(admin.ModelAdmin):
         'created',
         'modified',
     )
-    list_filter = ('status', 'photo_line', 'is_digital', ('created', DateFieldListFilter))
+    list_filter = ('status', 'photo_line', 'is_digital', 'user__use_manager_coupon', ('created', DateFieldListFilter))
     search_fields = ('user__email', 'photo_line__kindergarten__name', 'user__firstname', 'user__lastname')
     ordering = ('-created', 'modified')
     readonly_fields = (
