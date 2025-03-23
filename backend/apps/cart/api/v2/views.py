@@ -371,6 +371,8 @@ class CartV2APIView(APIView, DiscountMixin):
 
             discount_price_digital_photo = digital_photo_price
 
+            logger.info(f"after_discount_price_digital_photo: {discount_price_digital_photo}")
+
             if user_role == UserRole.manager and user.manager_discount_balance <= 0:
                 discount_price_digital_photo = self.apply_manager_discount(digital_photo_price)
             elif user_role == UserRole.parent and promo_code and promo_code.activate_count > 0:
@@ -387,6 +389,7 @@ class CartV2APIView(APIView, DiscountMixin):
             cart_photo_line.digital_price = discount_price_digital_photo
 
             total_price += discount_price_digital_photo
+            logger.info(f"before_discount_price_digital_photo: {discount_price_digital_photo}")
             logger.info(f"digital_photo_total_price: {total_price}")
             original_price += discount_price_digital_photo
 
@@ -464,7 +467,7 @@ class CartV2APIView(APIView, DiscountMixin):
                     pic.quantity = quantity
                     pic.price_per_piece = price_per_piece
                     pic.save()
-
+        logger.info(f"total_price_finaly: {total_price}")
         cart_photo_line.original_price = original_price
         cart_photo_line.total_price = total_price
         cart_photo_line.save()
