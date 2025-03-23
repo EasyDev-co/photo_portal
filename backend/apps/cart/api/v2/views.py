@@ -254,7 +254,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
                     # Нужно вычесть стоимость цифры из total_price
                     # Если есть промокод, учитываем скидку (как в вашем коде)
-                    if promo_code and user_role != UserRole.manager:
+                    if promo_code and user_role != UserRole.manager and promo_code.activate_count > 0:
                         digital_price = self.appy_discount(user, promo_code, digital_price)
                     elif user_role == UserRole.manager and user.manager_discount_balance <= 0:
                         digital_price = self.apply_manager_discount(digital_price)
