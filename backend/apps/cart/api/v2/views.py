@@ -363,6 +363,7 @@ class CartV2APIView(APIView, DiscountMixin):
             cart_photo_line.photo_book_price = discount_price_photo_book
 
             total_price += discount_price_photo_book
+            logger.info(f"photo_book_total_price: {total_price}")
             original_price += discount_price_photo_book
 
         if cart_photo_line.is_digital:
@@ -386,6 +387,7 @@ class CartV2APIView(APIView, DiscountMixin):
             cart_photo_line.digital_price = discount_price_digital_photo
 
             total_price += discount_price_digital_photo
+            logger.info(f"digital_photo_total_price: {total_price}")
             original_price += discount_price_digital_photo
 
         for photo_info in photos_data:
@@ -397,9 +399,6 @@ class CartV2APIView(APIView, DiscountMixin):
                 continue
 
             photo_obj = Photo.objects.filter(id=photo_uuid).first()
-
-            logger.info(f"photo_uuid: {photo_uuid}")
-            logger.info(f"photo_obj: {photo_obj}")
 
             if not photo_obj:
                 logger.info(f"error: photo not found: {photo_uuid}")
@@ -415,7 +414,7 @@ class CartV2APIView(APIView, DiscountMixin):
 
             if not price_per_piece:
                 continue
-            logger.info(f"user_role: {user_role}")
+
             if user_role == UserRole.manager:
                 manager_bonus = User.objects.get(id=user.id).manager_discount_balance
                 logger.info(f"in if manager_bonus: {manager_bonus}")
@@ -436,7 +435,6 @@ class CartV2APIView(APIView, DiscountMixin):
                         price_per_piece=price_per_piece
                     )
                 if manager_bonus:
-                    logger.info(f"apply_manager_bonus")
                     logger.info(f"manager_bonus_before: {manager_bonus}-------------------------------------------------")
                     discount_price = self.apply_kindergarten_manager_bonus(
                         discount_price,
@@ -449,6 +447,7 @@ class CartV2APIView(APIView, DiscountMixin):
                     logger.info(f"manager_bonus_after: {manager_bonus}--------------------------------------------------")
 
                 total_price += discount_price * quantity
+                logger.info(f"photo_total_price: {total_price}")
                 original_price += discount_price * quantity
 
                 pic, created = PhotoInCart.objects.get_or_create(
