@@ -104,6 +104,7 @@
 .block{
     display: flex;
     flex-direction: column;
+    gap: 50px;
 }
 .photoNumber{
     padding: 0 8px;
