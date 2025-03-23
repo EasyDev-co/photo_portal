@@ -321,21 +321,6 @@ useEffect(() => {
   console.log('isInitialLoad', isInitialLoad)
 }, [isInitialLoad])
 
-// Синхронизация корзины с сервером при изменении orderValue
-// useEffect(() => {
-//     if (orderValue.length > 0) {
-//         const transformedData = transformData(orderValue);
-//         fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-//             .then((res) => res.json())
-//             .then((data) => {
-//               console.log
-//                 dispatch(setCart(data));
-//                 localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
-//             })
-//             .catch((err) => console.error("Ошибка синхронизации корзины:", err));
-//     }
-// }, [orderValue, accessStor, dispatch]);
-
 useEffect(() => {
   const savedCart = JSON.parse(localStorage.getItem('cart'));
   
@@ -391,7 +376,7 @@ useEffect(() => {
           setHasChanges(true);
         }
         return [
-          ...prev.slice(0, existingItemIndex),
+          ...prev.slice(0, existingItemIndex),  
           updatedItem,
           ...prev.slice(existingItemIndex + 1),
         ];
@@ -412,8 +397,9 @@ useEffect(() => {
 
   const handlePromocodeChange = (e) => {
     const newPromoCode = e.target.value;
+    console.log('newPromoCode:', newPromoCode)
     setCurrentPromoCode(newPromoCode);
-
+    console.log('currentPromoCode:', currentPromoCode)
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
     }
@@ -422,7 +408,9 @@ useEffect(() => {
         ...order,
         promo_code: newPromoCode,
       }));
+      setHasChanges(true);
       setOrderValue(updatedOrders);
+      console.log('OrderValue updatedOrders:', orderValue)
     }, 1000);
   };
   
