@@ -54,13 +54,14 @@ const Counter = ({ blocksId, isChecked, photoLineId, onChangeHandler, name, id, 
     };
 
     return (
-        <div className={styles.counterBlock}>
+        <div onMouseEnter={() => setShowBtn(true)} onMouseLeave={() => setShowBtn(false)} className={styles.counterBlock}>
             <div className={styles.counterName}>{id}</div>
-            <div onMouseEnter={() => setShowBtn(true)} onMouseLeave={() => setShowBtn(false)} className={styles.counterButtonWrap}>
+            <div className={styles.counterButtonWrap}>
                 <button className={showBtn ? styles.counterButtonDecShow : styles.counterButtonDec} type="button" onClick={decrement} disabled={localQuantity === 0}>-</button>
                 <input className={styles.counterInput} ref={inputRef} type="text" name={name} value={localQuantity} disabled />
                 <button className={showBtn ? styles.counterButtonShow : styles.counterButton} type="button" onClick={increment}>+</button>
             </div>
+            <div style={{backgroundColor: 'white', width: '20px'}}></div>
         </div>
     );
 };
