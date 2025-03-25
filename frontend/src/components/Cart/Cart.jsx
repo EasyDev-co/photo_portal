@@ -170,8 +170,8 @@ const Cart = () => {
                     })}
                     {order.id &&
                         <div className={styles.btnWrap}>
-                            <button onClick={() => payCartItem()} className={styles.mainButton}>Оплатить</button>
                             <button onClick={() => deleteCartItem()} className={styles.deleteButton}>Удалить</button>
+                            <button onClick={() => payCartItem()} className={styles.mainButton}>Оплатить</button>
                         </div>
                     }
                     

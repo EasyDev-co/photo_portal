@@ -8,6 +8,8 @@ const GalleryItem = ({ orders }) => {
 
     const [hoveredPhotoId, setHoveredPhotoId] = useState(null);
 
+    
+
     const handleDownloadSinglePhoto = (photoPath, photoName) => {
         const a = document.createElement('a');
         a.href = photoPath;
@@ -17,20 +19,47 @@ const GalleryItem = ({ orders }) => {
         a.remove();
     };
     
+    // const handleDownloadAllPhotos = async () => {
+    //     console.log(orders)
+    //     for (const elem of orders) {
+    //         for (const photo of elem.photos) {
+    //             await new Promise((resolve) => {
+    //                 const a = document.createElement('a');
+    //                 a.href = photo.photo_path;
+    //                 a.download = `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`;
+    //                 document.body.appendChild(a);
+    //                 a.click();
+    //                 a.remove();
+    //                 setTimeout(resolve, 200); // Задержка между скачиваниями
+    //             });
+    //         }
+    //     }
+    // };
     const handleDownloadAllPhotos = async () => {
+        console.log(orders);
+        const downloadPromises = [];
+        
         for (const elem of orders) {
             for (const photo of elem.photos) {
-                await new Promise((resolve) => {
-                    const a = document.createElement('a');
-                    a.href = photo.photo_path;
-                    a.download = `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    setTimeout(resolve, 200); // Задержка между скачиваниями
-                });
+                downloadPromises.push(
+                    new Promise((resolve) => {
+                        setTimeout(() => {
+                            const a = document.createElement('a');
+                            a.href = photo.photo_path;
+                            a.download = `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => {
+                                a.remove();
+                                resolve();
+                            }, 100);
+                        }, downloadPromises.length * 300); // Увеличиваем задержку для каждого файла
+                    })
+                );
             }
         }
+        
+        await Promise.all(downloadPromises);
     };
 
     return (
