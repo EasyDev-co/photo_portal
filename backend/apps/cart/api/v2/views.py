@@ -241,8 +241,9 @@ class CartV2APIView(APIView, DiscountMixin):
                 logger.info(f"all_price_without_digital_pirce: {all_prices - digital_price}")
                 logger.info(f"test: {all_prices - digital_price >= threshold_value}")
 
-                if cart_photo_line.is_digital:
-                    all_prices -= digital_price
+                if cart_photo_line.is_digital and all_prices >= threshold_value:
+                    cart_photo_line.is_free_digital = True
+                    cart_photo_line.digital_price = 0
 
                 cart_photo_line.all_price = all_prices
 
