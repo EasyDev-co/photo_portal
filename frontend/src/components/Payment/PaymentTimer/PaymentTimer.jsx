@@ -30,8 +30,8 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
                 console.log(res)
             })
     }, [country])
-    const rootClassName = location.pathname === '/orders' 
-        ? styles.paymentTimerWrap_orders 
+    const rootClassName = location.pathname === '/orders' || location.pathname === '/orders_manager' 
+        ? styles.paymentTimerWrap_orders
         : styles.paymentTimerWrap;
     return (
         <div 
