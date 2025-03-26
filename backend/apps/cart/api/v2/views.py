@@ -242,6 +242,11 @@ class CartV2APIView(APIView, DiscountMixin):
                 logger.info(f"test: {all_prices - digital_price >= threshold_value}")
 
                 if cart_photo_line.is_digital:
+                    if user_role == UserRole.manager and user.manager_discount_balance <= 0:
+                        digital_price = self.apply_manager_discount(digital_price)
+                    elif user_role == UserRole.parent and promo_code and promo_code.activate_count > 0:
+                        digital_price = self.appy_discount(user, promo_code, digital_price)
+
                     all_prices -= digital_price
 
                 cart_photo_line.all_price = all_prices
