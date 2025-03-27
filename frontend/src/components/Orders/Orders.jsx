@@ -469,6 +469,9 @@ useEffect(() => {
             <div className={styles.orderPromoWrap}>
               <div className={styles.orderPromoPromocode}>
                 <div className={styles.promoInputWrap}>
+                  {cart[0]?.cart_error &&
+                  <p style={{color: 'red', alignSelf: 'flex-start'}}>{cart[0]?.cart_error ? cart[0]?.cart_error : ""}</p >
+                  }
                   <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
                     placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
                     type="text"
