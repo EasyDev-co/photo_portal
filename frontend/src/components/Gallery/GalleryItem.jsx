@@ -69,43 +69,43 @@ const GalleryItem = ({ orders }) => {
                     return null;
                 }
                 return (
-                    <div key={i} className={styles.galleryItemWrap}>
-                        <div className={styles.titleWrap}>
-                            <div className={styles.galleryTitle}>{elem.photo_theme_name}</div>
-                            <div className={styles.date}>
-                                {elem.photo_theme_date}. {elem.region}
+                    elem.is_digital ? (
+                        <div key={i} className={styles.galleryItemWrap}>
+                            <div className={styles.titleWrap}>
+                                <div className={styles.galleryTitle}>{elem.photo_theme_name}</div>
+                                <div className={styles.date}>
+                                    {elem.photo_theme_date}. {elem.region}
+                                </div>
                             </div>
-                        </div>
-                        <div className={styles.photosGallery}>
-                            {elem.photos.map((photo, i) => {
-                                return (
+                            <div className={styles.photosGallery}>
+                                {elem.photos.map((photo, i) => (
                                     <div
                                         onMouseEnter={() => setHoveredPhotoId(photo.id)}
                                         onMouseLeave={() => setHoveredPhotoId(null)}
                                         key={photo.id}
-                                        className={ styles.imgWrap}
+                                        className={styles.imgWrap}
                                     >
                                         <img src={photo.photo_path} alt="" />
                                         <div className={styles.photoNumber}>Фото № {photo.number}</div>
                                         {hoveredPhotoId === photo.id && (
-                                        <div
-                                            className={styles.uploadIconBlock}
-                                            onClick={(e) => {
-                                                e.stopPropagation(); // Предотвращаем всплытие клика
-                                                handleDownloadSinglePhoto(
-                                                    photo.photo_path,
-                                                    `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`
-                                                );
-                                            }}
-                                        >
-                                            <img className={styles.uploadIcon} src={uploadIcon} alt="Download" />
-                                        </div>
-                                    )}
+                                            <div
+                                                className={styles.uploadIconBlock}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDownloadSinglePhoto(
+                                                        photo.photo_path,
+                                                        `${elem.photo_theme_name}_${elem.photo_theme_date}_${photo.number}.jpg`
+                                                    );
+                                                }}
+                                            >
+                                                <img className={styles.uploadIcon} src={uploadIcon} alt="Download" />
+                                            </div>
+                                        )}
                                     </div>
-                                );
-                            })}
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    ) : (<div></div>) // или можно вернуть `null`, если условие не выполняется
                 );
             })}
             <div className={styles.btnWrap}>
