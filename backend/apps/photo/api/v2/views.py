@@ -640,8 +640,11 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         if isinstance(parent, Response):
             return parent  # Возвращаем ошибку, если есть
 
-        child_number = PhotoLine.objects.filter(parent=parent).count() + 1
+        parent_lines = PhotoLine.objects.filter(parent=parent).all()
+        photo_line_count = parent_lines.count()
+        child_number = photo_line_count + 1
 
+        logger.info(f"parent_line: {parent_lines} ")
         logger.info(f"child_number: {child_number}")
 
         # Проверка, что родитель принадлежит тому же детскому саду
