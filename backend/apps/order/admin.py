@@ -42,7 +42,7 @@ class OrderAdmin(admin.ModelAdmin):
         'modified',
     )
     list_filter = ('status', 'photo_line', 'is_digital', 'user__use_manager_coupon', ('created', DateFieldListFilter))
-    search_fields = ('user__email', 'photo_line__kindergarten__name', 'user__firstname', 'user__lastname')
+    search_fields = ('user__email', 'photo_line__kindergarten__name', 'user__first_name', 'user__last_name')
     ordering = ('-created', 'modified')
     readonly_fields = (
         'id',
