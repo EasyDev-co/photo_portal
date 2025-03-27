@@ -164,13 +164,11 @@ class CartV2APIView(APIView, DiscountMixin):
         # -----------------------------
         #   ПЕРВЫЙ ПРОХОД: считаем «грязные» цены
         # -----------------------------
-        child_number = 0
         cart_photo_lines_list = []
         all_prices = Decimal(0)
 
         for data in request_data:
             logger.info(f"for_data: {data}")
-            child_number += 1
 
             # 1) Создаём CartPhotoLine (строку корзины).
             #    Пока НЕ ставим is_free_digital / is_free_calendar.
@@ -179,7 +177,6 @@ class CartV2APIView(APIView, DiscountMixin):
                 kindergarten=kindergarten,
                 user=user,
                 data=data,
-                child_number=child_number,
             )
 
             # 2) Считаем базовую стоимость данной строки
@@ -300,7 +297,7 @@ class CartV2APIView(APIView, DiscountMixin):
         return cart
 
     @staticmethod
-    def _create_cart_photo_lines(cart, data, child_number, kindergarten, user):
+    def _create_cart_photo_lines(cart, data, kindergarten, user):
         photo_line = PhotoLine.objects.filter(
             id=data.get("id")
         ).first()
@@ -310,7 +307,7 @@ class CartV2APIView(APIView, DiscountMixin):
             photo_line=photo_line,
             kindergarten=kindergarten,
             user=user,
-            child_number=child_number,
+            child_number=photo_line.child_number,
             is_digital=data.get("is_digital"),
             is_photobook=data.get("is_photobook"),
         )

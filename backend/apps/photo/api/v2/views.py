@@ -443,6 +443,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         # Сохранение родителя для пробника
         if photo_line.parent is None:
             photo_line.parent = user
+
             photo_line.save()
 
         # Сериализация и возврат данных
@@ -639,6 +640,10 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         if isinstance(parent, Response):
             return parent  # Возвращаем ошибку, если есть
 
+        child_number = PhotoLine.objects.filter(parent=parent).count() + 1
+
+        logger.info(f"child_number: {child_number}")
+
         # Проверка, что родитель принадлежит тому же детскому саду
         if parent.kindergarten != kindergarten:
             return Response(
@@ -653,6 +658,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
 
         # Обновление поля 'parent' и сохранение
         instance.parent = parent
+        instance.child_number = child_number
         instance.save()
 
         serializer = self.get_serializer(instance)
