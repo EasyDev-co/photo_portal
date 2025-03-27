@@ -44,7 +44,7 @@ class PhotoPriceInline(admin.TabularInline):
 
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
-    list_display = ('name', 'region', 'code', "id", 'has_photobook', 'locality', 'active_photo_theme')
+    list_display = ('name', 'locality', 'region', 'code', "id", 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info', 'active_photo_theme')
