@@ -105,6 +105,14 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     console.log('has_photobook:', roleHasPhotobook);
     console.log('photoPrice:', photoPrice);
   }, [prevCheckedState])
+
+  useEffect(() => {
+  const cartItem = cart?.find(item => item.photo_line_id === currentLineId);
+
+    if (cartItem?.is_digital == true) {
+      setIsDigitalChecked(true)
+    }
+  }, [])
 //Из-за того что стоит if (cartItem) мы не затрагиваем нется бесконечный рендер
   useEffect(() => {
     // if (ransomDigitalPhotos === 0 || ransomCalendar ==второго и третьего ребенка, 
@@ -114,7 +122,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
 
-    // console.log('allPrice', allPrice)
+    console.log('cartItem', cartItem)
     // console.log('условие', !cartItem?.is_free_digitals && allPrice >= 25)
   
     // if (cartItem?.is_free_digitals == false && allPrice > 25) {

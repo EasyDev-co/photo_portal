@@ -10,6 +10,7 @@ import PaymentModal from '../Modal/PaymentModal';
 import { paymentCreate } from '../../http/fetchPayment';
 import Modal from '../Modal/Modlal';
 import { setCart } from '../../store/authSlice';
+import { useDispatch } from 'react-redux';
 
 const Cart = () => {
 
@@ -22,6 +23,7 @@ const Cart = () => {
     const [order, setOrder] = useState({})
     const [errModal, setErrModal] = useState(false);
     const [errMessage, setErrMessage] = useState('');
+    const dispatch = useDispatch();
     let blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
             !value &&
@@ -44,7 +46,7 @@ const Cart = () => {
                     .then(res => {
                         if (res.ok) {
                             setOrder({});
-                            setCart([])
+                            dispatch(setCart([]))
                             localStorage.setItem('cart', JSON.stringify([]));
                             console.log('корзина почищена')
                             setValue(true);
@@ -70,7 +72,7 @@ const Cart = () => {
                             localStorage.setItem('cart', JSON.stringify([]));
                             window.location.reload();
                             localStorage.setItem('cart', JSON.stringify([]));
-                            setCart([])
+                            dispatch(setCart([]))
                             console.log('корзина почищена3')
                         }, 100)
                     })
