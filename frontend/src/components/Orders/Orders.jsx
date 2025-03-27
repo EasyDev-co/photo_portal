@@ -72,12 +72,13 @@ export const Orders = () => {
 
   const cart = useSelector(state => state.user.cart);
 
-  useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem('cart'));
-    if (savedCart) {
-        dispatch(setCart(savedCart));
-    }
-    }, []);
+  // useEffect(() => {
+  //   const savedCart = JSON.parse(localStorage.getItem('cart'));
+  //   if (savedCart) {
+  //       dispatch(setCart(savedCart));
+  //       console.log('test1')
+  //   }
+  //   }, []);
 
     useEffect(() => {
       if (cart.length === 0 || localStorage.getItem('cart') === null) {
@@ -230,6 +231,7 @@ export const Orders = () => {
 
     setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
     setHasChanges(true); // Устанавливаем флаг изменений
+    console.log('hasChanges1')
   };
 
   const transformCartToOrderValue = (cart) => {
@@ -273,9 +275,9 @@ export const Orders = () => {
     console.log('uf orderValue', orderValue)
   }, [orderValue])
 
-  useEffect(() => {
-    console.log('hasChanges', hasChanges)
-  }, [hasChanges])
+  // useEffect(() => {
+  //   console.log('hasChanges', hasChanges)
+  // }, [hasChanges])
 
 useEffect(() => {
   const fetchData = async () => {
@@ -292,6 +294,7 @@ useEffect(() => {
           console.log('orderValue', orderValue)
           localStorage.setItem('cart', JSON.stringify(data));
           setHasChanges(false); // Сбрасываем флаг изменений
+          console.log('hasChanges2 false')
         } else {
           console.error('Ошибка при обновлении корзины:', response.statusText);
         }
@@ -334,12 +337,14 @@ useEffect(() => {
   
   if (savedCart && savedCart.length > 0) {
       dispatch(setCart(savedCart));
+      console.log('test2')
   } else {
       // Запрос данных корзины с сервера
       fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
           .then((res) => res.json())
           .then((data) => {
               dispatch(setCart(data));
+              console.log('test3')
           })
           .catch((err) => console.error("Ошибка загрузки корзины:", err));
   }
@@ -379,10 +384,12 @@ useEffect(() => {
         if (name == 6) {
           updatedItem.is_photobook = checked;
           setHasChanges(true);
+          console.log('hasChanges3')
         } else if (name == 7) {
           updatedItem.is_digital = checked;
           console.log('checked', checked)
           setHasChanges(true);
+          console.log('hasChanges4')
         }
         return [
           ...prev.slice(0, existingItemIndex),  
@@ -397,6 +404,7 @@ useEffect(() => {
           is_digital: name == 7 ? checked : false
         };
         setHasChanges(true);
+        console.log('hasChanges5')
         console.log('newItem', newItem)
         // setHasChanges(true);
         return [...prev, newItem];
@@ -418,6 +426,7 @@ useEffect(() => {
         promo_code: newPromoCode,
       }));
       setHasChanges(true);
+      console.log('hasChanges6')
       setOrderValue(updatedOrders);
       console.log('OrderValue updatedOrders:', orderValue)
     }, 1000);
