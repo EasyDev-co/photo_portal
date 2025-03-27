@@ -193,6 +193,8 @@ class OrderAPIView(APIView):
 
         order_items = []
         for cart_photo_line in cart_photo_lines:
+            logger.info(f"cart_photo_line: {cart_photo_line.photo_line}")
+
             order = orders_map[cart_photo_line.photo_line.id]
 
             # Берём все фото, которые выбрал пользователь
@@ -209,11 +211,11 @@ class OrderAPIView(APIView):
             )
 
             # Если пользователь заказал «электронные фото» (is_digital), добавляем отдельный OrderItem
-            if order.is_digital:
+            if order.is_digital and not order.is_free_digital:
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.digital,
-                        amount=1,  # обычно 1 позиция
+                        amount=1,
                         order=order,
                         price=cart_photo_line.digital_price,
                     )
