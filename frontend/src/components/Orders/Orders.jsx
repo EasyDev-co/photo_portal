@@ -86,9 +86,9 @@ export const Orders = () => {
       }
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
-    window.onload= function() {
-      setOrderValue([]);
-  };
+  //   window.onload= function() {
+  //     setOrderValue([]);
+  // };
   //   useEffect(() => {
   //   // Создаем объект для работы с параметрами URL
   //   const params = new URLSearchParams(location.search);
@@ -269,6 +269,14 @@ export const Orders = () => {
     return [...photosArray, ...digitalPhotosArray, ...photobookPhotosArray];
   };
 
+  useEffect(() => {
+    console.log('uf orderValue', orderValue)
+  }, [orderValue])
+
+  useEffect(() => {
+    console.log('hasChanges', hasChanges)
+  }, [hasChanges])
+
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -373,6 +381,7 @@ useEffect(() => {
           setHasChanges(true);
         } else if (name == 7) {
           updatedItem.is_digital = checked;
+          console.log('checked', checked)
           setHasChanges(true);
         }
         return [
