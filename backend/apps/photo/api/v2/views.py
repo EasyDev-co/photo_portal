@@ -525,11 +525,27 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             status=status.HTTP_403_FORBIDDEN,
         )
 
+        error_response_parent_exist = Response(
+            {'message': 'Этот пробник уже занят родителем'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+        error_response_it_is_your = Response(
+            {'message': 'Этот пробник уже добавден вами'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
         if user.role == UserRole.parent and photo_line.kindergarten not in user.kindergarten.all():
             return error_response
 
         if user.role == UserRole.manager and photo_line.kindergarten != user.managed_kindergarten:
             return error_response
+
+        if photo_line.parent:
+            return error_response_parent_exist
+
+        if photo_line.parent == user:
+            return error_response_it_is_your
 
         return None
 
