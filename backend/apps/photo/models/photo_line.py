@@ -43,6 +43,11 @@ class PhotoLine(UUIDMixin):
         blank=True,
         null=True,
     )
+    child_number = models.IntegerField(
+        verbose_name="Порядок ребенка",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return f'{self.photo_theme} ({self.kindergarten})'
