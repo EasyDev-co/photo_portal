@@ -135,6 +135,8 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)
     currentSum >= ransomDigitalPhotos;
 
+    console.log('currentSum', currentSum)
+
   const shouldActivateCheckboxCalendar =
     ransomCalendar !== undefined &&
     ransomCalendar !== null &&
@@ -149,8 +151,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
 
       // Если состояние изменилось, вызываем обновление
       if (shouldActivateCheckbox !== prevCheckedState.current && !manualControl) {
+        console.log('изменения запущены', manualControl)
         setIsDigitalChecked(shouldActivateCheckbox);
         prevCheckedState.current = shouldActivateCheckbox;
+        console.log('shouldActivateCheckbox', shouldActivateCheckbox)
         handleCheckboxChange({ target: { checked: shouldActivateCheckbox, name: 7 } }, currentLineId);
       }
 
@@ -174,6 +178,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     console.log('manualControl', manualControl)
   
     handleCheckboxChange(e, photoLineId);
+    setManualControl(false);
 
     // Сбрасываем ручное управление, если сумма достигает порога
     if (!checked && currentSum >= ransomDigitalPhotos) {
@@ -240,7 +245,6 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
                         name={7}
                         type="checkbox"
                         checked={isDigitalChecked}
-                        // onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
                         onChange={(e) => handleDigitalCheckboxChange(e, photo.photoLineId)}
                       />
                       <div className={styles.checkbox}>
