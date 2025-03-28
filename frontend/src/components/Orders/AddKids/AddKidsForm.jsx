@@ -68,10 +68,9 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, 
             if (arr.every(item => [...addPhoto, ...photosLine].some(photo => photo.number === item))) {
                 setInputValue({ addKids: '' });
                 setError("Фотографии уже добавлены.");
-                return; // Останавливаем дальнейшее выполнение, чтобы не закрылась форма
+                return;
             }
 
-            // Получаем обновленный токен и делаем запрос на добавление фотографий
             try {
                 const res = await tokenRefreshCreate();
                 const data = await res.json();
@@ -100,6 +99,13 @@ const AddKidsForm = ({ addBlock, isActiveForm, setIsActiveForm, setModalActive, 
                                 <span> fotodetstvo1@yandex.ru </span>
                                 и мы проверим информацию.
                             </p>
+                        );
+                    } else if (photoData.message && photoData.message.includes("Этот пробник уже занят родителем")) {
+                        setError(
+                            "Ваши номера кадров были выбраны уже кем-то другим. " +
+                            "Во избежание просмотра кадров другими родителями, свяжитесь с нами по электронной почте, " +
+                            "обязательно указав свои контактные данные. Мы с Вами свяжемся и, если это Ваш ребёнок, " +
+                            "предоставим доступ."
                         );
                     } else {
                         setError(photoData.message || 'Номера фотографий которые вы ввели уже добавлены или не существуют, введите другие номера!');
