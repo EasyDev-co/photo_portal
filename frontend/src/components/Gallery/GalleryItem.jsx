@@ -40,6 +40,9 @@ const GalleryItem = ({ orders }) => {
         const downloadPromises = [];
         
         for (const elem of orders) {
+            // Пропускаем элементы, где is_digital === false
+            if (!elem.is_digital) continue;
+            
             for (const photo of elem.photos) {
                 downloadPromises.push(
                     new Promise((resolve) => {
@@ -53,7 +56,7 @@ const GalleryItem = ({ orders }) => {
                                 a.remove();
                                 resolve();
                             }, 100);
-                        }, downloadPromises.length * 300); // Увеличиваем задержку для каждого файла
+                        }, downloadPromises.length * 300);
                     })
                 );
             }
@@ -61,7 +64,6 @@ const GalleryItem = ({ orders }) => {
         
         await Promise.all(downloadPromises);
     };
-
     return (
         <>
             {orders.map((elem, i) => {
