@@ -52,7 +52,7 @@ class PhotoPriceByRegionSerializer(serializers.Serializer):
 class KindergartenStatsSerializer(serializers.Serializer):
     """Сериализатор для статистики по детскому саду."""
 
-    total_orders = serializers.IntegerField()
+    total_orders = serializers.IntegerField() # На самом деле тут лежат не заказы, а кол-во детей участвует в фотосессии
     completed_orders = serializers.IntegerField()
     average_order_value = serializers.DecimalField(
         max_digits=10,
