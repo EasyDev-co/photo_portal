@@ -6,6 +6,9 @@
     width: 31%;
     position: relative;
 }
+.current {
+    width: 23%;
+}
 @media (min-width: 1080px) and (max-width: 1440px) {
     .itemWrap{
         width: 46%;
