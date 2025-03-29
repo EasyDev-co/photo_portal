@@ -3,7 +3,6 @@
 
 {% block content %}
 <style>
-    /* Немного общего оформления для поля fieldset */
     fieldset {
         border: 1px solid #ccc;
         padding: 1rem;
@@ -14,57 +13,83 @@
         font-size: 1.1rem;
         margin-bottom: 0.5rem;
     }
-
-    /* Небольшие отступы между строками формы */
     form div {
         margin-bottom: 0.8rem;
     }
-
-    /* Делаем label и input на одной линии */
     label {
         display: inline-block;
-        width: 300px; /* при желании измените ширину */
+        width: 300px;
         margin-right: 1rem;
     }
     input[type="number"] {
-        width: 120px; /* измените по вкусу */
+        width: 120px;
         padding: 4px;
     }
-
-    /* Кнопка */
     button[type="submit"] {
         padding: 0.6rem 1.2rem;
         font-size: 14px;
         cursor: pointer;
     }
 </style>
+
 <form method="post">
     {% csrf_token %}
+
     <fieldset>
         <legend>Суммы выкупа для ВСЕХ регионов</legend>
         <div>
             <label for="id_ransom_digital_1">Электронные фото (1 ребенок):</label>
-            <input type="number" name="ransom_amount_for_digital_photos" id="id_ransom_digital_1">
+            <input
+                type="number"
+                name="ransom_amount_for_digital_photos"
+                id="id_ransom_digital_1"
+                value="{{ ransom_amount_for_digital_photos }}"
+            >
         </div>
         <div>
             <label for="id_ransom_calendar_1">Календарь (1 ребенок):</label>
-            <input type="number" name="ransom_amount_for_calendar" id="id_ransom_calendar_1">
+            <input
+                type="number"
+                name="ransom_amount_for_calendar"
+                id="id_ransom_calendar_1"
+                value="{{ ransom_amount_for_calendar }}"
+            >
         </div>
         <div>
             <label for="id_ransom_digital_2">Электронные фото (2 ребенок):</label>
-            <input type="number" name="ransom_amount_for_digital_photos_second" id="id_ransom_digital_2">
+            <input
+                type="number"
+                name="ransom_amount_for_digital_photos_second"
+                id="id_ransom_digital_2"
+                value="{{ ransom_amount_for_digital_photos_second }}"
+            >
         </div>
         <div>
             <label for="id_ransom_calendar_2">Календарь (2 ребенок):</label>
-            <input type="number" name="ransom_amount_for_calendar_second" id="id_ransom_calendar_2">
+            <input
+                type="number"
+                name="ransom_amount_for_calendar_second"
+                id="id_ransom_calendar_2"
+                value="{{ ransom_amount_for_calendar_second }}"
+            >
         </div>
         <div>
             <label for="id_ransom_digital_3">Электронные фото (3 ребенок):</label>
-            <input type="number" name="ransom_amount_for_digital_photos_third" id="id_ransom_digital_3">
+            <input
+                type="number"
+                name="ransom_amount_for_digital_photos_third"
+                id="id_ransom_digital_3"
+                value="{{ ransom_amount_for_digital_photos_third }}"
+            >
         </div>
         <div>
             <label for="id_ransom_calendar_3">Календарь (3 ребенок):</label>
-            <input type="number" name="ransom_amount_for_calendar_third" id="id_ransom_calendar_3">
+            <input
+                type="number"
+                name="ransom_amount_for_calendar_third"
+                id="id_ransom_calendar_3"
+                value="{{ ransom_amount_for_calendar_third }}"
+            >
         </div>
     </fieldset>
 
@@ -74,7 +99,13 @@
             {% if code != 7 %}
                 <div>
                     <label for="id_price_{{ code }}">{{ label }}:</label>
-                    <input type="number" step="0.01" name="price_{{ code }}" id="id_price_{{ code }}">
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="price_{{ code }}"
+                        id="id_price_{{ code }}"
+                        value="{{ photo_type_prices[code] }}"
+                    >
                 </div>
             {% endif %}
         {% endfor %}
