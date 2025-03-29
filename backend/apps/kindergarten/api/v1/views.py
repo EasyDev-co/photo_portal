@@ -106,7 +106,7 @@ class KindergartenStatsAPIView(APIView):
             'current_stats': current_stats_data,
             'past_stats': ransom_serializer.data,
             'total_ransom_amount': total_ransom_amount + orders_total_amount,
-            'average_ransom_amount': round(average_ransom_amount, 2) + orders_average_order_value,
+            'average_ransom_amount': round(average_ransom_amount, 2) + float(orders_average_order_value),
         }, status=status.HTTP_200_OK)
 
 
