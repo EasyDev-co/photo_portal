@@ -1,5 +1,6 @@
 from urllib.parse import parse_qsl
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.contrib import admin
@@ -9,14 +10,15 @@ from django.contrib import messages
 from django.urls import reverse
 
 from apps.kindergarten.models import Region
-from apps.photo.form import PhotoThemeForm
-from apps.photo.models import (Photo,
-                               PhotoTheme,
-                               PhotoLine,
-                               Coefficient,
-                               UserPhotoCount,
-                               Season,
-                               )
+from apps.photo.form import PhotoThemeForm, PhotoThemeNameForm, SeasonForm
+from apps.photo.models import (
+    Photo,
+    PhotoTheme,
+    PhotoLine,
+    Coefficient,
+    UserPhotoCount,
+    Season,
+)
 from apps.photo.models.photo_theme import PhotoPopularityStat, PhotoThemeName
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
@@ -108,6 +110,7 @@ class PhotoThemeAdmin(admin.ModelAdmin):
 
 @admin.register(PhotoThemeName)
 class PhotoThemeNameAdmin(admin.ModelAdmin):
+    form = PhotoThemeNameForm
     list_display = ('name', 'season')
 
 
@@ -216,21 +219,22 @@ class PhotoPopularityStatAdmin(admin.ModelAdmin):
         return super().change_view(request, object_id, form_url, extra_context)
 
 
-@admin.register(Coefficient)
-class CoefficientAdmin(admin.ModelAdmin):
-    list_display = (
-        'photo_type',
-        'coefficient'
-    )
+if settings.SHOW_IN_ADMIN:
+    @admin.register(Coefficient)
+    class CoefficientAdmin(admin.ModelAdmin):
+        list_display = (
+            'photo_type',
+            'coefficient'
+        )
 
-    def has_add_permission(self, request):
-        return False
+        def has_add_permission(self, request):
+            return False
 
-    def has_change_permission(self, request, obj=None):
-        return False
+        def has_change_permission(self, request, obj=None):
+            return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+        def has_delete_permission(self, request, obj=None):
+            return False
 
 
 @admin.register(UserPhotoCount)
@@ -244,4 +248,5 @@ class UserPhotoCountAdmin(admin.ModelAdmin):
 
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
+    form = SeasonForm
     list_display = ('season',)
