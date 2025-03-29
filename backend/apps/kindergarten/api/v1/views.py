@@ -67,7 +67,7 @@ class KindergartenStatsAPIView(APIView):
             orders = Order.objects.filter(
                 photo_line__kindergarten=kindergarten,
                 photo_line__photo_theme=current_photo_theme
-            )
+            ).distinct('photo_line')
 
             # Статистика текущих заказов
             current_stats = orders.filter(
