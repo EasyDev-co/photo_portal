@@ -64,15 +64,22 @@ class KindergartenStatsAPIView(APIView):
 
         # Если фототема найдена, то собираем статистику заказов
         if current_photo_theme is not None:
-            orders = Order.objects.filter(
+            orders_qs = Order.objects.filter(
                 photo_line__kindergarten=kindergarten,
-                photo_line__photo_theme=current_photo_theme
-            ).distinct('photo_line')
+                photo_line__photo_theme=current_photo_theme,
+            )
 
-            # Статистика текущих заказов
-            current_stats = orders.filter(
+            # Получаем список уникальных id заказов, уникальных по photo_line,
+            # для заказов со статусами "completed" или "paid_for"
+            distinct_order_ids = orders_qs.filter(
                 status__in=(OrderStatus.completed, OrderStatus.paid_for)
-            ).aggregate(
+            ).order_by('photo_line').distinct('photo_line').values_list('pk', flat=True)
+
+            # Выбираем заказы по полученным id
+            distinct_orders = Order.objects.filter(pk__in=list(distinct_order_ids))
+
+            # Выполняем агрегацию по уникальным заказам
+            current_stats = distinct_orders.aggregate(
                 completed_orders=Count('id'),
                 total_amount=Round(Sum('order_price', default=0), 2),
                 average_order_value=Round(Avg('order_price', default=0), 2)
