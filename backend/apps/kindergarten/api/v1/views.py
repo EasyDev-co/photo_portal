@@ -64,35 +64,44 @@ class KindergartenStatsAPIView(APIView):
 
         # Если фототема найдена, то собираем статистику заказов
         if current_photo_theme is not None:
+            # Фильтруем заказы по детскому саду и теме фотосессии
             orders_qs = Order.objects.filter(
                 photo_line__kindergarten=kindergarten,
                 photo_line__photo_theme=current_photo_theme,
             )
 
-            # Получаем список уникальных id заказов, уникальных по photo_line,
-            # для заказов со статусами "completed" или "paid_for"
-            distinct_order_ids = orders_qs.filter(
+            # Фильтруем заказы по статусам "completed" и "paid_for"
+            completed_orders_qs = orders_qs.filter(
                 status__in=(OrderStatus.completed, OrderStatus.paid_for)
-            ).order_by('photo_line').distinct('photo_line').values_list('pk', flat=True)
+            )
 
-            # Выбираем заказы по полученным id
-            distinct_orders = Order.objects.filter(pk__in=list(distinct_order_ids))
+            # 1. Получаем количество уникальных заказов (по photo_line)
+            distinct_order_ids = completed_orders_qs.order_by(
+                'photo_line'
+            ).distinct('photo_line').values_list('pk', flat=True)
+            distinct_completed_count = Order.objects.filter(pk__in=list(distinct_order_ids)).count()
 
-            # Выполняем агрегацию по уникальным заказам
-            current_stats = distinct_orders.aggregate(
-                completed_orders=Count('id'),
+            # 2. Рассчитываем агрегированные значения по всем заказам (без distinct)
+            aggregates = completed_orders_qs.aggregate(
                 total_amount=Round(Sum('order_price', default=0), 2),
                 average_order_value=Round(Avg('order_price', default=0), 2)
             )
 
+            # Количество детей (для поля total_orders в сериализаторе)
             children_count = PhotoLine.objects.filter(
                 kindergarten=kindergarten,
                 photo_theme=current_photo_theme,
             ).count()
 
-            # Подставляем значение children_count в ключ total_orders
-            current_stats['total_orders'] = children_count
+            # Собираем итоговую статистику для сериализатора
+            current_stats = {
+                'completed_orders': distinct_completed_count,
+                'total_amount': aggregates.get('total_amount', 0),
+                'average_order_value': aggregates.get('average_order_value', 0),
+                'total_orders': children_count,
+            }
 
+            # Подставляем значение children_count в ключ total_orders
             current_serializer = KindergartenStatsSerializer(data=current_stats)
             current_serializer.is_valid(raise_exception=True)
             current_stats_data = current_serializer.data
