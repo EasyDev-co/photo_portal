@@ -135,10 +135,12 @@ export const Gallery = () => {
     )
   }
 
-  const isGalleryReady = paidOrders.every(
-    (order) => order.is_digital && order.is_date_end,
-  )
+  // const isGalleryReady = paidOrders.every(
+  //   (order) => order.is_digital && order.is_date_end,
+  // )
+  const isGalleryReady = paidOrders.some(order => order.is_digital) && paidOrders.every(order => order.is_date_end);
   if (isGalleryReady) {
+    console.log('isGalleryReady')
     return (
       <div className={styles.ordersWrap}>
         <GalleryItem orders={paidOrders} />

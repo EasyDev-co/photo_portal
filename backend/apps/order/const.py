@@ -51,7 +51,7 @@ message_is_calendar_free = """
     <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
         <div style="background-color: #f9f9f9; padding: 30px;">
             <p style="font-size: 18px; color: #333; text-align: center;">
-                {first_name} {last_name}, вы сделали заказ, превышающий сумму {price} 
+                {first_name} {last_name}, вы сделали заказ, превышающий сумму {price} рублей
                 и получаете от нас все фотографии в электронном виде полностью бесплатно! 
             </p>
             <p style="font-size: 16px; color: #555; text-align: center; line-height: 1.5;">

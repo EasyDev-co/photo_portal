@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.conf import settings
 
 from apps.promocode.models import Promocode
 
@@ -32,13 +33,13 @@ class PromocodeAdmin(admin.ModelAdmin):
 
     kindergarten.short_description = 'Детский сад'
 
-
-@admin.register(BonusCoupon)
-class BonusCouponAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-        'balance',
-        'created',
-        'modified',
-    )
-    raw_id_fields = ('user',)
+if settings.SHOW_IN_ADMIN:
+    @admin.register(BonusCoupon)
+    class BonusCouponAdmin(admin.ModelAdmin):
+        list_display = (
+            'user',
+            'balance',
+            'created',
+            'modified',
+        )
+        raw_id_fields = ('user',)

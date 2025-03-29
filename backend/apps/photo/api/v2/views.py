@@ -394,6 +394,9 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
 
         user = request.user
         numbers_list = request.data.get('numbers', '')
+
+        logger.info(f"numbers_list: {numbers_list}")
+
         if user.role == UserRole.parent:  # список из 1 или 6 элементов
             kindergarten = user.kindergarten.all().first()
         elif user.role == UserRole.manager:
@@ -437,9 +440,18 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if isinstance(limit_response, Response):
             return limit_response
 
+        parent_lines = PhotoLine.objects.filter(parent=user).all()
+        photo_line_count = parent_lines.count()
+        child_number = photo_line_count + 1
+
+        logger.info(f"child_number: {child_number}")
+        logger.info(f"child_number: {child_number}")
+
         # Сохранение родителя для пробника
         if photo_line.parent is None:
             photo_line.parent = user
+            photo_line.child_number = child_number
+
             photo_line.save()
 
         # Сериализация и возврат данных
@@ -455,10 +467,10 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Проверка, что указано ровно 6 номеров
-        if len(photo_numbers) != 6 and len(photo_numbers) != 1:
+        # Проверка, что указано не больше 6 символов
+        if len(photo_numbers) > 6:
             return Response(
-                {'message': 'Необходимо указать 1 или 6 номеров фотографий.'},
+                {'message': 'Необходимо указать от 1 до 6 номеров фотографий.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -497,32 +509,11 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         logger.info(f"type phot theme: {type(active_photo_theme)}")
         logger.info(f"type kindergarten: {type(kindergarten)}")
 
-        if len(photo_numbers) == 1:
-            photo = Photo.objects.filter(
-                number=photo_numbers[0],
-                photo_line__photo_theme=active_photo_theme,
-                photo_line__kindergarten=kindergarten,
-            ).first()
-            if not photo:
-                return Response(
-                    {'message': 'Некоторые из указанных номеров фотографий не найдены.'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            photo_line = photo.photo_line
-            return photo_line
-
         photos = Photo.objects.filter(
             number__in=photo_numbers,
             photo_line__photo_theme=active_photo_theme,
             photo_line__kindergarten=kindergarten,
         )
-
-        # Проверка, что найдены все 6 фотографий
-        if photos.count() != 6:
-            return Response(
-                {'message': 'Некоторые из указанных номеров фотографий не найдены.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
 
         # Проверка, что все фотографии принадлежат одному пробнику
         photo_line_ids = photos.values_list('photo_line', flat=True).distinct()
@@ -543,11 +534,27 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             status=status.HTTP_403_FORBIDDEN,
         )
 
+        error_response_parent_exist = Response(
+            {'message': 'Этот пробник уже занят родителем'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+        error_response_it_is_your = Response(
+            {'message': 'Этот пробник уже добавден вами'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
         if user.role == UserRole.parent and photo_line.kindergarten not in user.kindergarten.all():
             return error_response
 
         if user.role == UserRole.manager and photo_line.kindergarten != user.managed_kindergarten:
             return error_response
+
+        if photo_line.parent:
+            return error_response_parent_exist
+
+        if photo_line.parent == user:
+            return error_response_it_is_your
 
         return None
 
@@ -561,7 +568,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             photo_line.photos.values_list('number', flat=True)
         )
 
-        if set(photo_numbers) != set(numbers_in_photo_line):
+        if not set(photo_numbers).issubset(set(numbers_in_photo_line)):
             return Response(
                 {'message': 'Пробник с указанными фотографиями не найден.'},
                 status=status.HTTP_404_NOT_FOUND
@@ -640,6 +647,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         parent = self.get_parent(parent_id)
         if isinstance(parent, Response):
             return parent  # Возвращаем ошибку, если есть
+
 
         # Проверка, что родитель принадлежит тому же детскому саду
         if parent.kindergarten != kindergarten:

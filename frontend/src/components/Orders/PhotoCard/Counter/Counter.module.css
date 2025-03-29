@@ -85,6 +85,8 @@
 }
  .counterButtonWrap{
      position: relative;
+     /* right: 0; */
+     /* margin: 30px; */
  }
  .counterBlock{
      display: -webkit-box;
@@ -96,6 +98,7 @@
      -webkit-box-pack: justify;
          -ms-flex-pack: justify;
              justify-content: space-between;
+    position: relative;
  }
  @media (max-width: 460px) {
     .counterBlock {

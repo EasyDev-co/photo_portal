@@ -9,9 +9,11 @@ import { use } from 'react';
 
 const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, priceCalendar, handleRemoveBlock, onChangeHandler, inputValue, blurRef, setIsBlur, handleCheckboxChange, isChecked }) => {
   const cart = useSelector(state => state.user.cart);
+  // const photoPrice = useSelector(state => state.photoPrice);
   const allPrice = useSelector(state => state.user.total_price);
   const photoPrice = useSelector(state => state.user.photoPrice);
-  const [currentSum, setCurrentSum] = useState(0);
+  const currentSum = cart.length > 0 ? cart[cart.length - 1].all_price : null;
+  // const [currentSum, setCurrentSum] = useState(0);
   const [isDigitalChecked, setIsDigitalChecked] = useState(false);
   const currentLineId = photos[0].photoLineId
   const [manualControl, setManualControl] = useState(false); // Новый флаг для ручного управления
@@ -22,27 +24,30 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   const [ransomDigitalPhotos, setRansomDigitalPhotos] = useState(0)
   const [ransomCalendar, setRansomCalendar] = useState(0)
   const [isLoading, setIsLoading] = useState(true); // Новое состояние для лоадера
-
-  useEffect(() => {
-    console.log(isDigitalChecked)}, [isDigitalChecked, setIsDigitalChecked])
+  const [isLoading2, setIsLoading2] = useState(true);
+  
+  const roleHasPhotobook = userData?.role === 1 ? userData?.kindergarten?.[0]?.has_photobook : userData?.managed_kindergarten?.has_photobook
 
   // useEffect(() => {
   //   console.log(allPrice)}, [allPrice])
   useEffect(() => {
     if (!priceCalendar) {
-      console.error('priceCalendar is not provided');
+      // console.error('priceCalendar is not provided');
       setIsLoading(true)
+      console.log(userData)
     } else {
-      console.log('priceCalendar:', priceCalendar);
+      // console.log('priceCalendar:', priceCalendar);
       setIsLoading(false)
     }
   
     if (!ransomDigitalPhotos) {
-      console.error('ransomDigitalPhotos is not provided');
+      // console.error('ransomDigitalPhotos is not provided');
       setIsLoading(true)
+      console.log(userData)
     } else {
-      console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
+      // console.log('ransomDigitalPhotos:', ransomDigitalPhotos);
       setIsLoading(false)
+      console.log(userData)
     }
   }, [priceCalendar, ransomDigitalPhotos]);
 
@@ -77,77 +82,115 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
     calculateValues();
   }, [childNumber, priceCalendar])
 
-  // useEffect(() => {
-  //   photoPrice?.forEach(element => {
-  //     if (element.photo_type === 0) {
-  //       setDigitalPrice(element.price)
-  //     }
-  //     else return
-  //   });
-  // }, [])
+  useEffect(() => {
+    // Проверяем, есть ли данные в photoPrice
+    if (photoPrice && photoPrice.length > 0) {
+      // Если данные есть, выполняем ваш код
+      photoPrice.forEach(element => {
+        if (element.photo_type === 0) {
+          setDigitalPrice(element.price);
+        }
+      });
+      setIsLoading2(false); // Выключаем загрузку
+    } else {
+      // Если данных нет, включаем загрузку
+      setIsLoading2(true);
+    }
+  }, [photoPrice]); // Добавляем photoPrice в зависимости, чтобы эффект срабатывал при его изменении
 
 
   const prevCheckedState = useRef(isDigitalChecked);
   useEffect(() => {
     console.log('prevCheckedState:', prevCheckedState)
+    console.log('has_photobook:', roleHasPhotobook);
+    console.log('photoPrice:', photoPrice);
   }, [prevCheckedState])
-//Из-за того что стоит if (cartItem) мы не затрагиваем второго и третьего ребенка, 
-// и на них не ставятся галочки, если if убрать, ьто начнется бесконечный рендер
+
   useEffect(() => {
-    // if (ransomDigitalPhotos === 0 || ransomCalendar === 0) {
+  const cartItem = cart?.find(item => item.photo_line_id === currentLineId);
+
+    if (cartItem?.is_digital == true) {
+      setIsDigitalChecked(true)
+    }
+  }, [])
+//Из-за того что стоит if (cartItem) мы не затрагиваем нется бесконечный рендер
+  useEffect(() => {
+    // if (ransomDigitalPhotos === 0 || ransomCalendar ==второго и третьего ребенка, 
+// и на них не ставятся галочки, если if убрать, ьто нач= 0) {
     //   console.log('ransomDigitalPhotos or ransomCalendar not loaded yet');
     //   return; // Прекращаем выполнение, если данные не загружены
     // }
     const cartItem = cart.find(item => item.photo_line_id === currentLineId);
-    // console.log(cartItem)
-  
-    // if (cartItem) {
-      // setCurrentSum(cartItem.total_price);
-  
-    const shouldActivateCheckbox =
-        (ransomDigitalPhotos !== undefined &&
-            ransomDigitalPhotos !== null &&
-            ransomDigitalPhotos !== '') &&
-        (allPrice >= ransomDigitalPhotos);
 
-    // Аналогично для ransomCalendar
-    const shouldActivateCheckboxCalendar =
-        (ransomCalendar !== undefined &&
-            ransomCalendar !== null &&
-            ransomCalendar !== '') &&
-        (allPrice >= ransomCalendar);
+    console.log('cartItem', cartItem)
+    // console.log('условие', !cartItem?.is_free_digitals && allPrice >= 25)
+  
+    // if (cartItem?.is_free_digitals == false && allPrice > 25) {
+    //   setCurrentSum(allPrice - 25);
+    // }
+    // else {
+    //   setCurrentSum(allPrice);
+    // }
+    // console.log('is_free_digitals', cartItem?.is_free_digital)
+    // console.log('currentSum', currentSum)
+
+  
+      const shouldActivateCheckbox =
+    ransomDigitalPhotos !== undefined &&
+    ransomDigitalPhotos !== null &&
+    ransomDigitalPhotos !== '' &&
+    ransomDigitalPhotos !== 0 &&
+    // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)
+    currentSum >= ransomDigitalPhotos;
+
+    console.log('currentSum', currentSum)
+
+  const shouldActivateCheckboxCalendar =
+    ransomCalendar !== undefined &&
+    ransomCalendar !== null &&
+    ransomCalendar !== '' &&
+    ransomCalendar !== 0 &&
+    // (currentSum >= ransomDigitalPhotos || cartItem?.is_free_calendar)
+    currentSum >= ransomCalendar;
+
+
       setIsGalkaPhoto(shouldActivateCheckbox)
       setIsGalkaCalendar(shouldActivateCheckboxCalendar)
 
-      if (allPrice) {
-        console.log(allPrice >= ransomDigitalPhotos)
-      }
-
       // Если состояние изменилось, вызываем обновление
       if (shouldActivateCheckbox !== prevCheckedState.current && !manualControl) {
+        console.log('изменения запущены', manualControl)
         setIsDigitalChecked(shouldActivateCheckbox);
         prevCheckedState.current = shouldActivateCheckbox;
+        console.log('shouldActivateCheckbox', shouldActivateCheckbox)
         handleCheckboxChange({ target: { checked: shouldActivateCheckbox, name: 7 } }, currentLineId);
       }
 
     // }
     // else console.log('hui:', currentLineId)
   }, [
-    // allPrice, ransomDigitalPhotos, handleCheckboxChange
     allPrice, ransomDigitalPhotos, ransomCalendar, handleCheckboxChange, manualControl, cart, currentLineId
 ]);
-
+// useEffect(() => {
+//   console.log('manualControl', manualControl);
+//   // Здесь можно выполнить дополнительные действия, которые зависят от manualControl
+// }, [manualControl, currentLineId]);
   // Обработчик изменения чекбокса
   const handleDigitalCheckboxChange = (e, photoLineId) => {
     const { checked } = e.target;
-  
+    console.log('checked manual in pb', checked)
+    const cartItem = cart.find(item => item.photo_line_id === photoLineId);
     // Флаг ручного управления включается только при ручных действиях
     setManualControl(true);
     setIsDigitalChecked(checked);
-    handleCheckboxChange(e, photoLineId);
+    console.log('manualControl', manualControl)
   
+    handleCheckboxChange(e, photoLineId);
+    setManualControl(false);
+
     // Сбрасываем ручное управление, если сумма достигает порога
-    if (!checked && allPrice >= ransomDigitalPhotos) {
+    if (!checked && currentSum >= ransomDigitalPhotos) {
+      // if (!checked && (currentSum >= ransomDigitalPhotos || cartItem?.is_free_digitals)) {
       setManualControl(false);
     }
   };
@@ -155,6 +198,10 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
   if (isLoading) {
     return <h1>Загрузка...</h1>; // Компонент лоадера
   }
+  if (isLoading2) {
+    return <h1>Загрузка...</h1>; // Компонент лоадера
+  }
+
 
   return (
     <div style={{
@@ -179,7 +226,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
             {index === 5 &&
               <div className={styles.widgetDelete}>
                 <div className={styles.checkboxInputWrap}>
-                  {userData.kindergarten?.[0]?.has_photobook && (
+                  {roleHasPhotobook && (
                     <div className={styles.bookCheckbox}>
                       <div className={styles.bookDescr}>Фотокнига</div>
                       <label className={styles.custom_checkbox}>
@@ -198,7 +245,7 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
                     </div>
                   )}
                   <div className={styles.bookCheckbox}>
-                    <div className={styles.bookDescr}>В электронном виде</div>
+                    <div className={styles.bookDescr}>В электронном виде: {digitalPrice.length > 3 ? digitalPrice.slice(0, -3) : digitalPrice} рублей</div>
                     <label className={styles.custom_checkbox}>
                       <input
                         className=''
@@ -206,7 +253,6 @@ const PhotoBlock = memo(({ childNumber, blocksId, index, photos, price, oke, pri
                         name={7}
                         type="checkbox"
                         checked={isDigitalChecked}
-                        // onChange={(e) => handleCheckboxChange(e, photo.photoLineId)}
                         onChange={(e) => handleDigitalCheckboxChange(e, photo.photoLineId)}
                       />
                       <div className={styles.checkbox}>

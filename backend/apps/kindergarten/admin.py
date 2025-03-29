@@ -1,9 +1,14 @@
+from decimal import Decimal
+
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import path
 
-from apps.kindergarten.models.region import Region
+from apps.kindergarten.models.region import Region, RegionPriceSettings
 from apps.kindergarten.models.photo_price import PhotoPrice, PhotoType
 from apps.kindergarten.form import KindergartenForm
 from .models import Ransom
@@ -13,6 +18,7 @@ from apps.kindergarten.models.kindergarten import Kindergarten
 from config.settings import UPLOAD_URL, JQUERY_CDN
 
 from ..photo.models import KindergartenPhotoTheme
+from ..utils.models_mixins.models_mixins import logger
 from ..utils.services.generate_tokens_for_user import generate_tokens_for_user
 
 User = get_user_model()
@@ -41,7 +47,7 @@ class PhotoPriceInline(admin.TabularInline):
 
 @admin.register(Kindergarten)
 class KindergartenAdmin(admin.ModelAdmin):
-    list_display = ('name', 'region', 'code', "id", 'has_photobook', 'locality', 'active_photo_theme')
+    list_display = ('name', 'locality', 'region', 'code', "id", 'has_photobook', 'locality', 'active_photo_theme')
     list_filter = ('region', 'locality')
     search_fields = ('name', 'code')
     readonly_fields = ('qr_image', 'qr_code', 'file_upload', 'manager_info', 'active_photo_theme')
@@ -165,3 +171,130 @@ class RansomAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.select_related('kindergarten', 'photo_theme')
+
+@admin.register(RegionPriceSettings)
+class RegionPriceSettingsAdmin(admin.ModelAdmin):
+    """
+    Админ-класс для "прокси"-модели, в котором мы делаем одну
+    кастомную страницу (настройки цен/выкупа) и больше никаких
+    стандартных списков и т.д. не показываем.
+    """
+
+    # Чтобы при клике на "Глобальные настройки цен" мы сразу
+    # попадали на нашу форму (а не на список объектов), можно
+    # скрыть стандартные кнопки, переопределив методы ниже:
+
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    # Самое главное – добавить кастомный URL.
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                '',  # Пустой path => будет открываться по /admin/app/regionpricesettings/
+                self.admin_site.admin_view(self.settings_view),
+                name='region_price_settings',
+            ),
+        ]
+        return my_urls + urls
+
+    def settings_view(self, request):
+        """
+        Кастомный view, который обрабатывает GET (показывает форму)
+        и POST (обновляет ransom-поля у Region и PhotoPrice у всех регионов).
+        """
+        photo_types = PhotoType.choices  # [(0, 'Электронные'), (1,'10x15')...]
+
+        if request.method == 'POST':
+            # Читаем ransom
+            ransom_amount_for_digital_photos = request.POST.get('ransom_amount_for_digital_photos') or None
+            ransom_amount_for_calendar = request.POST.get('ransom_amount_for_calendar') or None
+            ransom_amount_for_digital_photos_second = request.POST.get('ransom_amount_for_digital_photos_second') or None
+            ransom_amount_for_calendar_second = request.POST.get('ransom_amount_for_calendar_second') or None
+            ransom_amount_for_digital_photos_third = request.POST.get('ransom_amount_for_digital_photos_third') or None
+            ransom_amount_for_calendar_third = request.POST.get('ransom_amount_for_calendar_third') or None
+
+            # Читаем цены на фото
+            # Допустим, вводим их в полях с именами price_{код}
+            photo_type_prices = {}
+            for code, label in photo_types:
+                field_name = f'price_{code}'
+                value = request.POST.get(field_name) or None
+                photo_type_prices[code] = value
+
+            # Обновляем Regions (ransom поля)
+            update_data = {}
+            if ransom_amount_for_digital_photos:
+                update_data['ransom_amount_for_digital_photos'] = ransom_amount_for_digital_photos
+            if ransom_amount_for_calendar:
+                update_data['ransom_amount_for_calendar'] = ransom_amount_for_calendar
+            if ransom_amount_for_digital_photos_second:
+                update_data['ransom_amount_for_digital_photos_second'] = ransom_amount_for_digital_photos_second
+            if ransom_amount_for_calendar_second:
+                update_data['ransom_amount_for_calendar_second'] = ransom_amount_for_calendar_second
+            if ransom_amount_for_digital_photos_third:
+                update_data['ransom_amount_for_digital_photos_third'] = ransom_amount_for_digital_photos_third
+            if ransom_amount_for_calendar_third:
+                update_data['ransom_amount_for_calendar_third'] = ransom_amount_for_calendar_third
+
+            if update_data:
+                (Region.objects
+                 .exclude(name__in=["Москва", "Санкт-Петербург", "москва", "cанкт-петербург"])
+                 .update(**update_data))
+
+            # Обновляем/создаем PhotoPrice для всех регионов и каждого типа
+            regions = Region.objects.exclude(name__in=["Москва", "Санкт-Петербург", "москва", "cанкт-петербург"])
+            for region in regions:
+                for code, label in photo_types:
+                    new_price = photo_type_prices.get(code)
+                    logger.info(f"new_price: {new_price}")
+                    logger.info(f"new_price_type: {type(new_price)}")
+                    if new_price:
+                        PhotoPrice.objects.update_or_create(
+                            region=region,
+                            photo_type=code,
+                            defaults={'price': Decimal(new_price.replace(",", "."))}
+                        )
+                    elif code == 7:
+                        PhotoPrice.objects.update_or_create(
+                            region=region,
+                            photo_type=PhotoType.free_calendar,
+                            defaults={'price': 0}
+                        )
+
+            messages.success(request, "Цены и суммы выкупа обновлены для всех регионов!")
+            return redirect('.')  # Перезагрузим эту же страницу
+
+        else:
+            example_region = Region.objects.exclude(name__in=["Москва", "Санкт-Петербург"]).first()
+
+            # Если регион найден, читаем у него данные выкупа
+            ransom_context = {}
+            if example_region:
+                ransom_context = {
+                    'ransom_amount_for_digital_photos': example_region.ransom_amount_for_digital_photos or '',
+                    'ransom_amount_for_calendar': example_region.ransom_amount_for_calendar or '',
+                    'ransom_amount_for_digital_photos_second': example_region.ransom_amount_for_digital_photos_second or '',
+                    'ransom_amount_for_calendar_second': example_region.ransom_amount_for_calendar_second or '',
+                    'ransom_amount_for_digital_photos_third': example_region.ransom_amount_for_digital_photos_third or '',
+                    'ransom_amount_for_calendar_third': example_region.ransom_amount_for_calendar_third or '',
+                }
+
+            # Аналогично, берём цены из PhotoPrice
+            photo_type_prices = {}
+            if example_region:
+                for code, label in photo_types:
+                    price_obj = PhotoPrice.objects.filter(region=example_region, photo_type=code).first()
+                    # Если нет объекта PhotoPrice, подставим пустую строку, чтобы в input не было "None"
+                    photo_type_prices[code] = price_obj.price if price_obj else ''
+
+            context = {
+                'title': 'Глобальные настройки цен и выкупа',
+                'photo_types': photo_types,
+                **ransom_context,
+                'photo_type_prices': photo_type_prices,
+            }
+            return render(request, 'admin/price_settings.html', context)

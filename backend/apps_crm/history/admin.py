@@ -20,12 +20,9 @@ models_to_unregister_celery = [
         PeriodicTasks,
     ]
 
-if not settings.SHOW_IN_ADMIN:
-    try:
-        admin.site.unregister(LogEntry)
-    except admin.sites.NotRegistered:
-        pass
+# admin.site.register(LogEntry)
 
+if not settings.SHOW_IN_ADMIN:
     for model in models_to_unregister_celery:
         try:
             admin.site.unregister(model)

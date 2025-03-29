@@ -31,7 +31,7 @@ const PaymentDiagram = ({ text, amount, label, bonus }) => {
             <div className={styles.diagramCircle}>
                 {cart.length ?
                     <>
-                        <div className={styles.count}>{count ? `${count},00` : `${amount?.slice(0, amount.length - 3) ? amount?.slice(0, amount.length - 3) : 0},00`}</div>
+                        <div className={styles.count}>{count ? `${count}` : `${amount?.slice(0, amount.length - 3) ? amount?.slice(0, amount.length - 3) : 0}`}</div>
                         <span>рублей</span>
                     </> :
                     <>

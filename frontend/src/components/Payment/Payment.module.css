@@ -62,6 +62,7 @@
     gap: 80px;
     height: 83.5vh;
     border-left:1px solid rgb(229, 229, 229);
+    
 }
 @media (max-width: 968px) {
     .paymentTimerWrap{
