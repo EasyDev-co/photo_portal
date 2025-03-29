@@ -238,10 +238,12 @@ class RegionPriceSettingsAdmin(admin.ModelAdmin):
                 update_data['ransom_amount_for_calendar_third'] = ransom_amount_for_calendar_third
 
             if update_data:
-                Region.objects.update(**update_data)
+                (Region.objects
+                 .exclude(name__in=["Москва", "Санкт-Петербург"])
+                 .update(**update_data))
 
             # Обновляем/создаем PhotoPrice для всех регионов и каждого типа
-            regions = Region.objects.all()
+            regions = Region.objects.exclude(name__in=["Москва", "Санкт-Петербург"])
             for region in regions:
                 for code, label in photo_types:
                     new_price = photo_type_prices.get(code)
@@ -261,9 +263,33 @@ class RegionPriceSettingsAdmin(admin.ModelAdmin):
             messages.success(request, "Цены и суммы выкупа обновлены для всех регионов!")
             return redirect('.')  # Перезагрузим эту же страницу
 
-        # Если GET – просто показываем форму
-        context = {
-            'title': 'Глобальные настройки цен и выкупа',
-            'photo_types': photo_types,
-        }
-        return render(request, 'admin/price_settings.html', context)
+        else:
+            example_region = Region.objects.exclude(name__in=["Москва", "Санкт-Петербург"]).first()
+
+            # Если регион найден, читаем у него данные выкупа
+            ransom_context = {}
+            if example_region:
+                ransom_context = {
+                    'ransom_amount_for_digital_photos': example_region.ransom_amount_for_digital_photos or '',
+                    'ransom_amount_for_calendar': example_region.ransom_amount_for_calendar or '',
+                    'ransom_amount_for_digital_photos_second': example_region.ransom_amount_for_digital_photos_second or '',
+                    'ransom_amount_for_calendar_second': example_region.ransom_amount_for_calendar_second or '',
+                    'ransom_amount_for_digital_photos_third': example_region.ransom_amount_for_digital_photos_third or '',
+                    'ransom_amount_for_calendar_third': example_region.ransom_amount_for_calendar_third or '',
+                }
+
+            # Аналогично, берём цены из PhotoPrice
+            photo_type_prices = {}
+            if example_region:
+                for code, label in photo_types:
+                    price_obj = PhotoPrice.objects.filter(region=example_region, photo_type=code).first()
+                    # Если нет объекта PhotoPrice, подставим пустую строку, чтобы в input не было "None"
+                    photo_type_prices[code] = price_obj.price if price_obj else ''
+
+            context = {
+                'title': 'Глобальные настройки цен и выкупа',
+                'photo_types': photo_types,
+                **ransom_context,
+                'photo_type_prices': photo_type_prices,
+            }
+            return render(request, 'admin/price_settings.html', context)
