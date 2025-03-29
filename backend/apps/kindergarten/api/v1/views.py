@@ -18,6 +18,7 @@ from apps.kindergarten.api.v1.serializers import (
     KindergartenSerializer,
     RegionSerializer,
 )
+from apps.photo.models import PhotoLine
 from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten, Region
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus
@@ -69,19 +70,21 @@ class KindergartenStatsAPIView(APIView):
             )
 
             # Статистика текущих заказов
-            current_stats = (
-                    orders.aggregate(
-                        total_orders=Count('id')
-                    )
-                    |
-                    orders.filter(
-                        status__in=(OrderStatus.completed, OrderStatus.paid_for)
-                    ).aggregate(
-                        completed_orders=Count('id'),
-                        total_amount=Round(Sum('order_price', default=0), 2),
-                        average_order_value=Round(Avg('order_price', default=0), 2)
-                    )
+            current_stats = orders.filter(
+                status__in=(OrderStatus.completed, OrderStatus.paid_for)
+            ).aggregate(
+                completed_orders=Count('id'),
+                total_amount=Round(Sum('order_price', default=0), 2),
+                average_order_value=Round(Avg('order_price', default=0), 2)
             )
+
+            children_count = PhotoLine.objects.filter(
+                kindergarten=kindergarten,
+                photo_theme=current_photo_theme,
+            ).count()
+
+            # Подставляем значение children_count в ключ total_orders
+            current_stats['total_orders'] = children_count
 
             current_serializer = KindergartenStatsSerializer(data=current_stats)
             current_serializer.is_valid(raise_exception=True)

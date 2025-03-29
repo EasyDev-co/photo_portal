@@ -34,7 +34,7 @@ class Kindergarten(UUIDMixin):
         blank=True
     )
     has_photobook = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name='Наличие фотокниги'
     )
     locality = models.CharField(

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -16,6 +18,7 @@ from apps.kindergarten.models.kindergarten import Kindergarten
 from config.settings import UPLOAD_URL, JQUERY_CDN
 
 from ..photo.models import KindergartenPhotoTheme
+from ..utils.models_mixins.models_mixins import logger
 from ..utils.services.generate_tokens_for_user import generate_tokens_for_user
 
 User = get_user_model()
@@ -239,19 +242,21 @@ class RegionPriceSettingsAdmin(admin.ModelAdmin):
 
             if update_data:
                 (Region.objects
-                 .exclude(name__in=["Москва", "Санкт-Петербург"])
+                 .exclude(name__in=["Москва", "Санкт-Петербург", "москва", "cанкт-петербург"])
                  .update(**update_data))
 
             # Обновляем/создаем PhotoPrice для всех регионов и каждого типа
-            regions = Region.objects.exclude(name__in=["Москва", "Санкт-Петербург"])
+            regions = Region.objects.exclude(name__in=["Москва", "Санкт-Петербург", "москва", "cанкт-петербург"])
             for region in regions:
                 for code, label in photo_types:
                     new_price = photo_type_prices.get(code)
+                    logger.info(f"new_price: {new_price}")
+                    logger.info(f"new_price_type: {type(new_price)}")
                     if new_price:
                         PhotoPrice.objects.update_or_create(
                             region=region,
                             photo_type=code,
-                            defaults={'price': new_price}
+                            defaults={'price': Decimal(new_price.replace(",", "."))}
                         )
                     elif code == 7:
                         PhotoPrice.objects.update_or_create(
