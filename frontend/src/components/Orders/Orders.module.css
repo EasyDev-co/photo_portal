@@ -491,11 +491,12 @@
 }
 
 .question {
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
+    /* position: absolute; */
+    /* bottom: 4px;
+    left: 4px; */
     width: 15px;
     cursor: pointer;
+    margin-right: 5px;
 }
 
 .signature {
@@ -507,7 +508,7 @@
 
 .signatureText {
     background-color: #ffffff;
-    border: 1px solid #000000;
+    border: 1px solid rgb(229, 229, 229);
     padding: 2px;
     border-radius: 6px;
     /* width: 100%; */

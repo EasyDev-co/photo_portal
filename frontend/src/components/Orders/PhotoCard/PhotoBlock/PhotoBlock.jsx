@@ -272,6 +272,13 @@ const PhotoBlock = memo(
                       <div className={styles.signature}>
                         <div className={styles.bookCheckbox}>
                           <div className={styles.bookDescr}>Фотокнига</div>
+                          <img
+                            className={styles.question}
+                            src={question}
+                            alt="question"
+                            onMouseEnter={() => setHoveredIndexBook(true)}
+                            onMouseLeave={() => setHoveredIndexBook(false)}
+                          ></img>
                           <label className={styles.custom_checkbox}>
                             <input
                               className=""
@@ -287,13 +294,7 @@ const PhotoBlock = memo(
                               <div className={styles.checkmark}></div>
                             </div>
                           </label>
-                          <img
-                            className={styles.question}
-                            src={question}
-                            alt="question"
-                            onMouseEnter={() => setHoveredIndexBook(true)}
-                            onMouseLeave={() => setHoveredIndexBook(false)}
-                          ></img>
+                          
                         </div>
                         <p className={`${styles.signatureText} ${!hoveredIndexBook ? styles.hovered : ''}`}>
                           2-4 разворота книги, все кадры, формат 20х30
@@ -309,6 +310,13 @@ const PhotoBlock = memo(
                             : digitalPrice}{' '}
                           рублей
                         </div>
+                        <img
+                          className={styles.question}
+                          src={question}
+                          alt="question"
+                          onMouseEnter={() => setHoveredIndexDigital(true)}
+                          onMouseLeave={() => setHoveredIndexDigital(false)}
+                        ></img>
                         <label className={styles.custom_checkbox}>
                           <input
                             className=""
@@ -324,13 +332,7 @@ const PhotoBlock = memo(
                             <div className={styles.checkmark}></div>
                           </div>
                         </label>
-                        <img
-                          className={styles.question}
-                          src={question}
-                          alt="question"
-                          onMouseEnter={() => setHoveredIndexDigital(true)}
-                          onMouseLeave={() => setHoveredIndexDigital(false)}
-                        ></img>
+          
                       </div>
                       <p className={`${styles.signatureText} ${!hoveredIndexDigital ? styles.hovered : ''}`}>
                         Электронная платная версия всех кадров
