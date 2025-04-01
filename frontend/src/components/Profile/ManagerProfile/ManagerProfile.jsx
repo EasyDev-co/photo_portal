@@ -44,6 +44,7 @@ const ManagerProfile = () => {
     const photoThemeId = localStorage.getItem('theme_id')
     const kindergartenId = localStorage.getItem('kindergarten_id')
     const [orderList, setOrderList] = useState([])
+    const [hasPhotoTheme, setHasPhotoTheme] = useState(true)
     
     const [stats, setStats] = useState({
             current_stats: {
@@ -154,20 +155,24 @@ const ManagerProfile = () => {
     }, [])
 
     useEffect(() => {
-        try {
-            getOrdersManager(photoThemeId, kindergartenId, accessStor)
-                .then(res => {
-                    if (res.ok) {
-                        res.json()
-                            .then(res => {
-                                console.log(res)
-                                setOrderList(res?.orders)
-                                console.log(orderList)
-                            })
+        if (photoThemeId !== 'Нет активной фототемы') {
+            const fetchOrders = async () => {
+                try {
+                    const response = await getOrdersManager(photoThemeId, kindergartenId, accessStor);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setOrderList(data?.orders || []); // Устанавливаем orders или пустой массив, если data.orders отсутствует
+                    } else {
+                        console.error('Ошибка при получении заказов:', response.statusText);
                     }
-                })
-        } catch (error) {
-            console.log(error)
+                } catch (error) {
+                    console.error('Ошибка при выполнении запроса:', error);
+                }
+            };
+    
+            fetchOrders(); // Вызываем асинхронную функцию
+        } else {
+            setHasPhotoTheme(false); // Если фототемы нет, обновляем состояние
         }
     }, [photoThemeId, kindergartenId, accessStor])
 
@@ -201,26 +206,42 @@ const ManagerProfile = () => {
             </ClientModal>
             <div className={styles.profileWidgetWrap}>
                 <h1 className={styles.profileTitle}>Статистика</h1>
-                <div className={styles.profileWidget}> 
+                <div className={styles.cuurent}>
+                    <h3 className={styles.cuurentTitle}>Текущая фотосессия</h3>
+                <div className={styles.profileWidget}>
                     <StatisticItem
-                        label={'Количество заказов'}
-                        data={`${stats.current_stats.completed_orders} из ${stats.current_stats.total_orders}`}
+                        label="Количество заказов"
+                        data={`${stats?.current_stats?.completed_orders ?? 0} из ${stats?.current_stats?.total_orders ?? 0}`}
+                        current={true}
                     />
+
+                    {/*<StatisticItem*/}
+                    {/*    label={'Количество заказов'}*/}
+                    {/*    data={`${stats.current_stats.completed_orders ? stats.current_stats.completed_orders : '0'} из ${stats.current_stats.total_orders}`}*/}
+                    {/*/>*/}
                     <StatisticItem
                         setIsCopy={setIsCopy}
                         isCopy
                         label={'Промо-код для сотрудников'}
                         data={promocode.code}
+                        current={true}
                     />
                     <StatisticItem
                         label={'Средний чек, руб'}
-                        data={stats.current_stats.average_order_value}
+                        data={stats?.current_stats?.average_order_value ?? 0}
+                        current={true}
+                    />
+                    <StatisticItem
+                        label={'Сумма выкупа, руб'}
+                        data={stats?.current_stats?.total_amount ?? 0}
+                        current={true}
                     />
                 </div>
+                </div>
                 {stats.past_stats && Array.isArray(stats.past_stats) && stats.past_stats.length > 0 && (
-                    <div className={styles.profileWidget}>
+                    <div >
                         {stats.past_stats.map((item, index) => (
-                            <>
+                            <div className={styles.profileWidget} key={index}>
                                 <StatisticItem
                                     key={index}
                                     label={`Тема фотосессии`}
@@ -228,23 +249,24 @@ const ManagerProfile = () => {
                                 />
                                 <StatisticItem
                                     key={index}
-                                    label={`Сумма выкупа`}
+                                    label={`Сумма выкупа за ${item.photo_theme.name}`}
                                     data={item.ransom_amount}
                                 />
-                            </>
+                            </div>
                         ))}
                     </div>
                 )}
                 <div className={styles.profileWidget}>
                     <StatisticItem
-                        label={'Итого руб.'}
+                        label={'Итого за все фотосессии руб.'}
                         data={`${stats.total_ransom_amount}`}
                     />
                     <StatisticItem
-                        label={'Средняя выручка за фотосессию'}
+                        label={'Средняя выручка за все фотосессии'}
                         data={`${stats.average_ransom_amount}`}
                     />
                 </div>
+                {!hasPhotoTheme && <p style={{marginBottom: '20px'}}>Нет активной фотосессии</p>}
                 <div className={styles.checkWrap}>
                     <div onClick={() => navigate('/orders_manager')}>
                         <MainButton

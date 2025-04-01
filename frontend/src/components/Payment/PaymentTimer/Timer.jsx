@@ -42,15 +42,15 @@ const Timer = ({ date, desc, isStats }) => {
             </span>
             <div className={styles.timerWrap}>
                 <div className={styles.timer}>
-                    <div className={styles.timerTime}>{isNaN(time.days) ? 0 : time.days}</div>
+                    <div className={styles.timerTime}>{isNaN(time.days) ? '0' : (time.days > 0 ? time.days : '0')}</div>
                     <span>Дней</span>
                 </div>
                 <div className={styles.timer}>
-                    <div className={styles.timerTime}>{isNaN(time.hours) ? 0 : time.hours}</div>
+                    <div className={styles.timerTime}>{isNaN(time.hours) ? '00' : (time.hours > 0 ? time.hours : '00')}</div>
                     <span>Часов</span>
                 </div>
                 <div className={styles.timer}>
-                    <div className={styles.timerTime}>{isNaN(time.minutes) ? 0 : time.minutes}</div>
+                    <div className={styles.timerTime}>{isNaN(time.minutes) ? 0 : (time.minutes > 0 ? time.minutes : '00')}</div>
                     <span>Минут</span>
                 </div>
             </div>

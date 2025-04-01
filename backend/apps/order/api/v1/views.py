@@ -29,6 +29,7 @@ from apps.order.models.notification import NotificationFiscalization
 from apps.order.permissions import IsOrdersPaymentOwner
 from apps.photo.api.v1.serializers import PaidPhotoLineSerializer
 from apps.photo.models import PhotoLine, PhotoTheme
+from apps.user.models import UserRole
 from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
@@ -87,7 +88,7 @@ class OrderAPIView(APIView):
         return photo_lines_dict, is_digital_by_photo_line_id
 
     @staticmethod
-    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id):
+    def finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id, user):
         """
         Формирует итоговый список объектов.
         """
@@ -99,10 +100,13 @@ class OrderAPIView(APIView):
             logger.info(f"photo_line_id: {photo_line_id}")
             logger.info(f"photo_line: {photo_line}")
 
-            photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
+            if user.role == UserRole.manager:
+                photo_line.is_date_end = True
+            else:
+                photo_line.is_digital, photo_line.is_free_digital = is_digital_by_photo_line_id[photo_line_id]
 
-            extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
-            photo_line.is_date_end = extended_date_end < current_time
+                extended_date_end = photo_line.photo_theme.date_end + timedelta(days=7)
+                photo_line.is_date_end = extended_date_end < current_time
 
             photo_lines.append(photo_line)
         return photo_lines
@@ -110,11 +114,20 @@ class OrderAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        photo_lines_queryset = PhotoLine.objects.filter(
-            kindergarten__in=user.kindergarten.all(),
-            parent=user,
-            orders__status=OrderStatus.paid_for
-        ).annotate(
+        if user.role == UserRole.manager:
+            photo_lines_kd_queryset = PhotoLine.objects.filter(
+                kindergarten=user.managed_kindergarten,
+                parent=user,
+                orders__status=OrderStatus.paid_for
+            )
+        else:
+            photo_lines_kd_queryset = PhotoLine.objects.filter(
+                kindergarten__in=user.kindergarten.all(),
+                parent=user,
+                orders__status=OrderStatus.paid_for
+            )
+
+        photo_lines_queryset = photo_lines_kd_queryset.annotate(
             is_digital=F('orders__is_digital'),
             is_free_digital=F('orders__is_free_digital'),
         ).order_by('id', 'photo_theme__date_end')
@@ -123,7 +136,7 @@ class OrderAPIView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         photo_lines_dict, is_digital_by_photo_line_id = self.aggregate_is_digital(photo_lines_queryset)
-        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id)
+        photo_lines = self.finalize_photo_lines(photo_lines_dict, is_digital_by_photo_line_id, user)
 
         if not photo_lines:
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -180,6 +193,8 @@ class OrderAPIView(APIView):
 
         order_items = []
         for cart_photo_line in cart_photo_lines:
+            logger.info(f"cart_photo_line: {cart_photo_line.photo_line}")
+
             order = orders_map[cart_photo_line.photo_line.id]
 
             # Берём все фото, которые выбрал пользователь
@@ -190,17 +205,19 @@ class OrderAPIView(APIView):
                     amount=photo_in_cart.quantity,
                     order=order,
                     photo=photo_in_cart.photo,
+                    price=photo_in_cart.discount_price * photo_in_cart.quantity,
                 )
                 for photo_in_cart in photos_in_cart
             )
 
             # Если пользователь заказал «электронные фото» (is_digital), добавляем отдельный OrderItem
-            if order.is_digital:
+            if order.is_digital and not order.is_free_digital:
                 order_items.append(
                     OrderItem(
                         photo_type=PhotoType.digital,
-                        amount=1,  # обычно 1 позиция
+                        amount=1,
                         order=order,
+                        price=cart_photo_line.digital_price,
                     )
                 )
 
@@ -211,6 +228,7 @@ class OrderAPIView(APIView):
                         photo_type=PhotoType.photobook,
                         amount=1,
                         order=order,
+                        price=cart_photo_line.photo_book_price,
                     )
                 )
 
@@ -222,51 +240,63 @@ class OrderAPIView(APIView):
                         amount=1,
                         photo=cart_photo_line.photo_line.photos.order_by('?').first(),
                         order=order,
+                        price=0,
+                    )
+                )
+
+            if order.is_free_digital:
+                order_items.append(
+                    OrderItem(
+                        photo_type=PhotoType.digital,
+                        amount=1,
+                        photo=None,
+                        order=order,
+                        price=0,
                     )
                 )
 
         # Теперь пересчитываем стоимость каждого OrderItem, учитывая промокод, купон, и (ВНИМАНИЕ!) флаг is_free_digital
         coupon_amount = [Decimal(cart.bonus_coupon) if cart.bonus_coupon else Decimal(0)]
 
-        for order_item in order_items:
-            order_ref = order_item.order  # сам заказ
-
-            # 1) Если для всего заказа (или корзины) стоит флаг "заказ полностью куплен купоном"
-            if cart.order_fully_paid_by_coupon:
-                order_item.price = Decimal(0)
-                continue
-
-            # 2) Если это цифровое фото, а у заказа проставлено is_free_digital=True – ставим 0
-            if order_ref.is_free_digital and order_item.photo_type == PhotoType.digital:
-                order_item.price = Decimal(0)
-                continue
-
-            if order_ref.is_free_calendar and order_item.photo_type == PhotoType.free_calendar:
-                order_item.price = Decimal(0)
-                continue
+        # for order_item in order_items:
+        #     order_ref = order_item.order  # сам заказ
+        #
+        #     # 1) Если для всего заказа (или корзины) стоит флаг "заказ полностью куплен купоном"
+        #     if cart.order_fully_paid_by_coupon:
+        #         order_item.price = Decimal(0)
+        #         continue
+        #
+        #     # 2) Если это цифровое фото, а у заказа проставлено is_free_digital=True – ставим 0
+        #     if order_ref.is_free_digital and order_item.photo_type == PhotoType.digital:
+        #         order_item.price = Decimal(0)
+        #         continue
+        #
+        #     if order_ref.is_free_calendar and order_item.photo_type == PhotoType.free_calendar:
+        #         order_item.price = Decimal(0)
+        #         continue
 
             # 3) Иначе – обычный расчёт цены
-            calculate_price_for_order_item(
-                order_item=order_item,
-                prices_dict=prices_dict,
-                ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
-                promocode=cart.promocode,
-                coupon_amount=coupon_amount,
-                user_role=user.role
-            )
+            # calculate_price_for_order_item(
+            #     order_item=order_item,
+            #     prices_dict=prices_dict,
+            #     ransom_amount_for_digital_photos=region.ransom_amount_for_digital_photos,
+            #     promocode=cart.promocode,
+            #     coupon_amount=coupon_amount,
+            #     user_role=user.role
+            # )
 
         # Важно: если всё было оплачено купоном, вы где-то ставите price=1 на самый первый OrderItem
         # (чтобы сумма не была = 0; по логике вашей платёжной системы).
         # Оставим это, как есть у вас сейчас:
-        if cart.order_fully_paid_by_coupon and order_items:
-            order_items[0].price = Decimal(1)
-
+        # if cart.order_fully_paid_by_coupon and order_items:
+        #     order_items[0].price = Decimal(1)
+                        
         # Промокод: увеличиваем счётчик активаций и записываем пользователя
         if cart.promocode:
             promocode = cart.promocode
             promocode.used_by = promocode.used_by or []
             promocode.used_by.append({'id': str(user.id), 'email': user.email})
-            promocode.activate_count += 1
+            promocode.activate_count -= 1
             promocode.save()
 
         # Сохраняем все OrderItem
@@ -322,9 +352,8 @@ class PaymentAPIView(APIView):
             'Email': str(user.email),
             'Taxation': TAXATION,
         }
-        total_price = 0
-        for item in order_items:
-            total_price += item.price
+
+        logger.info(f"payment_data: {payment_data}")
 
         payment_data['Token'] = token
         response = requests.post(
@@ -341,8 +370,15 @@ class PaymentAPIView(APIView):
 
                 # обновляем баланс бонусного купона, после его использования
                 total_original_price = sum(order.original_price for order in orders.all())
-                user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
-                user.save()
+                # user.manager_discount_balance = max(user.manager_discount_balance - total_original_price, 0)
+                if request.user.role == UserRole.manager:
+                    discount_balance = user.manager_discount_balance
+                    if discount_balance <= 0:
+                        user.manager_discount_intermediate_balance = 0
+                        user.manager_discount_balance_empty = True
+                    else:
+                        user.manager_discount_intermediate_balance = user.manager_discount_balance
+                    user.save()
 
                 return Response(payment_url, status=status.HTTP_200_OK)
             return Response(

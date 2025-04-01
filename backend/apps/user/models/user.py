@@ -76,6 +76,7 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True
     )
+    use_manager_coupon = models.BooleanField(default=False, verbose_name="Использовал промокод заведующей")
     birth_date = models.DateField(
         null=True,
         blank=True,
@@ -93,6 +94,11 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True,
     )
+    manager_discount_intermediate_balance = models.PositiveIntegerField(
+        default=3000,
+        verbose_name="Промежуточная таблица с бонусным балансом",
+    )
+    manager_discount_balance_empty = models.BooleanField(default=False, verbose_name="Доступность бонуса заведующей")
     manager_percent = models.DecimalField(
         verbose_name="Процент заведующей",
         decimal_places=2,

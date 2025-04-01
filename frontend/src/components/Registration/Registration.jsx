@@ -145,7 +145,7 @@ export const Registration = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const regex = /^(\d+|(\d+(([-,\s]| и? )\d+){5}))$/;
+    const regex = /^\d+(\.jpeg|\.jpg)?([и\s\-.;,]+(\d+(\.jpeg|\.jpg)?)){0,5}([и\s\-.;,]+)?$/i;
 
     if (inputValue.password !== inputValue.repeatPassword) {
       setError({ repeatPass: ['Пароли не совпадают!'] })
@@ -168,7 +168,7 @@ export const Registration = () => {
           )
           setResponseData(data);
           dispatch(setPhotoNumbers(
-            inputValue.pictureNumbers.split(/[-,\sи]+/).map(elem => {
+            inputValue.pictureNumbers.split(/[и\s\-.;,]+|jpg|jpeg/i).map(elem => {
               return Number(elem)
             })
           ))
@@ -184,8 +184,9 @@ export const Registration = () => {
         console.log(error)
       }
     } else {
-      setError({ pictureNumbers: ['Неправильный формат ввода.' +
-          ' Введите 1 или 6 номеров фото через дефис, запятую, пробел или "и".'] })
+      setError({ pictureNumbers: ['Введены недопустимые символы.' +
+          ' Пожалуйста, используйте только цифры, дефисы (-), запятые (,) или пробелы.' +
+          ' Если вы укажите только один номер кадра, будут подтянуты все номера кадров этого ребенка.'] })
     }
   }
 
@@ -220,7 +221,7 @@ export const Registration = () => {
               <InputField
                 name={'pictureNumbers'}
                 onChangeHandler={onChangeHandler}
-                placeholder={'Номера кадров'}
+                placeholder={'Укажите любой номер кадра'}
                 isQuestions
                 isAuthForm
                 value={inputValue.pictureNumbers}

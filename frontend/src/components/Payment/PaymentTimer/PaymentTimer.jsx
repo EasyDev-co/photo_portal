@@ -12,6 +12,10 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
     const accessStor = localStorage.getItem('access');
     const country = localStorage.getItem('regionName');
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        console.log('country', country)
+    }, [])
     
     useEffect(() => {
         fetchPhotoPriceWithTokenInterceptor(accessStor, country)
@@ -25,9 +29,9 @@ const PaymentTimer = ({onSubmitHandler, payOrder}) => {
             .catch(res=>{
                 console.log(res)
             })
-    }, [])
-    const rootClassName = location.pathname === '/orders' 
-        ? styles.paymentTimerWrap_orders 
+    }, [country])
+    const rootClassName = location.pathname === '/orders' || location.pathname === '/orders_manager' 
+        ? styles.paymentTimerWrap_orders
         : styles.paymentTimerWrap;
     return (
         <div 

@@ -18,6 +18,7 @@ from apps.kindergarten.api.v1.serializers import (
     KindergartenSerializer,
     RegionSerializer,
 )
+from apps.photo.models import PhotoLine
 from apps.kindergarten.models import PhotoPrice, Ransom, Kindergarten, Region
 from apps.order.models import Order
 from apps.order.models.const import OrderStatus
@@ -51,32 +52,66 @@ class KindergartenStatsAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Получаем текущую фотосессию
-        current_photo_theme = KindergartenPhotoTheme.objects.get(
-            is_active=True,
-            kindergarten=kindergarten,
-        ).photo_theme
+        # Пробуем получить текущую фототему, если её нет – устанавливаем current_photo_theme в None
+        try:
+            active_photo_theme = KindergartenPhotoTheme.objects.get(
+                is_active=True,
+                kindergarten=kindergarten,
+            )
+            current_photo_theme = active_photo_theme.photo_theme
+        except KindergartenPhotoTheme.DoesNotExist:
+            current_photo_theme = None
 
-        # Получаем все заказы для текущей фототемы
-        orders = Order.objects.filter(
-            photo_line__kindergarten=kindergarten,
-            photo_line__photo_theme=current_photo_theme
-        )
+        # Если фототема найдена, то собираем статистику заказов
+        if current_photo_theme is not None:
+            # Фильтруем заказы по детскому саду и теме фотосессии
+            orders_qs = Order.objects.filter(
+                photo_line__kindergarten=kindergarten,
+                photo_line__photo_theme=current_photo_theme,
+            )
 
-        # Статистика текущих заказов
-        current_stats: dict = (
-                orders.aggregate(
-                    total_orders=Count('id')
-                )
-                |
-                orders.filter(
-                    status__in=(OrderStatus.completed, OrderStatus.paid_for)
-                ).aggregate(
-                    completed_orders=Count('id'),
-                    total_amount=Round(Sum('order_price', default=0), 2),
-                    average_order_value=Round(Avg('order_price', default=0), 2)
-                )
-        )
+            # Фильтруем заказы по статусам "completed" и "paid_for"
+            completed_orders_qs = orders_qs.filter(
+                status__in=(OrderStatus.completed, OrderStatus.paid_for)
+            )
+
+            # 1. Получаем количество уникальных заказов (по photo_line)
+            distinct_order_ids = completed_orders_qs.order_by(
+                'photo_line'
+            ).distinct('photo_line').values_list('pk', flat=True)
+            distinct_completed_count = Order.objects.filter(pk__in=list(distinct_order_ids)).count()
+
+            # 2. Рассчитываем агрегированные значения по всем заказам (без distinct)
+            aggregates = completed_orders_qs.aggregate(
+                total_amount=Round(Sum('order_price', default=0), 2),
+                average_order_value=Round(Avg('order_price', default=0), 2)
+            )
+
+            # Количество детей (для поля total_orders в сериализаторе)
+            children_count = PhotoLine.objects.filter(
+                kindergarten=kindergarten,
+                photo_theme=current_photo_theme,
+            ).count()
+
+            # Собираем итоговую статистику для сериализатора
+            current_stats = {
+                'completed_orders': distinct_completed_count,
+                'total_amount': aggregates.get('total_amount', 0),
+                'average_order_value': aggregates.get('average_order_value', 0),
+                'total_orders': children_count,
+            }
+
+            # Подставляем значение children_count в ключ total_orders
+            current_serializer = KindergartenStatsSerializer(data=current_stats)
+            current_serializer.is_valid(raise_exception=True)
+            current_stats_data = current_serializer.data
+
+            orders_total_amount = current_serializer.validated_data['total_amount']
+            orders_average_order_value = current_serializer.validated_data['average_order_value']
+        else:
+            current_stats_data = None
+            orders_total_amount = 0
+            orders_average_order_value = 0
 
         # Статистика выкупов
         ransom_objects = Ransom.objects.filter(kindergarten=kindergarten)
@@ -86,15 +121,11 @@ class KindergartenStatsAPIView(APIView):
         total_ransom_amount = ransom_objects.aggregate(Sum('ransom_amount'))['ransom_amount__sum'] or 0
         average_ransom_amount = ransom_objects.aggregate(Avg('ransom_amount'))['ransom_amount__avg'] or 0
 
-        # Сериализуем данные
-        current_serializer = KindergartenStatsSerializer(data=current_stats)
-        current_serializer.is_valid(raise_exception=True)
-
         return Response({
-            'current_stats': current_serializer.data,
+            'current_stats': current_stats_data,
             'past_stats': ransom_serializer.data,
-            'total_ransom_amount': total_ransom_amount + current_serializer.validated_data['total_amount'],
-            'average_ransom_amount': round(average_ransom_amount, 2) + current_serializer.validated_data['average_order_value'],
+            'total_ransom_amount': total_ransom_amount + orders_total_amount,
+            'average_ransom_amount': round(average_ransom_amount, 2) + float(orders_average_order_value),
         }, status=status.HTTP_200_OK)
 
 

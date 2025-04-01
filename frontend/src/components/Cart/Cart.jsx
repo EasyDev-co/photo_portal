@@ -9,6 +9,8 @@ import { fetchCartDeleteWithTokenInterceptor } from '../../http/cart/cartDelete'
 import PaymentModal from '../Modal/PaymentModal';
 import { paymentCreate } from '../../http/fetchPayment';
 import Modal from '../Modal/Modlal';
+import { setCart } from '../../store/authSlice';
+import { useDispatch } from 'react-redux';
 
 const Cart = () => {
 
@@ -21,6 +23,7 @@ const Cart = () => {
     const [order, setOrder] = useState({})
     const [errModal, setErrModal] = useState(false);
     const [errMessage, setErrMessage] = useState('');
+    const dispatch = useDispatch();
     let blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
             !value &&
@@ -32,7 +35,9 @@ const Cart = () => {
         setErrModal(true)
         setErrMessage(errMessage)
     }
-
+    useEffect(() => {
+        console.log('order in cart', order)
+    }, [order])
     const deleteCartItem = () => {
         setActiveModal(false);
         if (!value) {
@@ -41,6 +46,9 @@ const Cart = () => {
                     .then(res => {
                         if (res.ok) {
                             setOrder({});
+                            dispatch(setCart([]))
+                            localStorage.setItem('cart', JSON.stringify([]));
+                            console.log('корзина почищена')
                             setValue(true);
                             if (blocker.location) {
                                 blocker.proceed();
@@ -54,13 +62,18 @@ const Cart = () => {
                                     navigate('/sign-in');
                                     localStorage.clear();
                                     window.location.reload();
+                                    console.log('корзина почищена2')
                                     return;
                                 }
                             } catch (error) {
                                 console.log(error)
                             }
                             navigate('/orders');
+                            localStorage.setItem('cart', JSON.stringify([]));
                             window.location.reload();
+                            localStorage.setItem('cart', JSON.stringify([]));
+                            dispatch(setCart([]))
+                            console.log('корзина почищена3')
                         }, 100)
                     })
 
@@ -102,6 +115,7 @@ const Cart = () => {
                         if (res.ok) {
                             res.json()
                                 .then(res => setOrder(res))
+                                console.log(res)
                         }
                     })
             } catch (error) {
@@ -170,8 +184,8 @@ const Cart = () => {
                     })}
                     {order.id &&
                         <div className={styles.btnWrap}>
-                            <button onClick={() => payCartItem()} className={styles.mainButton}>Оплатить</button>
                             <button onClick={() => deleteCartItem()} className={styles.deleteButton}>Удалить</button>
+                            <button onClick={() => payCartItem()} className={styles.mainButton}>Оплатить</button>
                         </div>
                     }
                     
