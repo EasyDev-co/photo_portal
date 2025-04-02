@@ -3,6 +3,19 @@
     display: flex;
 }
 
+.cuurent {
+    border: 1px solid black;
+    margin-bottom: 40px;
+    padding-left: 10px;
+    border-radius: 5px;
+}
+
+.cuurentTitle {
+    padding: 15px 0 15px 15px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
 @media screen and (max-width: 1000px) {
     .profileWrap {
         flex-direction: column;
@@ -80,7 +93,7 @@
     padding: 0;
 }
 .profileWidgetWrap{
-    width: 100%;
+    width: 99%;
 }
 .checkWrap{
     display: flex;

@@ -68,15 +68,17 @@ export const Orders = () => {
   const [isActiveForm, setIsActiveForm] = useState(false);
   const [hasChanges, setHasChanges] = useState(false); // Флаг для отслеживания изменений
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const role = localStorage.getItem('role');
 
   const cart = useSelector(state => state.user.cart);
 
-  useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem('cart'));
-    if (savedCart) {
-        dispatch(setCart(savedCart));
-    }
-    }, []);
+  // useEffect(() => {
+  //   const savedCart = JSON.parse(localStorage.getItem('cart'));
+  //   if (savedCart) {
+  //       dispatch(setCart(savedCart));
+  //       console.log('test1')
+  //   }
+  //   }, []);
 
     useEffect(() => {
       if (cart.length === 0 || localStorage.getItem('cart') === null) {
@@ -85,9 +87,9 @@ export const Orders = () => {
       }
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
-    window.onload= function() {
-      setOrderValue([]);
-  };
+  //   window.onload= function() {
+  //     setOrderValue([]);
+  // };
   //   useEffect(() => {
   //   // Создаем объект для работы с параметрами URL
   //   const params = new URLSearchParams(location.search);
@@ -229,6 +231,7 @@ export const Orders = () => {
 
     setInputValue((prevInput) => ({ ...prevInput, [name]: count }));
     setHasChanges(true); // Устанавливаем флаг изменений
+    console.log('hasChanges1')
   };
 
   const transformCartToOrderValue = (cart) => {
@@ -268,6 +271,14 @@ export const Orders = () => {
     return [...photosArray, ...digitalPhotosArray, ...photobookPhotosArray];
   };
 
+  useEffect(() => {
+    console.log('uf orderValue', orderValue)
+  }, [orderValue])
+
+  // useEffect(() => {
+  //   console.log('hasChanges', hasChanges)
+  // }, [hasChanges])
+
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -283,6 +294,7 @@ useEffect(() => {
           console.log('orderValue', orderValue)
           localStorage.setItem('cart', JSON.stringify(data));
           setHasChanges(false); // Сбрасываем флаг изменений
+          console.log('hasChanges2 false')
         } else {
           console.error('Ошибка при обновлении корзины:', response.statusText);
         }
@@ -320,32 +332,19 @@ useEffect(() => {
   console.log('isInitialLoad', isInitialLoad)
 }, [isInitialLoad])
 
-// Синхронизация корзины с сервером при изменении orderValue
-// useEffect(() => {
-//     if (orderValue.length > 0) {
-//         const transformedData = transformData(orderValue);
-//         fetchCartCreateWithTokenInterceptor(accessStor, '', transformedData)
-//             .then((res) => res.json())
-//             .then((data) => {
-//               console.log
-//                 dispatch(setCart(data));
-//                 localStorage.setItem('cart', JSON.stringify(data)); // Сохраняем в localStorage
-//             })
-//             .catch((err) => console.error("Ошибка синхронизации корзины:", err));
-//     }
-// }, [orderValue, accessStor, dispatch]);
-
 useEffect(() => {
   const savedCart = JSON.parse(localStorage.getItem('cart'));
   
   if (savedCart && savedCart.length > 0) {
       dispatch(setCart(savedCart));
+      console.log('test2')
   } else {
       // Запрос данных корзины с сервера
       fetchCartCreateWithTokenInterceptor(accessStor, '/cart', {})
           .then((res) => res.json())
           .then((data) => {
               dispatch(setCart(data));
+              console.log('test3')
           })
           .catch((err) => console.error("Ошибка загрузки корзины:", err));
   }
@@ -385,12 +384,15 @@ useEffect(() => {
         if (name == 6) {
           updatedItem.is_photobook = checked;
           setHasChanges(true);
+          console.log('hasChanges3')
         } else if (name == 7) {
           updatedItem.is_digital = checked;
+          console.log('checked', checked)
           setHasChanges(true);
+          console.log('hasChanges4')
         }
         return [
-          ...prev.slice(0, existingItemIndex),
+          ...prev.slice(0, existingItemIndex),  
           updatedItem,
           ...prev.slice(existingItemIndex + 1),
         ];
@@ -402,6 +404,7 @@ useEffect(() => {
           is_digital: name == 7 ? checked : false
         };
         setHasChanges(true);
+        console.log('hasChanges5')
         console.log('newItem', newItem)
         // setHasChanges(true);
         return [...prev, newItem];
@@ -411,8 +414,9 @@ useEffect(() => {
 
   const handlePromocodeChange = (e) => {
     const newPromoCode = e.target.value;
+    console.log('newPromoCode:', newPromoCode)
     setCurrentPromoCode(newPromoCode);
-
+    console.log('currentPromoCode:', currentPromoCode)
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
     }
@@ -421,7 +425,10 @@ useEffect(() => {
         ...order,
         promo_code: newPromoCode,
       }));
+      setHasChanges(true);
+      console.log('hasChanges6')
       setOrderValue(updatedOrders);
+      console.log('OrderValue updatedOrders:', orderValue)
     }, 1000);
   };
   
@@ -458,17 +465,22 @@ useEffect(() => {
           </div>
           <AddKidsForm setIsActiveForm={setIsActiveForm} isActiveForm={isActiveForm} addBlock={addBlock} setModalActive={setModalActive} setModalText={setModalText} />
           <Modal active={modalActive} setActive={setModalActive} text={modalText} />
-          <div className={styles.orderPromoWrap}>
-            <div className={styles.orderPromoPromocode}>
-              <div className={styles.promoInputWrap}>
-                <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
-                  placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
-                  type="text"
-                  name="digital"
-                />
+          {role == 1 &&
+            <div className={styles.orderPromoWrap}>
+              <div className={styles.orderPromoPromocode}>
+                <div className={styles.promoInputWrap}>
+                  {cart[0]?.cart_error &&
+                  <p style={{color: 'red', alignSelf: 'flex-start'}}>{cart[0]?.cart_error ? cart[0]?.cart_error : ""}</p >
+                  }
+                  <input onChange={(e) => handlePromocodeChange(e)} className={true ? styles.promoInputActive : styles.promoInput}
+                    placeholder={codeIsActive ? "Промо-код активирован" : "Введите промокод"}
+                    type="text"
+                    name="digital"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          }
           {lineLenght >= 3 ?
             <div className={styles.buttonAddKidsWrap}>
               <div className={styles.promoButtonWrap}>

@@ -73,8 +73,8 @@ class UserAdmin(BaseUserAdmin):
         'last_name',
         'phone_number',
         'role',
+        'use_manager_coupon',
         'is_verified',
-        'id'
     )
     search_fields = (
         'email',
@@ -84,7 +84,7 @@ class UserAdmin(BaseUserAdmin):
         'kindergarten__name',
         'managed_kindergarten__name'
     )
-    list_filter = ('role', 'is_verified')
+    list_filter = ('role', 'is_verified', 'use_manager_coupon')
     ordering = ('email', 'last_name', 'first_name')
     readonly_fields = ('last_login', 'date_joined')
 
@@ -127,7 +127,8 @@ class UserAdmin(BaseUserAdmin):
                              'second_name',
                              "last_name",
                              'phone_number',
-                             'is_verified'
+                             'is_verified',
+                             'use_manager_coupon'
                          )}),
                         (_("Important dates"),
                          {"fields": (
@@ -146,6 +147,7 @@ class UserAdmin(BaseUserAdmin):
                              "last_name",
                              'phone_number',
                              'is_verified',
+                             'use_manager_coupon'
                          )}),
                         (_("Permissions"),
                          {"fields": (

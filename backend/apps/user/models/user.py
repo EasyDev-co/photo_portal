@@ -76,6 +76,7 @@ class User(UUIDMixin, AbstractUser):
         null=True,
         blank=True
     )
+    use_manager_coupon = models.BooleanField(default=False, verbose_name="Использовал промокод заведующей")
     birth_date = models.DateField(
         null=True,
         blank=True,
