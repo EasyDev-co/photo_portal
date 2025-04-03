@@ -5,7 +5,6 @@ from uuid import UUID
 from zoneinfo import ZoneInfo
 
 import requests
-from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -38,6 +37,8 @@ from config.settings import UNISENER_TOKEN, FROM_EMAIL
 from apps.photo.models import PhotoTheme
 from apps.user.models.email_error_log import EmailErrorLog
 from apps.user.models.user import UserRole
+
+from django.db import close_old_connections
 
 from loguru import logger
 
@@ -201,13 +202,13 @@ class CheckIfOrdersPaid(BaseTask):
         successful_payment_order_ids = []
         failed_payment_order_ids = []
         for order in awaiting_payment_orders:
-            values = {
-                'TerminalKey': TERMINAL_KEY,
-                'PaymentId': order.payment_id,
-            }
-            token = generate_token_for_t_bank(values)
-            values['Token'] = token
             try:
+                values = {
+                    'TerminalKey': TERMINAL_KEY,
+                    'PaymentId': order.payment_id,
+                }
+                token = generate_token_for_t_bank(values)
+                values['Token'] = token
                 response = requests.post(
                     url=PAYMENT_GET_STATE_URL,
                     json=values
@@ -234,7 +235,9 @@ class CheckIfOrdersPaid(BaseTask):
                     kwargs={'order_id': order.id},
                     einfo=traceback.format_exc(),
                 )
-        # TODO изменить текст, отправлять только дедлайн
+            finally:
+                close_old_connections()
+
         Order.objects.filter(id__in=successful_payment_order_ids).update(status=OrderStatus.paid_for)
         orders = Order.objects.filter(id__in=successful_payment_order_ids).all()
         if len(orders) > 0:
@@ -245,8 +248,6 @@ class CheckIfOrdersPaid(BaseTask):
 
                 order_paid_notify.delay(email=order.user.email, message=message)
 
-        # TODO Доработать
-        # Вызов задачи для загрузки файлов на Яндекс Диск
         logger.info(f"successful_payment_order_ids: {successful_payment_order_ids}")
         upload_files_to_yadisk.delay(successful_payment_order_ids)
 

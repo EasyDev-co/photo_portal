@@ -3,6 +3,8 @@ import secrets
 from unisender_go_api import SyncClient, SendRequest
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db import close_old_connections
+
 
 from apps.user.models import ConfirmCode
 from apps.user.models.code import CodePurpose
@@ -37,54 +39,56 @@ class SendConfirmCodeTask(BaseTask):
     name = "send_confirm_code"
 
     def process(self, confirm_code_id, *args, **kwargs):
-        logger.info("send confirm code")
-
-        confirm_code = ConfirmCode.objects.get(id=confirm_code_id)
-        user = confirm_code.user
-        code_purpose = confirm_code.purpose
-        code = confirm_code.code
-
-        if code_purpose == CodePurpose.RESET_PASSWORD:
-            message = 'Код для сброса пароля:'
-        elif code_purpose == CodePurpose.CONFIRM_EMAIL:
-            message = 'Код для подтверждения почты:'
-        else:
-            raise ValueError('Неизвестный code_purpose.')
-
         try:
-            logger.info(f"send {confirm_code} for user {user.email}")
-            with SyncClient.setup(UNISENER_TOKEN):
-                request = SendRequest(
-                    message={
-                        "recipients": [
-                            {"email": user.email},
-                        ],
-                        "body": {
-                            "html": html_msg.format(
-                                message=message,
-                                code=code,
-                                logo=LOGO_FOR_NOTIFICATION_PATH
-                            ),
-                        },
-                        "subject": "Код подтверждения",
-                        "from_email": FROM_EMAIL,
-                    },
-                )
-                request.send()
-            logger.info("code was send")
-        except Exception as e:
-            logger.error(f"Error send email confirm code: {e}")
+            logger.info("send confirm code")
 
-            EmailErrorLog.objects.filter(confirm_code=confirm_code).update(
-                message=str(e),
-                is_sent=False
-            )
-        else:
-            EmailErrorLog.objects.filter(confirm_code=confirm_code).update(
-                is_sent=True,
-                message='Sent successfully'
-            )
-        logger.info("send confirm code done")
+            confirm_code = ConfirmCode.objects.get(id=confirm_code_id)
+            user = confirm_code.user
+            code_purpose = confirm_code.purpose
+            code = confirm_code.code
+
+            if code_purpose == CodePurpose.RESET_PASSWORD:
+                message = 'Код для сброса пароля:'
+            elif code_purpose == CodePurpose.CONFIRM_EMAIL:
+                message = 'Код для подтверждения почты:'
+            else:
+                raise ValueError('Неизвестный code_purpose.')
+
+            try:
+                logger.info(f"send {confirm_code} for user {user.email}")
+                with SyncClient.setup(UNISENER_TOKEN):
+                    request = SendRequest(
+                        message={
+                            "recipients": [
+                                {"email": user.email},
+                            ],
+                            "body": {
+                                "html": html_msg.format(
+                                    message=message,
+                                    code=code,
+                                    logo=LOGO_FOR_NOTIFICATION_PATH
+                                ),
+                            },
+                            "subject": "Код подтверждения",
+                            "from_email": FROM_EMAIL,
+                        },
+                    )
+                    request.send()
+                logger.info("code was send")
+            except Exception as e:
+                logger.error(f"Error send email confirm code: {e}")
+                EmailErrorLog.objects.filter(confirm_code=confirm_code).update(
+                    message=str(e),
+                    is_sent=False
+                )
+            else:
+                EmailErrorLog.objects.filter(confirm_code=confirm_code).update(
+                    is_sent=True,
+                    message='Sent successfully'
+                )
+            logger.info("send confirm code done")
+        finally:
+            close_old_connections()
 
     @staticmethod
     def generate_numeric_code():
@@ -92,6 +96,8 @@ class SendConfirmCodeTask(BaseTask):
 
 
 class ResendConfirmCodeTask(BaseTask):
+    soft_time_limit = 120
+
     def process(self, *args, **kwargs):
         logger.info("start resend code")
 
@@ -133,9 +139,10 @@ class ResendConfirmCodeTask(BaseTask):
                     )
                     request.send()
                 logger.info(f"email send")
-
             except Exception as e:
                 logger.error(f"Error send email confirm code: {e}")
+            finally:
+                close_old_connections()
         logger.info("end resend code and mark email")
         email_error_logs.update(is_sent=True)
 

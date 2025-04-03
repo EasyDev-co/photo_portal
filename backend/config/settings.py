@@ -228,7 +228,7 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 CELERY_BEAT_SCHEDULE = {
     "resend_code": {
         "task": "apps.user.tasks.ResendConfirmCodeTask",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(minute="*/5"),
     },
     "check_photo_theme_deadlines": {
         "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
