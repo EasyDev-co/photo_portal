@@ -192,6 +192,7 @@ class CheckIfOrdersPaid(BaseTask):
     """
     Задача для проверки статуса платежей у заказов, которые ожидают оплаты.
     """
+    soft_time_limit = 120
 
     def run(self, *args, **kwargs):
         awaiting_payment_orders = Order.objects.filter(

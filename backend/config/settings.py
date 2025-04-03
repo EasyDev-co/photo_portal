@@ -240,7 +240,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "check_if_orders_has_been_paid": {
         "task": "apps.order.tasks.CheckIfOrdersPaid",
-        "schedule": crontab(minute='*/1'),
+        "schedule": crontab(minute='*/3'),
     },
     "delete_expired_orders": {
         "task": "apps.order.tasks.DeleteExpiredOrders",
