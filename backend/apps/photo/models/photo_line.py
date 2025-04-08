@@ -35,9 +35,8 @@ class PhotoLine(UUIDMixin):
         null=True,
         blank=True
     )
-    parent = models.ForeignKey(
+    parent = models.ManyToManyField(
         User,
-        on_delete=models.SET_NULL,
         verbose_name='Родитель',
         related_name='photo_lines',
         blank=True,

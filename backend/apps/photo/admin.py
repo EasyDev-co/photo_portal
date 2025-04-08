@@ -116,7 +116,7 @@ class PhotoThemeNameAdmin(admin.ModelAdmin):
 
 @admin.register(PhotoLine)
 class PhotoLineAdmin(CustomMessageMixin, admin.ModelAdmin):
-    list_display = ('kindergarten', 'photo_theme', 'parent', 'photos')
+    list_display = ('kindergarten', 'photo_theme', 'photos')
     readonly_fields = ('qr_image', 'qr_code')
     raw_id_fields = ('photo_theme', 'kindergarten')
     search_fields = (
