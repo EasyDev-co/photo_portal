@@ -306,11 +306,12 @@ class CartV2APIView(APIView, DiscountMixin):
             cart=cart,
             photo_line=photo_line,
             kindergarten=kindergarten,
-            user=user,
             child_number=photo_line.child_number,
             is_digital=data.get("is_digital"),
             is_photobook=data.get("is_photobook"),
         )
+
+        cart_photo_line.user.add(user)
         return cart_photo_line
 
     def _update_photos_in_cart(

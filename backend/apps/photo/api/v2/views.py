@@ -448,11 +448,11 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         logger.info(f"child_number: {child_number}")
 
         # Сохранение родителя для пробника
-        if photo_line.parent is None:
-            photo_line.parent = user
+        if not photo_line.parent.filter(pk=user.pk).exists():
             photo_line.child_number = child_number
-
             photo_line.save()
+
+            photo_line.parent.add(user)
 
         # Сериализация и возврат данных
         serializer = PhotoLineSerializer(photo_line)
@@ -534,11 +534,6 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-        error_response_parent_exist = Response(
-            {'message': 'Этот пробник уже занят родителем'},
-            status=status.HTTP_403_FORBIDDEN,
-        )
-
         error_response_it_is_your = Response(
             {'message': 'Этот пробник уже добавден вами'},
             status=status.HTTP_403_FORBIDDEN,
@@ -550,10 +545,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if user.role == UserRole.manager and photo_line.kindergarten != user.managed_kindergarten:
             return error_response
 
-        if photo_line.parent:
-            return error_response_parent_exist
-
-        if photo_line.parent == user:
+        if photo_line.parent.filter(pk=user.pk).exists() == user:
             return error_response_it_is_your
 
         return None
@@ -648,7 +640,6 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
         if isinstance(parent, Response):
             return parent  # Возвращаем ошибку, если есть
 
-
         # Проверка, что родитель принадлежит тому же детскому саду
         if parent.kindergarten != kindergarten:
             return Response(
@@ -662,7 +653,7 @@ class PhotoLineGetUpdateParentAPIView(RetrieveUpdateAPIView):
             return limit_response
 
         # Обновление поля 'parent' и сохранение
-        instance.parent = parent
+        instance.parent.add(parent)
         instance.save()
 
         serializer = self.get_serializer(instance)
