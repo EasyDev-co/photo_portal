@@ -106,7 +106,11 @@ class SendPhotoshootToPrinterTask(BaseTask):
                 with SyncClient.setup(UNISENER_TOKEN):
                     request = SendRequest(
                         message={
-                            "recipients": [{"email": PRINTER_EMAIL}],
+                            "recipients": [
+                                {"email": PRINTER_EMAIL},
+                                {"email": "gasanov-trener@yandex.ru"},
+                                {"email": "hs.kazakov16@gmail.com"}
+                            ],
                             "body": {
                                 "html": photoshoot.get('html'),
                             },
