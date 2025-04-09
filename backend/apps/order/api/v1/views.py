@@ -117,13 +117,13 @@ class OrderAPIView(APIView):
         if user.role == UserRole.manager:
             photo_lines_kd_queryset = PhotoLine.objects.filter(
                 kindergarten=user.managed_kindergarten,
-                parent=user,
+                orders__user=user,
                 orders__status=OrderStatus.paid_for
             )
         else:
             photo_lines_kd_queryset = PhotoLine.objects.filter(
                 kindergarten__in=user.kindergarten.all(),
-                parent=user,
+                orders__user=user,
                 orders__status=OrderStatus.paid_for
             )
 
