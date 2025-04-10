@@ -115,7 +115,7 @@ class PhotoLinesGetByParent(ListAPIView):
         return PhotoLine.objects.filter(
             parent=parent,
             photo_theme__kindergartenphototheme__is_active=True
-        ).order_by('child_number')
+        ).order_by('parent_photo_lines__child_number')
 
 
 class CurrentPhotoThemeRetrieveAPIView(RetrieveAPIView):
