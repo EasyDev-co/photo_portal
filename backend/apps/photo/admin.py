@@ -19,6 +19,7 @@ from apps.photo.models import (
     UserPhotoCount,
     Season,
 )
+from apps.photo.models.photo_line import ParentPhotoLine
 from apps.photo.models.photo_theme import PhotoPopularityStat, PhotoThemeName
 from apps.utils.services.calculate_photo_popularity import (
     get_prepared_data,
@@ -250,3 +251,8 @@ class UserPhotoCountAdmin(admin.ModelAdmin):
 class SeasonAdmin(admin.ModelAdmin):
     form = SeasonForm
     list_display = ('season',)
+
+
+@admin.register(ParentPhotoLine)
+class ParentPhotoLineAdmin(admin.ModelAdmin):
+    ...
