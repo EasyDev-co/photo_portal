@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -11,6 +12,7 @@ from apps.cart.models import Cart, CartPhotoLine, PhotoInCart
 from apps.cart.api.v2.serializers import (
     CartPhotoLineV2Serializer,
 )
+from apps.photo.models.photo_line import ParentPhotoLine
 from apps.promocode.models import Promocode
 from apps.user.models import UserRole
 from apps.kindergarten.models import Kindergarten, PhotoType
@@ -302,15 +304,20 @@ class CartV2APIView(APIView, DiscountMixin):
             id=data.get("id")
         ).first()
 
+        parent_photo_line = ParentPhotoLine.objects.filter(
+            parent=user, photo_line=photo_line
+        ).first()
+
         cart_photo_line = CartPhotoLine.objects.create(
             cart=cart,
             photo_line=photo_line,
             kindergarten=kindergarten,
-            user=user,
-            child_number=photo_line.child_number,
+            child_number=parent_photo_line.child_number,
             is_digital=data.get("is_digital"),
             is_photobook=data.get("is_photobook"),
         )
+
+        cart_photo_line.user.add(user)
         return cart_photo_line
 
     def _update_photos_in_cart(

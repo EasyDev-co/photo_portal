@@ -28,9 +28,8 @@ class CartPhotoLine(UUIDMixin):
         null=True,
         blank=True,
     )
-    user = models.ForeignKey(
+    user = models.ManyToManyField(
         User,
-        on_delete=models.CASCADE,
         related_name='user_cart_photo_lines',
         verbose_name="Пользователь",
         null=True,

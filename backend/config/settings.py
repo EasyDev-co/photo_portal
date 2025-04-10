@@ -228,7 +228,7 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 CELERY_BEAT_SCHEDULE = {
     "resend_code": {
         "task": "apps.user.tasks.ResendConfirmCodeTask",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(minute="*/5"),
     },
     "check_photo_theme_deadlines": {
         "task": "apps.order.tasks.CheckPhotoThemeDeadlinesTask",
@@ -240,7 +240,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "check_if_orders_has_been_paid": {
         "task": "apps.order.tasks.CheckIfOrdersPaid",
-        "schedule": crontab(minute='*/1'),
+        "schedule": crontab(minute='*/3'),
     },
     "delete_expired_orders": {
         "task": "apps.order.tasks.DeleteExpiredOrders",
@@ -346,7 +346,7 @@ JQUERY_CDN = os.getenv('JQUERY_CDN', 'https://ajax.googleapis.com/ajax/libs/jque
 YAD_OAUTH_TOKEN = os.getenv('YAD_OAUTH_TOKEN')
 YAD_CLIENT_ID = os.getenv("YAD_CLIENT_ID")
 YAD_CLIENT_SECRET = os.getenv("YAD_CLIENT_SECRET")
-YAD_URL = os.getenv('YAD_URL')
+YAD_URL = "https://disk.yandex.ru/client/disk"
 
 UNISENER_TOKEN = os.getenv('UNISENER_TOKEN')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@photodetstvo.ru')
