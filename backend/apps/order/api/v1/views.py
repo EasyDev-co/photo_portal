@@ -33,7 +33,6 @@ from apps.user.models import UserRole
 from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
-from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService
@@ -117,13 +116,13 @@ class OrderAPIView(APIView):
         if user.role == UserRole.manager:
             photo_lines_kd_queryset = PhotoLine.objects.filter(
                 kindergarten=user.managed_kindergarten,
-                parent=user,
+                orders__user=user,
                 orders__status=OrderStatus.paid_for
             )
         else:
             photo_lines_kd_queryset = PhotoLine.objects.filter(
                 kindergarten__in=user.kindergarten.all(),
-                parent=user,
+                orders__user=user,
                 orders__status=OrderStatus.paid_for
             )
 

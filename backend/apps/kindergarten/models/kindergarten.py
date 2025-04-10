@@ -43,7 +43,7 @@ class Kindergarten(UUIDMixin):
     )
 
     def __str__(self):
-        return f'{self.name} ({self.code})'
+        return f'{self.region.name} {self.name} ({self.code})'
 
     class Meta:
         verbose_name = 'Детский сад'
