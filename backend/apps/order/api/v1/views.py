@@ -33,7 +33,6 @@ from apps.user.models import UserRole
 from apps.utils.models_mixins.models_mixins import logger
 
 from apps.utils.services import CartService
-from apps.utils.services.calculate_price_for_order_item import calculate_price_for_order_item
 from apps.utils.services.generate_token_for_t_bank import generate_token_for_t_bank
 from apps.utils.services.photo_line_cart_service import PhotoLineCartService
 from apps.utils.services.order_service import OrderService

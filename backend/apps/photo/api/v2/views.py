@@ -34,6 +34,8 @@ from config.settings import PHOTO_LINE_URL, UPLOAD_SERVICE_SECRET_KEY, GO_UPLOAD
 from apps.utils.services import generate_qr_code
 from django.core.files.base import ContentFile
 
+from apps.photo.models.photo_line import ParentPhotoLine
+
 
 class PhotoUploadView(APIView):
     """Загрузка фотографий"""
@@ -440,19 +442,21 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if isinstance(limit_response, Response):
             return limit_response
 
-        parent_lines = PhotoLine.objects.filter(parent=user).all()
-        photo_line_count = parent_lines.count()
+        parent_photo_lines = ParentPhotoLine.objects.filter(parent=user)
+        photo_line_count = parent_photo_lines.count()
         child_number = photo_line_count + 1
 
-        logger.info(f"child_number: {child_number}")
-        logger.info(f"child_number: {child_number}")
+        # Проверка существования связи пробника с родителем
+        parent_photo_line, created = ParentPhotoLine.objects.get_or_create(parent=user, photo_line=photo_line)
+        if created:
+            with transaction.atomic():
+                parent_photo_line.child_number = child_number
+                parent_photo_line.save()
 
-        # Сохранение родителя для пробника
-        if not photo_line.parent.filter(pk=user.pk).exists():
-            photo_line.child_number = child_number
-            photo_line.save()
+                photo_line.parent.add(user)
 
-            photo_line.parent.add(user)
+                photo_line.save()
+                parent_photo_line.save()
 
         # Сериализация и возврат данных
         serializer = PhotoLineSerializer(photo_line)
@@ -545,7 +549,7 @@ class PhotoLineGetByPhotoNumberAPIView(APIView):
         if user.role == UserRole.manager and photo_line.kindergarten != user.managed_kindergarten:
             return error_response
 
-        if photo_line.parent.filter(pk=user.pk).exists() == user:
+        if photo_line.parent.filter(pk=user.pk).exists():
             return error_response_it_is_your
 
         return None

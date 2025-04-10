@@ -60,3 +60,12 @@ class PhotoLine(UUIDMixin):
         current_time = datetime.now().astimezone(tz=timezone(TIME_ZONE))
         if self.photo_theme.date_end <= current_time:
             raise ValidationError('Срок указанной фотосессии вышел.')
+
+
+class ParentPhotoLine(models.Model):
+    parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_photo_lines')
+    photo_line = models.ForeignKey('PhotoLine', on_delete=models.CASCADE, related_name='parent_photo_lines')
+    child_number = models.IntegerField(verbose_name="Порядковый номер ребенка")
+
+    class Meta:
+        unique_together = ('parent', 'photo_line')
