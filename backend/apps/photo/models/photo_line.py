@@ -65,7 +65,7 @@ class PhotoLine(UUIDMixin):
 class ParentPhotoLine(models.Model):
     parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_photo_lines')
     photo_line = models.ForeignKey('PhotoLine', on_delete=models.CASCADE, related_name='parent_photo_lines')
-    child_number = models.IntegerField(verbose_name="Порядковый номер ребенка")
+    child_number = models.IntegerField(verbose_name="Порядковый номер ребенка", null=True, blank=True)
 
     class Meta:
         unique_together = ('parent', 'photo_line')
